@@ -1,0 +1,42 @@
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Assembly-CSharp.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Assembly-CSharp.pdb
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\UnityEditor.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\UnityEngine.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\UnityEngine.Networking.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\UnityEngine.UI.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Unity.SerializationLogic.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Unity.UNetWeaver.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Unity.CecilTools.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Mono.Cecil.Pdb.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\Mono.Cecil.Mdb.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\UnityEngine.xml
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\UnityEditor.xml
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\UnityEngine.UI.xml
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\Temp\bin\Debug\UnityEngine.Networking.xml
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\obj\Debug\Assembly-CSharp.dll
+C:\Users\Ben\Documents\Unity projects\Connect 4 v2.3\obj\Debug\Assembly-CSharp.pdb
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\obj\Debug\Assembly-CSharp.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Assembly-CSharp.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Assembly-CSharp.pdb
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEditor.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEngine.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEngine.Networking.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEngine.UI.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Mono.Cecil.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Unity.SerializationLogic.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Unity.DataContract.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Unity.UNetWeaver.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Unity.CecilTools.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Mono.Cecil.Pdb.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\Mono.Cecil.Mdb.dll
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEngine.xml
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEditor.xml
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEngine.UI.xml
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEngine.Networking.xml
+E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\obj\Debug\Assembly-CSharp.pdb

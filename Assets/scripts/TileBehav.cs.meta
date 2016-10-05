@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 924ab45f123053b4fa06dffc1c92c199
+timeCreated: 1470159258
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - flipSprite: {fileID: 21300014, guid: e20e2d4e4dcf3e54199a05feb058fd2f, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
