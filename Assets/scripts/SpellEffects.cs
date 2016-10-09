@@ -77,10 +77,17 @@ public class SpellEffects {
 		MageMatch.GetPlayer(id).ChangeBuff_Dmg (1f); // reset back to 100% dmg
 	}
 
+	//PLACEHOLDER EFFECT
 	public void HotBody(){
-
+		targetEffect = Hotbody_Target;
+		WaitForTargetClick (3);
 	}
 
+	public void Hotbody_Target(TileBehav tb){
+		mm.transmute (tb.tile.col, tb.tile.row, Tile.Element.Fire);
+		mm.DiscardTile(MageMatch.GetOpponent(MageMatch.activep.id));
+	}
+		
 	public void Cherrybomb(){
 		targetEffect = Cherrybomb_Target;
 		WaitForTargetClick(1);
@@ -88,7 +95,7 @@ public class SpellEffects {
 	void Cherrybomb_Target(TileBehav tb){
 		tb.SetEnchantment (EnchantEffects.Cherrybomb);
 	}
-
+	 
 	public void Incinerate(){
 
 	}

@@ -67,7 +67,7 @@ public class Loadout {
 		spells[0] = new Spell ("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
 		spells[1] = new Spell ("Lightning Palm", "AFAF", 1, spellfx.LightningPalm);
 		spells[2] = new Spell ("Caught You 'Mirin", "MFMF", 1, spellfx.CaughtYouMirin);
-		spells[3] = new Spell ("Hot Body", "FMF", 1, spellfx.Deal496Dmg);
+		spells[3] = new Spell ("Hot Body", "FMF", 1, spellfx.HotBody);
 	}
 
 	void EnfuegoB(){ // Enfuego B - fire mage
@@ -84,7 +84,7 @@ public class Loadout {
 		spells[0] = new Spell ("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
 		spells[1] = new Spell ("Cherrybomb", "EFWF", 1, spellfx.Cherrybomb);
 		spells[2] = new Spell ("Incinerate", "FAFF", 1, spellfx.Deal496Dmg);
-		spells[3] = new Spell ("Hot Body", "FMF", 1, spellfx.Deal496Dmg);
+		spells[3] = new Spell ("Hot Body", "FMF", 1, spellfx.HotBody);
 	}
 
 	void RockyA(){ // Rocky A - earth mage
@@ -113,7 +113,7 @@ public class Loadout {
 		dmuscle = 25;
 		dair = 10;
 
-		spells[0] = new Spell ("Magnitude 10", "EEMEE", 1, spellfx.Deal496Dmg);
+		spells[0] = new Spell ("Magnitude 10", "EEMEE", 1, spellfx.Magnitude10);
 		spells[1] = new Spell ("Living Flesh Armor", "EWWE", 1, spellfx.Deal496Dmg);
 		spells[2] = new Spell ("Figure-Four Leglock", "MEEM", 1, spellfx.Deal496Dmg);
 		spells[3] = new Spell ("Stalagmite", "AEE", 1, spellfx.Deal496Dmg);

@@ -8,11 +8,7 @@ public static class EnchantEffects {
 	public static void Init(){
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
-
-	public static void Burning(TileBehav tb){
-		// TODO??????????
-	}
-
+		
 	public static void Cherrybomb(TileBehav tb){
 		Tile tile = tb.tile;
 

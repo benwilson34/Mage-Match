@@ -17,6 +17,8 @@ public class ColumnBehav : MonoBehaviour {
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
 				mm.PlaceTile (col, go, .15f);
 			}
+		} else if(SpellEffects.IsTargetMode()) {
+			//Put target return here!
 		}
 	}
 }

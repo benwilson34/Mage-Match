@@ -15,11 +15,12 @@ public class Player {
 	public int handSize = 5;
 	public int tilesPlaced, tilesSwapped, matches;
 	public Loadout loadout;
+	public int numOfBurningTiles = 0;
 
 	// TODO buffs and debuffs
 	private float buff_dmg = 1;
 
-	private Transform handSlot;
+	public Transform handSlot;
 	private const float vert = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 
 	public Player (int playerNum) {

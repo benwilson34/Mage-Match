@@ -13,6 +13,7 @@ public class MageMatch : MonoBehaviour {
 	[HideInInspector] public static Player p1, p2, activep, commish;
 	[HideInInspector] public static List<TurnEffect> beginTurnEffects, endTurnEffects;
 
+
 	private static bool endGame = false;             	       // is either player dead?
 	private static bool boardChanged = false;                  // has the board changed?
 	private static bool commishTurn = false;                  // has the board changed?
@@ -186,6 +187,7 @@ public class MageMatch : MonoBehaviour {
 			}
 		}
 	}
+		
 
 	void ResolveEndTurnEffects(){
 		TurnEffect turnEffect;
@@ -199,6 +201,7 @@ public class MageMatch : MonoBehaviour {
 			}
 		}
 	}
+		
 	
 	public bool PlaceTile(int col){
 		if (PlaceTile(col, currentTile, .08f)) {
@@ -307,6 +310,16 @@ public class MageMatch : MonoBehaviour {
 		return go;
 	}
 
+	public void DiscardTile(Player player){
+		int tilesInHand = player.hand.Count;
+		if (tilesInHand > 0) {
+			int randomRoll = Random.Range (0, tilesInHand);
+			GameObject go = player.hand[randomRoll].gameObject;
+			player.hand.RemoveAt (randomRoll);
+			Destroy(go);
+		}
+	}
+
 	public void CastSpell(int spellNum){ // TODO move player stuff (AP) to player.Cast()
 		Spell spell = activep.loadout.GetSpell (spellNum);
 		if (activep.CastSpell(spellNum)) {
@@ -357,6 +370,16 @@ public class MageMatch : MonoBehaviour {
 
 		StartCoroutine (AnimRemove (col, row, tb, true)); // FIXME hardcode
 	}
+
+	public void transmute(int col, int row, Tile.Element element){
+
+		Destroy(HexGrid.GetTileBehavAt (col, row).gameObject);
+		HexGrid.ClearTileBehavAt (col, row);
+		TileBehav tb = GenerateTile (element).GetComponent<TileBehav>();
+		tb.ChangePos (col, row);
+
+	}
+		
 
 	IEnumerator AnimRemove(int col, int row, TileBehav tb, bool checkGrav){
 		animating++;
