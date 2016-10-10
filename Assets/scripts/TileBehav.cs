@@ -14,8 +14,9 @@ public class TileBehav : MonoBehaviour {
 	private Vector3 dragClick;
 	private bool flipped = false, placed = false, dragged = false;
 	// TODO enchantments
-	public delegate void EnchantEffect(TileBehav tb);
-	private EnchantEffect enchantEffect;
+//	public delegate void EnchantEffect(TileBehav tb);
+//	private EnchantEffect enchantEffect;
+	private TurnEffect enchantment;
 	private bool resolved = false;
 
 //	private float vy = 0, grav = -1.2f; // animation stuff
@@ -143,21 +144,24 @@ public class TileBehav : MonoBehaviour {
 	}
 	
 	public bool HasEnchantment(){
-		return this.enchantEffect != null;
+//		return this.enchantEffect != null;
+		return this.enchantment != null;
 	}
 
 	public void ClearEnchantment(){
-		this.enchantEffect = null;
+//		this.enchantEffect = null;
+		this.enchantment = null;
 		this.GetComponent<SpriteRenderer> ().color = Color.white;
 	}
 
-	public bool SetEnchantment(EnchantEffect effect){
+	public bool SetEnchantment(TurnEffect effect){
 		if (HasEnchantment()) {
-			return false;
+			return false; // where we decide whether new enchantments should overwrite current ones
 		}
 		resolved = false;
-		this.enchantEffect = effect;
-		this.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
+//		this.enchantEffect = effect;
+		effect.SetAsEnchantment(this);
+		this.enchantment = effect; 
 		return true;
 	}
 
@@ -165,7 +169,9 @@ public class TileBehav : MonoBehaviour {
 		if (HasEnchantment() && !resolved) {
 //			Debug.Log ("About to resolve enchant: " + (this.enchantEffect != null));
 			resolved = true;
-			this.enchantEffect (this);
+//			this.enchantEffect (this);
+			enchantment.CancelEffect(this);
+			MageMatch.endTurnEffects.Remove (enchantment); // assumes end-of-turn list
 			return true;
 		}
 		return false;

@@ -181,6 +181,7 @@ public class MageMatch : MonoBehaviour {
 			turnEffect = beginTurnEffects [i];
 			if (turnEffect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
 				beginTurnEffects.Remove (turnEffect);
+				turnEffect.GetEnchantee ().ClearEnchantment ();
 				i--;
 			} else {
 				Debug.Log ("Beginning-of-turn effect has " + turnEffect.TurnsRemaining () + " turns left.");
@@ -188,13 +189,13 @@ public class MageMatch : MonoBehaviour {
 		}
 	}
 		
-
 	void ResolveEndTurnEffects(){
 		TurnEffect turnEffect;
 		for (int i = 0; i < endTurnEffects.Count; i++) {
 			turnEffect = endTurnEffects [i];
 			if (turnEffect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
 				endTurnEffects.Remove (turnEffect);
+				turnEffect.GetEnchantee ().ClearEnchantment ();
 				i--;
 			} else {
 				Debug.Log ("End-of-turn effect has " + turnEffect.TurnsRemaining () + " turns left.");
@@ -202,7 +203,6 @@ public class MageMatch : MonoBehaviour {
 		}
 	}
 		
-	
 	public bool PlaceTile(int col){
 		if (PlaceTile(col, currentTile, .08f)) {
 			activep.hand.Remove (currentTile.GetComponent<TileBehav>()); // remove from hand
@@ -371,7 +371,7 @@ public class MageMatch : MonoBehaviour {
 		StartCoroutine (AnimRemove (col, row, tb, true)); // FIXME hardcode
 	}
 
-	public void transmute(int col, int row, Tile.Element element){
+	public void Transmute(int col, int row, Tile.Element element){
 
 		Destroy(HexGrid.GetTileBehavAt (col, row).gameObject);
 		HexGrid.ClearTileBehavAt (col, row);
@@ -380,7 +380,6 @@ public class MageMatch : MonoBehaviour {
 
 	}
 		
-
 	IEnumerator AnimRemove(int col, int row, TileBehav tb, bool checkGrav){
 		animating++;
 		Tween swellTween = tb.transform.DOScale (new Vector3 (1.25f, 1.25f), .15f);

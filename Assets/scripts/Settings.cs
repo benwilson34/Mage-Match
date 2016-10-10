@@ -6,10 +6,12 @@ using System.Collections;
 public class Settings : MonoBehaviour {
 
 	private GameObject settingsMenu;
+	private static SpellEffects spellfx;
 
 	void Start () {
 		settingsMenu = GameObject.Find("SettingsMenu");
 		settingsMenu.SetActive(MageMatch.menu); //?
+		spellfx = new SpellEffects();
 	}
 
 	public void ToggleMenu(){
@@ -56,9 +58,11 @@ public class Settings : MonoBehaviour {
 			tb.ClearEnchantment();
 			break;
 		case 3: // cherrybomb
-			tb.SetEnchantment (EnchantEffects.Cherrybomb);
+//			tb.SetEnchantment (EnchantEffects.Cherrybomb);
+			spellfx.Ench_SetCherrybomb(tb);
 			break;
 		case 4:
+			spellfx.Ench_SetBurning (tb);
 			break;
 		case 5:
 			break;

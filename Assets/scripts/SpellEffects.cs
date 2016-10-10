@@ -28,7 +28,7 @@ public class SpellEffects {
 		targetEffect (tb);
 	}
 
-	// ----------------------------------------------------------------------------------------
+	// -------------------------------------- SPELLS ---------------------------------------------
 
 	public void Deal496Dmg(){
 		mm.InactivePlayer ().ChangeHealth (-496);
@@ -68,7 +68,7 @@ public class SpellEffects {
 
 	public void CaughtYouMirin(){
 		MageMatch.activep.ChangeBuff_Dmg (.5f); // 50% damage multiplier
-		MageMatch.endTurnEffects.Add( new TurnEffect (MageMatch.activep.id, 4, CaughtYouMirin_Turn, CaughtYouMirin_End));
+		MageMatch.endTurnEffects.Add( new TurnEffect (MageMatch.activep.id, 4, CaughtYouMirin_Turn, CaughtYouMirin_End, null));
 	}
 	void CaughtYouMirin_Turn(int id){ // technically this isn't needed
 		MageMatch.GetPlayer(id).ChangeBuff_Dmg (.5f); // 50% damage multiplier
@@ -82,10 +82,10 @@ public class SpellEffects {
 		targetEffect = Hotbody_Target;
 		WaitForTargetClick (3);
 	}
-
 	public void Hotbody_Target(TileBehav tb){
-		mm.transmute (tb.tile.col, tb.tile.row, Tile.Element.Fire);
-		mm.DiscardTile(MageMatch.GetOpponent(MageMatch.activep.id));
+//		mm.Transmute (tb.tile.col, tb.tile.row, Tile.Element.Fire);
+//		mm.DiscardTile(MageMatch.GetOpponent(MageMatch.activep.id));
+		Ench_SetBurning(tb);
 	}
 		
 	public void Cherrybomb(){
@@ -93,7 +93,8 @@ public class SpellEffects {
 		WaitForTargetClick(1);
 	}
 	void Cherrybomb_Target(TileBehav tb){
-		tb.SetEnchantment (EnchantEffects.Cherrybomb);
+//		tb.SetEnchantment (Ench_Cherrybomb);
+		Ench_SetCherrybomb(tb);
 	}
 	 
 	public void Incinerate(){
@@ -101,7 +102,7 @@ public class SpellEffects {
 	}
 
 	public void Magnitude10(){
-		MageMatch.endTurnEffects.Add (new TurnEffect (MageMatch.activep.id, 3, Magnitude10_Turn, Magnitude10_End));
+		MageMatch.endTurnEffects.Add (new TurnEffect (MageMatch.activep.id, 3, Magnitude10_Turn, Magnitude10_End, null));
 	}
 	void Magnitude10_Turn(int id){
 		int dmg = 0;
@@ -188,4 +189,75 @@ public class SpellEffects {
 		return 6;
 	}
 
+	// -------------------------------- ENCHANTMENTS --------------------------------------
+
+	public void Ench_SetCherrybomb(TileBehav tb){
+		TurnEffect effect = new TurnEffect (MageMatch.activep.id, 0, null, null, Ench_Cherrybomb_Resolve);
+		tb.SetEnchantment (effect);
+		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
+	}
+	public void Ench_Cherrybomb_Resolve(int id, TileBehav tb){
+		Tile tile = tb.tile;
+
+		Debug.Log ("CHERRYBOMB tile = (" + tile.col + ", " + tile.row + ")");
+
+		MageMatch.GetOpponent(id).ChangeHealth (-200);
+
+		// Board N
+		if (tile.row != HexGrid.TopOfColumn (tile.col)) { // Board N
+			if (HexGrid.IsSlotFilled (tile.col, tile.row + 1)){
+				mm.RemoveTile(tile.col, tile.row + 1, false);
+			}
+		}
+
+		// Board NE
+		if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1) {
+			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row + 1))
+				mm.RemoveTile(tile.col + 1, tile.row + 1, false);
+		}
+
+		// Board SE
+		bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
+		if (tile.col != HexGrid.numCols - 1 && bottomcheck) {
+			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row))
+				mm.RemoveTile(tile.col + 1, tile.row, false);
+		}
+
+		// Board S
+		if (tile.row != HexGrid.BottomOfColumn (tile.col)) {
+			if (HexGrid.IsSlotFilled (tile.col, tile.row - 1))
+				mm.RemoveTile(tile.col, tile.row - 1, false);
+		}
+
+		// Board SW
+		if (tile.row != 0 && tile.col != 0) {
+			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row - 1))
+				mm.RemoveTile(tile.col - 1, tile.row - 1, false);
+		}
+
+		// Board NW
+		bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
+		if (tile.col != 0 && topcheck) {
+			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row))
+				mm.RemoveTile(tile.col - 1, tile.row, false);
+		}
+	}
+
+	public void Ench_SetBurning(TileBehav tb){
+		// Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
+		TurnEffect effect = new TurnEffect (MageMatch.activep.id, 5, Ench_Burning_Turn, Ench_Burning_End, Ench_Burning_Cancel);
+		tb.SetEnchantment (effect);
+		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
+		MageMatch.endTurnEffects.Add(effect);
+	}
+	void Ench_Burning_Turn(int id){
+		MageMatch.GetOpponent(id).ChangeHealth (-3);
+	}
+	void Ench_Burning_End(int id){
+		MageMatch.GetOpponent(id).ChangeHealth (-6);
+	}
+	void Ench_Burning_Cancel(int id, TileBehav tb){
+		
+	}
+	
 }
