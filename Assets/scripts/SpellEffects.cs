@@ -98,13 +98,12 @@ public class SpellEffects {
 	}
 	 
 	public void Incinerate(){
-		int burnCount = (MageMatch.GetOpponent (MageMatch.activep.id).hand.Count) * 2;
-		mm.DiscardTile(MageMatch.GetOpponent(MageMatch.activep.id), 2);
+		int burnCount = mm.InactivePlayer().hand.Count * 2;
+		mm.DiscardTile (mm.InactivePlayer(), 2);
 		targetEffect = Incinerate_Target;
 		WaitForTargetClick (burnCount);
 	}
-
-	public void Incinerate_Target(TileBehav tb){
+	void Incinerate_Target(TileBehav tb){
 		Ench_SetBurning (tb);
 	}
 
@@ -150,10 +149,10 @@ public class SpellEffects {
 	}
 
 	public static void Comm_Place5RandomTiles(){
-		mm.StartAnim(CommAnim());
+		mm.StartAnim(Comm_Anim());
 	}
 
-	static IEnumerator CommAnim(){
+	static IEnumerator Comm_Anim(){
 		int numTiles = 5;
 		int tries = 20;
 		float[] ratios;
@@ -203,7 +202,7 @@ public class SpellEffects {
 		tb.SetEnchantment (effect);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
 	}
-	public void Ench_Cherrybomb_Resolve(int id, TileBehav tb){
+	void Ench_Cherrybomb_Resolve(int id, TileBehav tb){
 		Tile tile = tb.tile;
 
 		Debug.Log ("CHERRYBOMB tile = (" + tile.col + ", " + tile.row + ")");

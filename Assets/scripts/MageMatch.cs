@@ -13,7 +13,6 @@ public class MageMatch : MonoBehaviour {
 	[HideInInspector] public static Player p1, p2, activep, commish;
 	[HideInInspector] public static List<TurnEffect> beginTurnEffects, endTurnEffects;
 
-
 	private static bool endGame = false;             	       // is either player dead?
 	private static bool boardChanged = false;                  // has the board changed?
 	private static bool commishTurn = false;                  // has the board changed?
@@ -370,7 +369,7 @@ public class MageMatch : MonoBehaviour {
 		}
 //		if (tb.ResolveEnchantment ()) TODO
 
-		StartCoroutine (AnimRemove (col, row, tb, true)); // FIXME hardcode
+		StartCoroutine (Remove_Anim (col, row, tb, true)); // FIXME hardcode
 	}
 
 	public void Transmute(int col, int row, Tile.Element element){
@@ -382,7 +381,7 @@ public class MageMatch : MonoBehaviour {
 
 	}
 		
-	IEnumerator AnimRemove(int col, int row, TileBehav tb, bool checkGrav){
+	IEnumerator Remove_Anim(int col, int row, TileBehav tb, bool checkGrav){
 		animating++;
 		Tween swellTween = tb.transform.DOScale (new Vector3 (1.25f, 1.25f), .15f);
 		tb.GetComponent<SpriteRenderer> ().DOColor (new Color (0, 1, 0, 0), .15f);

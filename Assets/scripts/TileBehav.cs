@@ -5,33 +5,23 @@ using DG.Tweening;
 public class TileBehav : MonoBehaviour {
 
 	public Tile tile;
-//	public float[] pos; // private?
 	public Tile.Element initElement;
 	public Sprite flipSprite;
 
-	private MageMatch mageMatch; //?
+	private MageMatch mm; //?
 	private Transform parentT = null;
 	private Vector3 dragClick;
 	private bool flipped = false, placed = false, dragged = false;
-	// TODO enchantments
+
 //	public delegate void EnchantEffect(TileBehav tb);
 //	private EnchantEffect enchantEffect;
 	private TurnEffect enchantment;
 	private bool resolved = false;
-
-//	private float vy = 0, grav = -1.2f; // animation stuff
 	private bool inPos = true;
 
 	void Awake(){
-//		Debug.Log ("Calling Awake() from " + transform.name);
 		tile = new Tile (initElement);
-//		pos = new float[2];
-		mageMatch = GameObject.Find ("board").GetComponent<MageMatch> ();
-	}
-
-	void Update(){
-//		if(!inPos)
-//			ApplyGrav (Time.deltaTime);
+		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
 	public void ChangePos(int col, int row){
@@ -51,20 +41,17 @@ public class TileBehav : MonoBehaviour {
 		HexGrid.SetTileBehavAt (this, col, row);
 
 		inPos = false;
-		StartCoroutine(AnimChangePos(col, startrow, duration, this));
+		StartCoroutine(ChangePos_Anim(col, startrow, duration));
 	}
 
-	IEnumerator AnimChangePos(int col, int row, float duration, TileBehav tb){
+	IEnumerator ChangePos_Anim(int col, int row, float duration){
 		MageMatch.IncAnimating ();
 //		inPos = false;
-//		animating++;
-		Tween moveTween = tb.transform.DOMove(new Vector3(HexGrid.GridColToPos(col), HexGrid.GridRowToPos(col, row)),
+		Tween moveTween = transform.DOMove(new Vector3(HexGrid.GridColToPos(col), HexGrid.GridRowToPos(col, row)),
 			duration, false);
 
 		yield return moveTween.WaitForCompletion ();
-//		tb.OutOfPosition ();
 //		MageMatch.DecAnimating ();
-//		animating--;
 		MageMatch.BoardChanged (); //?
 //		boardChanged = true;
 		StartCoroutine(Grav_Anim());
@@ -73,23 +60,6 @@ public class TileBehav : MonoBehaviour {
 	public void SetPlaced(){
 		placed = true;
 	}
-
-//	public void ApplyGrav(float delta){ // kinda sloppy
-//		float cx = transform.position.x;
-//		float cy = transform.position.y;
-//		vy += grav * delta;
-//		if (cy + vy > pos[1]) {
-//			transform.position = new Vector3 (cx, cy + vy); // TODO! idk why this works but transform.position.Set() doesn't
-//		} else {
-//			Debug.Log (transform.name + " is in position: (" + tile.col + ", " + tile.row + ")");
-//			transform.position = new Vector3 (cx, pos[1]);
-//			inPos = true;
-//			MageMatch.DecAnimating (); //?
-//			if(vy < -.1f) // swapping sound fix - kinda sloppy
-//				AudioController.DropSound (this.GetComponent<AudioSource>());
-//			vy = 0;
-//		}
-//	}
 
 	// TODO TODO
 	public IEnumerator Grav_Anim(){
@@ -178,7 +148,7 @@ public class TileBehav : MonoBehaviour {
 	}
 
 
-	// ----------------------- dragging stuff -----------------------
+	// ----------------------- MOUSE EVENTS -----------------------
 	void OnMouseDown(){
 		if (!MageMatch.IsEnded () && !MageMatch.IsCommishTurn()) { // if the game isn't done
 			if (!MageMatch.menu) { // if the menu isn't open
@@ -224,7 +194,7 @@ public class TileBehav : MonoBehaviour {
 				if (hit.collider != null) { // if dropped on a column
 //				Debug.Log ("Tile dropped on " + hit.collider.name);
 					ColumnBehav cb = hit.collider.GetComponent<ColumnBehav> ();
-					if (cb == null || !mageMatch.PlaceTile (cb.col)) {
+					if (cb == null || !mm.PlaceTile (cb.col)) {
 						transform.SetParent (parentT);
 						parentT = null;
 						MageMatch.activep.AlignHand (.12f, false);
@@ -252,29 +222,29 @@ public class TileBehav : MonoBehaviour {
 			if (angle < 60) {         // NE cell - board NE
 				//					Debug.Log("Drag NE");
 				if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1)
-					mageMatch.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
+					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
 			} else if (angle < 120) { // N cell  - board N
 				//					Debug.Log("Drag N");
 				if (tile.row != HexGrid.TopOfColumn(tile.col))
-					mageMatch.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
+					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
 			} else if (angle < 180) { // W cell  - board NW
 				//					Debug.Log("Drag NW");
 				bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
 				if(tile.col != 0 && topcheck)
-					mageMatch.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
+					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
 			} else if (angle < 240) { // SW cell - board SW
 				//					Debug.Log("Drag SW");
 				if (tile.row != 0 && tile.col != 0)
-					mageMatch.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
+					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
 			} else if (angle < 300) { // S cell  - board S
 				//					Debug.Log("Drag S");
 				if (tile.row != HexGrid.BottomOfColumn(tile.col))
-					mageMatch.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
+					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
 			} else {                  // E cell  - board SE
 				//					Debug.Log("Drag SE");
 				bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
 				if(tile.col != HexGrid.numCols - 1 && bottomcheck)
-					mageMatch.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
+					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
 			}
 		}
 	}

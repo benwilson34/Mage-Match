@@ -7,7 +7,6 @@ public class Player {
 
 	public string name;
 	public int id;
-
 	public int health;
 	public int maxAP = 3; // Action points per round
 	public int AP;
@@ -15,9 +14,7 @@ public class Player {
 	public int handSize = 5;
 	public int tilesPlaced, tilesSwapped, matches;
 	public Loadout loadout;
-	public int numOfBurningTiles = 0;
 
-	// TODO buffs and debuffs
 	private float buff_dmg = 1;
 
 	public Transform handSlot;
@@ -69,22 +66,6 @@ public class Player {
 	}
 
 	public void AlignHand(float duration, bool linear){
-//		TileBehav tb;
-//		for(int i = 0; i < hand.Count; i++){
-//			tb = hand[i];
-////			Debug.Log ("AlignHand hand[" + i + "] = " + tb.transform.name + ", position is (" + handSlot.position.x + ", " + handSlot.position.y + ")");
-//			if (id == 1) {
-//				tb.transform.position = new Vector3 (handSlot.position.x - i, handSlot.position.y);
-//				if (i >= 3) {
-//					tb.transform.position = new Vector3 (handSlot.position.x - (i - 3) - .5f, handSlot.position.y - vert);
-//				}
-//			} else {
-//				tb.transform.position = new Vector3 (handSlot.position.x + i, handSlot.position.y);
-//				if (i >= 3) {
-//					tb.transform.position = new Vector3 (handSlot.position.x + (i - 3) + .5f, handSlot.position.y - vert);
-//				}
-//			}
-//		}
 		GameObject.Find("board").GetComponent<MageMatch>().StartAnim(AlignHand_Anim(duration, linear));
 	}
 
