@@ -310,13 +310,15 @@ public class MageMatch : MonoBehaviour {
 		return go;
 	}
 
-	public void DiscardTile(Player player){
+	public void DiscardTile(Player player, int num){
 		int tilesInHand = player.hand.Count;
-		if (tilesInHand > 0) {
-			int randomRoll = Random.Range (0, tilesInHand);
-			GameObject go = player.hand[randomRoll].gameObject;
-			player.hand.RemoveAt (randomRoll);
-			Destroy(go);
+		for(int i = 0; i < num; i++){
+			if (tilesInHand > 0) {
+				int randomRoll = Random.Range (0, tilesInHand);
+				GameObject go = player.hand[randomRoll].gameObject;
+				player.hand.RemoveAt (randomRoll);
+				Destroy(go);
+			}
 		}
 	}
 

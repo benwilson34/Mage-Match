@@ -98,7 +98,14 @@ public class SpellEffects {
 	}
 	 
 	public void Incinerate(){
+		int burnCount = (MageMatch.GetOpponent (MageMatch.activep.id).hand.Count) * 2;
+		mm.DiscardTile(MageMatch.GetOpponent(MageMatch.activep.id), 2);
+		targetEffect = Incinerate_Target;
+		WaitForTargetClick (burnCount);
+	}
 
+	public void Incinerate_Target(TileBehav tb){
+		Ench_SetBurning (tb);
 	}
 
 	public void Magnitude10(){

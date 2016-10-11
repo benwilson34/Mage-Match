@@ -83,7 +83,7 @@ public class Loadout {
 
 		spells[0] = new Spell ("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
 		spells[1] = new Spell ("Cherrybomb", "EFWF", 1, spellfx.Cherrybomb);
-		spells[2] = new Spell ("Incinerate", "FAFF", 1, spellfx.Deal496Dmg);
+		spells[2] = new Spell ("Incinerate", "FAFF", 1, spellfx.Incinerate);
 		spells[3] = new Spell ("Hot Body", "FMF", 1, spellfx.HotBody);
 	}
 
