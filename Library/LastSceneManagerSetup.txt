@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/scenes/MM Game Screen (Landscape) tween.unity
+- path: Assets/scenes/collider bug demo.unity
   isLoaded: 1
   isActive: 1

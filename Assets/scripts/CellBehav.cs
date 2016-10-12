@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 using System.Collections;
 
-public class ColumnBehav : MonoBehaviour {
+public class CellBehav : MonoBehaviour {
 
-	public int col;
+	public int col, row;
 
 	// TODO hovers/arrows?
 	void OnMouseDown(){
@@ -13,7 +12,7 @@ public class ColumnBehav : MonoBehaviour {
 			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 			Tile.Element element = Settings.GetClickElement ();
 			if (element != Tile.Element.None) {
-//				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
+				//				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
 				GameObject go = mm.GenerateTile (element);
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
 				mm.PlaceTile (col, go, .15f);

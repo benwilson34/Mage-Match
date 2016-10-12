@@ -193,7 +193,7 @@ public class TileBehav : MonoBehaviour {
 				RaycastHit2D hit = Physics2D.Raycast (new Vector2 (mouse.x, mouse.y), Vector2.zero);
 				if (hit.collider != null) { // if dropped on a column
 //				Debug.Log ("Tile dropped on " + hit.collider.name);
-					ColumnBehav cb = hit.collider.GetComponent<ColumnBehav> ();
+					CellBehav cb = hit.collider.GetComponent<CellBehav> ();
 					if (cb == null || !mm.PlaceTile (cb.col)) {
 						transform.SetParent (parentT);
 						parentT = null;

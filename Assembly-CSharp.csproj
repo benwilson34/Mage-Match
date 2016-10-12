@@ -48,6 +48,7 @@
      <Compile Include="Assets\scripts\AudioController.cs" />
      <Compile Include="Assets\scripts\BoardCheck.cs" />
      <Compile Include="Assets\scripts\ButtonController.cs" />
+     <Compile Include="Assets\scripts\CellBehav.cs" />
      <Compile Include="Assets\scripts\ColumnBehav.cs" />
      <Compile Include="Assets\scripts\EnchantEffects.cs" />
      <Compile Include="Assets\scripts\HexGrid.cs" />
