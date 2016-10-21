@@ -26,6 +26,7 @@ public class MageMatch : MonoBehaviour {
 		EnchantEffects.Init ();
 
 		UIController.Init ();
+//		InputController.Init ();
 		AudioController.Init ();
 		Reset ();
 	}
@@ -124,6 +125,7 @@ public class MageMatch : MonoBehaviour {
 		} else if (commishTurn) { // if the commissioner just had his turn
 			commishTurn = false;
 			activep.FlipHand ();
+			UIController.FlipGradient ();
 			DealPlayerHand (activep, 2); // deal 2 tiles to activep at beginning of turn
 			ResolveBeginTurnEffects ();
 
@@ -349,21 +351,21 @@ public class MageMatch : MonoBehaviour {
 		for (int i = 0; i < seq.sequence.Count;) {
 			tile = seq.sequence [0];
 			if (HexGrid.IsSlotFilled (tile.col, tile.row))
-				RemoveTile (tile, false);
+				RemoveTile (tile, false, true);
 			else
 				Debug.Log ("RemoveSeq(): The tile at (" + tile.col + ", " + tile.row + ") is already gone.");
 			seq.sequence.Remove (tile);
 		}
 	}
 
-	public void RemoveTile(Tile tile, bool checkGrav){
-		RemoveTile(tile.col, tile.row, checkGrav);
+	public void RemoveTile(Tile tile, bool checkGrav, bool resolveEnchant){
+		RemoveTile(tile.col, tile.row, checkGrav, resolveEnchant);
 	}
 
-	public void RemoveTile(int col, int row, bool checkGrav){
+	public void RemoveTile(int col, int row, bool checkGrav, bool resolveEnchant){
 		Debug.Log ("Removing (" + col + ", " + row + ")");
 		TileBehav tb = HexGrid.GetTileBehavAt (col, row);
-		if (tb.HasEnchantment ()) {
+		if (resolveEnchant && tb.HasEnchantment ()) {
 			Debug.Log ("About to resolve enchant on tile (" + col + ", " + row + ")");
 			tb.ResolveEnchantment ();
 		}

@@ -61,7 +61,7 @@ public static class HexGrid {
 		for (int c = 0; c < numCols; c++) {
 			for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) {
 				if (IsSlotFilled(c, r)) {
-					if (!tileGrid [c, r].isInPosition())
+					if (!tileGrid [c, r].IsInPosition())
 						return false;
 				} else
 					break;

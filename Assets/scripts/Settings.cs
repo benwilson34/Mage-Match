@@ -52,7 +52,7 @@ public class Settings : MonoBehaviour {
 		default: // none
 			break;
 		case 1: // destroy tile
-			mm.RemoveTile(tb.tile, true); // FIXME will probably throw null reference exception
+			mm.RemoveTile(tb.tile, true, false); // FIXME will probably throw null reference exception
 			break;
 		case 2: // clear enchant
 			tb.ClearEnchantment();
@@ -61,7 +61,7 @@ public class Settings : MonoBehaviour {
 //			tb.SetEnchantment (EnchantEffects.Cherrybomb);
 			spellfx.Ench_SetCherrybomb(tb);
 			break;
-		case 4:
+		case 4: // burning
 			spellfx.Ench_SetBurning (tb);
 			break;
 		case 5:

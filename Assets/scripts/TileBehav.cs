@@ -4,24 +4,31 @@ using DG.Tweening;
 
 public class TileBehav : MonoBehaviour {
 
+	public enum TileState { Hand, Flipped, Placed, Removed };
+	public TileState currentState;
+
 	public Tile tile;
 	public Tile.Element initElement;
 	public Sprite flipSprite;
 
-	private MageMatch mm; //?
-	private Transform parentT = null;
-	private Vector3 dragClick;
-	private bool flipped = false, placed = false, dragged = false;
+	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
+	public bool ableTarget = true; // will eventually need a list of valid spells - maybe a hierarchy? categories?
+
+//	private MageMatch mm; //?
+//	private Transform parentT = null;
+//	private Vector3 dragClick;
+//	private bool flipped = false, placed = false, dragged = false;
 
 //	public delegate void EnchantEffect(TileBehav tb);
 //	private EnchantEffect enchantEffect;
 	private TurnEffect enchantment;
-	private bool resolved = false;
+//	private bool resolved = false;
 	private bool inPos = true;
 
 	void Awake(){
 		tile = new Tile (initElement);
-		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+		currentState = TileState.Hand;
+//		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
 	public void ChangePos(int col, int row){
@@ -58,7 +65,8 @@ public class TileBehav : MonoBehaviour {
 	}
 
 	public void SetPlaced(){
-		placed = true;
+//		placed = true;
+		currentState = TileState.Placed;
 	}
 
 	// TODO TODO
@@ -102,14 +110,18 @@ public class TileBehav : MonoBehaviour {
 		Sprite temp = rend.sprite;
 		rend.sprite = flipSprite;
 		flipSprite = temp;
-		flipped = !flipped;
+		if (currentState == TileState.Hand)
+			currentState = TileState.Flipped;
+		else if (currentState == TileState.Flipped)
+			currentState = TileState.Hand;
+//		flipped = !flipped;
 	}
 
 	public void SetOutOfPosition(){
 		inPos = false;
 	}
 
-	public bool isInPosition(){
+	public bool IsInPosition(){
 		return inPos;
 	}
 	
@@ -128,7 +140,7 @@ public class TileBehav : MonoBehaviour {
 		if (HasEnchantment()) {
 			return false; // where we decide whether new enchantments should overwrite current ones
 		}
-		resolved = false;
+//		resolved = false;
 //		this.enchantEffect = effect;
 		effect.SetAsEnchantment(this);
 		this.enchantment = effect; 
@@ -136,9 +148,10 @@ public class TileBehav : MonoBehaviour {
 	}
 
 	public bool ResolveEnchantment(){
-		if (HasEnchantment() && !resolved) {
+		if (HasEnchantment() && currentState == TileState.Placed) {
 //			Debug.Log ("About to resolve enchant: " + (this.enchantEffect != null));
-			resolved = true;
+//			resolved = true;
+			currentState = TileState.Removed;
 //			this.enchantEffect (this);
 			enchantment.CancelEffect(this);
 			MageMatch.endTurnEffects.Remove (enchantment); // assumes end-of-turn list
@@ -147,105 +160,17 @@ public class TileBehav : MonoBehaviour {
 		return false;
 	}
 
+//	void OnMouseDown(){
+//		InputController.CorrectMouseDown ();
+//	}
+//
+//	void OnMouseDrag(){
+//		InputController.CorrectMouseDrag();
+//	}
+//
+//	void OnMouseUp(){
+//		Debug.Log ("TileBehav MouseUp() called.");
+//		InputController.CorrectMouseUp ();
+//	}
 
-	// ----------------------- MOUSE EVENTS -----------------------
-	void OnMouseDown(){
-		if (!MageMatch.IsEnded () && !MageMatch.IsCommishTurn()) { // if the game isn't done
-			if (!MageMatch.menu) { // if the menu isn't open
-				if (!placed) { // dragging from hand
-					if (!flipped) {
-						parentT = transform.parent;
-						transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-						gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
-						MageMatch.currentTile = gameObject;
-						AudioController.PickupSound (this.GetComponent<AudioSource> ());
-					}
-				} else if (SpellEffects.IsTargetMode ()) { // if it's target mode
-					SpellEffects.OnTargetClick (this);
-				} else { // if it's on the board - SWAP handling
-					dragClick = Camera.main.WorldToScreenPoint (transform.position);
-					dragged = true;
-				}
-			} else { // menu mode
-				Settings.GetClickEffect(this);
-			}
-		}
-	}
-
-	void OnMouseDrag(){
-		if (!MageMatch.IsEnded () && !MageMatch.menu && !MageMatch.IsCommishTurn()) {
-			if (!placed) { // dragging from hand
-				if (!flipped && parentT != null) {
-					Vector3 cursor = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-					cursor.z = 0;
-					transform.position = cursor;
-				}
-			} else { // SWAP handling
-				SwapCheck ();
-			}
-		}
-	}
-
-	void OnMouseUp(){
-		if (!MageMatch.IsEnded () && !MageMatch.menu && !MageMatch.IsCommishTurn()) {
-			if (!placed && !flipped && parentT != null) { // dragging from hand
-				Vector3 mouse = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-				RaycastHit2D hit = Physics2D.Raycast (new Vector2 (mouse.x, mouse.y), Vector2.zero);
-				if (hit.collider != null) { // if dropped on a column
-//				Debug.Log ("Tile dropped on " + hit.collider.name);
-					CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-					if (cb == null || !mm.PlaceTile (cb.col)) {
-						transform.SetParent (parentT);
-						parentT = null;
-						MageMatch.activep.AlignHand (.12f, false);
-					}
-				} else { // if not dropped on a column
-					transform.SetParent (parentT);
-					parentT = null;
-					MageMatch.activep.AlignHand (.12f, false);
-				}
-				gameObject.layer = LayerMask.NameToLayer ("Default");
-			}
-		}
-	}
-
-	void SwapCheck(){
-		Vector3 mouse = Input.mousePosition;
-		if(Vector3.Distance(mouse, dragClick) > 50 && dragged){ // if dragged more than 50 px away
-			mouse -= dragClick;
-			mouse.z = 0;
-			float angle = Vector3.Angle(mouse, Vector3.right);
-			if (mouse.y < 0)
-				angle = 360 - angle;
-			//				Debug.Log("mouse = " + mouse.ToString() + "; angle = " + angle);
-			dragged = false; // TODO move into cases below for continuous dragging
-			if (angle < 60) {         // NE cell - board NE
-				//					Debug.Log("Drag NE");
-				if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1)
-					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
-			} else if (angle < 120) { // N cell  - board N
-				//					Debug.Log("Drag N");
-				if (tile.row != HexGrid.TopOfColumn(tile.col))
-					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
-			} else if (angle < 180) { // W cell  - board NW
-				//					Debug.Log("Drag NW");
-				bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
-				if(tile.col != 0 && topcheck)
-					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
-			} else if (angle < 240) { // SW cell - board SW
-				//					Debug.Log("Drag SW");
-				if (tile.row != 0 && tile.col != 0)
-					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
-			} else if (angle < 300) { // S cell  - board S
-				//					Debug.Log("Drag S");
-				if (tile.row != HexGrid.BottomOfColumn(tile.col))
-					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
-			} else {                  // E cell  - board SE
-				//					Debug.Log("Drag SE");
-				bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
-				if(tile.col != HexGrid.numCols - 1 && bottomcheck)
-					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
-			}
-		}
-	}
 }
