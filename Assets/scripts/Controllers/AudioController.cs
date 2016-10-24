@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class AudioController { // TODO! Maybe not necessary to have a separate script...
+public static class AudioController {
 
 	private static AudioSource source;
 	private static AudioClip[] swap, drop, hand, match;

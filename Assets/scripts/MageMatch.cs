@@ -6,6 +6,9 @@ using DG.Tweening;
 
 public class MageMatch : MonoBehaviour {
 
+	public enum GameState {  };
+	public GameState currentState;
+
 	public GameObject firePF, waterPF, earthPF, airPF, musclePF;  // tile prefabs
 	[HideInInspector] public static int turns;                 // number of current turn
 	[HideInInspector] public static bool menu = false;         // is the settings menu open?
@@ -125,7 +128,7 @@ public class MageMatch : MonoBehaviour {
 		} else if (commishTurn) { // if the commissioner just had his turn
 			commishTurn = false;
 			activep.FlipHand ();
-			UIController.FlipGradient ();
+			UIController.FlipGradient (); // ugly
 			DealPlayerHand (activep, 2); // deal 2 tiles to activep at beginning of turn
 			ResolveBeginTurnEffects ();
 
