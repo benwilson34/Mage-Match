@@ -110,28 +110,32 @@ public class MageMatch : MonoBehaviour {
 				}
 				break;
 			case GameState.PlayerTurn:
+				if (activep.AP == 0) {
+					TurnSystem ();
+				}
+				UIController.UpdatePlayerInfo(); // ditto here
 				break;
 			case GameState.CommishTurn:
 				break;
 			}
-			if (boardChanged) { // if the board changed (place, swap, etc)...
-				HexGrid.CheckGrav(); // TODO! move into v(that)v?
-				if (HexGrid.IsGridAtRest ()) { // ...AND all the tiles are in place
-					List<TileSeq> seqMatches = BoardCheck.MatchCheck ();
-					if (seqMatches.Count > 0) { // if there's at least one MATCH
-						Debug.Log("At least one match: " + BoardCheck.PrintSeqList(seqMatches));
-						ResolveMatchEffects (seqMatches);
-					} else {
-						boardChanged = false;
-						SpellCheck();
-						UIController.UpdateDebugGrid ();
-					}
-					UIController.UpdatePlayerInfo(); // try to move out of main loop
-				}
-			} else {
-				TurnSystem ();
-				UIController.UpdatePlayerInfo(); // ditto here
-			}
+//			if (boardChanged) { // if the board changed (place, swap, etc)...
+//				HexGrid.CheckGrav(); // TODO! move into v(that)v?
+//				if (HexGrid.IsGridAtRest ()) { // ...AND all the tiles are in place
+//					List<TileSeq> seqMatches = BoardCheck.MatchCheck ();
+//					if (seqMatches.Count > 0) { // if there's at least one MATCH
+//						Debug.Log("At least one match: " + BoardCheck.PrintSeqList(seqMatches));
+//						ResolveMatchEffects (seqMatches);
+//					} else {
+//						boardChanged = false;
+//						SpellCheck();
+//						UIController.UpdateDebugGrid ();
+//					}
+//					UIController.UpdatePlayerInfo(); // try to move out of main loop
+//				}
+//			} else {
+//				TurnSystem ();
+//				UIController.UpdatePlayerInfo(); // ditto here
+//			}
 		}
 	}
 	// -----------------------------------------------------------------------------------------------------------
