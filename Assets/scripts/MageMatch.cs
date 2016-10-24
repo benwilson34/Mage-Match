@@ -6,7 +6,7 @@ using DG.Tweening;
 
 public class MageMatch : MonoBehaviour {
 
-	public enum GameState {  };
+	public enum GameState { PlayerTurn, BoardChecking, CommishTurn };
 	public GameState currentState;
 
 	public GameObject firePF, waterPF, earthPF, airPF, musclePF;  // tile prefabs
@@ -72,6 +72,7 @@ public class MageMatch : MonoBehaviour {
 		DealPlayerHand (p2, 3);
 		p2.AlignHand (.12f, true);
 
+		currentState = GameState.PlayerTurn;
 		activep = p1;
 		InactivePlayer().FlipHand ();
 		activep.InitAP();
@@ -90,7 +91,29 @@ public class MageMatch : MonoBehaviour {
 
 	// ---------------------------- Update is called once per frame - MAIN GAME LOOP ----------------------------
 	void Update () {
-		if (!endGame && !menu && !SpellEffects.IsTargetMode() && !IsAnimating()) { // if there is no winning player and the settings menu is not open
+		// if there is no winning player and the settings menu is not open
+		if (!endGame && !menu && !SpellEffects.IsTargetMode() && !IsAnimating()) { 
+			switch (currentState) {
+			case GameState.BoardChecking:
+				HexGrid.CheckGrav(); // TODO! move into v(that)v?
+				if (HexGrid.IsGridAtRest ()) { // ...AND all the tiles are in place
+					List<TileSeq> seqMatches = BoardCheck.MatchCheck ();
+					if (seqMatches.Count > 0) { // if there's at least one MATCH
+						Debug.Log("At least one match: " + BoardCheck.PrintSeqList(seqMatches));
+						ResolveMatchEffects (seqMatches);
+					} else {
+						boardChanged = false;
+						SpellCheck();
+						UIController.UpdateDebugGrid ();
+					}
+					UIController.UpdatePlayerInfo(); // try to move out of main loop
+				}
+				break;
+			case GameState.PlayerTurn:
+				break;
+			case GameState.CommishTurn:
+				break;
+			}
 			if (boardChanged) { // if the board changed (place, swap, etc)...
 				HexGrid.CheckGrav(); // TODO! move into v(that)v?
 				if (HexGrid.IsGridAtRest ()) { // ...AND all the tiles are in place
