@@ -15,24 +15,21 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 	private static CellBehav clickCB;
 	public static bool isClickTB = false;
 
-//	// Use this for initialization
-//	public static void Init () {
-//		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-//	}
-
 	// Use this for initialization
 	void Awake () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
 	void Update(){
-		if (Input.GetMouseButton (0)) { // whenever left mouse is down
-//			Debug.Log("Left mouse is down!!!");
-			nowClick = true;
-			HandleMouse ();
-		} else if (Input.GetMouseButtonUp (0)) {
-			nowClick = false;
-			HandleMouse ();
+//		Debug.Log("Polling...");
+		if(MageMatch.currentState != MageMatch.GameState.CommishTurn ){
+			if (Input.GetMouseButton (0)) { // whenever left mouse is down
+				nowClick = true;
+				HandleMouse ();
+			} else if (Input.GetMouseButtonUp (0)) {
+				nowClick = false;
+				HandleMouse ();
+			}
 		}
 	}
 
@@ -94,47 +91,6 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		return false;
 	}
 
-//	public static void CorrectMouseDown(){
-//		nowClick = true;
-//		GetClick ();
-//	}
-//
-//	public static void CorrectMouseDrag(){
-//		GetClick ();
-//	}
-//
-//	public static void CorrectMouseUp(){
-//		nowClick = false;
-//		GetClick ();
-//	}
-
-//	static void HandleTileBehav(TileBehav tb){
-//		if (!lastClick && nowClick) {
-//			TBMouseDown (tb);
-//			lastClick = true;
-//			nowClick = false;
-//		} else if (lastClick && nowClick) {
-//			TBMouseDrag (tb);
-//		} else if (lastClick && !nowClick) {
-//			TBMouseUp (tb);
-//			lastClick = false;
-//		}
-//		// only other case is no click - probably never passed in?
-//	}
-
-//	static void HandleCellBehav(CellBehav cb){
-//		if (!lastClick && nowClick) {
-//			CBMouseDown (cb);
-//			lastClick = true;
-//		} else if (lastClick && nowClick) {
-////			TBMouseDrag (cb);
-//		} else if (lastClick && !nowClick) {
-////			TBMouseUp (cb);
-//			lastClick = false;
-//		}
-//		// only other case is no click - probably never passed in?
-//	}
-
 	static void TBMouseDown(TileBehav tb){
 		if (!MageMatch.IsEnded () && !MageMatch.IsCommishTurn()) { // if the game isn't done
 			if (!MageMatch.menu) { // if the menu isn't open
@@ -149,6 +105,7 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 					AudioController.PickupSound (tb.gameObject.GetComponent<AudioSource> ());
 					break;
 				case TileBehav.TileState.Placed:
+					Debug.Log ("MouseDown on Placed tile.");
 					if (SpellEffects.IsTargetMode ())
 						SpellEffects.OnTargetClick (tb);
 					else {
