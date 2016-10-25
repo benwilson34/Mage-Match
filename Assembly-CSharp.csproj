@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{DD12AC88-0C0B-EA06-356B-874496441549}</ProjectGuid>
+    <ProjectGuid>{8A2EBAB0-B9BF-B7B6-9585-9BB4CEF8B73C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -76,28 +76,16 @@
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
  <Reference Include="DOTween">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/DOTween.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match Assets/Mage-Match-master/Mage-Match-master/Assets/DOTween/DOTween/DOTween.dll</HintPath>
  </Reference>
  <Reference Include="DOTween43">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/DOTween43.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match Assets/Mage-Match-master/Mage-Match-master/Assets/DOTween/DOTween/DOTween43.dll</HintPath>
  </Reference>
  <Reference Include="DOTween46">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/DOTween46.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match Assets/Mage-Match-master/Mage-Match-master/Assets/DOTween/DOTween/DOTween46.dll</HintPath>
  </Reference>
  <Reference Include="DOTween50">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/DOTween50.dll</HintPath>
- </Reference>
- <Reference Include="DOTween">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/DOTween/DOTween/DOTween.dll</HintPath>
- </Reference>
- <Reference Include="DOTween43">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/DOTween/DOTween/DOTween43.dll</HintPath>
- </Reference>
- <Reference Include="DOTween46">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/DOTween/DOTween/DOTween46.dll</HintPath>
- </Reference>
- <Reference Include="DOTween50">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/DOTween/DOTween/DOTween50.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match Assets/Mage-Match-master/Mage-Match-master/Assets/DOTween/DOTween/DOTween50.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

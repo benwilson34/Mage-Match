@@ -1,9 +1,9 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\SpellEffects.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\MageMatch.cs">
     <Files>
-      <File FileName="Assets\scripts\MageMatch.cs" Line="315" Column="28" />
-      <File FileName="Assets\scripts\Loadout.cs" Line="86" Column="69" />
+      <File FileName="Assets\scripts\MageMatch.cs" Line="66" Column="28" />
+      <File FileName="Assets\scripts\Loadout.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\SpellEffects.cs" Line="105" Column="3" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>

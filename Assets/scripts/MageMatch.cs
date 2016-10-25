@@ -59,6 +59,10 @@ public class MageMatch : MonoBehaviour {
 		turns = 0;
 		endGame = false;
 
+		//Make Commish non-player object! :)
+		//Make Commish non-player object! :)
+		//Make Commish non-player object! :)
+
 		commish = new Player (0);
 
 		p1 = new Player (1);
