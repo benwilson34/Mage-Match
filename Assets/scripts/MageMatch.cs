@@ -13,7 +13,7 @@ public class MageMatch : MonoBehaviour {
 	[HideInInspector] public static int turns;                 // number of current turn
 	[HideInInspector] public static bool menu = false;         // is the settings menu open?
 	[HideInInspector] public static GameObject currentTile;    // current game tile
-	[HideInInspector] public static Player p1, p2, activep, commish;
+	[HideInInspector] public static Player p1, p2, activep;
 	[HideInInspector] public static List<TurnEffect> beginTurnEffects, endTurnEffects;
 
 	private static bool endGame = false;             	       // is either player dead?
@@ -26,6 +26,7 @@ public class MageMatch : MonoBehaviour {
 		BoardCheck.debugLogOn = false;
 
 		Loadout.Init ();
+		Commish.Init ();
 		EnchantEffects.Init ();
 
 		UIController.Init ();
@@ -61,8 +62,6 @@ public class MageMatch : MonoBehaviour {
 
 		turns = 0;
 		endGame = false;
-
-		commish = new Player (0);
 
 		p1 = new Player (1);
 		DealPlayerHand (p1, 3);
@@ -155,8 +154,8 @@ public class MageMatch : MonoBehaviour {
 			
 //			commishTurn = true;
 			currentState = GameState.CommishTurn;
-			yield return commish.CastSpell (0); // place 5 random tiles
-		Debug.Log("Commish turn done.");
+			yield return Commish.Place_Tiles(); // place 5 random tiles
+			Debug.Log("Commish turn done.");
 			activep = InactivePlayer ();
 			activep.InitAP ();
 //		} else if (commishTurn) { // if the commissioner just had his turn
@@ -297,11 +296,7 @@ public class MageMatch : MonoBehaviour {
 		else
 			return p1;
 	}
-
-	public Player GetCommish(){
-		return commish;
-	}
-
+		
 	void DealPlayerHand(Player player, int numTiles){
 		for (int i = 0; i < numTiles && player.hand.Count < player.handSize; i++) {
 			GameObject go = GenerateTile (player.loadout.GetTileElement());

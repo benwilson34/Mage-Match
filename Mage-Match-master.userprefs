@@ -2,9 +2,12 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\SpellEffects.cs">
     <Files>
-      <File FileName="Assets\scripts\MageMatch.cs" Line="315" Column="28" />
-      <File FileName="Assets\scripts\Loadout.cs" Line="86" Column="69" />
-      <File FileName="Assets\scripts\SpellEffects.cs" Line="105" Column="3" NotebookId="1" />
+      <File FileName="Assets\scripts\MageMatch.cs" Line="299" Column="3" />
+      <File FileName="Assets\scripts\Commish.cs" Line="73" Column="3" />
+      <File FileName="Assets\scripts\SpellEffects.cs" Line="165" Column="35" NotebookId="1" />
+      <File FileName="Assets\scripts\Controllers\InputController.cs" Line="27" Column="21" NotebookId="1" />
+      <File FileName="Assets\scripts\Player.cs" Line="121" Column="1" NotebookId="1" />
+      <File FileName="Assets\scripts\Loadout.cs" Line="54" Column="3" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -25,11 +25,11 @@ public class Player {
 		hand = new List<TileBehav>();
 
 		switch (playerNum) {
-		case 0: 
-			SetName ("Commissioner");
-			id = 0;
-			loadout = new Loadout (0);
-			break;
+//		case 0: 
+//			SetName ("Commissioner");
+//			id = 0;
+//			loadout = new Loadout (0);
+//			break;
 		case 1: 
 			SetName ("Raucous Pinefuck");
 			id = 1;

@@ -22,7 +22,7 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 
 	void Update(){
 //		Debug.Log("Polling...");
-		if(MageMatch.currentState != MageMatch.GameState.CommishTurn ){
+		if(!MageMatch.IsCommishTurn()){
 			if (Input.GetMouseButton (0)) { // whenever left mouse is down
 				nowClick = true;
 				HandleMouse ();

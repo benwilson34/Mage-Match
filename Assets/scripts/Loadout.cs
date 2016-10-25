@@ -15,9 +15,9 @@ public class Loadout {
 	public Loadout(int preset){
 		spells = new Spell[4];
 		switch (preset) {
-		case 0:
-			Commissioner ();
-			break;
+//		case 0:
+//			Commissioner ();
+//			break;
 		case 1:
 			EnfuegoA ();
 			break;
@@ -41,19 +41,19 @@ public class Loadout {
 		SpellEffects.Init ();
 	}
 
-	void Commissioner(){
-		characterName = "Commissioner";
+//	void Commissioner(){
+//		characterName = "Commissioner";
 //		techniqueName = "default";
-//		maxHealth = 1;
-
-		dfire = 20;
-		dwater = 20;
-		dearth = 20;
-		dair = 20;
-		dmuscle = 20;
-
-		spells [0] = new Spell ("Commissioner turn", "", 0, SpellEffects.Comm_Place5RandomTiles);
-	}
+////		maxHealth = 1;
+//
+//		dfire = 20;
+//		dwater = 20;
+//		dearth = 20;
+//		dair = 20;
+//		dmuscle = 20;
+//
+//		spells [0] = new Spell ("Commissioner turn", "", 0, SpellEffects.Comm_Place5RandomTiles);
+//	}
 
 	void EnfuegoA(){ // Enfuego A - kickboxing
 		characterName = "Enfuego";
