@@ -3,6 +3,7 @@ using System.Collections;
 
 public static class Commish  {
 
+	private static int mood = 0;
 	private static MageMatch mm;
 	//private static Spell[] spells;
 
@@ -12,6 +13,19 @@ public static class Commish  {
 		//spells = new Spell[1];
 		//spells[0] = new Spell ("Commissioner turn", "", 0, Comm_Place5RandomTiles);
 
+	}
+
+	public static void ChangeMood(int amount){
+		mood += amount;
+		if (mood <= -100) {
+			AngryDamage ();
+		} else if (mood >= 100) {
+			HappyHealing ();
+		}
+	}
+
+	public static int GetMood(){
+		return mood;
 	}
 
 	public static IEnumerator Place_Tiles(){
@@ -42,6 +56,33 @@ public static class Commish  {
 			Debug.Log ("The board is full. The Commissioner ends his turn early.");
 			GameObject.Destroy (go);
 		}
+	}
+
+	public static void AngryDamage(){
+		mm.InactivePlayer ().ChangeHealth (-50);
+		mm.DiscardTile (mm.InactivePlayer(), 1);
+
+		MageMatch.activep.ChangeHealth (-50);
+		mm.DiscardTile (MageMatch.activep, 1);
+
+		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
+
+		mood = 0;
+		UIController.UpdateCommishMeter ();
+	}
+
+	public static void HappyHealing(){
+		mm.InactivePlayer ().ChangeHealth (100);
+		mm.DealPlayerHand (mm.InactivePlayer(), 1);
+
+
+		MageMatch.activep.ChangeHealth (100);
+		mm.DealPlayerHand (MageMatch.activep, 1);
+
+		Debug.Log ("The Commissioner is pleased, and has decided to heal both players for 100!");
+
+		mood = 0;
+		UIController.UpdateCommishMeter ();
 	}
 
 	static Tile.Element GetTileElement (){

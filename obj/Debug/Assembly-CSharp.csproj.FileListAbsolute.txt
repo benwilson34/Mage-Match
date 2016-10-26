@@ -40,3 +40,4 @@ E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp
 E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEngine.UI.xml
 E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\Temp\bin\Debug\UnityEngine.Networking.xml
 E:\Mage Match Assets\Scripts\-CURRENT Mage Match v0.2.4.1\Mage Match v0.2.4\obj\Debug\Assembly-CSharp.pdb
+E:\Mage Match Assets\Latest Version\Mage Match Assets\Mage-Match-master\Mage-Match-master\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache

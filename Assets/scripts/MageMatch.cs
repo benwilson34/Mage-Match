@@ -116,6 +116,7 @@ public class MageMatch : MonoBehaviour {
 					StartCoroutine(TurnSystem());
 				}
 				UIController.UpdatePlayerInfo(); // ditto here
+				UIController.UpdateCommishMeter();
 				break;
 
 			case GameState.CommishTurn:
@@ -156,6 +157,7 @@ public class MageMatch : MonoBehaviour {
 			currentState = GameState.CommishTurn;
 			yield return Commish.Place_Tiles(); // place 5 random tiles
 			Debug.Log("Commish turn done.");
+			Commish.ChangeMood(-15);
 			activep = InactivePlayer ();
 			activep.InitAP ();
 //		} else if (commishTurn) { // if the commissioner just had his turn
@@ -202,12 +204,16 @@ public class MageMatch : MonoBehaviour {
 			// TODO handle enchantments, bigger sequences, critical matches...
 //			if (!commishTurn) {
 			if (currentState != GameState.CommishTurn) {
-				if(seqList[i].GetSeqLength() == 3)
+				if (seqList [i].GetSeqLength () == 3) {
 					InactivePlayer ().ChangeHealth (Random.Range (-100, -75));
-				else if (seqList[i].GetSeqLength() == 4)
+					Commish.ChangeMood(10);
+				} else if (seqList [i].GetSeqLength () == 4) {
 					InactivePlayer ().ChangeHealth (Random.Range (-150, -125));
-				else // TODO critical matches
+					Commish.ChangeMood(15);
+				} else { // TODO critical matches
 					InactivePlayer ().ChangeHealth (Random.Range (-225, -200));
+					Commish.ChangeMood(20);
+				}
 			}
 		}
 		RemoveSeqList (seqList);
@@ -297,7 +303,7 @@ public class MageMatch : MonoBehaviour {
 			return p1;
 	}
 		
-	void DealPlayerHand(Player player, int numTiles){
+	public void DealPlayerHand(Player player, int numTiles){
 		for (int i = 0; i < numTiles && player.hand.Count < player.handSize; i++) {
 			GameObject go = GenerateTile (player.loadout.GetTileElement());
 			if (player.id == 1)
@@ -360,6 +366,7 @@ public class MageMatch : MonoBehaviour {
 	public void CastSpell(int spellNum){ // TODO move player stuff (AP) to player.Cast()
 		Spell spell = activep.loadout.GetSpell (spellNum);
 		if (activep.CastSpell(spellNum)) {
+			Commish.ChangeMood(20);
 			UIController.DeactivateAllSpellButtons (activep); // ?
 			RemoveSeq (spell.GetBoardSeq ());
 			BoardChanged ();
