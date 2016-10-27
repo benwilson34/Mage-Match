@@ -21,16 +21,16 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 	}
 
 	void Update(){
-//		Debug.Log("Polling...");
-		if(!MageMatch.IsCommishTurn()){
+//		if(!MageMatch.IsCommishTurn()){
 			if (Input.GetMouseButton (0)) { // whenever left mouse is down
+//				Debug.Log("NOT Commish turn...");
 				nowClick = true;
 				HandleMouse ();
 			} else if (Input.GetMouseButtonUp (0)) {
 				nowClick = false;
 				HandleMouse ();
 			}
-		}
+//		}
 	}
 
 	void HandleMouse(){
@@ -105,7 +105,7 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 					AudioController.PickupSound (tb.gameObject.GetComponent<AudioSource> ());
 					break;
 				case TileBehav.TileState.Placed:
-					Debug.Log ("MouseDown on Placed tile.");
+//					Debug.Log ("MouseDown on Placed tile.");
 					if (SpellEffects.IsTargetMode ())
 						SpellEffects.OnTargetClick (tb);
 					else {

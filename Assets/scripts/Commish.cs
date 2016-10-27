@@ -5,30 +5,24 @@ public static class Commish  {
 
 	private static int mood = 0;
 	private static MageMatch mm;
-	//private static Spell[] spells;
 
-	public static void  Init() {
-		
+	public static void Init() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-		//spells = new Spell[1];
-		//spells[0] = new Spell ("Commissioner turn", "", 0, Comm_Place5RandomTiles);
-
 	}
 
-	public static void ChangeMood(int amount){
-		mood += amount;
+	public static IEnumerator CTurn(){
 		if (mood <= -100) {
 			AngryDamage ();
 		} else if (mood >= 100) {
 			HappyHealing ();
-		}
+		} else
+			ChangeMood (-15);
+
+		yield return PlaceTiles ();
+//		Debug.Log ("CTurn: done placing tiles.");
 	}
 
-	public static int GetMood(){
-		return mood;
-	}
-
-	public static IEnumerator Place_Tiles(){
+	public static IEnumerator PlaceTiles(){
 		int numTiles = 5;
 		int tries = 20;
 		float[] ratios;
@@ -58,33 +52,6 @@ public static class Commish  {
 		}
 	}
 
-	public static void AngryDamage(){
-		mm.InactivePlayer ().ChangeHealth (-50);
-		mm.DiscardTile (mm.InactivePlayer(), 1);
-
-		MageMatch.activep.ChangeHealth (-50);
-		mm.DiscardTile (MageMatch.activep, 1);
-
-		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
-
-		mood = 0;
-		UIController.UpdateCommishMeter ();
-	}
-
-	public static void HappyHealing(){
-		mm.InactivePlayer ().ChangeHealth (100);
-		mm.DealPlayerHand (mm.InactivePlayer(), 1);
-
-
-		MageMatch.activep.ChangeHealth (100);
-		mm.DealPlayerHand (MageMatch.activep, 1);
-
-		Debug.Log ("The Commissioner is pleased, and has decided to heal both players for 100!");
-
-		mood = 0;
-		UIController.UpdateCommishMeter ();
-	}
-
 	static Tile.Element GetTileElement (){
 		int rand = Random.Range (0, 100);
 		if      (rand < 20)
@@ -111,5 +78,40 @@ public static class Commish  {
 		Debug.Log ("GetSemiRandomCol: shouldn't get to this point. val = " + val);
 		return 6;
 	}
+
+	public static void ChangeMood(int amount){
+		mood += amount;
+		Mathf.Clamp(mood, -100, 100);
+	}
+	
+	public static int GetMood(){
+		return mood;
+	}
+	
+	public static void AngryDamage(){
+		mm.InactivePlayer ().ChangeHealth (-50);
+		mm.DiscardTile (mm.InactivePlayer(), 1);
 		
+		MageMatch.activep.ChangeHealth (-50);
+		mm.DiscardTile (MageMatch.activep, 1);
+		
+		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
+		
+		mood = 0;
+		UIController.UpdateCommishMeter ();
+	}
+	
+	public static void HappyHealing(){
+		mm.InactivePlayer ().ChangeHealth (100);
+		mm.DealPlayerHand (mm.InactivePlayer(), 1);
+		
+		
+		MageMatch.activep.ChangeHealth (100);
+		mm.DealPlayerHand (MageMatch.activep, 1);
+		
+		Debug.Log ("The Commissioner is pleased, and has decided to heal both players for 100!");
+		
+		mood = 0;
+		UIController.UpdateCommishMeter ();
+	}
 }

@@ -158,53 +158,6 @@ public class SpellEffects {
 
 	}
 
-//	public static void Comm_Place5RandomTiles(){
-//		mm.StartAnim(Comm_Anim());
-//	}
-//
-//	static IEnumerator Comm_Anim(){
-//		int numTiles = 5;
-//		int tries = 20;
-//		float[] ratios;
-//		yield return ratios = BoardCheck.EmptyCheck ();
-//
-//		GameObject go = mm.GenerateTile (MageMatch.commish.loadout.GetTileElement());
-//
-//		for (int i = 0; i < numTiles && tries > 0; i++) {
-//			if (tries == 20 && i != 0) {
-//				yield return new WaitForSeconds (.15f);
-//				go = mm.GenerateTile (MageMatch.commish.loadout.GetTileElement ());
-//			}
-//
-//			int col = GetSemiRandomCol (ratios);
-//			if (!mm.PlaceTile (col, go, .15f)) { // if col is full
-//				i--;
-//				tries--;
-//			} else {
-//				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-//				tries = 20;
-//			}
-//		}
-//
-//		if (tries == 0) {
-//			Debug.Log ("The board is full. The Commissioner ends his turn early.");
-//			GameObject.Destroy (go);
-//		}
-//	}
-//
-//	static int GetSemiRandomCol(float[] ratios){
-//		float val = Random.Range (0f, 1f);
-////		Debug.Log ("GetSemiRandomCol: val = " + val);
-//		float thresh = 0;
-//		for (int i = 0; i < HexGrid.numCols; i++) {
-//			thresh += ratios [i];
-//			if (val < thresh)
-//				return i;
-//		}
-//		Debug.Log ("GetSemiRandomCol: shouldn't get to this point. val = " + val);
-//		return 6;
-//	}
-
 	// -------------------------------- ENCHANTMENTS --------------------------------------
 
 	public void Ench_SetCherrybomb(TileBehav tb){

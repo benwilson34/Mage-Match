@@ -123,53 +123,33 @@ public class MageMatch : MonoBehaviour {
 				break;
 
 			}
-//			if (boardChanged) { // if the board changed (place, swap, etc)...
-//				HexGrid.CheckGrav(); // TODO! move into v(that)v?
-//				if (HexGrid.IsGridAtRest ()) { // ...AND all the tiles are in place
-//					List<TileSeq> seqMatches = BoardCheck.MatchCheck ();
-//					if (seqMatches.Count > 0) { // if there's at least one MATCH
-//						Debug.Log("At least one match: " + BoardCheck.PrintSeqList(seqMatches));
-//						ResolveMatchEffects (seqMatches);
-//					} else {
-//						boardChanged = false;
-//						SpellCheck();
-//						UIController.UpdateDebugGrid ();
-//					}
-//					UIController.UpdatePlayerInfo(); // try to move out of main loop
-//				}
-//			} else {
-//				TurnSystem ();
-//				UIController.UpdatePlayerInfo(); // ditto here
-//			}
 		}
 	}
 	// -----------------------------------------------------------------------------------------------------------
 
 
-	IEnumerator TurnSystem(){ // TODO! needs work - should be a private class?
-//		if (activep.AP == 0) { // if active player has just used their last AP
-			ResolveEndTurnEffects ();
-			turns++;
-			UIController.UpdateTurnText ();
-			UIController.DeactivateAllSpellButtons (activep);
-			
-//			commishTurn = true;
-			currentState = GameState.CommishTurn;
-			yield return Commish.Place_Tiles(); // place 5 random tiles
-			Debug.Log("Commish turn done.");
-			Commish.ChangeMood(-15);
-			activep = InactivePlayer ();
-			activep.InitAP ();
-//		} else if (commishTurn) { // if the commissioner just had his turn
-//			commishTurn = false;
-			activep.FlipHand ();
-			UIController.FlipGradient (); // ugly
-			DealPlayerHand (activep, 2); // deal 2 tiles to activep at beginning of turn
-			ResolveBeginTurnEffects ();
+	IEnumerator TurnSystem(){
+		ResolveEndTurnEffects ();
+		turns++;
+		UIController.UpdateTurnText ();
+		UIController.DeactivateAllSpellButtons (activep);
+		
+		currentState = GameState.CommishTurn;
+		yield return Commish.CTurn(); // place 5 random tiles
+//		Debug.Log ("TurnSystem: done placing tiles.");
+		yield return new WaitUntil(() => animating == 0);
+//		yield return WaitForAnims();
+		Debug.Log("Commish turn done.");
 
-			SpellCheck ();
-		currentState = GameState.PlayerTurn;
-//		}
+		activep = InactivePlayer ();
+		activep.InitAP ();
+		activep.FlipHand ();
+		UIController.FlipGradient (); // ugly
+		DealPlayerHand (activep, 2); // deal 2 tiles to activep at beginning of turn
+		ResolveBeginTurnEffects ();
+
+		SpellCheck ();
+		currentState = GameState.BoardChecking;
 	}
 
 	void SpellCheck(){ // TODO clean up
@@ -274,11 +254,13 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	public void SwapTiles(int c1, int r1, int c2, int r2){
-		if (HexGrid.Swap (c1, r1, c2, r2)) {
-			activep.AP--;
-			if (activep.AP == 0)
-				activep.FlipHand ();
-			AudioController.SwapSound ();
+		if (!IsCommishTurn ()) {
+			if (HexGrid.Swap (c1, r1, c2, r2)) {
+				activep.AP--;
+				if (activep.AP == 0)
+					activep.FlipHand ();
+				AudioController.SwapSound ();
+			}
 		}
 	}
 
@@ -443,7 +425,8 @@ public class MageMatch : MonoBehaviour {
 
 	public static void BoardChanged(){
 //		boardChanged = true;
-		currentState = GameState.BoardChecking;
+		if(currentState != GameState.CommishTurn)
+			currentState = GameState.BoardChecking;
 	}
 
 	public static void EndTheGame(){
@@ -458,6 +441,10 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	public static bool IsCommishTurn(){
+//		if (currentState == GameState.CommishTurn)
+//			Debug.Log ("IsCommishTurn evaluates to true!");
+//		else
+//			Debug.Log ("IsCommishTurn evaluates to false!");
 		return currentState == GameState.CommishTurn;
 	}
 
