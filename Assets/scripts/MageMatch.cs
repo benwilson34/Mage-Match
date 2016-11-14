@@ -92,7 +92,7 @@ public class MageMatch : MonoBehaviour {
 	// ---------------------------- Update is called once per frame - MAIN GAME LOOP ----------------------------
 	void Update () {
 		// if there is no winning player and the settings menu is not open
-		if (!endGame && !menu && !SpellEffects.IsTargetMode() && !IsAnimating()) { 
+		if (!endGame && !menu && !InputController.IsTargetMode() && !IsAnimating()) { 
 			switch (currentState) {
 
 			case GameState.BoardChecking:

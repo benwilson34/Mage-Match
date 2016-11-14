@@ -2,6 +2,8 @@
 using UnityEngine.EventSystems;
 using System.Collections;
 
+// NOTE: I don't think this script is used right now.
+
 public class ColumnBehav : MonoBehaviour {
 
 	public int col;
@@ -18,8 +20,9 @@ public class ColumnBehav : MonoBehaviour {
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
 				mm.DropTile (col, go, .15f);
 			}
-		} else if(SpellEffects.IsTargetMode()) {
-			//Put target return here!
-		}
+		} 
+//		else if(SpellEffects.IsTargetMode()) {
+//			//Put target return here!
+//		}
 	}
 }

@@ -38,26 +38,28 @@ public class Loadout {
 		SpellEffects.Init ();
 	}
 
-	void EnfuegoA(){ // Enfuego A - kickboxing
+	void EnfuegoA(){ // Enfuego A - Supah Hot Fire
 		characterName = "Enfuego";
-		techniqueName = "Kickboxer";
-		maxHealth = 1150;
+		techniqueName = "Supah Hot Fire";
+		maxHealth = 1000;
 
+		// TODO revise deck
 		dfire = 40;
 		dmuscle = 40;
 		dair = 20;
 
 		spells[0] = new Spell ("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
-		spells[1] = new Spell ("Lightning Palm", "AFAF", 1, spellfx.LightningPalm);
-		spells[2] = new Spell ("Caught You 'Mirin", "MFMF", 1, spellfx.CaughtYouMirin);
-		spells[3] = new Spell ("Hot Body", "FMF", 1, spellfx.HotBody);
+		spells[2] = new Spell ("Incinerate", "FAFF", 1, spellfx.Incinerate);
+		spells[1] = new Spell ("Baila!", "FMF", 1, spellfx.Baila);
+		spells[3] = new Spell ("Phoenix Fire", "AFM", 1, spellfx.PhoenixFire);
 	}
 
-	void EnfuegoB(){ // Enfuego B - fire mage
+	void EnfuegoB(){ // Enfuego B - Hot Feet
 		characterName = "Enfuego";
-		techniqueName = "Fire Mage";
-		maxHealth = 1050;
+		techniqueName = "Hot Feet";
+		maxHealth = 1100;
 
+		// TODO revise deck
 		dfire = 45;
 		dair = 25;
 		dmuscle = 15;
@@ -65,14 +67,14 @@ public class Loadout {
 		dearth = 7;
 
 		spells[0] = new Spell ("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
-		spells[1] = new Spell ("Cherrybomb", "EFWF", 1, spellfx.Cherrybomb);
-		spells[2] = new Spell ("Incinerate", "FAFF", 1, spellfx.Incinerate);
-		spells[3] = new Spell ("Hot Body", "FMF", 1, spellfx.HotBody);
+		spells[1] = new Spell ("Hot Body", "FEFM", 1, spellfx.HotBody);
+		spells[2] = new Spell ("Hot and Bothered", "FMF", 1, spellfx.HotAndBothered);
+		spells[3] = new Spell ("Pivot", "MEF", 1, spellfx.Pivot);
 	}
 
-	void RockyA(){ // Rocky A - earth mage
+	void RockyA(){ // Rocky A - Tectonic Titan 
 		characterName = "Rocky";
-		techniqueName = "Earth Mage";
+		techniqueName = "Tectonic Titan";
 		maxHealth = 1100;
 
 		dearth = 45;
@@ -86,9 +88,9 @@ public class Loadout {
 		spells[3] = new Spell ("Stalagmite", "AEE", 1, spellfx.Stalagmite);
 	}
 
-	void RockyB(){ // Rocky B - MMA master
+	void RockyB(){ // Rocky B - Continental Champion
 		characterName = "Rocky";
-		techniqueName = "MMA Thug";
+		techniqueName = "Continental Champion";
 		maxHealth = 1300;
 
 		dearth = 40;

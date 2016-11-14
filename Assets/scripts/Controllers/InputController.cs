@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class InputController : MonoBehaviour { // Monobehaviour needed? One InputController per tile?
 
@@ -14,6 +15,15 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 	private static TileBehav clickTB;
 	private static CellBehav clickCB;
 	public static bool isClickTB = false;
+
+	private enum TargetMode { Tile, Area, Drag, Cell };
+	private static TargetMode currentTMode = TargetMode.Tile;
+	private static int targets = 0;
+
+	public delegate void TBTargetEffect (TileBehav tb); // move to SpellEffects?
+	private static TBTargetEffect TBtargetEffect;
+	public delegate void CBTargetEffect (CellBehav cb); // move to SpellEffects?
+	private static CBTargetEffect CBtargetEffect;
 
 	void Awake () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -39,19 +49,24 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 
 		// TODO replace with tags eventually
 		// filter array
-		foreach (RaycastHit2D hit in hits){
-			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
-			if (tb != null) {
-				clickTB = tb;
-				isClickTB = true;
-				return true;
+//		if (currentTMode != TargetMode.Cell) { // TODO there's a better way
+			foreach (RaycastHit2D hit in hits) {
+				TileBehav tb = hit.collider.GetComponent<TileBehav> ();
+				if (tb != null) {
+					clickTB = tb;
+					if (currentTMode == TargetMode.Tile) { // TODO there's a better way
+						isClickTB = true; // move up ^^
+						return true;
+					}
+				}
 			}
-		}
+//		}
 		foreach (RaycastHit2D hit in hits) {
 			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
 			if (cb != null) {
 				clickCB = cb;
-				return true;
+				if (currentTMode == TargetMode.Cell) // TODO there's a better way
+					return true;
 			}
 		}
 		return false;
@@ -103,8 +118,8 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 					break;
 				case TileBehav.TileState.Placed:
 //					Debug.Log ("MouseDown on Placed tile.");
-					if (SpellEffects.IsTargetMode ())
-						SpellEffects.OnTargetClick (tb);
+					if (IsTargetMode ())
+						OnTileTarget (tb);
 					else {
 						dragClick = Camera.main.WorldToScreenPoint (tb.transform.position);
 						dragged = true;
@@ -209,9 +224,58 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
 				mm.DropTile (cb.col, go, .15f);
 			}
-		} else if(SpellEffects.IsTargetMode()) {
-			SpellEffects.OnCBTargetClick (cb);
+		} else if(IsTargetMode()) {
+			OnCellTarget (cb);
 			//Put target return here!
 		}
+	}
+
+	// -------------------------------- TARGETING ------------------------------------
+
+	public static bool IsTargetMode(){
+		return targets > 0;
+	}
+
+	static void DecTargets(){
+		targets--;
+		if (targets == 0)
+			currentTMode = TargetMode.Tile;
+	}
+
+	public static void WaitForTileTarget(int count, TBTargetEffect targetEffect){
+		// TODO handle fewer tiles on board than count
+		// TODO handle targeting same tile more than once
+		currentTMode = TargetMode.Tile;
+		targets = count;
+		TBtargetEffect = targetEffect;
+		Debug.Log ("targets = " + targets);
+	}
+
+	static void OnTileTarget(TileBehav tb){ // doesn't need param due to field rn
+		DecTargets ();
+		Debug.Log ("Targeted tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+		TBtargetEffect (tb);
+	}
+
+	public static void WaitForCellTarget(int count, CBTargetEffect targetEffect){
+		currentTMode = TargetMode.Cell;
+		targets = count;
+		CBtargetEffect = targetEffect;
+		Debug.Log ("targets = " + targets);
+	}
+
+	static void OnCellTarget(CellBehav cb){ // doesn't need param due to field rn
+		DecTargets ();
+		Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
+		CBtargetEffect (cb);
+	}
+
+	public static void WaitForTargetDrag(int count){
+		// TODO
+		currentTMode = TargetMode.Drag;
+	}
+
+	static void OnTargetDrag (List<TileBehav> tbs){
+		// TODO
 	}
 }
