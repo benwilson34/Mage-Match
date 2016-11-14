@@ -6,9 +6,11 @@ public class SpellEffects {
 
 	private static MageMatch mm;
 	private static int targets;
-	private delegate void TargetEffect (TileBehav tb);
-	private static TargetEffect targetEffect;
-	
+	private delegate void TBTargetEffect (TileBehav tb);
+	private static TBTargetEffect TBtargetEffect;
+	private delegate void CBTargetEffect (CellBehav cb);
+	private static CBTargetEffect CBtargetEffect;
+
 	public static void Init(){
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
@@ -27,7 +29,18 @@ public class SpellEffects {
 	public static void OnTargetClick(TileBehav tb){
 		targets--;
 		Debug.Log ("Targeted tile (" + tb.tile.col + ", " + tb.tile.row + ")");
-		targetEffect (tb);
+		TBtargetEffect (tb);
+	}
+
+	static void WaitForCBTargetClick(int count){
+		targets = count;
+		Debug.Log ("targets = " + targets);
+	}
+
+	public static void OnCBTargetClick(CellBehav cb){
+		targets--;
+		Debug.Log ("Targeted tile (" + cb.col + ", " + cb.row + ")");
+		CBtargetEffect (cb);
 	}
 
 	static void WaitForTargetDrag(int count){
@@ -45,7 +58,7 @@ public class SpellEffects {
 	}
 
 	public void WhiteHotComboKick(){
-		targetEffect = WHCK_Target;
+		TBtargetEffect = WHCK_Target;
 		WaitForTargetClick (3);
 	}
 	void WHCK_Target(TileBehav tb){
@@ -61,7 +74,7 @@ public class SpellEffects {
 	}
 
 	public void LightningPalm(){ // TODO targeting
-		targetEffect = LightningPalm_Target;
+		TBtargetEffect = LightningPalm_Target;
 		WaitForTargetClick(1);
 	}
 	void LightningPalm_Target(TileBehav tb){
@@ -89,7 +102,7 @@ public class SpellEffects {
 
 	//PLACEHOLDER EFFECT
 	public void HotBody(){
-		targetEffect = Hotbody_Target;
+		TBtargetEffect = Hotbody_Target;
 		WaitForTargetClick (3);
 	}
 	public void Hotbody_Target(TileBehav tb){
@@ -99,7 +112,7 @@ public class SpellEffects {
 	}
 		
 	public void Cherrybomb(){
-		targetEffect = Cherrybomb_Target;
+		TBtargetEffect = Cherrybomb_Target;
 		WaitForTargetClick(1);
 	}
 	void Cherrybomb_Target(TileBehav tb){
@@ -110,7 +123,7 @@ public class SpellEffects {
 	public void Incinerate(){
 		int burnCount = mm.InactivePlayer().hand.Count * 2;
 		mm.DiscardTile (mm.InactivePlayer(), 2);
-		targetEffect = Incinerate_Target;
+		TBtargetEffect = Incinerate_Target;
 		WaitForTargetClick (burnCount);
 	}
 	void Incinerate_Target(TileBehav tb){
@@ -146,8 +159,20 @@ public class SpellEffects {
 
 	}
 
+	// TODO
 	public void Stalagmite(){
-
+		CBtargetEffect = Stalagmite_Target;
+		WaitForTargetClick(1);
+	}
+	void Stalagmite_Target(CellBehav cb){
+		int col = cb.col;
+		int bottomr = HexGrid.BottomOfColumn (col);
+		// hardset bottom three cells of column
+		GameObject stone;
+		for (int i = 0; i < 3; i++){
+			stone = mm.GenerateToken ("stone");
+			MageMatch.PutTile (stone, col, bottomr + i);
+		}
 	}
 
 	public void LivingFleshArmor(){

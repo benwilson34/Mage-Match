@@ -60,8 +60,14 @@ public class TileBehav : MonoBehaviour {
 		yield return moveTween.WaitForCompletion ();
 //		MageMatch.DecAnimating ();
 		MageMatch.BoardChanged (); //?
-//		boardChanged = true;
 		StartCoroutine(Grav_Anim());
+	}
+
+	public void HardSetPos(int col, int row){ // essentially a "teleport"
+		tile.SetPos(col, row);
+		HexGrid.HardSetTileBehavAt (this, col, row);
+		transform.position = HexGrid.GridCoordToPos (col, row);
+		MageMatch.BoardChanged ();
 	}
 
 	public void SetPlaced(){
@@ -71,9 +77,9 @@ public class TileBehav : MonoBehaviour {
 
 	// TODO TODO
 	public IEnumerator Grav_Anim(){
-		float[] newPos = HexGrid.GridCoordToPos (tile.col, tile.row);
-		float height = transform.position.y - newPos [1];
-		Tween tween = transform.DOMove (new Vector3 (newPos [0], newPos [1]), .08f * height, false);
+		Vector2 newPos = HexGrid.GridCoordToPos (tile.col, tile.row);
+		float height = transform.position.y - newPos.y;
+		Tween tween = transform.DOMove (newPos, .08f * height, false);
 		tween.SetEase (Ease.InQuad);
 //		tween.SetEase (Bounce);
 
@@ -159,18 +165,5 @@ public class TileBehav : MonoBehaviour {
 		}
 		return false;
 	}
-
-//	void OnMouseDown(){
-//		InputController.CorrectMouseDown ();
-//	}
-//
-//	void OnMouseDrag(){
-//		InputController.CorrectMouseDrag();
-//	}
-//
-//	void OnMouseUp(){
-//		Debug.Log ("TileBehav MouseUp() called.");
-//		InputController.CorrectMouseUp ();
-//	}
 
 }

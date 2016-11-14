@@ -12,7 +12,13 @@ public static class HexGrid {
 	public static void Init(){ // TODO! change to public static void Init()?
 		tileGrid = new TileBehav[numCols, numRows];
 	}
-	
+
+	public static void HardSetTileBehavAt(TileBehav tb, int col, int row){
+		if (IsSlotFilled (col, row))
+			ClearTileBehavAt (col, row);
+		SetTileBehavAt (tb, col, row);
+	}
+
 	public static void SetTileBehavAt(TileBehav tb, int col, int row){
 		tileGrid [col, row] = tb;
 		MageMatch.BoardChanged ();
@@ -35,16 +41,16 @@ public static class HexGrid {
 	}
 
 	public static int BottomOfColumn(int col){ // 0, 0, 0, 0, 1, 2, 3
-		if (col >= 0 && col <= 6) {
+		if (col >= 0 && col <= 6)
 			return (int)Mathf.Max (0, col - 3);
-		} else
+		else
 			return -1;
 	}
 
 	public static int TopOfColumn(int col){    // 3, 4, 5, 6, 6, 6, 6
-		if (col >= 0 && col <= 6) {
+		if (col >= 0 && col <= 6)
 			return (int)Mathf.Min (col + 3, 6);
-		} else
+		else
 			return -1;
 	}
 
@@ -70,11 +76,8 @@ public static class HexGrid {
 		return true;
 	}
 
-	public static float[] GridCoordToPos(int col, int row){
-		float[] pos = new float[2];
-		pos [0] = GridColToPos (col);
-		pos [1] = GridRowToPos (col, row);
-		return pos;
+	public static Vector2 GridCoordToPos(int col, int row){
+		return new Vector2 (GridColToPos (col), GridRowToPos (col, row));
 	}
 
 	public static float GridColToPos(int col){
@@ -86,8 +89,10 @@ public static class HexGrid {
 	}
 
 	public static bool Swap(int c1, int r1, int c2, int r2){
-		//		Debug.Log("Swapping (" + c1 + ", " + r1 + ") to (" + c2 + ", " + r2 + ")");
+//		Debug.Log("Swapping (" + c1 + ", " + r1 + ") to (" + c2 + ", " + r2 + ")");
 		if (IsSlotFilled(c2, r2)) { // if there's something in the slot
+			if (!tileGrid [c1, r1].ableSwap || !tileGrid [c2, r2].ableSwap)
+				return false;
 			TileBehav temp = GetTileBehavAt(c2, r2);
 			SetTileBehavAt(GetTileBehavAt(c1, r1), c2, r2); // TODO look at TileBehav.ChangePos
 			GetTileBehavAt(c2, r2).ChangePos (c2, r2);

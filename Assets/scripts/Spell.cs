@@ -17,7 +17,6 @@ public class Spell {
 		this.name = name;
 		this.seq = new TileSeq (seq);
 		this.APcost = APcost;
-
 		this.effect = effect;
 	}
 

@@ -15,22 +15,46 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 	private static CellBehav clickCB;
 	public static bool isClickTB = false;
 
-	// Use this for initialization
 	void Awake () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
-	void Update(){
+	void Update(){ // polling input
 //		if(!MageMatch.IsCommishTurn()){
-			if (Input.GetMouseButton (0)) { // whenever left mouse is down
+			if (Input.GetMouseButton (0)) { // if left mouse is down
 //				Debug.Log("NOT Commish turn...");
 				nowClick = true;
 				HandleMouse ();
-			} else if (Input.GetMouseButtonUp (0)) {
+			} else if (Input.GetMouseButtonUp (0)) { // if left mouse was JUST released
 				nowClick = false;
 				HandleMouse ();
 			}
 //		}
+	}
+
+	public static bool GetClick(){
+		isClickTB = false;
+		Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
+
+		// TODO replace with tags eventually
+		// filter array
+		foreach (RaycastHit2D hit in hits){
+			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
+			if (tb != null) {
+				clickTB = tb;
+				isClickTB = true;
+				return true;
+			}
+		}
+		foreach (RaycastHit2D hit in hits) {
+			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
+			if (cb != null) {
+				clickCB = cb;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void HandleMouse(){
@@ -62,33 +86,6 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 			}
 			lastClick = false;
 		}
-	}
-
-	public static bool GetClick(){
-		isClickTB = false;
-		Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
-
-		// TODO replace with tags eventually
-		// filter array
-		foreach (RaycastHit2D hit in hits){
-			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
-			if (tb != null) {
-//				HandleTileBehav (tb);
-				clickTB = tb;
-				isClickTB = true;
-				return true;
-			}
-		}
-		foreach (RaycastHit2D hit in hits) {
-			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-			if (cb != null) {
-//				HandleCellBehav (cb);
-				clickCB = cb;
-				return true;
-			}
-		}
-		return false;
 	}
 
 	static void TBMouseDown(TileBehav tb){
@@ -148,7 +145,7 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 				foreach (RaycastHit2D hit in hits){
 					CellBehav cb = hit.collider.GetComponent<CellBehav> ();
 					if (cb != null) {
-						mm.PlaceTile(cb.col);
+						mm.DropTile(cb.col);
 						return;
 					}
 				}
@@ -210,9 +207,10 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 				//				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
 				GameObject go = mm.GenerateTile (element);
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-				mm.PlaceTile (cb.col, go, .15f);
+				mm.DropTile (cb.col, go, .15f);
 			}
 		} else if(SpellEffects.IsTargetMode()) {
+			SpellEffects.OnCBTargetClick (cb);
 			//Put target return here!
 		}
 	}

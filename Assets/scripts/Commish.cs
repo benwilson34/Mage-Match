@@ -37,7 +37,7 @@ public static class Commish  {
 			}
 
 			int col = GetSemiRandomCol (ratios);
-			if (!mm.PlaceTile (col, go, .15f)) { // if col is full
+			if (!mm.DropTile (col, go, .15f)) { // if col is full
 				i--;
 				tries--;
 			} else {
@@ -89,27 +89,24 @@ public static class Commish  {
 	}
 	
 	public static void AngryDamage(){
+		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
 		mm.InactivePlayer ().ChangeHealth (-50);
 		mm.DiscardTile (mm.InactivePlayer(), 1);
 		
 		MageMatch.activep.ChangeHealth (-50);
 		mm.DiscardTile (MageMatch.activep, 1);
 		
-		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
-		
 		mood = 0;
 		UIController.UpdateCommishMeter ();
 	}
 	
 	public static void HappyHealing(){
+		Debug.Log ("The Commissioner is pleased, and has decided to heal both players for 100!");
 		mm.InactivePlayer ().ChangeHealth (100);
 		mm.DealPlayerHand (mm.InactivePlayer(), 1);
-		
-		
+
 		MageMatch.activep.ChangeHealth (100);
 		mm.DealPlayerHand (MageMatch.activep, 1);
-		
-		Debug.Log ("The Commissioner is pleased, and has decided to heal both players for 100!");
 		
 		mood = 0;
 		UIController.UpdateCommishMeter ();

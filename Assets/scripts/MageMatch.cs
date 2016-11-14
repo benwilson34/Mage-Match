@@ -10,6 +10,7 @@ public class MageMatch : MonoBehaviour {
 	public static GameState currentState;
 
 	public GameObject firePF, waterPF, earthPF, airPF, musclePF;  // tile prefabs
+	public GameObject stonePF, emberPF;                        // token prefabs
 	[HideInInspector] public static int turns;                 // number of current turn
 	[HideInInspector] public static bool menu = false;         // is the settings menu open?
 	[HideInInspector] public static GameObject currentTile;    // current game tile
@@ -228,8 +229,8 @@ public class MageMatch : MonoBehaviour {
 		}
 	}
 		
-	public bool PlaceTile(int col){
-		if (PlaceTile(col, currentTile, .08f)) {
+	public bool DropTile(int col){
+		if (DropTile(col, currentTile, .08f)) {
 			activep.hand.Remove (currentTile.GetComponent<TileBehav>()); // remove from hand
 			//			CheckGrav (); //? eventually once gravity gets moved to this script?
 			activep.AP--;
@@ -241,7 +242,7 @@ public class MageMatch : MonoBehaviour {
 			return false;
 	}
 
-	public bool PlaceTile(int col, GameObject go, float dur){
+	public bool DropTile(int col, GameObject go, float dur){
 		int row = BoardCheck.CheckColumn (col); // check that column isn't full
 		if (row >= 0) { // if the col is not full
 			TileBehav currentTileBehav = go.GetComponent<TileBehav> ();
@@ -262,6 +263,16 @@ public class MageMatch : MonoBehaviour {
 				AudioController.SwapSound ();
 			}
 		}
+	}
+
+	// TODO
+	public static void PutTile(GameObject go, int col, int row){
+		TileBehav currentTileBehav = go.GetComponent<TileBehav> ();
+		if(HexGrid.IsSlotFilled(col, row))
+			Destroy(HexGrid.GetTileBehavAt (col, row).gameObject);
+		currentTileBehav.SetPlaced();
+		currentTileBehav.HardSetPos (col, row);
+		BoardChanged();
 	}
 
 	public Player InactivePlayer(){
@@ -333,6 +344,17 @@ public class MageMatch : MonoBehaviour {
 		return go;
 	}
 
+	public GameObject GenerateToken(string name){
+		switch (name) {
+		case "stone":
+			return Instantiate (stonePF);
+		case "ember":
+			return Instantiate (emberPF);
+		default:
+			return null;
+		}
+	}
+
 	public void DiscardTile(Player player, int num){
 		int tilesInHand = player.hand.Count;
 		for(int i = 0; i < num; i++){
@@ -398,12 +420,10 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	public void Transmute(int col, int row, Tile.Element element){
-
 		Destroy(HexGrid.GetTileBehavAt (col, row).gameObject);
 		HexGrid.ClearTileBehavAt (col, row);
 		TileBehav tb = GenerateTile (element).GetComponent<TileBehav>();
 		tb.ChangePos (col, row);
-
 	}
 		
 	IEnumerator Remove_Anim(int col, int row, TileBehav tb, bool checkGrav){

@@ -15,9 +15,6 @@ public class Loadout {
 	public Loadout(int preset){
 		spells = new Spell[4];
 		switch (preset) {
-//		case 0:
-//			Commissioner ();
-//			break;
 		case 1:
 			EnfuegoA ();
 			break;
@@ -31,7 +28,7 @@ public class Loadout {
 			RockyB ();
 			break;
 		default:
-			Debug.Log ("Loadouts must be 1, 2, 3, or 4.");
+			Debug.Log ("Loadout number must be 1, 2, 3, or 4.");
 			break;
 		}
 	}
@@ -40,20 +37,6 @@ public class Loadout {
 		spellfx = new SpellEffects ();
 		SpellEffects.Init ();
 	}
-
-//	void Commissioner(){
-//		characterName = "Commissioner";
-//		techniqueName = "default";
-////		maxHealth = 1;
-//
-//		dfire = 20;
-//		dwater = 20;
-//		dearth = 20;
-//		dair = 20;
-//		dmuscle = 20;
-//
-//		spells [0] = new Spell ("Commissioner turn", "", 0, SpellEffects.Comm_Place5RandomTiles);
-//	}
 
 	void EnfuegoA(){ // Enfuego A - kickboxing
 		characterName = "Enfuego";
@@ -100,7 +83,7 @@ public class Loadout {
 		spells[0] = new Spell ("Magnitude 10", "EEMEE", 1, spellfx.Magnitude10);
 		spells[1] = new Spell ("Sinkhole", "EAAE", 1, spellfx.Deal496Dmg);
 		spells[2] = new Spell ("Boulder Barrage", "MMEE", 1, spellfx.Deal496Dmg);
-		spells[3] = new Spell ("Stalagmite", "AEE", 1, spellfx.Deal496Dmg);
+		spells[3] = new Spell ("Stalagmite", "AEE", 1, spellfx.Stalagmite);
 	}
 
 	void RockyB(){ // Rocky B - MMA master

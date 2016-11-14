@@ -107,6 +107,8 @@ public static class BoardCheck {
 	static List<TileSeq> CheckTile(int c, int r, List<TileSeq> shortList, bool matchMode){
 		// if check matches color of current, keep checking the line
 		List<TileSeq> returnList = new List<TileSeq> ();
+		if (!HexGrid.GetTileBehavAt (c, r).ableMatch) // handle current tile not matchable
+			return returnList;
 
 		// direction loop
 		for (int dir = 0; dir < 6; dir++) {
@@ -177,6 +179,7 @@ public static class BoardCheck {
 
 					if (!skipCurrentSeq && 
 						HexGrid.IsSlotFilled(c + dc, r + dr) && // if there's something there...
+						HexGrid.GetTileBehavAt(c + dc, r + dr).ableMatch && // and it can be matched...
 						HexGrid.GetTileAt(c + dc, r + dr).element.Equals(checkSeq.GetElementAt (seqIndex))) { // ...and the next tile matches the next in the seq
 						outSeq.sequence.Add (HexGrid.GetTileAt(c + dc, r + dr));
 					} else {

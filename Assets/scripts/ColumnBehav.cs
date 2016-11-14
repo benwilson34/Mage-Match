@@ -16,7 +16,7 @@ public class ColumnBehav : MonoBehaviour {
 //				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
 				GameObject go = mm.GenerateTile (element);
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-				mm.PlaceTile (col, go, .15f);
+				mm.DropTile (col, go, .15f);
 			}
 		} else if(SpellEffects.IsTargetMode()) {
 			//Put target return here!
