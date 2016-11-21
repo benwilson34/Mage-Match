@@ -6,11 +6,11 @@ using DG.Tweening;
 
 public class MageMatch : MonoBehaviour {
 
-	public enum GameState { PlayerTurn, BoardChecking, CommishTurn };
+	public enum GameState { PlayerTurn, TargetMode, BoardChecking, CommishTurn };
 	public static GameState currentState;
 
 	public GameObject firePF, waterPF, earthPF, airPF, musclePF;  // tile prefabs
-	public GameObject stonePF, emberPF;                        // token prefabs
+	public GameObject stonePF, emberPF, prereqPF, targetPF;       // token prefabs
 	[HideInInspector] public static int turns;                 // number of current turn
 	[HideInInspector] public static bool menu = false;         // is the settings menu open?
 	[HideInInspector] public static GameObject currentTile;    // current game tile
@@ -28,10 +28,10 @@ public class MageMatch : MonoBehaviour {
 
 		Loadout.Init ();
 		Commish.Init ();
-		EnchantEffects.Init ();
+//		EnchantEffects.Init ();
 
 		UIController.Init ();
-//		InputController.Init ();
+		Targeting.Init ();
 		AudioController.Init ();
 		Reset ();
 	}
@@ -92,7 +92,7 @@ public class MageMatch : MonoBehaviour {
 	// ---------------------------- Update is called once per frame - MAIN GAME LOOP ----------------------------
 	void Update () {
 		// if there is no winning player and the settings menu is not open
-		if (!endGame && !menu && !InputController.IsTargetMode() && !IsAnimating()) { 
+		if (!endGame && !menu && !IsTargetMode() && !IsAnimating()) { 
 			switch (currentState) {
 
 			case GameState.BoardChecking:
@@ -182,9 +182,9 @@ public class MageMatch : MonoBehaviour {
 
 	void ResolveMatchEffects(List<TileSeq> seqList){
 		for (int i = 0; i < seqList.Count; i++) {
-			// TODO handle enchantments, bigger sequences, critical matches...
-//			if (!commishTurn) {
 			if (currentState != GameState.CommishTurn) {
+				activep.ResolveMatchEffect (); // match-based effects
+
 				if (seqList [i].GetSeqLength () == 3) {
 					InactivePlayer ().ChangeHealth (Random.Range (-100, -75));
 					Commish.ChangeMood(10);
@@ -350,35 +350,30 @@ public class MageMatch : MonoBehaviour {
 			return Instantiate (stonePF);
 		case "ember":
 			return Instantiate (emberPF);
+		case "prereq":
+			return Instantiate (prereqPF);
+		case "target":
+			return Instantiate (targetPF);
 		default:
 			return null;
 		}
 	}
 
-	public void DiscardTile(Player player, int num){
-		int tilesInHand = player.hand.Count;
-		for(int i = 0; i < num; i++){
-			if (tilesInHand > 0) {
-				int randomRoll = Random.Range (0, tilesInHand);
-				GameObject go = player.hand[randomRoll].gameObject;
-				player.hand.RemoveAt (randomRoll);
-				Destroy(go);
-			}
-		}
-	}
-
-	public void CastSpell(int spellNum){ // TODO move player stuff (AP) to player.Cast()
-		Spell spell = activep.loadout.GetSpell (spellNum);
-		if (activep.CastSpell(spellNum)) {
+	public void CastSpell(int spellNum){ // IEnumerator?
+		Player p = activep;
+//		Spell spell = activep.loadout.GetSpell (spellNum);
+		if (p.CastSpell(spellNum)) {
 			Commish.ChangeMood(20);
 			UIController.DeactivateAllSpellButtons (activep); // ?
-			RemoveSeq (spell.GetBoardSeq ());
-			BoardChanged ();
-			HexGrid.CheckGrav (); //?
+			if(currentState != GameState.TargetMode){ // kinda shitty
+				RemoveSeq (p.GetCurrentBoardSeq ());
+				p.ApplyAPCost();
+				BoardChanged ();
+			}
 //			UIController.UpdateMoveText (activep.name + " casts " + spell.name + " for " + spell.APcost + " AP!!");
-			UIController.UpdatePlayerInfo();
+			UIController.UpdatePlayerInfo(); // move to BoardChecking handling??
 		} else {
-			UIController.UpdateMoveText ("Not enough AP! That spell costs " + spell.APcost + " and you only have " + activep.AP);
+			UIController.UpdateMoveText ("Not enough AP to cast!");
 		}
 	}
 		
@@ -390,7 +385,7 @@ public class MageMatch : MonoBehaviour {
 		}
 	}
 
-	void RemoveSeq(TileSeq seq){ // TODO messy stuff
+	public void RemoveSeq(TileSeq seq){ // TODO messy stuff
 		Debug.Log ("RemoveSeq(): About to remove " + BoardCheck.PrintSeq(seq, true));
 		Tile tile;
 		for (int i = 0; i < seq.sequence.Count;) {
@@ -466,6 +461,10 @@ public class MageMatch : MonoBehaviour {
 //		else
 //			Debug.Log ("IsCommishTurn evaluates to false!");
 		return currentState == GameState.CommishTurn;
+	}
+
+	public static bool IsTargetMode(){
+		return currentState == GameState.TargetMode;
 	}
 
 	public static void IncAnimating(){

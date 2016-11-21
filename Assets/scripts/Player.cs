@@ -14,6 +14,11 @@ public class Player {
 	public int handSize = 5;
 	public int tilesPlaced, tilesSwapped, matches;
 	public Loadout loadout;
+	private Spell currentSpell;
+
+	public delegate void MatchEffect();
+	private MatchEffect matchEffect;
+	private int matchesLeft = 0;
 
 	private float buff_dmg = 1;
 
@@ -26,13 +31,13 @@ public class Player {
 
 		switch (playerNum) {
 		case 1: 
-			SetName ("Raucous Pinefuck");
+			SetName ("Maxsimilous Forza");
 			id = 1;
 			handSlot = GameObject.Find ("handslot1").transform;
 			loadout = new Loadout (UIController.GetLoadoutNum(1));
 			break;
 		case 2: 
-			SetName ("Stevey St. Evans");
+			SetName ("Quincy Shungle");
 			id = 2;
 			handSlot = GameObject.Find ("handslot2").transform;
 			loadout = new Loadout (UIController.GetLoadoutNum(2));
@@ -60,6 +65,8 @@ public class Player {
 			MageMatch.EndTheGame ();
 	}
 
+	// TODO DrawTile()?
+
 	public void AlignHand(float duration, bool linear){
 		GameObject.Find("board").GetComponent<MageMatch>().StartAnim(AlignHand_Anim(duration, linear));
 	}
@@ -86,6 +93,20 @@ public class Player {
 		}
 	}
 
+	public int DiscardRandom(int count){
+		int tilesInHand = hand.Count;
+		int i;
+		for(i = 0; i < count; i++){
+			if (tilesInHand > 0) {
+				int rand = Random.Range (0, tilesInHand);
+				GameObject go = hand[rand].gameObject;
+				hand.RemoveAt (rand);
+				GameObject.Destroy(go);
+			}
+		}
+		return i;
+	}
+
 	public void FlipHand(){
 		foreach (TileBehav tb in hand) {
 			tb.FlipTile ();
@@ -99,13 +120,36 @@ public class Player {
 	public bool CastSpell(int index){ // TODO
 		Spell spell = loadout.GetSpell (index);
 		if (AP >= spell.APcost) {
+			currentSpell = spell;
 			spell.Cast ();
-			AP -= spell.APcost;
-			if (AP == 0)
-				FlipHand ();
 			return true;
 		} else 
 			return false;
+	}
+
+	public void ApplyAPCost(){
+		AP -= currentSpell.APcost;
+		if (AP == 0)
+			FlipHand ();
+	}
+
+	public TileSeq GetCurrentBoardSeq(){
+		return currentSpell.GetBoardSeq ();
+	}
+
+	public void SetMatchEffect(int count, MatchEffect effect){
+		matchEffect = effect;
+		matchesLeft = count;
+	}
+
+	public void ResolveMatchEffect(){
+		if (matchesLeft > 0) {
+			matchEffect ();
+			matches--;
+		}
+		if (matches == 0) {
+			matchEffect = null; //?
+		}
 	}
 
 	public void ChangeBuff_Dmg(float d){

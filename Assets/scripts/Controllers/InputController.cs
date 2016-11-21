@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// TODO eventually handle mobile tap input instead of clicking
 public class InputController : MonoBehaviour { // Monobehaviour needed? One InputController per tile?
 
 	private static MageMatch mm;
@@ -10,66 +11,50 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 	private static Transform parentT;
 	private static bool dragged = false;
 
-//	private static int click = 0;
 	private static bool lastClick = false, nowClick = false;
-	private static TileBehav clickTB;
-	private static CellBehav clickCB;
-	public static bool isClickTB = false;
-
-	private enum TargetMode { Tile, Area, Drag, Cell };
-	private static TargetMode currentTMode = TargetMode.Tile;
-	private static int targets = 0;
-
-	public delegate void TBTargetEffect (TileBehav tb); // move to SpellEffects?
-	private static TBTargetEffect TBtargetEffect;
-	public delegate void CBTargetEffect (CellBehav cb); // move to SpellEffects?
-	private static CBTargetEffect CBtargetEffect;
+	private static TileBehav clickTB; // needed?
+	private static CellBehav clickCB; // needed?
+	private static bool isClickTB = false;
 
 	void Awake () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
 	void Update(){ // polling input
-//		if(!MageMatch.IsCommishTurn()){
-			if (Input.GetMouseButton (0)) { // if left mouse is down
-//				Debug.Log("NOT Commish turn...");
-				nowClick = true;
+		if (Input.GetMouseButton (0)) { // if left mouse is down
+			if (Targeting.currentTMode == Targeting.TargetMode.Drag){
+//				HandleDrag ();
+			} else 
 				HandleMouse ();
-			} else if (Input.GetMouseButtonUp (0)) { // if left mouse was JUST released
-				nowClick = false;
-				HandleMouse ();
-			}
-//		}
+			nowClick = true; // move up?
+		} else if (Input.GetMouseButtonUp (0)) { // if left mouse was JUST released
+			nowClick = false;
+			HandleMouse ();
+		}
 	}
 
-	public static bool GetClick(){
-		isClickTB = false;
-		Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
-
-		// TODO replace with tags eventually
-		// filter array
-//		if (currentTMode != TargetMode.Cell) { // TODO there's a better way
-			foreach (RaycastHit2D hit in hits) {
-				TileBehav tb = hit.collider.GetComponent<TileBehav> ();
-				if (tb != null) {
-					clickTB = tb;
-					if (currentTMode == TargetMode.Tile) { // TODO there's a better way
-						isClickTB = true; // move up ^^
-						return true;
-					}
-				}
+	TileBehav GetMouseTile(RaycastHit2D[] hits){
+		foreach (RaycastHit2D hit in hits) {
+			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
+			if (tb != null) {
+//				clickTB = tb;
+//				isClickTB = true;
+				return tb;
 			}
-//		}
+		}
+		return null;
+	}
+
+	CellBehav GetMouseCell(RaycastHit2D[] hits){
 		foreach (RaycastHit2D hit in hits) {
 			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
 			if (cb != null) {
-				clickCB = cb;
-				if (currentTMode == TargetMode.Cell) // TODO there's a better way
-					return true;
+//				clickTB = tb;
+//				isClickTB = true;
+				return cb;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	void HandleMouse(){
@@ -103,24 +88,73 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		}
 	}
 
+	bool GetClick(){
+		isClickTB = false;
+		Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
+
+		if (Targeting.currentTMode != Targeting.TargetMode.Cell) {
+			TileBehav tb = GetMouseTile (hits);
+			if (tb != null) {
+				clickTB = tb;
+				isClickTB = true;
+				return true; // void?
+			}
+		}
+		CellBehav cb = GetMouseCell (hits);
+		if (cb != null) {
+			clickCB = cb;
+			return true; // void?
+		}
+
+		// TODO replace with tags eventually
+		// filter array
+		//		foreach (RaycastHit2D hit in hits) {
+		//			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
+		//			if (tb != null) {
+		//				clickTB = tb;
+		//				if (currentTMode == TargetMode.Tile) { // TODO there's a better way...check for target mode?
+		//					isClickTB = true; // move up ^^
+		//					return true;
+		//				}
+		//			}
+		//		}
+		//		foreach (RaycastHit2D hit in hits) {
+		//			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
+		//			if (cb != null) {
+		//				clickCB = cb;
+		//				if (currentTMode == TargetMode.Cell) // TODO there's a better way
+		//					return true;
+		//			}
+		//		}
+		return false;
+	}
+
 	static void TBMouseDown(TileBehav tb){
 		if (!MageMatch.IsEnded () && !MageMatch.IsCommishTurn()) { // if the game isn't done
 			if (!MageMatch.menu) { // if the menu isn't open
 				switch(tb.currentState){
 				case TileBehav.TileState.Hand:
-					parentT = tb.transform.parent;
-					tb.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-					// TODO
-					//tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
+					if (!Targeting.IsTargetMode ()) {
+						parentT = tb.transform.parent;
+						tb.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
+						// TODO
+						//tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
 
-					MageMatch.currentTile = tb.gameObject;
-					AudioController.PickupSound (tb.gameObject.GetComponent<AudioSource> ());
+						MageMatch.currentTile = tb.gameObject;
+						AudioController.PickupSound (tb.gameObject.GetComponent<AudioSource> ());
+					}
 					break;
 				case TileBehav.TileState.Placed:
 //					Debug.Log ("MouseDown on Placed tile.");
-					if (IsTargetMode ())
-						OnTileTarget (tb);
-					else {
+					Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
+					if (Targeting.IsTargetMode ()
+					    && Targeting.currentTMode == Targeting.TargetMode.Tile) {
+						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
+						Targeting.OnTileTarget (tb);
+//					} else if (IsTargetMode () && currentTMode == TargetMode.Drag){
+////						OnDragTarget (tbs); // TODO
+					} else { // disable during targeting screen?
 						dragClick = Camera.main.WorldToScreenPoint (tb.transform.position);
 						dragged = true;
 					}
@@ -132,9 +166,10 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		}
 	}
 
-	public static void TBMouseDrag(TileBehav tb){
+	static void TBMouseDrag(TileBehav tb){
 //		Debug.Log ("TBMouseDrag called.");
-		if (!MageMatch.IsEnded () && !MageMatch.menu && !MageMatch.IsCommishTurn()) {
+		if (!MageMatch.IsEnded () && !MageMatch.menu 
+			&& !MageMatch.IsCommishTurn() && !Targeting.IsTargetMode()) {
 			switch (tb.currentState) {
 			case TileBehav.TileState.Hand:
 				Vector3 cursor = Camera.main.ScreenToWorldPoint (Input.mousePosition);
@@ -150,7 +185,8 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 
 	static void TBMouseUp(TileBehav tb){
 //		Debug.Log ("TBMouseUp called.");
-		if (!MageMatch.IsEnded () && !MageMatch.menu && !MageMatch.IsCommishTurn()) {
+		if (!MageMatch.IsEnded () && !MageMatch.menu 
+			&& !MageMatch.IsCommishTurn() && !Targeting.IsTargetMode()) {
 			switch (tb.currentState) {
 			case TileBehav.TileState.Hand:
 				Vector3 mouse = Camera.main.ScreenToWorldPoint (Input.mousePosition);
@@ -219,63 +255,15 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 			Tile.Element element = Settings.GetClickElement ();
 			if (element != Tile.Element.None) {
-				//				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
+//				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
 				GameObject go = mm.GenerateTile (element);
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
 				mm.DropTile (cb.col, go, .15f);
 			}
-		} else if(IsTargetMode()) {
-			OnCellTarget (cb);
+		} else if(Targeting.IsTargetMode() && Targeting.currentTMode == Targeting.TargetMode.Cell) {
+			Targeting.OnCellTarget (cb);
 			//Put target return here!
 		}
 	}
 
-	// -------------------------------- TARGETING ------------------------------------
-
-	public static bool IsTargetMode(){
-		return targets > 0;
-	}
-
-	static void DecTargets(){
-		targets--;
-		if (targets == 0)
-			currentTMode = TargetMode.Tile;
-	}
-
-	public static void WaitForTileTarget(int count, TBTargetEffect targetEffect){
-		// TODO handle fewer tiles on board than count
-		// TODO handle targeting same tile more than once
-		currentTMode = TargetMode.Tile;
-		targets = count;
-		TBtargetEffect = targetEffect;
-		Debug.Log ("targets = " + targets);
-	}
-
-	static void OnTileTarget(TileBehav tb){ // doesn't need param due to field rn
-		DecTargets ();
-		Debug.Log ("Targeted tile (" + tb.tile.col + ", " + tb.tile.row + ")");
-		TBtargetEffect (tb);
-	}
-
-	public static void WaitForCellTarget(int count, CBTargetEffect targetEffect){
-		currentTMode = TargetMode.Cell;
-		targets = count;
-		CBtargetEffect = targetEffect;
-		Debug.Log ("targets = " + targets);
-	}
-
-	static void OnCellTarget(CellBehav cb){ // doesn't need param due to field rn
-		DecTargets ();
-		Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
-		CBtargetEffect (cb);
-	}
-
-	public static void WaitForTargetDrag(int count){
-		// TODO
-		currentTMode = TargetMode.Drag;
-	}
-
-	static void OnTargetDrag (List<TileBehav> tbs){
-		// TODO
-	}
 }

@@ -229,6 +229,7 @@ public static class BoardCheck {
 		return (dir + 3) % 6;
 	}
 
+	// TODO move to HexGrid?
 	public static List<TileBehav> PlacedTileList(){
 		List<TileBehav> returnList = new List<TileBehav> ();
 		for(int c = 0; c < HexGrid.numCols; c++){ // for each col

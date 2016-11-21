@@ -90,11 +90,13 @@ public static class Commish  {
 	
 	public static void AngryDamage(){
 		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
-		mm.InactivePlayer ().ChangeHealth (-50);
-		mm.DiscardTile (mm.InactivePlayer(), 1);
-		
-		MageMatch.activep.ChangeHealth (-50);
-		mm.DiscardTile (MageMatch.activep, 1);
+		Player p = mm.InactivePlayer ();
+		p.ChangeHealth (-50);
+		p.DiscardRandom (1);
+
+		p = MageMatch.activep;
+		p.ChangeHealth (-50);
+		p.DiscardRandom (1);
 		
 		mood = 0;
 		UIController.UpdateCommishMeter ();

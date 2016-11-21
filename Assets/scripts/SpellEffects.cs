@@ -5,51 +5,10 @@ using System.Collections.Generic;
 public class SpellEffects {
 
 	private static MageMatch mm;
-//	private static int targets;
-//	private delegate void TBTargetEffect (TileBehav tb);
-//	private static TBTargetEffect TBtargetEffect;
-//	private delegate void CBTargetEffect (CellBehav cb);
-//	private static CBTargetEffect CBtargetEffect;
 
 	public static void Init(){
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
-
-//	public static bool IsTargetMode (){
-//		return targets > 0;
-//	}
-//
-//	static void WaitForTargetClick(int count){
-//		// TODO handle fewer tiles on board than count
-//		// TODO handle targeting same tile more than once
-//		targets = count;
-//		Debug.Log ("targets = " + targets);
-//	}
-//
-//	public static void OnTargetClick(TileBehav tb){
-//		targets--;
-//		Debug.Log ("Targeted tile (" + tb.tile.col + ", " + tb.tile.row + ")");
-//		TBtargetEffect (tb);
-//	}
-//
-//	static void WaitForCBTargetClick(int count){
-//		targets = count;
-//		Debug.Log ("targets = " + targets);
-//	}
-//
-//	public static void OnCBTargetClick(CellBehav cb){
-//		targets--;
-//		Debug.Log ("Targeted tile (" + cb.col + ", " + cb.row + ")");
-//		CBtargetEffect (cb);
-//	}
-//
-//	static void WaitForTargetDrag(int count){
-//		// TODO
-//	}
-//
-//	public static void OnTargetDrag (List<TileBehav> tbs){
-//		// TODO
-//	}
 
 	// -------------------------------------- SPELLS ---------------------------------------------
 
@@ -57,63 +16,68 @@ public class SpellEffects {
 		mm.InactivePlayer ().ChangeHealth (-496);
 	}
 
+	// TODO
 	public void WhiteHotComboKick(){
-//		TBtargetEffect = WHCK_Target;
-		InputController.WaitForTileTarget (3, WHCK_Target);
+		Targeting.WaitForTileTarget (3, WHCK_Target);
 	}
 	void WHCK_Target(TileBehav tb){
-		if (tb.tile.element.Equals (Tile.Element.Fire))
-			mm.InactivePlayer ().ChangeHealth (-100);
-		else if (tb.tile.element.Equals (Tile.Element.Muscle)) { // TODO
-//			mm.InactivePlayer.RandomDiscard(1);
-			mm.InactivePlayer ().ChangeHealth (-70);
-		} else
-			mm.InactivePlayer ().ChangeHealth (-70);
+		mm.InactivePlayer ().ChangeHealth (-70);
+		
+		if (tb.tile.element.Equals (Tile.Element.Fire)){
+			// TODO spread Burning
+		} else if (tb.tile.element.Equals (Tile.Element.Muscle)) {
+			mm.InactivePlayer().DiscardRandom(1);
+		}
 		
 		mm.RemoveTile (tb.tile, true, true);
 	}
 
+	// empty
 	public void Baila(){
 		
 	}
 
+	// empty
 	public void PhoenixFire(){
 		
 	}
 	
-	//PLACEHOLDER EFFECT
+	// TODO PLACEHOLDER EFFECT
 	public void HotBody(){
-		//		TBtargetEffect = Hotbody_Target;
-		InputController.WaitForTileTarget (3, Hotbody_Target);
+		MageMatch.activep.SetMatchEffect (3, Hotbody_Match);
 	}
-	public void Hotbody_Target(TileBehav tb){
-		//		mm.Transmute (tb.tile.col, tb.tile.row, Tile.Element.Fire);
-		//		mm.DiscardTile(MageMatch.GetOpponent(MageMatch.activep.id));
-		Ench_SetBurning(tb);
+	public void Hotbody_Match(){
+		// TODO random tiles x 3
+//		Ench_SetBurning();
 	}
 
+	// TODO
 	public void HotAndBothered(){
 		
 	}
 
+	// TODO TurnEffect
 	public void Pivot(){
-		
+		MageMatch.activep.SetMatchEffect (1, Pivot_Match);
+	}
+	void Pivot_Match(){
+		MageMatch.activep.AP++;
 	}
 	
 	public void Incinerate(){
 		// TODO drag targeting
 		int burnCount = mm.InactivePlayer().hand.Count * 2;
-		mm.DiscardTile (mm.InactivePlayer(), 2);
-		//		TBtargetEffect = Incinerate_Target;
-		InputController.WaitForTileTarget (burnCount, Incinerate_Target);
+		Debug.Log ("SPELLFX: Incinerate burnCount = " + burnCount);
+		mm.InactivePlayer().DiscardRandom (2);
+		Targeting.WaitForDragTarget (burnCount, Incinerate_Target);
 	}
-	void Incinerate_Target(TileBehav tb){
-		Ench_SetBurning (tb);
+	void Incinerate_Target(List<TileBehav> tbs){
+		foreach(TileBehav tb in tbs)
+			Ench_SetBurning (tb);
 	}
 
-	public void LightningPalm(){ // TODO targeting
-//		TBtargetEffect = LightningPalm_Target;
-		InputController.WaitForTileTarget(1, LightningPalm_Target);
+	public void LightningPalm(){
+		Targeting.WaitForTileTarget(1, LightningPalm_Target);
 	}
 	void LightningPalm_Target(TileBehav tb){
 		List<TileBehav> tileList = BoardCheck.PlacedTileList ();
@@ -139,8 +103,7 @@ public class SpellEffects {
 	}
 
 	public void Cherrybomb(){
-//		TBtargetEffect = Cherrybomb_Target;
-		InputController.WaitForTileTarget(1, Cherrybomb_Target);
+		Targeting.WaitForTileTarget(1, Cherrybomb_Target);
 	}
 	void Cherrybomb_Target(TileBehav tb){
 //		tb.SetEnchantment (Ench_Cherrybomb);
@@ -176,10 +139,8 @@ public class SpellEffects {
 
 	}
 
-	// TODO
 	public void Stalagmite(){
-//		CBtargetEffect = Stalagmite_Target;
-		InputController.WaitForCellTarget(1, Stalagmite_Target);
+		Targeting.WaitForCellTarget(1, Stalagmite_Target);
 	}
 	void Stalagmite_Target(CellBehav cb){
 		int col = cb.col;
@@ -257,6 +218,7 @@ public class SpellEffects {
 
 	public void Ench_SetBurning(TileBehav tb){
 		// Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
+		Debug.Log("SPELLEFFECTS: Setting burning...");
 		TurnEffect effect = new TurnEffect (MageMatch.activep.id, 5, Ench_Burning_Turn, Ench_Burning_End, Ench_Burning_Cancel);
 		tb.SetEnchantment (effect);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);

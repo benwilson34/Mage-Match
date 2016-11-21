@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// Abstract class??
 public class Loadout {
 
 	public string characterName;
@@ -22,13 +23,19 @@ public class Loadout {
 			EnfuegoB ();
 			break;
 		case 3:
-			RockyA ();
+			GravekeeperA ();
 			break;
 		case 4:
+			GravekeeperB ();
+			break;
+		case 5:
+			RockyA ();
+			break;
+		case 6:
 			RockyB ();
 			break;
 		default:
-			Debug.Log ("Loadout number must be 1, 2, 3, or 4.");
+			Debug.Log ("Loadout number must be 1 through 6.");
 			break;
 		}
 	}
@@ -43,10 +50,9 @@ public class Loadout {
 		techniqueName = "Supah Hot Fire";
 		maxHealth = 1000;
 
-		// TODO revise deck
-		dfire = 40;
-		dmuscle = 40;
+		dfire = 50;
 		dair = 20;
+		dmuscle = 30;
 
 		spells[0] = new Spell ("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
 		spells[2] = new Spell ("Incinerate", "FAFF", 1, spellfx.Incinerate);
@@ -54,24 +60,54 @@ public class Loadout {
 		spells[3] = new Spell ("Phoenix Fire", "AFM", 1, spellfx.PhoenixFire);
 	}
 
+	// FOCUS
 	void EnfuegoB(){ // Enfuego B - Hot Feet
 		characterName = "Enfuego";
 		techniqueName = "Hot Feet";
 		maxHealth = 1100;
 
-		// TODO revise deck
-		dfire = 45;
-		dair = 25;
-		dmuscle = 15;
-		dwater = 8;
-		dearth = 7;
+		dfire = 50;
+		dearth = 15;
+		dmuscle = 35;
 
 		spells[0] = new Spell ("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
 		spells[1] = new Spell ("Hot Body", "FEFM", 1, spellfx.HotBody);
 		spells[2] = new Spell ("Hot and Bothered", "FMF", 1, spellfx.HotAndBothered);
-		spells[3] = new Spell ("Pivot", "MEF", 1, spellfx.Pivot);
+		spells[3] = new Spell ("Pivot", "MEF", 0, spellfx.Pivot);
 	}
 
+	// FOCUS
+	void GravekeeperA(){ // The Gravekeeper A - Business in the Front
+		characterName = "The Gravekeeper";
+		techniqueName = "Business in the Front";
+		maxHealth = 1150;
+
+		dwater = 20;
+		dearth = 40;
+		dmuscle = 40;
+
+		spells[0] = new Spell ("Raise Zombie", "EMME", 1, spellfx.Deal496Dmg);
+		spells[1] = new Spell ("Zombie Synergy", "MEE", 1, spellfx.Deal496Dmg);
+		spells[2] = new Spell ("Human Resources", "MEME", 1, spellfx.Deal496Dmg);
+		spells[3] = new Spell ("Company Luncheon", "EMWM", 1, spellfx.Deal496Dmg);
+	}
+	
+	void GravekeeperB(){ // The Gravekeeper A - Party in the Back
+		characterName = "The Gravekeeper";
+		techniqueName = "Party in the Back";
+		maxHealth = 1050;
+
+		dfire = 25;
+		dearth = 35;
+		dmuscle = 40;
+
+		spells[0] = new Spell ("Raise Zombie", "EMME", 1, spellfx.Deal496Dmg);
+		spells[1] = new Spell ("R.S.V.Z.", "MEM", 1, spellfx.Deal496Dmg);
+		spells[2] = new Spell ("The Oogie Boogie", "MFE", 1, spellfx.Deal496Dmg);
+		spells[3] = new Spell ("Bottle Rocket Mishap", "EMFM", 1, spellfx.Deal496Dmg);
+	}
+
+	// TODO
 	void RockyA(){ // Rocky A - Tectonic Titan 
 		characterName = "Rocky";
 		techniqueName = "Tectonic Titan";
@@ -88,6 +124,7 @@ public class Loadout {
 		spells[3] = new Spell ("Stalagmite", "AEE", 1, spellfx.Stalagmite);
 	}
 
+	// TODO
 	void RockyB(){ // Rocky B - Continental Champion
 		characterName = "Rocky";
 		techniqueName = "Continental Champion";
@@ -115,7 +152,7 @@ public class Loadout {
 		return outlist;
 	}
 
-	public Tile.Element GetTileElement (){
+	public Tile.Element GetTileElement(){
 		int rand = Random.Range (0, 100);
 		if      (rand < dfire)
 			return Tile.Element.Fire;
