@@ -47,7 +47,7 @@ public static class Commish  {
 		}
 
 		if (tries == 0) {
-			Debug.Log ("The board is full. The Commissioner ends his turn early.");
+			Debug.Log ("COMMISH: The board is full. The Commissioner ends his turn early.");
 			GameObject.Destroy (go);
 		}
 	}
@@ -75,7 +75,7 @@ public static class Commish  {
 			if (val < thresh)
 				return i;
 		}
-		Debug.Log ("GetSemiRandomCol: shouldn't get to this point. val = " + val);
+		Debug.Log ("COMMISH: GetSemiRandomCol: shouldn't get to this point. val = " + val);
 		return 6;
 	}
 

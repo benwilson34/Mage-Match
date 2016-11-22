@@ -47,13 +47,27 @@ public class SpellEffects {
 		MageMatch.activep.SetMatchEffect (3, Hotbody_Match);
 	}
 	public void Hotbody_Match(){
-		// TODO random tiles x 3
-//		Ench_SetBurning();
+		// TODO threshold to prevent infinite loop
+		List<TileBehav> tbs = HexGrid.GetPlacedTiles();
+		for (int i = 0; i < 3; i++) {
+			int rand = Random.Range (0, tbs.Count);
+			if (tbs[rand].HasEnchantment()) {
+				i--;
+			} else {
+				Ench_SetBurning (tbs [rand]);
+			}
+		}
 	}
 
-	// TODO
 	public void HotAndBothered(){
-		
+		mm.InactivePlayer ().ChangeBuff_DmgExtra (15);
+		MageMatch.endTurnEffects.Add( new TurnEffect (mm.InactivePlayer().id, 5, HAB_Turn, HAB_End, null));
+	}
+	void HAB_Turn(int id){
+		mm.InactivePlayer ().ChangeBuff_DmgExtra (15); // technically not needed
+	}
+	void HAB_End(int id){
+		mm.InactivePlayer ().ChangeBuff_DmgExtra (0); // reset
 	}
 
 	// TODO TurnEffect
@@ -80,7 +94,7 @@ public class SpellEffects {
 		Targeting.WaitForTileTarget(1, LightningPalm_Target);
 	}
 	void LightningPalm_Target(TileBehav tb){
-		List<TileBehav> tileList = BoardCheck.PlacedTileList ();
+		List<TileBehav> tileList = HexGrid.GetPlacedTiles ();
 		Tile tile;
 		for (int i = 0; i < tileList.Count; i++) {
 			tile = tileList [i].tile;
@@ -92,14 +106,14 @@ public class SpellEffects {
 	}
 
 	public void CaughtYouMirin(){
-		MageMatch.activep.ChangeBuff_Dmg (.5f); // 50% damage multiplier
+		MageMatch.activep.ChangeBuff_DmgMult (.5f); // 50% damage multiplier
 		MageMatch.endTurnEffects.Add( new TurnEffect (MageMatch.activep.id, 4, CaughtYouMirin_Turn, CaughtYouMirin_End, null));
 	}
 	void CaughtYouMirin_Turn(int id){ // technically this isn't needed
-		MageMatch.GetPlayer(id).ChangeBuff_Dmg (.5f); // 50% damage multiplier
+		MageMatch.GetPlayer(id).ChangeBuff_DmgMult (.5f); // 50% damage multiplier
 	}
 	void CaughtYouMirin_End(int id){
-		MageMatch.GetPlayer(id).ChangeBuff_Dmg (1f); // reset back to 100% dmg
+		MageMatch.GetPlayer(id).ChangeBuff_DmgMult (1f); // reset back to 100% dmg
 	}
 
 	public void Cherrybomb(){
@@ -170,50 +184,53 @@ public class SpellEffects {
 		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
 	}
 	void Ench_Cherrybomb_Resolve(int id, TileBehav tb){
-		Tile tile = tb.tile;
-
-		Debug.Log ("CHERRYBOMB tile = (" + tile.col + ", " + tile.row + ")");
-
+		Debug.Log ("SPELLEFFECTS: Resolving Cherrybomb at (" + tb.tile.col + ", " + tb.tile.row + ")");
 		MageMatch.GetOpponent(id).ChangeHealth (-200);
 
-		// Board N
-		if (tile.row != HexGrid.TopOfColumn (tile.col)) { // Board N
-			if (HexGrid.IsSlotFilled (tile.col, tile.row + 1)){
-				mm.RemoveTile(tile.col, tile.row + 1, false, true);
-			}
+		List<TileBehav> tbs = HexGrid.GetAdjacentTiles (tb.tile.col, tb.tile.row);
+		foreach(TileBehav ctb in tbs){
+			if (ctb.ableDestroy)
+				mm.RemoveTile (ctb.tile.col, ctb.tile.row, false, true);
 		}
 
-		// Board NE
-		if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1) {
-			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row + 1))
-				mm.RemoveTile(tile.col + 1, tile.row + 1, false, true);
-		}
-
-		// Board SE
-		bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
-		if (tile.col != HexGrid.numCols - 1 && bottomcheck) {
-			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row))
-				mm.RemoveTile(tile.col + 1, tile.row, false, true);
-		}
-
-		// Board S
-		if (tile.row != HexGrid.BottomOfColumn (tile.col)) {
-			if (HexGrid.IsSlotFilled (tile.col, tile.row - 1))
-				mm.RemoveTile(tile.col, tile.row - 1, false, true);
-		}
-
-		// Board SW
-		if (tile.row != 0 && tile.col != 0) {
-			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row - 1))
-				mm.RemoveTile(tile.col - 1, tile.row - 1, false, true);
-		}
-
-		// Board NW
-		bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
-		if (tile.col != 0 && topcheck) {
-			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row))
-				mm.RemoveTile(tile.col - 1, tile.row, false, true);
-		}
+//		// Board N
+//		if (tile.row != HexGrid.TopOfColumn (tile.col)) { // Board N
+//			if (HexGrid.IsSlotFilled (tile.col, tile.row + 1)){
+//				mm.RemoveTile(tile.col, tile.row + 1, false, true);
+//			}
+//		}
+//
+//		// Board NE
+//		if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1) {
+//			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row + 1))
+//				mm.RemoveTile(tile.col + 1, tile.row + 1, false, true);
+//		}
+//
+//		// Board SE
+//		bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
+//		if (tile.col != HexGrid.numCols - 1 && bottomcheck) {
+//			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row))
+//				mm.RemoveTile(tile.col + 1, tile.row, false, true);
+//		}
+//
+//		// Board S
+//		if (tile.row != HexGrid.BottomOfColumn (tile.col)) {
+//			if (HexGrid.IsSlotFilled (tile.col, tile.row - 1))
+//				mm.RemoveTile(tile.col, tile.row - 1, false, true);
+//		}
+//
+//		// Board SW
+//		if (tile.row != 0 && tile.col != 0) {
+//			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row - 1))
+//				mm.RemoveTile(tile.col - 1, tile.row - 1, false, true);
+//		}
+//
+//		// Board NW
+//		bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
+//		if (tile.col != 0 && topcheck) {
+//			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row))
+//				mm.RemoveTile(tile.col - 1, tile.row, false, true);
+//		}
 	}
 
 	public void Ench_SetBurning(TileBehav tb){

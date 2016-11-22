@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 public class Targeting {
 
-	public enum TargetMode { Tile, Area, Drag, Cell };
+	public enum TargetMode { Tile, TileArea, Cell, CellArea, Drag };
 	public static TargetMode currentTMode = TargetMode.Tile;
 
 	private static MageMatch mm;
 	private static int targetsLeft = 0;
 	private static List<TileBehav> targetTBs; // static?
-	private static Vector3 lastTCenter;     // static?
+	private static Vector3 lastTCenter;       // static?
 
 	private static List<GameObject> outlines;
 

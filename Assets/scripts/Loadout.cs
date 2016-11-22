@@ -16,6 +16,9 @@ public class Loadout {
 	public Loadout(int preset){
 		spells = new Spell[4];
 		switch (preset) {
+		case 0:
+			TestLoadout ();
+			break;
 		case 1:
 			EnfuegoA ();
 			break;
@@ -43,6 +46,23 @@ public class Loadout {
 	public static void Init(){
 		spellfx = new SpellEffects ();
 		SpellEffects.Init ();
+	}
+
+	void TestLoadout(){
+		characterName = "Sample";
+		techniqueName = "Test Loadout";
+		maxHealth = 1000;
+
+		dfire = 20;
+		dwater = 20;
+		dearth = 20;
+		dair = 20;
+		dmuscle = 20;
+
+		spells[0] = new Spell ("Cherrybomb", "FAM", 1, spellfx.Cherrybomb);
+		spells[2] = new Spell ("Spell two", "FAF", 1, spellfx.Deal496Dmg);
+		spells[1] = new Spell ("Spell three", "FMF", 1, spellfx.Deal496Dmg);
+		spells[3] = new Spell ("Spell four", "AFM", 1, spellfx.Deal496Dmg);
 	}
 
 	void EnfuegoA(){ // Enfuego A - Supah Hot Fire

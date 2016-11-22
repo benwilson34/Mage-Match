@@ -3,18 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 
 // TODO eventually handle mobile tap input instead of clicking
-public class InputController : MonoBehaviour { // Monobehaviour needed? One InputController per tile?
+public class InputController : MonoBehaviour {
 
-	private static MageMatch mm;
+	private MageMatch mm;
 
-	private static Vector3 dragClick;
-	private static Transform parentT;
-	private static bool dragged = false;
+	private Vector3 dragClick;
+	private Transform parentT;
+	private bool dragged = false;
 
-	private static bool lastClick = false, nowClick = false;
-	private static TileBehav clickTB; // needed?
-	private static CellBehav clickCB; // needed?
-	private static bool isClickTB = false;
+	private bool lastClick = false, nowClick = false;
+	private TileBehav clickTB; // needed?
+	private CellBehav clickCB; // needed?
+	private bool isClickTB = false;
 
 	void Awake () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -107,30 +107,10 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 			return true; // void?
 		}
 
-		// TODO replace with tags eventually
-		// filter array
-		//		foreach (RaycastHit2D hit in hits) {
-		//			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
-		//			if (tb != null) {
-		//				clickTB = tb;
-		//				if (currentTMode == TargetMode.Tile) { // TODO there's a better way...check for target mode?
-		//					isClickTB = true; // move up ^^
-		//					return true;
-		//				}
-		//			}
-		//		}
-		//		foreach (RaycastHit2D hit in hits) {
-		//			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-		//			if (cb != null) {
-		//				clickCB = cb;
-		//				if (currentTMode == TargetMode.Cell) // TODO there's a better way
-		//					return true;
-		//			}
-		//		}
 		return false;
 	}
 
-	static void TBMouseDown(TileBehav tb){
+	void TBMouseDown(TileBehav tb){
 		if (!MageMatch.IsEnded () && !MageMatch.IsCommishTurn()) { // if the game isn't done
 			if (!MageMatch.menu) { // if the menu isn't open
 				switch(tb.currentState){
@@ -146,11 +126,10 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 					}
 					break;
 				case TileBehav.TileState.Placed:
-//					Debug.Log ("MouseDown on Placed tile.");
-					Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
+//					Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
 					if (Targeting.IsTargetMode ()
 					    && Targeting.currentTMode == Targeting.TargetMode.Tile) {
-						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
+//						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
 						Targeting.OnTileTarget (tb);
 //					} else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
@@ -166,7 +145,7 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		}
 	}
 
-	static void TBMouseDrag(TileBehav tb){
+	void TBMouseDrag(TileBehav tb){
 //		Debug.Log ("TBMouseDrag called.");
 		if (!MageMatch.IsEnded () && !MageMatch.menu 
 			&& !MageMatch.IsCommishTurn() && !Targeting.IsTargetMode()) {
@@ -183,7 +162,7 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		}
 	}
 
-	static void TBMouseUp(TileBehav tb){
+	void TBMouseUp(TileBehav tb){
 //		Debug.Log ("TBMouseUp called.");
 		if (!MageMatch.IsEnded () && !MageMatch.menu 
 			&& !MageMatch.IsCommishTurn() && !Targeting.IsTargetMode()) {
@@ -191,24 +170,29 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 			case TileBehav.TileState.Hand:
 				Vector3 mouse = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 				RaycastHit2D[] hits = Physics2D.LinecastAll (mouse, mouse);
-//				RaycastHit2D hit = Physics2D.Raycast (new Vector2 (mouse.x, mouse.y), Vector2.zero);
 
-				foreach (RaycastHit2D hit in hits){
-					CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-					if (cb != null) {
-						mm.DropTile(cb.col);
-						return;
-					}
+				CellBehav cb = GetMouseCell (hits);
+				if (cb != null) {
+					mm.DropTile (cb.col);
+//					return; // void?
+				} else {
+//				foreach (RaycastHit2D hit in hits){
+//					CellBehav cb = hit.collider.GetComponent<CellBehav> ();
+//					if (cb != null) {
+//						mm.DropTile(cb.col);
+//						return;
+//					}
+//				}
+					tb.transform.SetParent (parentT);
+					parentT = null;
+					MageMatch.activep.AlignHand (.12f, false);
 				}
-				tb.transform.SetParent (parentT);
-				parentT = null;
-				MageMatch.activep.AlignHand (.12f, false);
 				break;
 			}
 		}
 	}
 
-	static void SwapCheck(TileBehav tb){
+	void SwapCheck(TileBehav tb){
 		Tile tile = tb.tile;
 		Vector3 mouse = Input.mousePosition;
 		if(Vector3.Distance(mouse, dragClick) > 50 && dragged){ // if dragged more than 50 px away
@@ -249,7 +233,7 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		}
 	}
 
-	static void CBMouseDown(CellBehav cb){
+	void CBMouseDown(CellBehav cb){
 //		Debug.Log ("OnMouseDown hit on column " + cb.col);
 		if (MageMatch.menu) {
 			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -265,5 +249,4 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 			//Put target return here!
 		}
 	}
-
 }

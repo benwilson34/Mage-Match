@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public static class HexGrid {
 
@@ -103,6 +104,63 @@ public static class HexGrid {
 			return true;
 		}
 		return false;
+	}
+
+	// TODO handle floating things, once they are implemented
+	public static List<TileBehav> GetPlacedTiles(){
+		List<TileBehav> returnList = new List<TileBehav> ();
+		for(int c = 0; c < numCols; c++){ // for each col
+			for(int r = BottomOfColumn(c); r <= TopOfColumn(c); r++){ // for each row
+				if (IsSlotFilled(c, r)) { // if there's a tile there
+					returnList.Add(GetTileBehavAt(c, r));
+				} else
+					break; // breaks just inner loop
+			}	
+		}
+		return returnList;
+	}
+
+	// TODO 3x3x3
+	public static List<TileBehav> GetAreaTiles(int col, int row){
+		return GetAdjacentTiles (col, row);
+	}
+
+	public static List<TileBehav> GetAdjacentTiles(int col, int row){
+		List<TileBehav> tbs = new List<TileBehav> ();
+
+		// Board N
+		if (row != TopOfColumn (col)) // Board N
+			if (IsSlotFilled (col, row + 1))
+				tbs.Add(tileGrid[col, row + 1]);
+
+		// Board NE
+		if (row != numRows - 1 && col != numCols - 1)
+			if (IsSlotFilled (col + 1, row + 1))
+				tbs.Add(tileGrid[col + 1, row + 1]);
+
+		// Board SE
+		bool bottomcheck = !(col >= 3 && row == BottomOfColumn(col));
+		if (col != numCols - 1 && bottomcheck)
+			if (IsSlotFilled (col + 1, row))
+				tbs.Add(tileGrid[col + 1, row]);
+
+		// Board S
+		if (row != BottomOfColumn (col))
+			if (IsSlotFilled (col, row - 1))
+				tbs.Add(tileGrid[col, row - 1]);
+
+		// Board SW
+		if (row != 0 && col != 0)
+			if (IsSlotFilled (col - 1, row - 1))
+				tbs.Add(tileGrid[col - 1, row - 1]);
+
+		// Board NW
+		bool topcheck = !(col <= 3 && row == TopOfColumn (col));
+		if (col != 0 && topcheck)
+			if (IsSlotFilled (col - 1, row))
+				tbs.Add(tileGrid[col - 1, row]);
+
+		return tbs;
 	}
 
 	// apply "gravity" to any tiles with empty space under them

@@ -20,7 +20,6 @@ public class TileSeq {
 
 	public TileSeq (Tile tile){
 		sequence = new List<Tile> ();
-//		Tile t = new Tile (tile.color);
 		Tile t = new Tile (tile.element);
 		t.SetPos (tile.col, tile.row);
 		sequence.Add (t);

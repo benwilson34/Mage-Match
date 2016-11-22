@@ -20,7 +20,8 @@ public class Player {
 	private MatchEffect matchEffect;
 	private int matchesLeft = 0;
 
-	private float buff_dmg = 1;
+	private float buff_dmgMult = 1;
+	private int buff_dmgExtra;
 
 	public Transform handSlot;
 	private const float vert = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
@@ -55,11 +56,13 @@ public class Player {
 
 	public void ChangeHealth(int amount){
 		if(amount < 0) { // damage
-			amount = (int)(amount * buff_dmg);
+			if (buff_dmgExtra > 0)
+				Debug.Log ("PLAYER: Wow, " + name + " is taking " + buff_dmgExtra + " extra damage!");
+			amount = (int)(amount * buff_dmgMult) + buff_dmgExtra;
 			amount = -1 * Mathf.Min (Mathf.Abs(amount), health); // prevent negative health
 		} else // healing
 			amount = Mathf.Min (amount, loadout.maxHealth - health);
-		Debug.Log (name + " had health changed from " + health + " to " + (health + amount) + ".");
+		Debug.Log ("PLAYER: " + name + " had health changed from " + health + " to " + (health + amount) + ".");
 		health += amount;
 		if (health == 0)
 			MageMatch.EndTheGame ();
@@ -145,15 +148,20 @@ public class Player {
 	public void ResolveMatchEffect(){
 		if (matchesLeft > 0) {
 			matchEffect ();
-			matches--;
+			matchesLeft--;
 		}
-		if (matches == 0) {
+		if (matchesLeft == 0) {
 			matchEffect = null; //?
 		}
 	}
 
-	public void ChangeBuff_Dmg(float d){
-		Debug.Log (name + " changed dmg buff to " + d);
-		buff_dmg = d;
+	public void ChangeBuff_DmgMult(float d){
+		Debug.Log ("PLAYER: " + name + " had dmg multiply buff changed to " + d);
+		buff_dmgMult = d;
+	}
+
+	public void ChangeBuff_DmgExtra(int amount){
+		Debug.Log ("PLAYER: " + name + " had dmg bonus buff changed to +" + amount);
+		buff_dmgExtra = amount;
 	}
 }

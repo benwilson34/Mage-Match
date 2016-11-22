@@ -100,10 +100,8 @@ public class MageMatch : MonoBehaviour {
 				if (HexGrid.IsGridAtRest ()) { // ...AND all the tiles are in place
 					List<TileSeq> seqMatches = BoardCheck.MatchCheck ();
 					if (seqMatches.Count > 0) { // if there's at least one MATCH
-						Debug.Log("At least one match: " + BoardCheck.PrintSeqList(seqMatches));
 						ResolveMatchEffects (seqMatches);
 					} else {
-//						boardChanged = false;
 						currentState = GameState.PlayerTurn;
 						SpellCheck();
 						UIController.UpdateDebugGrid ();
@@ -140,7 +138,7 @@ public class MageMatch : MonoBehaviour {
 //		Debug.Log ("TurnSystem: done placing tiles.");
 		yield return new WaitUntil(() => animating == 0);
 //		yield return WaitForAnims();
-		Debug.Log("Commish turn done.");
+//		Debug.Log("MAGEMATCH: Commish turn done.");
 
 		activep = InactivePlayer ();
 		activep.InitAP ();
@@ -181,6 +179,7 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	void ResolveMatchEffects(List<TileSeq> seqList){
+		Debug.Log("MAGEMATCH: At least one match: " + BoardCheck.PrintSeqList(seqList));
 		for (int i = 0; i < seqList.Count; i++) {
 			if (currentState != GameState.CommishTurn) {
 				activep.ResolveMatchEffect (); // match-based effects
@@ -207,10 +206,11 @@ public class MageMatch : MonoBehaviour {
 			turnEffect = beginTurnEffects [i];
 			if (turnEffect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
 				beginTurnEffects.Remove (turnEffect);
-				turnEffect.GetEnchantee ().ClearEnchantment ();
+				if(turnEffect.IsEnchantment())
+					turnEffect.GetEnchantee ().ClearEnchantment ();
 				i--;
 			} else {
-				Debug.Log ("Beginning-of-turn effect has " + turnEffect.TurnsRemaining () + " turns left.");
+				Debug.Log ("MAGEMATCH: Beginning-of-turn effect " + i + " has " + turnEffect.TurnsRemaining () + " turns left.");
 			}
 		}
 	}
@@ -221,10 +221,11 @@ public class MageMatch : MonoBehaviour {
 			turnEffect = endTurnEffects [i];
 			if (turnEffect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
 				endTurnEffects.Remove (turnEffect);
-				turnEffect.GetEnchantee ().ClearEnchantment ();
+				if(turnEffect.IsEnchantment())
+					turnEffect.GetEnchantee ().ClearEnchantment ();
 				i--;
 			} else {
-				Debug.Log ("End-of-turn effect has " + turnEffect.TurnsRemaining () + " turns left.");
+				Debug.Log ("MAGEMATCH: End-of-turn effect " + i + " has " + turnEffect.TurnsRemaining () + " turns left.");
 			}
 		}
 	}
@@ -386,7 +387,7 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	public void RemoveSeq(TileSeq seq){ // TODO messy stuff
-		Debug.Log ("RemoveSeq(): About to remove " + BoardCheck.PrintSeq(seq, true));
+		Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + BoardCheck.PrintSeq(seq, true));
 		Tile tile;
 		for (int i = 0; i < seq.sequence.Count;) {
 			tile = seq.sequence [0];
@@ -403,10 +404,10 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	public void RemoveTile(int col, int row, bool checkGrav, bool resolveEnchant){
-		Debug.Log ("Removing (" + col + ", " + row + ")");
+//		Debug.Log ("Removing (" + col + ", " + row + ")");
 		TileBehav tb = HexGrid.GetTileBehavAt (col, row);
 		if (resolveEnchant && tb.HasEnchantment ()) {
-			Debug.Log ("About to resolve enchant on tile (" + col + ", " + row + ")");
+			Debug.Log ("MAGEMATCH: About to resolve enchant on tile (" + col + ", " + row + ")");
 			tb.ResolveEnchantment ();
 		}
 //		if (tb.ResolveEnchantment ()) TODO
