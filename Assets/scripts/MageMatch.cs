@@ -186,13 +186,13 @@ public class MageMatch : MonoBehaviour {
 			if (currentState != GameState.CommishTurn) {
 				if (seqList [i].GetSeqLength () == 3) {
 					InactivePlayer ().ChangeHealth (Random.Range (-100, -75));
-					Commish.ChangeMood(10);
+					Commish.ChangeMood(15);
 				} else if (seqList [i].GetSeqLength () == 4) {
 					InactivePlayer ().ChangeHealth (Random.Range (-150, -125));
-					Commish.ChangeMood(15);
+					Commish.ChangeMood(35);
 				} else { // TODO critical matches
 					InactivePlayer ().ChangeHealth (Random.Range (-225, -200));
-					Commish.ChangeMood(20);
+					Commish.ChangeMood(55);
 				}
 			}
 		}
@@ -348,7 +348,7 @@ public class MageMatch : MonoBehaviour {
 	public void CastSpell(int spellNum){ // TODO move player stuff (AP) to player.Cast()
 		Spell spell = activep.loadout.GetSpell (spellNum);
 		if (activep.CastSpell(spellNum)) {
-			Commish.ChangeMood(20);
+			Commish.ChangeMood(45);
 			UIController.DeactivateAllSpellButtons (activep); // ?
 			RemoveSeq (spell.GetBoardSeq ());
 			BoardChanged ();
