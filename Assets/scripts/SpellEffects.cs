@@ -5,37 +5,9 @@ using System.Collections.Generic;
 public class SpellEffects {
 
 	private static MageMatch mm;
-	private static int targets;
-	private delegate void TargetEffect (TileBehav tb);
-	private static TargetEffect targetEffect;
-	
+
 	public static void Init(){
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-	}
-
-	public static bool IsTargetMode (){
-		return targets > 0;
-	}
-
-	static void WaitForTargetClick(int count){
-		// TODO handle fewer tiles on board than count
-		// TODO handle targeting same tile more than once
-		targets = count;
-		Debug.Log ("targets = " + targets);
-	}
-
-	public static void OnTargetClick(TileBehav tb){
-		targets--;
-		Debug.Log ("Targeted tile (" + tb.tile.col + ", " + tb.tile.row + ")");
-		targetEffect (tb);
-	}
-
-	static void WaitForTargetDrag(int count){
-		// TODO
-	}
-
-	public static void OnTargetDrag (List<TileBehav> tbs){
-		// TODO
 	}
 
 	// -------------------------------------- SPELLS ---------------------------------------------
@@ -44,28 +16,85 @@ public class SpellEffects {
 		mm.InactivePlayer ().ChangeHealth (-496);
 	}
 
+	// TODO
 	public void WhiteHotComboKick(){
-		targetEffect = WHCK_Target;
-		WaitForTargetClick (3);
+		Targeting.WaitForTileTarget (3, WHCK_Target);
 	}
 	void WHCK_Target(TileBehav tb){
-		if (tb.tile.element.Equals (Tile.Element.Fire))
-			mm.InactivePlayer ().ChangeHealth (-100);
-		else if (tb.tile.element.Equals (Tile.Element.Muscle)) { // TODO
-//			mm.InactivePlayer.RandomDiscard(1);
-			mm.InactivePlayer ().ChangeHealth (-70);
-		} else
-			mm.InactivePlayer ().ChangeHealth (-70);
+		mm.InactivePlayer ().ChangeHealth (-70);
+		
+		if (tb.tile.element.Equals (Tile.Element.Fire)){
+			// TODO spread Burning
+		} else if (tb.tile.element.Equals (Tile.Element.Muscle)) {
+			mm.InactivePlayer().DiscardRandom(1);
+		}
 		
 		mm.RemoveTile (tb.tile, true, true);
 	}
 
-	public void LightningPalm(){ // TODO targeting
-		targetEffect = LightningPalm_Target;
-		WaitForTargetClick(1);
+	// empty
+	public void Baila(){
+		
+	}
+
+	// empty
+	public void PhoenixFire(){
+		
+	}
+	
+	// TODO PLACEHOLDER EFFECT
+	public void HotBody(){
+		MageMatch.activep.SetMatchEffect (3, Hotbody_Match);
+	}
+	public void Hotbody_Match(){
+		// TODO threshold to prevent infinite loop
+		List<TileBehav> tbs = HexGrid.GetPlacedTiles();
+		for (int i = 0; i < 3; i++) {
+			int rand = Random.Range (0, tbs.Count);
+			if (tbs[rand].HasEnchantment()) {
+				i--;
+			} else {
+				Ench_SetBurning (tbs [rand]);
+			}
+		}
+	}
+
+	public void HotAndBothered(){
+		mm.InactivePlayer ().ChangeBuff_DmgExtra (15);
+		MageMatch.endTurnEffects.Add( new TurnEffect (mm.InactivePlayer().id, 5, HAB_Turn, HAB_End, null));
+	}
+	void HAB_Turn(int id){
+		mm.InactivePlayer ().ChangeBuff_DmgExtra (15); // technically not needed
+	}
+	void HAB_End(int id){
+		mm.InactivePlayer ().ChangeBuff_DmgExtra (0); // reset
+	}
+
+	// TODO TurnEffect
+	public void Pivot(){
+		MageMatch.activep.SetMatchEffect (1, Pivot_Match);
+	}
+	void Pivot_Match(){
+		MageMatch.activep.AP++;
+	}
+	
+	public void Incinerate(){
+		// TODO drag targeting
+		int burnCount = mm.InactivePlayer().hand.Count * 2;
+		Debug.Log ("SPELLFX: Incinerate burnCount = " + burnCount);
+		mm.InactivePlayer().DiscardRandom (2);
+		Targeting.WaitForDragTarget (burnCount, Incinerate_Target);
+	}
+	void Incinerate_Target(List<TileBehav> tbs){
+		foreach(TileBehav tb in tbs)
+			Ench_SetBurning (tb);
+	}
+
+	public void LightningPalm(){
+		Targeting.WaitForTileTarget(1, LightningPalm_Target);
 	}
 	void LightningPalm_Target(TileBehav tb){
-		List<TileBehav> tileList = BoardCheck.PlacedTileList ();
+		List<TileBehav> tileList = HexGrid.GetPlacedTiles ();
 		Tile tile;
 		for (int i = 0; i < tileList.Count; i++) {
 			tile = tileList [i].tile;
@@ -77,44 +106,22 @@ public class SpellEffects {
 	}
 
 	public void CaughtYouMirin(){
-		MageMatch.activep.ChangeBuff_Dmg (.5f); // 50% damage multiplier
+		MageMatch.activep.ChangeBuff_DmgMult (.5f); // 50% damage multiplier
 		MageMatch.endTurnEffects.Add( new TurnEffect (MageMatch.activep.id, 4, CaughtYouMirin_Turn, CaughtYouMirin_End, null));
 	}
 	void CaughtYouMirin_Turn(int id){ // technically this isn't needed
-		MageMatch.GetPlayer(id).ChangeBuff_Dmg (.5f); // 50% damage multiplier
+		MageMatch.GetPlayer(id).ChangeBuff_DmgMult (.5f); // 50% damage multiplier
 	}
 	void CaughtYouMirin_End(int id){
-		MageMatch.GetPlayer(id).ChangeBuff_Dmg (1f); // reset back to 100% dmg
+		MageMatch.GetPlayer(id).ChangeBuff_DmgMult (1f); // reset back to 100% dmg
 	}
 
-	//PLACEHOLDER EFFECT
-	public void HotBody(){
-		targetEffect = Hotbody_Target;
-		WaitForTargetClick (3);
-	}
-	public void Hotbody_Target(TileBehav tb){
-//		mm.Transmute (tb.tile.col, tb.tile.row, Tile.Element.Fire);
-//		mm.DiscardTile(MageMatch.GetOpponent(MageMatch.activep.id));
-		Ench_SetBurning(tb);
-	}
-		
 	public void Cherrybomb(){
-		targetEffect = Cherrybomb_Target;
-		WaitForTargetClick(1);
+		Targeting.WaitForTileTarget(1, Cherrybomb_Target);
 	}
 	void Cherrybomb_Target(TileBehav tb){
 //		tb.SetEnchantment (Ench_Cherrybomb);
 		Ench_SetCherrybomb(tb);
-	}
-	 
-	public void Incinerate(){
-		int burnCount = mm.InactivePlayer().hand.Count * 2;
-		mm.DiscardTile (mm.InactivePlayer(), 2);
-		targetEffect = Incinerate_Target;
-		WaitForTargetClick (burnCount);
-	}
-	void Incinerate_Target(TileBehav tb){
-		Ench_SetBurning (tb);
 	}
 
 	public void Magnitude10(){
@@ -147,7 +154,18 @@ public class SpellEffects {
 	}
 
 	public void Stalagmite(){
-
+		Targeting.WaitForCellTarget(1, Stalagmite_Target);
+	}
+	void Stalagmite_Target(CellBehav cb){
+		int col = cb.col;
+		int bottomr = HexGrid.BottomOfColumn (col);
+		// hardset bottom three cells of column
+		GameObject stone;
+		for (int i = 0; i < 3; i++){
+			stone = mm.GenerateToken ("stone");
+			stone.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
+			MageMatch.PutTile (stone, col, bottomr + i);
+		}
 	}
 
 	public void LivingFleshArmor(){
@@ -166,54 +184,58 @@ public class SpellEffects {
 		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
 	}
 	void Ench_Cherrybomb_Resolve(int id, TileBehav tb){
-		Tile tile = tb.tile;
-
-		Debug.Log ("CHERRYBOMB tile = (" + tile.col + ", " + tile.row + ")");
-
+		Debug.Log ("SPELLEFFECTS: Resolving Cherrybomb at (" + tb.tile.col + ", " + tb.tile.row + ")");
 		MageMatch.GetOpponent(id).ChangeHealth (-200);
 
-		// Board N
-		if (tile.row != HexGrid.TopOfColumn (tile.col)) { // Board N
-			if (HexGrid.IsSlotFilled (tile.col, tile.row + 1)){
-				mm.RemoveTile(tile.col, tile.row + 1, false, true);
-			}
+		List<TileBehav> tbs = HexGrid.GetAdjacentTiles (tb.tile.col, tb.tile.row);
+		foreach(TileBehav ctb in tbs){
+			if (ctb.ableDestroy)
+				mm.RemoveTile (ctb.tile.col, ctb.tile.row, false, true);
 		}
 
-		// Board NE
-		if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1) {
-			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row + 1))
-				mm.RemoveTile(tile.col + 1, tile.row + 1, false, true);
-		}
-
-		// Board SE
-		bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
-		if (tile.col != HexGrid.numCols - 1 && bottomcheck) {
-			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row))
-				mm.RemoveTile(tile.col + 1, tile.row, false, true);
-		}
-
-		// Board S
-		if (tile.row != HexGrid.BottomOfColumn (tile.col)) {
-			if (HexGrid.IsSlotFilled (tile.col, tile.row - 1))
-				mm.RemoveTile(tile.col, tile.row - 1, false, true);
-		}
-
-		// Board SW
-		if (tile.row != 0 && tile.col != 0) {
-			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row - 1))
-				mm.RemoveTile(tile.col - 1, tile.row - 1, false, true);
-		}
-
-		// Board NW
-		bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
-		if (tile.col != 0 && topcheck) {
-			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row))
-				mm.RemoveTile(tile.col - 1, tile.row, false, true);
-		}
+//		// Board N
+//		if (tile.row != HexGrid.TopOfColumn (tile.col)) { // Board N
+//			if (HexGrid.IsSlotFilled (tile.col, tile.row + 1)){
+//				mm.RemoveTile(tile.col, tile.row + 1, false, true);
+//			}
+//		}
+//
+//		// Board NE
+//		if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1) {
+//			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row + 1))
+//				mm.RemoveTile(tile.col + 1, tile.row + 1, false, true);
+//		}
+//
+//		// Board SE
+//		bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
+//		if (tile.col != HexGrid.numCols - 1 && bottomcheck) {
+//			if (HexGrid.IsSlotFilled (tile.col + 1, tile.row))
+//				mm.RemoveTile(tile.col + 1, tile.row, false, true);
+//		}
+//
+//		// Board S
+//		if (tile.row != HexGrid.BottomOfColumn (tile.col)) {
+//			if (HexGrid.IsSlotFilled (tile.col, tile.row - 1))
+//				mm.RemoveTile(tile.col, tile.row - 1, false, true);
+//		}
+//
+//		// Board SW
+//		if (tile.row != 0 && tile.col != 0) {
+//			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row - 1))
+//				mm.RemoveTile(tile.col - 1, tile.row - 1, false, true);
+//		}
+//
+//		// Board NW
+//		bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
+//		if (tile.col != 0 && topcheck) {
+//			if (HexGrid.IsSlotFilled (tile.col - 1, tile.row))
+//				mm.RemoveTile(tile.col - 1, tile.row, false, true);
+//		}
 	}
 
 	public void Ench_SetBurning(TileBehav tb){
 		// Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
+		Debug.Log("SPELLEFFECTS: Setting burning...");
 		TurnEffect effect = new TurnEffect (MageMatch.activep.id, 5, Ench_Burning_Turn, Ench_Burning_End, Ench_Burning_Cancel);
 		tb.SetEnchantment (effect);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
@@ -228,5 +250,4 @@ public class SpellEffects {
 	void Ench_Burning_Cancel(int id, TileBehav tb){
 		
 	}
-	
 }

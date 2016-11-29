@@ -25,6 +25,10 @@ public class TurnEffect { // TODO enact effect right away! skip current turn cou
 		this.enchantee = tb;
 	}
 
+	public bool IsEnchantment(){
+		return enchantee != null;
+	}
+
 	public TileBehav GetEnchantee(){
 		return enchantee;
 	}
