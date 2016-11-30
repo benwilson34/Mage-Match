@@ -361,7 +361,7 @@ public class MageMatch : MonoBehaviour {
 		Player p = activep;
 //		Spell spell = activep.loadout.GetSpell (spellNum);
 		if (p.CastSpell(spellNum)) {
-			Commish.ChangeMood(20);
+			Commish.ChangeMood(45);
 			UIController.DeactivateAllSpellButtons (activep); // ?
 			if(currentState != GameState.TargetMode){ // kinda shitty
 				RemoveSeq (p.GetCurrentBoardSeq ());

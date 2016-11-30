@@ -57,8 +57,8 @@ public static class UIController {
 
 	public static void FlipGradient(){
 		GameObject go = GameObject.Find ("green-gradient");
-		//		Vector3 scale = go.transform.localScale;
-		//		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
+//		Vector3 scale = go.transform.localScale;
+//		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
 		go.transform.Rotate(0,0,180);
 	}
 
@@ -121,7 +121,7 @@ public static class UIController {
 				Image minitile = t.Find ("minitile" + m).GetComponent<Image> ();
 				minitile.color = Color.white;
 				Tile.Element currentEl = currentSpell.GetElementAt (m);
-				//				Debug.Log (currentEl);
+//				Debug.Log (currentEl);
 				if (!currentEl.Equals(Tile.Element.None)) {
 					switch (currentEl) {
 					case Tile.Element.Fire:
@@ -144,7 +144,7 @@ public static class UIController {
 					// turn image transparent
 					minitile.color = new Color(1,1,1,0);
 				}
-
+					
 			}
 		}
 	}
@@ -191,6 +191,6 @@ public static class UIController {
 		RectTransform moodmarker = GameObject.Find ("MoodMarker").GetComponent<RectTransform> ();
 		float slideRatio = (float)(Commish.GetMood() + 100) / 200f;
 		float meterwidth = GameObject.Find ("MoodMeter").GetComponent<RectTransform> ().rect.width;
-		yield return moodmarker.DOAnchorPosX(slideRatio * meterwidth, .2f, false);
+		yield return moodmarker.DOAnchorPosX(slideRatio * meterwidth, .4f, false);
 	}
 }

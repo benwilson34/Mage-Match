@@ -16,7 +16,7 @@ public static class Commish  {
 		} else if (mood >= 100) {
 			HappyHealing ();
 		} else
-			ChangeMood (-15);
+			ChangeMood (-35);
 
 		yield return PlaceTiles ();
 //		Debug.Log ("CTurn: done placing tiles.");
