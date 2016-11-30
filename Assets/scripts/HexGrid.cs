@@ -9,8 +9,9 @@ public static class HexGrid {
 
 	private const float horiz = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 	private static TileBehav[,] tileGrid;
+	// TODO public static List<TileBehav> tilesOnBoard?
 
-	public static void Init(){ // TODO! change to public static void Init()?
+	public static void Init(){
 		tileGrid = new TileBehav[numCols, numRows];
 	}
 
@@ -119,47 +120,78 @@ public static class HexGrid {
 		}
 		return returnList;
 	}
-
-	// TODO 3x3x3
-	public static List<TileBehav> GetAreaTiles(int col, int row){
-		return GetAdjacentTiles (col, row);
+		
+	public static bool CellExists(int col, int row){
+		bool bounds = (col >= 0 && col < numCols) && (row >= 0 && row < numRows);
+		bool diag = (row <= TopOfColumn (col)) && (row >= BottomOfColumn(col));
+		return bounds && diag;
 	}
 
-	public static List<TileBehav> GetAdjacentTiles(int col, int row){
+	public static void GetOffset(int dir, out int dc, out int dr){
+		dc = dr = 0;
+		switch (dir) {
+		case 0: // N
+			dr = 1;
+			break;
+		case 1: // NE
+			dc = 1;
+			dr = 1;
+			break;
+		case 2: // SE
+			dc = 1;
+			break;
+		case 3: // S
+			dr = -1; 
+			break;
+		case 4: // SW
+			dc = -1;
+			dr = -1;
+			break;
+		case 5: // NW
+			dc = -1;
+			break;
+		}
+	}
+
+	public static bool HasAdjacentCell(int col, int row, int dir){
+		int dc, dr;
+		GetOffset (dir, out dc, out dr);
+		return CellExists (col + dc, row + dr);
+	}
+
+	public static List<TileBehav> GetSmallAreaTiles(int col, int row){
 		List<TileBehav> tbs = new List<TileBehav> ();
+		int dc, dr;
+		for (int dir = 0; dir < 6; dir++) {
+			GetOffset (dir, out dc, out dr);
+			if (CellExists (col + dc, row + dr)) {
+				if (IsSlotFilled (col + dc, row + dr))
+					tbs.Add (tileGrid [col + dc, row + dr]);
+			}
+		}
+		return tbs;
+	}
 
-		// Board N
-		if (row != TopOfColumn (col)) // Board N
-			if (IsSlotFilled (col, row + 1))
-				tbs.Add(tileGrid[col, row + 1]);
-
-		// Board NE
-		if (row != numRows - 1 && col != numCols - 1)
-			if (IsSlotFilled (col + 1, row + 1))
-				tbs.Add(tileGrid[col + 1, row + 1]);
-
-		// Board SE
-		bool bottomcheck = !(col >= 3 && row == BottomOfColumn(col));
-		if (col != numCols - 1 && bottomcheck)
-			if (IsSlotFilled (col + 1, row))
-				tbs.Add(tileGrid[col + 1, row]);
-
-		// Board S
-		if (row != BottomOfColumn (col))
-			if (IsSlotFilled (col, row - 1))
-				tbs.Add(tileGrid[col, row - 1]);
-
-		// Board SW
-		if (row != 0 && col != 0)
-			if (IsSlotFilled (col - 1, row - 1))
-				tbs.Add(tileGrid[col - 1, row - 1]);
-
-		// Board NW
-		bool topcheck = !(col <= 3 && row == TopOfColumn (col));
-		if (col != 0 && topcheck)
-			if (IsSlotFilled (col - 1, row))
-				tbs.Add(tileGrid[col - 1, row]);
-
+	public static List<TileBehav> GetLargeAreaTiles(int col, int row){
+		List<TileBehav> tbs = GetSmallAreaTiles(col, row);
+		for(int dir = 0; dir < 6; dir++){
+			int dc, dr;
+			GetOffset (dir, out dc, out dr);
+			dc *= 2;
+			dr *= 2;
+			
+			if (CellExists(col + dc, row + dr))
+			if (IsSlotFilled (col + dc, row + dr))
+				tbs.Add (tileGrid [col + dc, row + dr]);
+			
+			if (HasAdjacentCell (col + dc, row + dr, (dir + 2) % 6)) {
+				int dc2, dr2;
+				GetOffset ((dir + 2) % 6, out dc2, out dr2);
+				//				Debug.Log ("Dir = " + dir + ", new dir = " + ((dir+2)%6) + ", dc2 = " + dc2 + ", dr2 = " + dr2);
+				if (IsSlotFilled (col + dc + dc2, row + dr + dr2))
+					tbs.Add (tileGrid [col + dc + dc2, row + dr + dr2]);
+			}
+		}
 		return tbs;
 	}
 

@@ -5,8 +5,7 @@ using System.Collections.Generic;
 
 public static class BoardCheck {
 
-	public static bool debugLogOn = false;
-
+	private static bool debugLogOn = false;
 	private static List<TileSeq> matchSeqList, checkList; // dictionary, compare list??
 
 	// check skipping object
@@ -135,45 +134,12 @@ public static class BoardCheck {
 				int dc = 0, dr = 0; // difference from current tile pos
 				for (int seqIndex = 1; seqIndex < checkSeq.sequence.Count; seqIndex++) {
 					bool skipCurrentSeq = false;
-					switch (dir) { // TODO change edge cases to those used in TileBehav swapping
-					case 0: // N cell - board N
-						if (r + dr != HexGrid.numRows - 1) {
-							dr = 1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 1: // NE cell - board NE
-						if (c + dc != HexGrid.numCols - 1 && r + dr != HexGrid.numRows - 1) {
-							dc = 1 * seqIndex;
-							dr = 1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 2: // E cell - board SE
-						if (c + dc != HexGrid.numCols - 1) {
-							dc = 1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 3: // S cell - board S
-						if (r  + dr != 0) {
-							dr = -1 * seqIndex; 
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 4: // SW cell - board SW
-						if (r + dr != 0 && c + dc != 0) {
-							dc = -1 * seqIndex;
-							dr = -1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 5: // W cell - board NW
-						if (c + dc != 0) {
-							dc = -1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
+					if (!HexGrid.HasAdjacentCell (c + dc, r + dr, dir))
+						skipCurrentSeq = true;
+					else {
+						HexGrid.GetOffset (dir, out dc, out dr);
+						dc *= seqIndex;
+						dr *= seqIndex;
 					}
 
 					if (debugLogOn)

@@ -15,6 +15,7 @@ public class Player {
 	public int tilesPlaced, tilesSwapped, matches;
 	public Loadout loadout;
 	private Spell currentSpell;
+	private MageMatch mm;
 
 	public delegate void MatchEffect();
 	private MatchEffect matchEffect;
@@ -29,6 +30,7 @@ public class Player {
 	public Player (int playerNum) {
 		AP = 0;
 		hand = new List<TileBehav>();
+		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 
 		switch (playerNum) {
 		case 1: 
@@ -54,6 +56,11 @@ public class Player {
 		this.name = name;	
 	}
 
+	// hmmmm
+	public void DealDamage(int amount){
+		MageMatch.GetOpponent (id).ChangeHealth (-amount);
+	}
+
 	public void ChangeHealth(int amount){
 		if(amount < 0) { // damage
 			if (buff_dmgExtra > 0)
@@ -68,7 +75,22 @@ public class Player {
 			MageMatch.EndTheGame ();
 	}
 
-	// TODO DrawTile()?
+	public void DrawTiles(int numTiles){
+		for (int i = 0; i < numTiles && hand.Count < handSize; i++) {
+			GameObject go = mm.GenerateTile (loadout.GetTileElement());
+			if (id == 1)
+				go.transform.position = new Vector3 (-5, 2);
+			else if (id == 2)
+				go.transform.position = new Vector3 (5, 2);
+
+			go.transform.SetParent (handSlot, false);
+
+			TileBehav tb = go.GetComponent<TileBehav> ();
+			hand.Add (tb);
+		}
+		AudioController.PickupSound (mm.GetComponent<AudioSource> ());
+		AlignHand (.12f, true);
+	}
 
 	public void AlignHand(float duration, bool linear){
 		GameObject.Find("board").GetComponent<MageMatch>().StartAnim(AlignHand_Anim(duration, linear));

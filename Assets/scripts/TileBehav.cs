@@ -14,11 +14,6 @@ public class TileBehav : MonoBehaviour {
 	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
 	public bool ableTarget = true; // will eventually need a list of valid spells - maybe a hierarchy? categories?
 
-//	private MageMatch mm; //?
-//	private Transform parentT = null;
-//	private Vector3 dragClick;
-//	private bool flipped = false, placed = false, dragged = false;
-
 //	public delegate void EnchantEffect(TileBehav tb);
 //	private EnchantEffect enchantEffect;
 	private TurnEffect enchantment;
@@ -28,7 +23,6 @@ public class TileBehav : MonoBehaviour {
 	void Awake(){
 		tile = new Tile (initElement);
 		currentState = TileState.Hand;
-//		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
 	public void ChangePos(int col, int row){
@@ -71,7 +65,6 @@ public class TileBehav : MonoBehaviour {
 	}
 
 	public void SetPlaced(){
-//		placed = true;
 		currentState = TileState.Placed;
 	}
 
@@ -120,7 +113,6 @@ public class TileBehav : MonoBehaviour {
 			currentState = TileState.Flipped;
 		else if (currentState == TileState.Flipped)
 			currentState = TileState.Hand;
-//		flipped = !flipped;
 	}
 
 	public void SetOutOfPosition(){

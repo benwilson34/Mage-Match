@@ -128,8 +128,9 @@ public class InputController : MonoBehaviour {
 				case TileBehav.TileState.Placed:
 //					Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
 					if (Targeting.IsTargetMode ()
-					    && Targeting.currentTMode == Targeting.TargetMode.Tile) {
-//						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
+//					    && Targeting.currentTMode == Targeting.TargetMode.Tile
+						) {
+						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
 						Targeting.OnTileTarget (tb);
 //					} else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
@@ -185,7 +186,7 @@ public class InputController : MonoBehaviour {
 //				}
 					tb.transform.SetParent (parentT);
 					parentT = null;
-					MageMatch.activep.AlignHand (.12f, false);
+					MageMatch.ActiveP().AlignHand (.12f, false);
 				}
 				break;
 			}
@@ -203,31 +204,23 @@ public class InputController : MonoBehaviour {
 				angle = 360 - angle;
 			//				Debug.Log("mouse = " + mouse.ToString() + "; angle = " + angle);
 			dragged = false; // TODO move into cases below for continuous dragging
-			if (angle < 60) {         // NE cell - board NE
-				//					Debug.Log("Drag NE");
-				if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1)
+			if (angle < 60) {         // NE
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 1))
 					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
-			} else if (angle < 120) { // N cell  - board N
-				//					Debug.Log("Drag N");
-				if (tile.row != HexGrid.TopOfColumn(tile.col))
+			} else if (angle < 120) { // N
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 0))
 					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
-			} else if (angle < 180) { // W cell  - board NW
-				//					Debug.Log("Drag NW");
-				bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
-				if(tile.col != 0 && topcheck)
+			} else if (angle < 180) { // NW
+				if(HexGrid.HasAdjacentCell(tile.col, tile.row, 5))
 					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
-			} else if (angle < 240) { // SW cell - board SW
-				//					Debug.Log("Drag SW");
-				if (tile.row != 0 && tile.col != 0)
+			} else if (angle < 240) { // SW
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 4))
 					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
-			} else if (angle < 300) { // S cell  - board S
-				//					Debug.Log("Drag S");
-				if (tile.row != HexGrid.BottomOfColumn(tile.col))
+			} else if (angle < 300) { // S
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 3))
 					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
-			} else {                  // E cell  - board SE
-				//					Debug.Log("Drag SE");
-				bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
-				if(tile.col != HexGrid.numCols - 1 && bottomcheck)
+			} else {                  // SE
+				if(HexGrid.HasAdjacentCell(tile.col, tile.row, 2))
 					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
 			}
 		}

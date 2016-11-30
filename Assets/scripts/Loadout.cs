@@ -60,8 +60,8 @@ public class Loadout {
 		dmuscle = 20;
 
 		spells[0] = new Spell ("Cherrybomb", "FAM", 1, spellfx.Cherrybomb);
-		spells[2] = new Spell ("Spell two", "FAF", 1, spellfx.Deal496Dmg);
-		spells[1] = new Spell ("Spell three", "FMF", 1, spellfx.Deal496Dmg);
+		spells[1] = new Spell ("Spell two", "FMF", 1, spellfx.Deal496Dmg);
+		spells[2] = new Spell ("Bailaaaaahh", "FAF", 1, spellfx.Baila);
 		spells[3] = new Spell ("Spell four", "AFM", 1, spellfx.Deal496Dmg);
 	}
 
@@ -75,8 +75,8 @@ public class Loadout {
 		dmuscle = 30;
 
 		spells[0] = new Spell ("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
-		spells[2] = new Spell ("Incinerate", "FAFF", 1, spellfx.Incinerate);
 		spells[1] = new Spell ("Baila!", "FMF", 1, spellfx.Baila);
+		spells[2] = new Spell ("Incinerate", "FAFF", 1, spellfx.Incinerate);
 		spells[3] = new Spell ("Phoenix Fire", "AFM", 1, spellfx.PhoenixFire);
 	}
 

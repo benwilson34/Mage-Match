@@ -90,11 +90,11 @@ public static class Commish  {
 	
 	public static void AngryDamage(){
 		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
-		Player p = mm.InactivePlayer ();
+		Player p = MageMatch.InactiveP ();
 		p.ChangeHealth (-50);
 		p.DiscardRandom (1);
 
-		p = MageMatch.activep;
+		p = MageMatch.ActiveP();
 		p.ChangeHealth (-50);
 		p.DiscardRandom (1);
 		
@@ -104,11 +104,11 @@ public static class Commish  {
 	
 	public static void HappyHealing(){
 		Debug.Log ("The Commissioner is pleased, and has decided to heal both players for 100!");
-		mm.InactivePlayer ().ChangeHealth (100);
-		mm.DealPlayerHand (mm.InactivePlayer(), 1);
+		MageMatch.InactiveP ().ChangeHealth (100);
+		MageMatch.InactiveP ().DrawTiles (1);
 
-		MageMatch.activep.ChangeHealth (100);
-		mm.DealPlayerHand (MageMatch.activep, 1);
+		MageMatch.ActiveP ().ChangeHealth (100);
+		MageMatch.ActiveP ().DrawTiles (1);
 		
 		mood = 0;
 		UIController.UpdateCommishMeter ();

@@ -51,8 +51,8 @@ public static class UIController {
 	}
 
 	public static void UpdatePlayerInfo(){
-		UpdatePlayerInfo (MageMatch.activep);
-		UpdatePlayerInfo (mm.InactivePlayer());
+		UpdatePlayerInfo (MageMatch.ActiveP());
+		UpdatePlayerInfo (MageMatch.InactiveP());
 	}
 
 	public static void FlipGradient(){
@@ -70,7 +70,7 @@ public static class UIController {
 			pinfo = GameObject.Find ("Player2_Info");
 		}
 
-		if (player.id == MageMatch.activep.id) {
+		if (player.id == MageMatch.ActiveP().id) {
 			pinfo.GetComponent<Image> ().color = new Color (0, 1, 0, .4f);
 		} else {
 			pinfo.GetComponent<Image> ().color = new Color (1, 1, 1, .4f);
