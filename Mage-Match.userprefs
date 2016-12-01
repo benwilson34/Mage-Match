@@ -1,18 +1,25 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\Controllers\UIController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\MageMatch.cs">
     <Files>
-      <File FileName="Assets\scripts\MageMatch.cs" Line="128" Column="33" />
+      <File FileName="Assets\scripts\MageMatch.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\HexGrid.cs" Line="1" Column="1" />
-      <File FileName="Assets\scripts\TileBehav.cs" Line="10" Column="19" />
-      <File FileName="Assets\scripts\CellBehav.cs" Line="16" Column="2" />
+      <File FileName="Assets\scripts\BoardCheck.cs" Line="1" Column="1" />
+      <File FileName="Assets\scripts\TileBehav.cs" Line="1" Column="1" />
+      <File FileName="Assets\scripts\CellBehav.cs" Line="1" Column="1" />
+      <File FileName="Assets\scripts\Loadout.cs" Line="1" Column="1" />
+      <File FileName="Assets\scripts\Spell.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\EnchantEffects.cs" Line="1" Column="1" />
+      <File FileName="Assets\scripts\SpellEffects.cs" Line="50" Column="16" NotebookId="1" />
       <File FileName="Assets\scripts\Player.cs" Line="1" Column="1" NotebookId="1" />
-      <File FileName="Assets\scripts\SpellEffects.cs" Line="22" Column="11" NotebookId="1" />
-      <File FileName="Assets\scripts\Settings.cs" Line="52" Column="19" NotebookId="1" />
+      <File FileName="Assets\scripts\Commish.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\scripts\Controllers\InputController.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\scripts\Targeting.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\scripts\Settings.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\scripts\TileSeq.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\scripts\Controllers\UIController.cs" Line="1" Column="1" NotebookId="1" />
       <File FileName="Assets\scripts\TurnEffect.cs" Line="1" Column="1" NotebookId="1" />
-      <File FileName="Assets\scripts\Controllers\InputController.cs" Line="75" Column="39" NotebookId="1" />
-      <File FileName="Assets\scripts\Controllers\UIController.cs" Line="61" Column="32" NotebookId="1" />
+      <File FileName="Assets\scripts\ColumnBehav.cs" Line="1" Column="1" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

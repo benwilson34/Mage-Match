@@ -1,39 +1,60 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class InputController : MonoBehaviour { // Monobehaviour needed? One InputController per tile?
+// TODO eventually handle mobile tap input instead of clicking
+public class InputController : MonoBehaviour {
 
-	private static MageMatch mm;
+	private MageMatch mm;
 
-	private static Vector3 dragClick;
-	private static Transform parentT;
-	private static bool dragged = false;
+	private Vector3 dragClick;
+	private Transform parentT;
+	private bool dragged = false;
 
-//	private static int click = 0;
-	private static bool lastClick = false, nowClick = false;
-	private static TileBehav clickTB;
-	private static CellBehav clickCB;
-	public static bool isClickTB = false;
+	private bool lastClick = false, nowClick = false;
+	private TileBehav clickTB; // needed?
+	private CellBehav clickCB; // needed?
+	private bool isClickTB = false;
 
-//	// Use this for initialization
-//	public static void Init () {
-//		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-//	}
-
-	// Use this for initialization
 	void Awake () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
-	void Update(){
-		if (Input.GetMouseButton (0)) { // whenever left mouse is down
-//			Debug.Log("Left mouse is down!!!");
-			nowClick = true;
-			HandleMouse ();
-		} else if (Input.GetMouseButtonUp (0)) {
+	void Update(){ // polling input
+		if (Input.GetMouseButton (0)) { // if left mouse is down
+			if (Targeting.currentTMode == Targeting.TargetMode.Drag){
+//				HandleDrag ();
+			} else 
+				HandleMouse ();
+			nowClick = true; // move up?
+		} else if (Input.GetMouseButtonUp (0)) { // if left mouse was JUST released
 			nowClick = false;
 			HandleMouse ();
 		}
+	}
+
+	TileBehav GetMouseTile(RaycastHit2D[] hits){
+		foreach (RaycastHit2D hit in hits) {
+			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
+			if (tb != null) {
+//				clickTB = tb;
+//				isClickTB = true;
+				return tb;
+			}
+		}
+		return null;
+	}
+
+	CellBehav GetMouseCell(RaycastHit2D[] hits){
+		foreach (RaycastHit2D hit in hits) {
+			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
+			if (cb != null) {
+//				clickTB = tb;
+//				isClickTB = true;
+				return cb;
+			}
+		}
+		return null;
 	}
 
 	void HandleMouse(){
@@ -67,91 +88,53 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		}
 	}
 
-	public static bool GetClick(){
+	bool GetClick(){
 		isClickTB = false;
 		Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
 
-		// TODO replace with tags eventually
-		// filter array
-		foreach (RaycastHit2D hit in hits){
-			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
+		if (Targeting.currentTMode != Targeting.TargetMode.Cell) {
+			TileBehav tb = GetMouseTile (hits);
 			if (tb != null) {
-//				HandleTileBehav (tb);
 				clickTB = tb;
 				isClickTB = true;
-				return true;
+				return true; // void?
 			}
 		}
-		foreach (RaycastHit2D hit in hits) {
-			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-			if (cb != null) {
-//				HandleCellBehav (cb);
-				clickCB = cb;
-				return true;
-			}
+		CellBehav cb = GetMouseCell (hits);
+		if (cb != null) {
+			clickCB = cb;
+			return true; // void?
 		}
+
 		return false;
 	}
 
-//	public static void CorrectMouseDown(){
-//		nowClick = true;
-//		GetClick ();
-//	}
-//
-//	public static void CorrectMouseDrag(){
-//		GetClick ();
-//	}
-//
-//	public static void CorrectMouseUp(){
-//		nowClick = false;
-//		GetClick ();
-//	}
-
-//	static void HandleTileBehav(TileBehav tb){
-//		if (!lastClick && nowClick) {
-//			TBMouseDown (tb);
-//			lastClick = true;
-//			nowClick = false;
-//		} else if (lastClick && nowClick) {
-//			TBMouseDrag (tb);
-//		} else if (lastClick && !nowClick) {
-//			TBMouseUp (tb);
-//			lastClick = false;
-//		}
-//		// only other case is no click - probably never passed in?
-//	}
-
-//	static void HandleCellBehav(CellBehav cb){
-//		if (!lastClick && nowClick) {
-//			CBMouseDown (cb);
-//			lastClick = true;
-//		} else if (lastClick && nowClick) {
-////			TBMouseDrag (cb);
-//		} else if (lastClick && !nowClick) {
-////			TBMouseUp (cb);
-//			lastClick = false;
-//		}
-//		// only other case is no click - probably never passed in?
-//	}
-
-	static void TBMouseDown(TileBehav tb){
+	void TBMouseDown(TileBehav tb){
 		if (!MageMatch.IsEnded () && !MageMatch.IsCommishTurn()) { // if the game isn't done
 			if (!MageMatch.menu) { // if the menu isn't open
 				switch(tb.currentState){
 				case TileBehav.TileState.Hand:
-					parentT = tb.transform.parent;
-					tb.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-					// TODO
-					//tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
+					if (!Targeting.IsTargetMode ()) {
+						parentT = tb.transform.parent;
+						tb.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
+						// TODO
+						//tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
 
-					MageMatch.currentTile = tb.gameObject;
-					AudioController.PickupSound (tb.gameObject.GetComponent<AudioSource> ());
+						MageMatch.currentTile = tb.gameObject;
+						AudioController.PickupSound (tb.gameObject.GetComponent<AudioSource> ());
+					}
 					break;
 				case TileBehav.TileState.Placed:
-					if (SpellEffects.IsTargetMode ())
-						SpellEffects.OnTargetClick (tb);
-					else {
+//					Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
+					if (Targeting.IsTargetMode ()
+//					    && Targeting.currentTMode == Targeting.TargetMode.Tile
+						) {
+						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
+						Targeting.OnTileTarget (tb);
+//					} else if (IsTargetMode () && currentTMode == TargetMode.Drag){
+////						OnDragTarget (tbs); // TODO
+					} else { // disable during targeting screen?
 						dragClick = Camera.main.WorldToScreenPoint (tb.transform.position);
 						dragged = true;
 					}
@@ -163,9 +146,10 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		}
 	}
 
-	public static void TBMouseDrag(TileBehav tb){
+	void TBMouseDrag(TileBehav tb){
 //		Debug.Log ("TBMouseDrag called.");
-		if (!MageMatch.IsEnded () && !MageMatch.menu && !MageMatch.IsCommishTurn()) {
+		if (!MageMatch.IsEnded () && !MageMatch.menu 
+			&& !MageMatch.IsCommishTurn() && !Targeting.IsTargetMode()) {
 			switch (tb.currentState) {
 			case TileBehav.TileState.Hand:
 				Vector3 cursor = Camera.main.ScreenToWorldPoint (Input.mousePosition);
@@ -179,31 +163,37 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 		}
 	}
 
-	static void TBMouseUp(TileBehav tb){
+	void TBMouseUp(TileBehav tb){
 //		Debug.Log ("TBMouseUp called.");
-		if (!MageMatch.IsEnded () && !MageMatch.menu && !MageMatch.IsCommishTurn()) {
+		if (!MageMatch.IsEnded () && !MageMatch.menu 
+			&& !MageMatch.IsCommishTurn() && !Targeting.IsTargetMode()) {
 			switch (tb.currentState) {
 			case TileBehav.TileState.Hand:
 				Vector3 mouse = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 				RaycastHit2D[] hits = Physics2D.LinecastAll (mouse, mouse);
-//				RaycastHit2D hit = Physics2D.Raycast (new Vector2 (mouse.x, mouse.y), Vector2.zero);
 
-				foreach (RaycastHit2D hit in hits){
-					CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-					if (cb != null) {
-						mm.PlaceTile(cb.col);
-						return;
-					}
+				CellBehav cb = GetMouseCell (hits);
+				if (cb != null) {
+					mm.DropTile (cb.col);
+//					return; // void?
+				} else {
+//				foreach (RaycastHit2D hit in hits){
+//					CellBehav cb = hit.collider.GetComponent<CellBehav> ();
+//					if (cb != null) {
+//						mm.DropTile(cb.col);
+//						return;
+//					}
+//				}
+					tb.transform.SetParent (parentT);
+					parentT = null;
+					MageMatch.ActiveP().AlignHand (.12f, false);
 				}
-				tb.transform.SetParent (parentT);
-				parentT = null;
-				MageMatch.activep.AlignHand (.12f, false);
 				break;
 			}
 		}
 	}
 
-	static void SwapCheck(TileBehav tb){
+	void SwapCheck(TileBehav tb){
 		Tile tile = tb.tile;
 		Vector3 mouse = Input.mousePosition;
 		if(Vector3.Distance(mouse, dragClick) > 50 && dragged){ // if dragged more than 50 px away
@@ -214,48 +204,41 @@ public class InputController : MonoBehaviour { // Monobehaviour needed? One Inpu
 				angle = 360 - angle;
 			//				Debug.Log("mouse = " + mouse.ToString() + "; angle = " + angle);
 			dragged = false; // TODO move into cases below for continuous dragging
-			if (angle < 60) {         // NE cell - board NE
-				//					Debug.Log("Drag NE");
-				if (tile.row != HexGrid.numRows - 1 && tile.col != HexGrid.numCols - 1)
+			if (angle < 60) {         // NE
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 1))
 					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
-			} else if (angle < 120) { // N cell  - board N
-				//					Debug.Log("Drag N");
-				if (tile.row != HexGrid.TopOfColumn(tile.col))
+			} else if (angle < 120) { // N
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 0))
 					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
-			} else if (angle < 180) { // W cell  - board NW
-				//					Debug.Log("Drag NW");
-				bool topcheck = !(tile.col <= 3 && tile.row == HexGrid.TopOfColumn (tile.col));
-				if(tile.col != 0 && topcheck)
+			} else if (angle < 180) { // NW
+				if(HexGrid.HasAdjacentCell(tile.col, tile.row, 5))
 					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
-			} else if (angle < 240) { // SW cell - board SW
-				//					Debug.Log("Drag SW");
-				if (tile.row != 0 && tile.col != 0)
+			} else if (angle < 240) { // SW
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 4))
 					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
-			} else if (angle < 300) { // S cell  - board S
-				//					Debug.Log("Drag S");
-				if (tile.row != HexGrid.BottomOfColumn(tile.col))
+			} else if (angle < 300) { // S
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 3))
 					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
-			} else {                  // E cell  - board SE
-				//					Debug.Log("Drag SE");
-				bool bottomcheck = !(tile.col >= 3 && tile.row == HexGrid.BottomOfColumn(tile.col));
-				if(tile.col != HexGrid.numCols - 1 && bottomcheck)
+			} else {                  // SE
+				if(HexGrid.HasAdjacentCell(tile.col, tile.row, 2))
 					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
 			}
 		}
 	}
 
-	static void CBMouseDown(CellBehav cb){
+	void CBMouseDown(CellBehav cb){
 //		Debug.Log ("OnMouseDown hit on column " + cb.col);
 		if (MageMatch.menu) {
 			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 			Tile.Element element = Settings.GetClickElement ();
 			if (element != Tile.Element.None) {
-				//				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
+//				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
 				GameObject go = mm.GenerateTile (element);
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-				mm.PlaceTile (cb.col, go, .15f);
+				mm.DropTile (cb.col, go, .15f);
 			}
-		} else if(SpellEffects.IsTargetMode()) {
+		} else if(Targeting.IsTargetMode() && Targeting.currentTMode == Targeting.TargetMode.Cell) {
+			Targeting.OnCellTarget (cb);
 			//Put target return here!
 		}
 	}

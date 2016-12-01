@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 7d8aa892b6e7d804d84100d7e7017175
-timeCreated: 1472777581
+timeCreated: 1479102041
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
@@ -10,6 +10,8 @@ MonoImporter:
   - earthPF: {fileID: 187288, guid: e3327746c4b675c44bac4d152b735d99, type: 2}
   - airPF: {fileID: 160986, guid: 6484d089b6d6bda478ae01f8acbeedd4, type: 2}
   - musclePF: {fileID: 130290, guid: e46c081515a53f84da7480481c7ae9d2, type: 2}
+  - stonePF: {fileID: 1000012655875964, guid: c4e046e883fd0d144b41a8540614c307, type: 2}
+  - emberPF: {fileID: 1000010477918290, guid: aec995073adce7142ac50c1fd0b4b583, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

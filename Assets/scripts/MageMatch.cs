@@ -6,27 +6,31 @@ using DG.Tweening;
 
 public class MageMatch : MonoBehaviour {
 
+	public enum GameState { PlayerTurn, TargetMode, BoardChecking, CommishTurn };
+	public static GameState currentState;
+
 	public GameObject firePF, waterPF, earthPF, airPF, musclePF;  // tile prefabs
+	public GameObject stonePF, emberPF, prereqPF, targetPF;       // token prefabs
 	[HideInInspector] public static int turns;                 // number of current turn
 	[HideInInspector] public static bool menu = false;         // is the settings menu open?
 	[HideInInspector] public static GameObject currentTile;    // current game tile
-	[HideInInspector] public static Player p1, p2, activep, commish;
+	[HideInInspector] private static Player p1, p2, activep;
 	[HideInInspector] public static List<TurnEffect> beginTurnEffects, endTurnEffects;
 
 	private static bool endGame = false;             	       // is either player dead?
-	private static bool boardChanged = false;                  // has the board changed?
-	private static bool commishTurn = false;                  // has the board changed?
+//	private static bool boardChanged = false;                  // has the board changed?
+//	private static bool commishTurn = false;                  // has the board changed?
 	private static int animating = 0;                     // is something animating?
 
 	void Start () {
 		BoardCheck.Init ();
-		BoardCheck.debugLogOn = false;
 
 		Loadout.Init ();
-		EnchantEffects.Init ();
+		Commish.Init ();
+//		EnchantEffects.Init ();
 
 		UIController.Init ();
-//		InputController.Init ();
+		Targeting.Init ();
 		AudioController.Init ();
 		Reset ();
 	}
@@ -59,24 +63,22 @@ public class MageMatch : MonoBehaviour {
 		turns = 0;
 		endGame = false;
 
-		//Make Commish non-player object! :)
-		//Make Commish non-player object! :)
-		//Make Commish non-player object! :)
-
-		commish = new Player (0);
-
 		p1 = new Player (1);
-		DealPlayerHand (p1, 3);
+		p1.DrawTiles (3);
+//		DealPlayerHand (p1, 3);
 		p1.AlignHand (.12f, true);
 
 		p2 = new Player (2);
-		DealPlayerHand (p2, 3);
+		p2.DrawTiles (3);
+//		DealPlayerHand (p2, 3);
 		p2.AlignHand (.12f, true);
 
+		currentState = GameState.PlayerTurn;
 		activep = p1;
-		InactivePlayer().FlipHand ();
+		InactiveP().FlipHand ();
 		activep.InitAP();
-		DealPlayerHand (activep, 2);
+		activep.DrawTiles (2);
+//		DealPlayerHand (activep, 2);
 
 		UIController.UpdateTurnText();
 		UIController.UpdateDebugGrid ();
@@ -91,55 +93,70 @@ public class MageMatch : MonoBehaviour {
 
 	// ---------------------------- Update is called once per frame - MAIN GAME LOOP ----------------------------
 	void Update () {
-		if (!endGame && !menu && !SpellEffects.IsTargetMode() && !IsAnimating()) { // if there is no winning player and the settings menu is not open
-			if (boardChanged) { // if the board changed (place, swap, etc)...
+		// if there is no winning player and the settings menu is not open
+		if (!endGame && !menu && !IsTargetMode() && !IsAnimating()) { 
+			switch (currentState) {
+
+			case GameState.BoardChecking:
 				HexGrid.CheckGrav(); // TODO! move into v(that)v?
 				if (HexGrid.IsGridAtRest ()) { // ...AND all the tiles are in place
 					List<TileSeq> seqMatches = BoardCheck.MatchCheck ();
 					if (seqMatches.Count > 0) { // if there's at least one MATCH
-						Debug.Log("At least one match: " + BoardCheck.PrintSeqList(seqMatches));
 						ResolveMatchEffects (seqMatches);
 					} else {
-						boardChanged = false;
+						currentState = GameState.PlayerTurn;
 						SpellCheck();
 						UIController.UpdateDebugGrid ();
 					}
 					UIController.UpdatePlayerInfo(); // try to move out of main loop
 				}
-			} else {
-				TurnSystem ();
+				break;
+
+			case GameState.PlayerTurn:
+				if (activep.AP == 0) {
+					StartCoroutine(TurnSystem());
+				}
 				UIController.UpdatePlayerInfo(); // ditto here
+				UIController.UpdateCommishMeter();
+				break;
+
+			case GameState.CommishTurn:
+				break;
+
 			}
 		}
 	}
 	// -----------------------------------------------------------------------------------------------------------
 
 
-	void TurnSystem(){ // TODO! needs work - should be a private class?
-		if (activep.AP == 0) { // if active player has just used their last AP
-			ResolveEndTurnEffects ();
-			turns++;
-			UIController.UpdateTurnText ();
-			UIController.DeactivateAllSpellButtons (activep);
-			
-			commishTurn = true;
-			commish.CastSpell (0); // place 5 random tiles
-			activep = InactivePlayer ();
-			activep.InitAP ();
-		} else if (commishTurn) { // if the commissioner just had his turn
-			commishTurn = false;
-			activep.FlipHand ();
-			UIController.FlipGradient ();
-			DealPlayerHand (activep, 2); // deal 2 tiles to activep at beginning of turn
-			ResolveBeginTurnEffects ();
+	IEnumerator TurnSystem(){
+		ResolveEndTurnEffects ();
+		turns++;
+		UIController.UpdateTurnText ();
+		UIController.DeactivateAllSpellButtons (activep);
+		
+		currentState = GameState.CommishTurn;
+		yield return Commish.CTurn(); // place 5 random tiles
+//		Debug.Log ("TurnSystem: done placing tiles.");
+		yield return new WaitUntil(() => animating == 0);
+//		yield return WaitForAnims();
+//		Debug.Log("MAGEMATCH: Commish turn done.");
 
-			SpellCheck ();
-		}
+		activep = InactiveP ();
+		activep.InitAP ();
+		activep.FlipHand ();
+		UIController.FlipGradient (); // ugly
+		activep.DrawTiles(2);
+//		DealPlayerHand (activep, 2); // deal 2 tiles to activep at beginning of turn
+		ResolveBeginTurnEffects ();
+
+		SpellCheck ();
+		currentState = GameState.BoardChecking;
 	}
 
 	void SpellCheck(){ // TODO clean up
 		List<TileSeq> spells = activep.loadout.GetTileSeqList ();
-		spells.AddRange (InactivePlayer ().loadout.GetTileSeqList ()); //?
+		spells.AddRange (InactiveP ().loadout.GetTileSeqList ()); //?
 		spells = BoardCheck.SpellCheck (spells);
 		if (spells.Count > 0) {
 			List<TileSeq> spellList = activep.loadout.GetTileSeqList ();
@@ -165,15 +182,21 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	void ResolveMatchEffects(List<TileSeq> seqList){
+		Debug.Log("MAGEMATCH: At least one match: " + BoardCheck.PrintSeqList(seqList));
 		for (int i = 0; i < seqList.Count; i++) {
-			// TODO handle enchantments, bigger sequences, critical matches...
-			if (!commishTurn) {
-				if(seqList[i].GetSeqLength() == 3)
-					InactivePlayer ().ChangeHealth (Random.Range (-100, -75));
-				else if (seqList[i].GetSeqLength() == 4)
-					InactivePlayer ().ChangeHealth (Random.Range (-150, -125));
-				else // TODO critical matches
-					InactivePlayer ().ChangeHealth (Random.Range (-225, -200));
+			if (currentState != GameState.CommishTurn) {
+				activep.ResolveMatchEffect (); // match-based effects
+
+				if (seqList [i].GetSeqLength () == 3) {
+					InactiveP ().ChangeHealth (Random.Range (-100, -75));
+					Commish.ChangeMood(10);
+				} else if (seqList [i].GetSeqLength () == 4) {
+					InactiveP ().ChangeHealth (Random.Range (-150, -125));
+					Commish.ChangeMood(15);
+				} else { // TODO critical matches
+					InactiveP ().ChangeHealth (Random.Range (-225, -200));
+					Commish.ChangeMood(20);
+				}
 			}
 		}
 		RemoveSeqList (seqList);
@@ -186,10 +209,11 @@ public class MageMatch : MonoBehaviour {
 			turnEffect = beginTurnEffects [i];
 			if (turnEffect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
 				beginTurnEffects.Remove (turnEffect);
-				turnEffect.GetEnchantee ().ClearEnchantment ();
+				if(turnEffect.IsEnchantment())
+					turnEffect.GetEnchantee ().ClearEnchantment ();
 				i--;
 			} else {
-				Debug.Log ("Beginning-of-turn effect has " + turnEffect.TurnsRemaining () + " turns left.");
+				Debug.Log ("MAGEMATCH: Beginning-of-turn effect " + i + " has " + turnEffect.TurnsRemaining () + " turns left.");
 			}
 		}
 	}
@@ -200,16 +224,17 @@ public class MageMatch : MonoBehaviour {
 			turnEffect = endTurnEffects [i];
 			if (turnEffect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
 				endTurnEffects.Remove (turnEffect);
-				turnEffect.GetEnchantee ().ClearEnchantment ();
+				if(turnEffect.IsEnchantment())
+					turnEffect.GetEnchantee ().ClearEnchantment ();
 				i--;
 			} else {
-				Debug.Log ("End-of-turn effect has " + turnEffect.TurnsRemaining () + " turns left.");
+				Debug.Log ("MAGEMATCH: End-of-turn effect " + i + " has " + turnEffect.TurnsRemaining () + " turns left.");
 			}
 		}
 	}
 		
-	public bool PlaceTile(int col){
-		if (PlaceTile(col, currentTile, .08f)) {
+	public bool DropTile(int col){
+		if (DropTile(col, currentTile, .08f)) {
 			activep.hand.Remove (currentTile.GetComponent<TileBehav>()); // remove from hand
 			//			CheckGrav (); //? eventually once gravity gets moved to this script?
 			activep.AP--;
@@ -221,28 +246,51 @@ public class MageMatch : MonoBehaviour {
 			return false;
 	}
 
-	public bool PlaceTile(int col, GameObject go, float dur){
+	public bool DropTile(int col, GameObject go, float dur){
 		int row = BoardCheck.CheckColumn (col); // check that column isn't full
 		if (row >= 0) { // if the col is not full
 			TileBehav currentTileBehav = go.GetComponent<TileBehav> ();
 			currentTileBehav.SetPlaced();
 			currentTileBehav.ChangePos (HexGrid.TopOfColumn(col) + 1, col, row, dur); // move to appropriate spot in column
-			boardChanged = true;
+			BoardChanged();
 			return true;
 		}
 		return false;
 	}
 
 	public void SwapTiles(int c1, int r1, int c2, int r2){
-		if (HexGrid.Swap (c1, r1, c2, r2)) {
-			activep.AP--;
-			if (activep.AP == 0)
-				activep.FlipHand ();
-			AudioController.SwapSound ();
+		if (!IsCommishTurn ()) {
+			if (HexGrid.Swap (c1, r1, c2, r2)) {
+				activep.AP--;
+				if (activep.AP == 0)
+					activep.FlipHand ();
+				AudioController.SwapSound ();
+			}
 		}
 	}
 
-	public Player InactivePlayer(){
+	// TODO
+	public static void PutTile(GameObject go, int col, int row){
+		TileBehav currentTileBehav = go.GetComponent<TileBehav> ();
+		if(HexGrid.IsSlotFilled(col, row))
+			Destroy(HexGrid.GetTileBehavAt (col, row).gameObject);
+		currentTileBehav.SetPlaced();
+		currentTileBehav.HardSetPos (col, row);
+		BoardChanged();
+	}
+
+	public void Transmute(int col, int row, Tile.Element element){
+		Destroy(HexGrid.GetTileBehavAt (col, row).gameObject);
+		HexGrid.ClearTileBehavAt (col, row);
+		TileBehav tb = GenerateTile (element).GetComponent<TileBehav>();
+		tb.ChangePos (col, row);
+	}
+
+	public static Player ActiveP(){
+		return activep;
+	}
+
+	public static Player InactiveP(){
 		if (activep.id == 1)
 			return p2;
 		else
@@ -261,27 +309,6 @@ public class MageMatch : MonoBehaviour {
 			return p2;
 		else
 			return p1;
-	}
-
-	public Player GetCommish(){
-		return commish;
-	}
-
-	void DealPlayerHand(Player player, int numTiles){
-		for (int i = 0; i < numTiles && player.hand.Count < player.handSize; i++) {
-			GameObject go = GenerateTile (player.loadout.GetTileElement());
-			if (player.id == 1)
-				go.transform.position = new Vector3 (-5, 2);
-			else if (player.id == 2)
-				go.transform.position = new Vector3 (5, 2);
-				
-			go.transform.SetParent (GameObject.Find ("handslot" + player.id).transform, false);
-
-			TileBehav tb = go.GetComponent<TileBehav> ();
-			player.hand.Add (tb);
-		}
-		AudioController.PickupSound (this.GetComponent<AudioSource> ());
-		player.AlignHand (.12f, true);
 	}
 
 	public GameObject GenerateTile(Tile.Element element){
@@ -315,29 +342,36 @@ public class MageMatch : MonoBehaviour {
 		return go;
 	}
 
-	public void DiscardTile(Player player, int num){
-		int tilesInHand = player.hand.Count;
-		for(int i = 0; i < num; i++){
-			if (tilesInHand > 0) {
-				int randomRoll = Random.Range (0, tilesInHand);
-				GameObject go = player.hand[randomRoll].gameObject;
-				player.hand.RemoveAt (randomRoll);
-				Destroy(go);
-			}
+	public GameObject GenerateToken(string name){
+		switch (name) {
+		case "stone":
+			return Instantiate (stonePF);
+		case "ember":
+			return Instantiate (emberPF);
+		case "prereq":
+			return Instantiate (prereqPF);
+		case "target":
+			return Instantiate (targetPF);
+		default:
+			return null;
 		}
 	}
 
-	public void CastSpell(int spellNum){ // TODO move player stuff (AP) to player.Cast()
-		Spell spell = activep.loadout.GetSpell (spellNum);
-		if (activep.CastSpell(spellNum)) {
+	public void CastSpell(int spellNum){ // IEnumerator?
+		Player p = activep;
+//		Spell spell = activep.loadout.GetSpell (spellNum);
+		if (p.CastSpell(spellNum)) {
+			Commish.ChangeMood(45);
 			UIController.DeactivateAllSpellButtons (activep); // ?
-			RemoveSeq (spell.GetBoardSeq ());
-			boardChanged = true; //?
-			HexGrid.CheckGrav (); //?
+			if(currentState != GameState.TargetMode){ // kinda shitty
+				RemoveSeq (p.GetCurrentBoardSeq ());
+				p.ApplyAPCost();
+				BoardChanged ();
+			}
 //			UIController.UpdateMoveText (activep.name + " casts " + spell.name + " for " + spell.APcost + " AP!!");
-			UIController.UpdatePlayerInfo();
+			UIController.UpdatePlayerInfo(); // move to BoardChecking handling??
 		} else {
-			UIController.UpdateMoveText ("Not enough AP! That spell costs " + spell.APcost + " and you only have " + activep.AP);
+			UIController.UpdateMoveText ("Not enough AP to cast!");
 		}
 	}
 		
@@ -349,8 +383,8 @@ public class MageMatch : MonoBehaviour {
 		}
 	}
 
-	void RemoveSeq(TileSeq seq){ // TODO messy stuff
-		Debug.Log ("RemoveSeq(): About to remove " + BoardCheck.PrintSeq(seq, true));
+	public void RemoveSeq(TileSeq seq){ // TODO messy stuff
+		Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + BoardCheck.PrintSeq(seq, true));
 		Tile tile;
 		for (int i = 0; i < seq.sequence.Count;) {
 			tile = seq.sequence [0];
@@ -367,10 +401,10 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	public void RemoveTile(int col, int row, bool checkGrav, bool resolveEnchant){
-		Debug.Log ("Removing (" + col + ", " + row + ")");
+//		Debug.Log ("Removing (" + col + ", " + row + ")");
 		TileBehav tb = HexGrid.GetTileBehavAt (col, row);
 		if (resolveEnchant && tb.HasEnchantment ()) {
-			Debug.Log ("About to resolve enchant on tile (" + col + ", " + row + ")");
+			Debug.Log ("MAGEMATCH: About to resolve enchant on tile (" + col + ", " + row + ")");
 			tb.ResolveEnchantment ();
 		}
 //		if (tb.ResolveEnchantment ()) TODO
@@ -378,15 +412,6 @@ public class MageMatch : MonoBehaviour {
 		StartCoroutine (Remove_Anim (col, row, tb, true)); // FIXME hardcode
 	}
 
-	public void Transmute(int col, int row, Tile.Element element){
-
-		Destroy(HexGrid.GetTileBehavAt (col, row).gameObject);
-		HexGrid.ClearTileBehavAt (col, row);
-		TileBehav tb = GenerateTile (element).GetComponent<TileBehav>();
-		tb.ChangePos (col, row);
-
-	}
-		
 	IEnumerator Remove_Anim(int col, int row, TileBehav tb, bool checkGrav){
 		animating++;
 		Tween swellTween = tb.transform.DOScale (new Vector3 (1.25f, 1.25f), .15f);
@@ -400,12 +425,14 @@ public class MageMatch : MonoBehaviour {
 		HexGrid.ClearTileBehavAt(col, row);
 
 		if(checkGrav){
-			boardChanged = true;
+			BoardChanged ();
 		}
 	}
 
 	public static void BoardChanged(){
-		boardChanged = true;
+//		boardChanged = true;
+		if(currentState != GameState.CommishTurn)
+			currentState = GameState.BoardChecking;
 	}
 
 	public static void EndTheGame(){
@@ -420,7 +447,15 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	public static bool IsCommishTurn(){
-		return commishTurn;
+//		if (currentState == GameState.CommishTurn)
+//			Debug.Log ("IsCommishTurn evaluates to true!");
+//		else
+//			Debug.Log ("IsCommishTurn evaluates to false!");
+		return currentState == GameState.CommishTurn;
+	}
+
+	public static bool IsTargetMode(){
+		return currentState == GameState.TargetMode;
 	}
 
 	public static void IncAnimating(){

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public static class HexGrid {
 
@@ -8,11 +9,18 @@ public static class HexGrid {
 
 	private const float horiz = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 	private static TileBehav[,] tileGrid;
+	// TODO public static List<TileBehav> tilesOnBoard?
 
-	public static void Init(){ // TODO! change to public static void Init()?
+	public static void Init(){
 		tileGrid = new TileBehav[numCols, numRows];
 	}
-	
+
+	public static void HardSetTileBehavAt(TileBehav tb, int col, int row){
+		if (IsSlotFilled (col, row))
+			ClearTileBehavAt (col, row);
+		SetTileBehavAt (tb, col, row);
+	}
+
 	public static void SetTileBehavAt(TileBehav tb, int col, int row){
 		tileGrid [col, row] = tb;
 		MageMatch.BoardChanged ();
@@ -35,16 +43,16 @@ public static class HexGrid {
 	}
 
 	public static int BottomOfColumn(int col){ // 0, 0, 0, 0, 1, 2, 3
-		if (col >= 0 && col <= 6) {
+		if (col >= 0 && col <= 6)
 			return (int)Mathf.Max (0, col - 3);
-		} else
+		else
 			return -1;
 	}
 
 	public static int TopOfColumn(int col){    // 3, 4, 5, 6, 6, 6, 6
-		if (col >= 0 && col <= 6) {
+		if (col >= 0 && col <= 6)
 			return (int)Mathf.Min (col + 3, 6);
-		} else
+		else
 			return -1;
 	}
 
@@ -70,11 +78,8 @@ public static class HexGrid {
 		return true;
 	}
 
-	public static float[] GridCoordToPos(int col, int row){
-		float[] pos = new float[2];
-		pos [0] = GridColToPos (col);
-		pos [1] = GridRowToPos (col, row);
-		return pos;
+	public static Vector2 GridCoordToPos(int col, int row){
+		return new Vector2 (GridColToPos (col), GridRowToPos (col, row));
 	}
 
 	public static float GridColToPos(int col){
@@ -86,8 +91,10 @@ public static class HexGrid {
 	}
 
 	public static bool Swap(int c1, int r1, int c2, int r2){
-		//		Debug.Log("Swapping (" + c1 + ", " + r1 + ") to (" + c2 + ", " + r2 + ")");
+//		Debug.Log("Swapping (" + c1 + ", " + r1 + ") to (" + c2 + ", " + r2 + ")");
 		if (IsSlotFilled(c2, r2)) { // if there's something in the slot
+			if (!tileGrid [c1, r1].ableSwap || !tileGrid [c2, r2].ableSwap)
+				return false;
 			TileBehav temp = GetTileBehavAt(c2, r2);
 			SetTileBehavAt(GetTileBehavAt(c1, r1), c2, r2); // TODO look at TileBehav.ChangePos
 			GetTileBehavAt(c2, r2).ChangePos (c2, r2);
@@ -98,6 +105,94 @@ public static class HexGrid {
 			return true;
 		}
 		return false;
+	}
+
+	// TODO handle floating things, once they are implemented
+	public static List<TileBehav> GetPlacedTiles(){
+		List<TileBehav> returnList = new List<TileBehav> ();
+		for(int c = 0; c < numCols; c++){ // for each col
+			for(int r = BottomOfColumn(c); r <= TopOfColumn(c); r++){ // for each row
+				if (IsSlotFilled(c, r)) { // if there's a tile there
+					returnList.Add(GetTileBehavAt(c, r));
+				} else
+					break; // breaks just inner loop
+			}	
+		}
+		return returnList;
+	}
+		
+	public static bool CellExists(int col, int row){
+		bool bounds = (col >= 0 && col < numCols) && (row >= 0 && row < numRows);
+		bool diag = (row <= TopOfColumn (col)) && (row >= BottomOfColumn(col));
+		return bounds && diag;
+	}
+
+	public static void GetOffset(int dir, out int dc, out int dr){
+		dc = dr = 0;
+		switch (dir) {
+		case 0: // N
+			dr = 1;
+			break;
+		case 1: // NE
+			dc = 1;
+			dr = 1;
+			break;
+		case 2: // SE
+			dc = 1;
+			break;
+		case 3: // S
+			dr = -1; 
+			break;
+		case 4: // SW
+			dc = -1;
+			dr = -1;
+			break;
+		case 5: // NW
+			dc = -1;
+			break;
+		}
+	}
+
+	public static bool HasAdjacentCell(int col, int row, int dir){
+		int dc, dr;
+		GetOffset (dir, out dc, out dr);
+		return CellExists (col + dc, row + dr);
+	}
+
+	public static List<TileBehav> GetSmallAreaTiles(int col, int row){
+		List<TileBehav> tbs = new List<TileBehav> ();
+		int dc, dr;
+		for (int dir = 0; dir < 6; dir++) {
+			GetOffset (dir, out dc, out dr);
+			if (CellExists (col + dc, row + dr)) {
+				if (IsSlotFilled (col + dc, row + dr))
+					tbs.Add (tileGrid [col + dc, row + dr]);
+			}
+		}
+		return tbs;
+	}
+
+	public static List<TileBehav> GetLargeAreaTiles(int col, int row){
+		List<TileBehav> tbs = GetSmallAreaTiles(col, row);
+		for(int dir = 0; dir < 6; dir++){
+			int dc, dr;
+			GetOffset (dir, out dc, out dr);
+			dc *= 2;
+			dr *= 2;
+			
+			if (CellExists(col + dc, row + dr))
+			if (IsSlotFilled (col + dc, row + dr))
+				tbs.Add (tileGrid [col + dc, row + dr]);
+			
+			if (HasAdjacentCell (col + dc, row + dr, (dir + 2) % 6)) {
+				int dc2, dr2;
+				GetOffset ((dir + 2) % 6, out dc2, out dr2);
+				//				Debug.Log ("Dir = " + dir + ", new dir = " + ((dir+2)%6) + ", dc2 = " + dc2 + ", dr2 = " + dr2);
+				if (IsSlotFilled (col + dc + dc2, row + dr + dr2))
+					tbs.Add (tileGrid [col + dc + dc2, row + dr + dr2]);
+			}
+		}
+		return tbs;
 	}
 
 	// apply "gravity" to any tiles with empty space under them

@@ -5,8 +5,7 @@ using System.Collections.Generic;
 
 public static class BoardCheck {
 
-	public static bool debugLogOn = false;
-
+	private static bool debugLogOn = false;
 	private static List<TileSeq> matchSeqList, checkList; // dictionary, compare list??
 
 	// check skipping object
@@ -47,7 +46,7 @@ public static class BoardCheck {
 	public static float[] EmptyCheck(){
 		float[] ratios = new float[7];
 		int[] counts = new int[7];
-		int total = HexGrid.numCells - PlacedTileList ().Count;
+		int total = HexGrid.numCells - HexGrid.GetPlacedTiles ().Count;
 		for (int i = 0; i < HexGrid.numCols; i++) {
 			if (CheckColumn (i) >= 0)
 				counts [i] = HexGrid.TopOfColumn (i) - CheckColumn (i) + 1;
@@ -60,7 +59,8 @@ public static class BoardCheck {
 
 		float totalf = 0;
 		foreach(float f in ratios) totalf += f;
-		Debug.Log ("EmptyCheck: totalf = " + totalf);
+		if(debugLogOn)
+			Debug.Log ("EmptyCheck: totalf = " + totalf);
 		return ratios;
 	}
 
@@ -107,13 +107,16 @@ public static class BoardCheck {
 	static List<TileSeq> CheckTile(int c, int r, List<TileSeq> shortList, bool matchMode){
 		// if check matches color of current, keep checking the line
 		List<TileSeq> returnList = new List<TileSeq> ();
+		if (!HexGrid.GetTileBehavAt (c, r).ableMatch) // handle current tile not matchable
+			return returnList;
 
 		// direction loop
 		for (int dir = 0; dir < 6; dir++) {
 			bool skip = false;
 			foreach (SkipCheck s in skips) {
 				if (s.col == c && s.row == r && s.dir == dir) {
-					Debug.Log ("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir);
+					if(debugLogOn)
+						Debug.Log ("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir);
 					skip = true;
 					break;
 				}
@@ -131,45 +134,12 @@ public static class BoardCheck {
 				int dc = 0, dr = 0; // difference from current tile pos
 				for (int seqIndex = 1; seqIndex < checkSeq.sequence.Count; seqIndex++) {
 					bool skipCurrentSeq = false;
-					switch (dir) { // TODO change edge cases to those used in TileBehav swapping
-					case 0: // N cell - board N
-						if (r + dr != HexGrid.numRows - 1) {
-							dr = 1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 1: // NE cell - board NE
-						if (c + dc != HexGrid.numCols - 1 && r + dr != HexGrid.numRows - 1) {
-							dc = 1 * seqIndex;
-							dr = 1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 2: // E cell - board SE
-						if (c + dc != HexGrid.numCols - 1) {
-							dc = 1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 3: // S cell - board S
-						if (r  + dr != 0) {
-							dr = -1 * seqIndex; 
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 4: // SW cell - board SW
-						if (r + dr != 0 && c + dc != 0) {
-							dc = -1 * seqIndex;
-							dr = -1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
-					case 5: // W cell - board NW
-						if (c + dc != 0) {
-							dc = -1 * seqIndex;
-						} else
-							skipCurrentSeq = true;
-						break;
+					if (!HexGrid.HasAdjacentCell (c + dc, r + dr, dir))
+						skipCurrentSeq = true;
+					else {
+						HexGrid.GetOffset (dir, out dc, out dr);
+						dc *= seqIndex;
+						dr *= seqIndex;
 					}
 
 					if (debugLogOn)
@@ -177,6 +147,7 @@ public static class BoardCheck {
 
 					if (!skipCurrentSeq && 
 						HexGrid.IsSlotFilled(c + dc, r + dr) && // if there's something there...
+						HexGrid.GetTileBehavAt(c + dc, r + dr).ableMatch && // and it can be matched...
 						HexGrid.GetTileAt(c + dc, r + dr).element.Equals(checkSeq.GetElementAt (seqIndex))) { // ...and the next tile matches the next in the seq
 						outSeq.sequence.Add (HexGrid.GetTileAt(c + dc, r + dr));
 					} else {
@@ -202,7 +173,8 @@ public static class BoardCheck {
 	}
 
 	static void AddMatchSkips(TileSeq seq, int dir){
-		Debug.Log ("Adding skips for " + PrintSeq (seq, true));
+		if(debugLogOn)
+			Debug.Log ("Adding skips for " + PrintSeq (seq, true));
 		switch (seq.GetSeqLength ()) {
 		case 3:
 			skips.Add (new SkipCheck (seq.sequence [2], OppDir(dir))); // 3
@@ -224,19 +196,6 @@ public static class BoardCheck {
 
 	static int OppDir(int dir){
 		return (dir + 3) % 6;
-	}
-
-	public static List<TileBehav> PlacedTileList(){
-		List<TileBehav> returnList = new List<TileBehav> ();
-		for(int c = 0; c < HexGrid.numCols; c++){ // for each col
-			for(int r = HexGrid.BottomOfColumn(c); r <= HexGrid.TopOfColumn(c); r++){ // for each row
-				if (HexGrid.IsSlotFilled(c, r)) { // if there's a tile there
-					returnList.Add(HexGrid.GetTileBehavAt(c, r));
-				} else
-					break; // breaks just inner loop
-			}	
-		}
-		return returnList;
 	}
 
 	public static string PrintSeq(TileSeq seq, bool showPos){ // debug
