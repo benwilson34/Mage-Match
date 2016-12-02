@@ -15,7 +15,7 @@ public class MageMatch : MonoBehaviour {
 	[HideInInspector] public static bool menu = false;         // is the settings menu open?
 	[HideInInspector] public static GameObject currentTile;    // current game tile
 	[HideInInspector] private static Player p1, p2, activep;
-	[HideInInspector] public static List<TurnEffect> beginTurnEffects, endTurnEffects;
+	[HideInInspector] public static List<Effect> beginTurnEffects, endTurnEffects;
 
 	private static bool endGame = false;             	       // is either player dead?
 //	private static bool boardChanged = false;                  // has the board changed?
@@ -57,8 +57,8 @@ public class MageMatch : MonoBehaviour {
 		}
 
 		HexGrid.Init(); // init game board
-		beginTurnEffects = new List<TurnEffect>(); // init beginning-of-turn effects
-		endTurnEffects = new List<TurnEffect>(); // init end-of-turn effects
+		beginTurnEffects = new List<Effect>(); // init beginning-of-turn effects
+		endTurnEffects = new List<Effect>(); // init end-of-turn effects
 
 		turns = 0;
 		endGame = false;
@@ -204,31 +204,31 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	void ResolveBeginTurnEffects(){
-		TurnEffect turnEffect;
+		Effect effect;
 		for (int i = 0; i < beginTurnEffects.Count; i++) {
-			turnEffect = beginTurnEffects [i];
-			if (turnEffect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
-				beginTurnEffects.Remove (turnEffect);
-				if(turnEffect.IsEnchantment())
-					turnEffect.GetEnchantee ().ClearEnchantment ();
+			effect = beginTurnEffects [i];
+			if (effect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
+				beginTurnEffects.Remove (effect);
+				if(effect is Enchantment)
+					((Enchantment)effect).GetEnchantee ().ClearEnchantment ();
 				i--;
 			} else {
-				Debug.Log ("MAGEMATCH: Beginning-of-turn effect " + i + " has " + turnEffect.TurnsRemaining () + " turns left.");
+				Debug.Log ("MAGEMATCH: Beginning-of-turn effect " + i + " has " + effect.TurnsRemaining () + " turns left.");
 			}
 		}
 	}
 		
 	void ResolveEndTurnEffects(){
-		TurnEffect turnEffect;
+		Effect effect;
 		for (int i = 0; i < endTurnEffects.Count; i++) {
-			turnEffect = endTurnEffects [i];
-			if (turnEffect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
-				endTurnEffects.Remove (turnEffect);
-				if(turnEffect.IsEnchantment())
-					turnEffect.GetEnchantee ().ClearEnchantment ();
+			effect = endTurnEffects [i];
+			if (effect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
+				endTurnEffects.Remove (effect);
+				if(effect is Enchantment)
+					((Enchantment)effect).GetEnchantee ().ClearEnchantment ();
 				i--;
 			} else {
-				Debug.Log ("MAGEMATCH: End-of-turn effect " + i + " has " + turnEffect.TurnsRemaining () + " turns left.");
+				Debug.Log ("MAGEMATCH: End-of-turn effect " + i + " has " + effect.TurnsRemaining () + " turns left.");
 			}
 		}
 	}

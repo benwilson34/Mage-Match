@@ -60,7 +60,7 @@ public class SpellEffects {
 		
 	}
 	
-	// TODO PLACEHOLDER EFFECT
+	// TODO
 	public void HotBody(){
 		MageMatch.ActiveP().SetMatchEffect (3, Hotbody_Match);
 	}
@@ -79,7 +79,7 @@ public class SpellEffects {
 
 	public void HotAndBothered(){
 		MageMatch.InactiveP ().ChangeBuff_DmgExtra (15);
-		MageMatch.endTurnEffects.Add( new TurnEffect (MageMatch.InactiveP().id, 5, HAB_Turn, HAB_End, null));
+		MageMatch.endTurnEffects.Add( new TurnEffect (5, HAB_Turn, HAB_End, null));
 	}
 	void HAB_Turn(int id){
 		MageMatch.InactiveP ().ChangeBuff_DmgExtra (15); // technically not needed
@@ -108,6 +108,25 @@ public class SpellEffects {
 			Ench_SetBurning (tb);
 	}
 
+    // TODO
+    public void ZombieSynergy() { }
+
+    // TODO PLACEHOLDER
+    public void HumanResources() {
+        Targeting.WaitForTileAreaTarget(false, HumanResources_Target);
+    }
+    void HumanResources_Target(TileBehav tb) {
+        Ench_SetZombify(tb, false);
+    }
+
+    // TODO
+    public void CompanyLuncheon() { }
+    void CompanyLuncheon_Target(TileBehav tb) { }
+
+    // TODO
+    public void RaiseZombie() { }
+    void RaiseZombie_Target(CellBehav cb) { }
+
 	public void LightningPalm(){
 		Targeting.WaitForTileTarget(1, LightningPalm_Target);
 	}
@@ -125,7 +144,7 @@ public class SpellEffects {
 
 	public void CaughtYouMirin(){
 		MageMatch.ActiveP().ChangeBuff_DmgMult (.5f); // 50% damage multiplier
-		MageMatch.endTurnEffects.Add( new TurnEffect (MageMatch.ActiveP().id, 4, CaughtYouMirin_Turn, CaughtYouMirin_End, null));
+		MageMatch.endTurnEffects.Add( new TurnEffect (4, CaughtYouMirin_Turn, CaughtYouMirin_End, null));
 	}
 	void CaughtYouMirin_Turn(int id){ // technically this isn't needed
 		MageMatch.GetPlayer(id).ChangeBuff_DmgMult (.5f); // 50% damage multiplier
@@ -138,12 +157,11 @@ public class SpellEffects {
 		Targeting.WaitForTileTarget(1, Cherrybomb_Target);
 	}
 	void Cherrybomb_Target(TileBehav tb){
-//		tb.SetEnchantment (Ench_Cherrybomb);
 		Ench_SetCherrybomb(tb);
 	}
 
 	public void Magnitude10(){
-		MageMatch.endTurnEffects.Add (new TurnEffect (MageMatch.ActiveP().id, 3, Magnitude10_Turn, Magnitude10_End, null));
+		MageMatch.endTurnEffects.Add (new TurnEffect (3, Magnitude10_Turn, Magnitude10_End, null));
 	}
 	void Magnitude10_Turn(int id){
 		int dmg = 0;
@@ -197,7 +215,7 @@ public class SpellEffects {
 	// -------------------------------- ENCHANTMENTS --------------------------------------
 
 	public void Ench_SetCherrybomb(TileBehav tb){
-		TurnEffect effect = new TurnEffect (MageMatch.ActiveP().id, 0, null, null, Ench_Cherrybomb_Resolve);
+		Enchantment effect = new Enchantment (false, null, null, Ench_Cherrybomb_Resolve);
 		tb.SetEnchantment (effect);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
 	}
@@ -213,41 +231,41 @@ public class SpellEffects {
 	}
 
 	public void Ench_SetBurning(TileBehav tb){
-		// Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
-//		Debug.Log("SPELLEFFECTS: Setting burning...");
-		TurnEffect effect = new TurnEffect (MageMatch.ActiveP().id, 5, Ench_Burning_Turn, Ench_Burning_End, Ench_Burning_Cancel);
+        // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
+        //		Debug.Log("SPELLEFFECTS: Setting burning...");
+        Enchantment effect = new Enchantment(5, false, Ench_Burning_Turn, Ench_Burning_End, null);
 		tb.SetEnchantment (effect);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
 		MageMatch.endTurnEffects.Add(effect);
 	}
-	void Ench_Burning_Turn(int id){
+	void Ench_Burning_Turn(int id, TileBehav tb){
 		MageMatch.GetOpponent(id).ChangeHealth (-3);
 	}
-	void Ench_Burning_End(int id){
+	void Ench_Burning_End(int id, TileBehav tb){
 		MageMatch.GetOpponent(id).ChangeHealth (-6);
 	}
-	void Ench_Burning_Cancel(int id, TileBehav tb){
-		
-	}
 
-    public void Ench_SetZombify(TileBehav tb){
-        
+    // TODO
+    public void Ench_SetZombify(TileBehav tb, bool skip){
+        Enchantment ench = new Enchantment(skip, Ench_Zombify_Turn, null, null);
+        tb.SetEnchantment(ench);
+        tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
+        MageMatch.endTurnEffects.Add(ench);
     }
-    void Ench_Zombify_Turn(int id) {
-        //list<tilebehav> tbs = hexgrid;
-        //if (tbs.Count > 0) {
-        //    int tries = 10;
-        //    for (int i = 0; i < 1; i++) {
-        //        int rand = Random.Range(0, tbs.Count);
-        //        if()
-        //    }
-        //}
-    }
-    void Ench_Zombify_End(int id) {
-
-    }
-    void Ench_Zombify_Cancel(int id, TileBehav tb) {
-
+    void Ench_Zombify_Turn(int id, TileBehav tb) {
+        List<TileBehav> tbs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+        if (tbs.Count > 0){
+            int tries = 10;
+            for (int i = 0; i < 1 && tries > 0; i++) {
+                int rand = Random.Range(0, tbs.Count);
+                if (tbs[rand].HasEnchantment()) { // TODO not enchantable
+                    i--;
+                    tries--;
+                } else {
+                    Ench_SetZombify(tbs[rand], true);
+                }
+            }
+        }
     }
 
 }

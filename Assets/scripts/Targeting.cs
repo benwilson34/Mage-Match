@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Targeting {
+public static class Targeting {
 
 	public enum TargetMode { Tile, TileArea, Cell, CellArea, Drag };
 	public static TargetMode currentTMode = TargetMode.Tile;

@@ -62,19 +62,21 @@
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="DOTween">
-      <HintPath>Assets\DOTween\DOTween\DOTween.dll</HintPath>
+      <HintPath>Assets\Demigiant\DOTween\DOTween.dll</HintPath>
     </Reference>
     <Reference Include="DOTween43">
-      <HintPath>Assets\DOTween\DOTween\DOTween43.dll</HintPath>
+      <HintPath>Assets\Demigiant\DOTween\DOTween43.dll</HintPath>
     </Reference>
     <Reference Include="DOTween46">
-      <HintPath>Assets\DOTween\DOTween\DOTween46.dll</HintPath>
+      <HintPath>Assets\Demigiant\DOTween\DOTween46.dll</HintPath>
     </Reference>
     <Reference Include="DOTween50">
-      <HintPath>Assets\DOTween\DOTween\DOTween50.dll</HintPath>
+      <HintPath>Assets\Demigiant\DOTween\DOTween50.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Demigiant\DOTween\Examples\Basics.cs" />
+    <Compile Include="Assets\Demigiant\DOTween\Examples\Sequences.cs" />
     <Compile Include="Assets\scripts\BoardCheck.cs" />
     <Compile Include="Assets\scripts\CellBehav.cs" />
     <Compile Include="Assets\scripts\ColumnBehav.cs" />
@@ -83,6 +85,7 @@
     <Compile Include="Assets\scripts\Controllers\ButtonController.cs" />
     <Compile Include="Assets\scripts\Controllers\InputController.cs" />
     <Compile Include="Assets\scripts\Controllers\UIController.cs" />
+    <Compile Include="Assets\scripts\Effect.cs" />
     <Compile Include="Assets\scripts\EnchantEffects.cs" />
     <Compile Include="Assets\scripts\HexGrid.cs" />
     <Compile Include="Assets\scripts\Loadout.cs" />
@@ -99,12 +102,12 @@
     <Compile Include="Assets\scripts\UIResources.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\DOTween\DOTween\DOTween.XML" />
-    <None Include="Assets\DOTween\DOTween\DOTween43.xml" />
-    <None Include="Assets\DOTween\DOTween\DOTween46.xml" />
-    <None Include="Assets\DOTween\DOTween\DOTween50.xml" />
-    <None Include="Assets\DOTween\DOTween\Editor\DOTweenEditor.XML" />
-    <None Include="Assets\DOTween\DOTween\readme.txt" />
+    <None Include="Assets\Demigiant\DOTween\DOTween.XML" />
+    <None Include="Assets\Demigiant\DOTween\DOTween43.xml" />
+    <None Include="Assets\Demigiant\DOTween\DOTween46.xml" />
+    <None Include="Assets\Demigiant\DOTween\DOTween50.xml" />
+    <None Include="Assets\Demigiant\DOTween\Editor\DOTweenEditor.XML" />
+    <None Include="Assets\Demigiant\DOTween\readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

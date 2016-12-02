@@ -16,7 +16,7 @@ public class TileBehav : MonoBehaviour {
 
 //	public delegate void EnchantEffect(TileBehav tb);
 //	private EnchantEffect enchantEffect;
-	private TurnEffect enchantment;
+	private Enchantment enchantment;
 //	private bool resolved = false;
 	private bool inPos = true;
 
@@ -134,14 +134,14 @@ public class TileBehav : MonoBehaviour {
 		this.GetComponent<SpriteRenderer> ().color = Color.white;
 	}
 
-	public bool SetEnchantment(TurnEffect effect){
+	public bool SetEnchantment(Enchantment ench){
 		if (HasEnchantment()) {
 			return false; // where we decide whether new enchantments should overwrite current ones
 		}
 //		resolved = false;
 //		this.enchantEffect = effect;
-		effect.SetAsEnchantment(this);
-		this.enchantment = effect; 
+		ench.SetAsEnchantment(this);
+		this.enchantment = ench; 
 		return true;
 	}
 
@@ -151,8 +151,8 @@ public class TileBehav : MonoBehaviour {
 //			resolved = true;
 			currentState = TileState.Removed;
 //			this.enchantEffect (this);
-			enchantment.CancelEffect(this);
-			MageMatch.endTurnEffects.Remove (enchantment); // assumes end-of-turn list
+			enchantment.CancelEffect();
+			MageMatch.endTurnEffects.Remove (enchantment); // TODO assumes end-of-turn list
 			return true;
 		}
 		return false;

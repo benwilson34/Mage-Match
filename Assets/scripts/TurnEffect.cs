@@ -1,58 +1,62 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// REPLACED BY EFFECT.CS. SLATED FOR DELETION 12/1/2016
 
-public class TurnEffect { // TODO enact effect right away! skip current turn count!
+//using UnityEngine;
+//using System.Collections;
 
-	public delegate void MyTurnEffect(int id); // research delegates please?
-	public delegate void MyCancelEffect(int id, TileBehav tb); // research delegates please?
+//public class TurnEffect { // TODO enact effect right away! skip current turn count!
 
-	private int turnsLeft;
-	private int playerID;
-	private MyTurnEffect turnEffect, endEffect;
-	private MyCancelEffect cancelEffect;
-//	private bool enchantment = false;
-	private TileBehav enchantee;
+//	public delegate void Effect(int id, TileBehav tb); // research delegates please?
 
-	public TurnEffect(int id, int turns, MyTurnEffect turnEffect, MyTurnEffect endEffect, MyCancelEffect cancelEffect){
-		this.playerID = id;
-		this.turnsLeft = turns;
-		this.turnEffect = turnEffect;
-		this.endEffect = endEffect;
-		this.cancelEffect = cancelEffect;
-	}
+//	private int turnsLeft;
+//	private int playerID;
+//	private Effect turnEffect, endEffect, cancelEffect;
+////	private bool enchantment = false;
+//	private TileBehav enchantee;
 
-	public void SetAsEnchantment(TileBehav tb){
-		this.enchantee = tb;
-	}
+//	public TurnEffect(int id, int turns, Effect turnEffect, Effect endEffect, Effect cancelEffect){
+//		playerID = id;
+//		turnsLeft = turns;
+//		this.turnEffect = turnEffect;
+//		this.endEffect = endEffect;
+//		this.cancelEffect = cancelEffect;
+//	}
 
-	public bool IsEnchantment(){
-		return enchantee != null;
-	}
+//	public void SetAsEnchantment(TileBehav tb){
+//		enchantee = tb;
+//	}
 
-	public TileBehav GetEnchantee(){
-		return enchantee;
-	}
+//	public bool IsEnchantment(){
+//		return enchantee != null;
+//	}
 
-	public bool ResolveEffect(){
-		turnsLeft--;
-		if (turnsLeft > 0) {
-			turnEffect (playerID);
-			return false;
-		} else {
-			EndEffect ();
-			return true;
-		}
-	}
+//	public TileBehav GetEnchantee(){
+//		return enchantee;
+//	}
 
-	public void EndEffect(){
-		endEffect (playerID);
-	}
+//    public void TriggerEffect() {
+//        turnEffect(playerID, enchantee);
+//    }
 
-	public void CancelEffect(TileBehav tb){
-		cancelEffect (playerID, tb);
-	}
+//	public bool ResolveEffect(){
+//		turnsLeft--;
+//		if (turnsLeft != 0) {
+//			turnEffect (playerID, enchantee);
+//			return false;
+//		} else {
+//			EndEffect ();
+//			return true;
+//		}
+//	}
 
-	public int TurnsRemaining(){
-		return turnsLeft;
-	}
-}
+//	public void EndEffect(){
+//		endEffect (playerID, enchantee);
+//	}
+
+//	public void CancelEffect(){
+//		cancelEffect (playerID, enchantee);
+//	}
+
+//	public int TurnsRemaining(){
+//		return turnsLeft;
+//	}
+//}
