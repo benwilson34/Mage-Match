@@ -51,8 +51,9 @@ public class SpellEffects {
 	public void Baila(){
 		Targeting.WaitForTileAreaTarget (true, Baila_Target);
 	}
-	void Baila_Target(TileBehav tb){
-		Ench_SetBurning (tb);
+	void Baila_Target(List<TileBehav> tbs){
+        foreach(TileBehav tb in tbs)
+		    Ench_SetBurning (tb);
 	}
 
 	// empty
@@ -115,7 +116,6 @@ public class SpellEffects {
 			Ench_SetBurning (tb);
 	}
 
-    // TODO test
     public void ZombieSynergy() {
         int count = 0;
         List<TileBehav> tbs = HexGrid.GetPlacedTiles();
@@ -133,25 +133,29 @@ public class SpellEffects {
         MageMatch.ActiveP().DealDamage(count * 4);
     }
 
-    // TODO PLACEHOLDER
+    // TODO
     public void HumanResources() {
-        //Targeting.WaitForTileTarget(3, HumanResources_Target);
+        Targeting.WaitForTileAreaTarget(false, HumanResources_Target);
     }
-    void HumanResources_Target(TileBehav tb) {
-        //Ench_SetZombify(tb, false);
+    void HumanResources_Target(List<TileBehav> tbs) {
+        foreach (TileBehav tb in tbs) {
+            if(tb.tile.element == Tile.Element.Muscle)
+                Ench_SetZombify(tb, false);
+        }
     }
 
     // TODO
     public void CompanyLuncheon() {
         Targeting.WaitForTileAreaTarget(false, CompanyLuncheon_Target);
     }
-    void CompanyLuncheon_Target(TileBehav tb) {
-        List<TileBehav> tbs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-        foreach (TileBehav ctb in tbs) {
-            if (ctb.HasEnchantment() && ctb.GetEnchType() == Enchantment.EnchType.Zombify) {
-                ctb.TriggerEnchantment();
-            }
+    void CompanyLuncheon_Target(List<TileBehav> tbs) {
+        for (int i = 0; i < tbs.Count; i++) {
+            TileBehav tb = tbs[i];
+            if (!tb.HasEnchantment() || tb.GetEnchType() != Enchantment.EnchType.Zombify)
+                tbs.Remove(tb);
         }
+        foreach(TileBehav tb in tbs)
+            tb.TriggerEnchantment();
     }
 
     // TODO
@@ -278,7 +282,6 @@ public class SpellEffects {
 		MageMatch.GetOpponent(id).ChangeHealth (-6);
 	}
 
-    // TODO
     public void Ench_SetZombify(TileBehav tb, bool skip){
         Enchantment ench = new Enchantment(Ench_Zombify_Turn, null, null);
         ench.SetTypeTier(Enchantment.EnchType.Zombify, 1);
@@ -289,17 +292,27 @@ public class SpellEffects {
         MageMatch.endTurnEffects.Add(ench);
     }
     void Ench_Zombify_Turn(int id, TileBehav tb) {
+        // TODO filter list before rand
         List<TileBehav> tbs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
         if (tbs.Count > 0){
-            int tries = 10;
+            int tries = 15;
+            TileBehav ctb;
             for (int i = 0; i < 1 && tries > 0; i++) {
                 int rand = Random.Range(0, tbs.Count);
                 // TODO eat muscle tiles
-                if (tbs[rand].HasEnchantment()) { // TODO not enchantable
+                ctb = tbs[rand];
+                if (ctb.tile.element == Tile.Element.Muscle) {
+                    if (ctb.HasEnchantment() && ctb.GetEnchType() == Enchantment.EnchType.Zombify) ;
+                    else {
+                        mm.RemoveTile(ctb.tile, true, true);
+                        MageMatch.GetPlayer(id).DealDamage(10);
+                        MageMatch.GetPlayer(id).ChangeHealth(10);
+                    }
+                } else if (ctb.HasEnchantment()) { // TODO TB - ableEnchant
                     i--;
                     tries--;
                 } else {
-                    Ench_SetZombify(tbs[rand], true);
+                    Ench_SetZombify(ctb, true);
                 }
             }
         }

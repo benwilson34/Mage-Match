@@ -5,21 +5,24 @@ public static class Commish  {
 
 	private static int mood = 0;
 	private static MageMatch mm;
+    private static bool active = false;
 
 	public static void Init() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
 	public static IEnumerator CTurn(){
-		if (mood <= -100) {
-			AngryDamage ();
-		} else if (mood >= 100) {
-			HappyHealing ();
-		} else
-			ChangeMood (-35);
+        if (active) {
+            if (mood <= -100) {
+                AngryDamage();
+            } else if (mood >= 100) {
+                HappyHealing();
+            } else
+                ChangeMood(-35);
 
-		yield return PlaceTiles ();
+            yield return PlaceTiles();
 //		Debug.Log ("CTurn: done placing tiles.");
+        }
 	}
 
 	public static IEnumerator PlaceTiles(){

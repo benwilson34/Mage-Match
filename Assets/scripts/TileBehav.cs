@@ -132,11 +132,13 @@ public class TileBehav : MonoBehaviour {
     }
 
     public void TriggerEnchantment() {
+        Debug.Log("Triggering enchantment at " + tile.col + ", " + tile.row);
         enchantment.TriggerEffect();
     }
 
 	public void ClearEnchantment(){
 //		this.enchantEffect = null;
+        // TODO remove Effect from whichever list in MageMatch...
 		this.enchantment = null;
 		this.GetComponent<SpriteRenderer> ().color = Color.white;
 	}

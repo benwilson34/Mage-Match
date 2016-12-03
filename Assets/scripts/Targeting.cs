@@ -19,8 +19,8 @@ public static class Targeting {
 	private static TBTargetEffect TBtargetEffect;
 	public delegate void CBTargetEffect (CellBehav cb);
 	private static CBTargetEffect CBtargetEffect;
-	public delegate void TBDragTargetEffect (List<TileBehav> tbs);
-	private static TBDragTargetEffect TBdragTargetEffect;
+	public delegate void TBMultiTargetEffect (List<TileBehav> tbs);
+	private static TBMultiTargetEffect TBmultiTargetEffect;
 
 	public static void Init(){
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -84,12 +84,12 @@ public static class Targeting {
 	}
 
 	// TODO
-	public static void WaitForTileAreaTarget(bool largeArea, TBTargetEffect targetEffect){
+	public static void WaitForTileAreaTarget(bool largeArea, TBMultiTargetEffect targetEffect){
 		currentTMode = TargetMode.TileArea;
 		targetsLeft = 1;
 		targetTBs = new List<TileBehav> ();
 		largeAreaMode = largeArea;
-		TBtargetEffect = targetEffect;
+		TBmultiTargetEffect = targetEffect;
 		Debug.Log ("TARGETING: Waiting for TileArea target. Targets = " + targetsLeft);
 
 		mm.StartCoroutine(TargetingScreen());
@@ -123,16 +123,16 @@ public static class Targeting {
 	}
 
 	// TODO
-	public static void WaitForDragTarget(int count, TBDragTargetEffect targetEffect){
+	public static void WaitForDragTarget(int count, TBMultiTargetEffect targetEffect){
 		// TODO
 		currentTMode = TargetMode.Drag;
 		targetsLeft = count;
-		TBdragTargetEffect = targetEffect;
+		TBmultiTargetEffect = targetEffect;
 	}
 
 	public static void OnDragTarget (List<TileBehav> tbs){ // should just pass each TB that gets painted?
 		// TODO
-		TBdragTargetEffect(tbs);
+		TBmultiTargetEffect(tbs);
 	}
 
 	static IEnumerator TargetingScreen(){
@@ -164,9 +164,10 @@ public static class Targeting {
 			}
 			break;
 		case TargetMode.TileArea:
-			foreach(TileBehav tb in targetTBs){
-				TBtargetEffect (tb);
-			}
+                //foreach(TileBehav tb in targetTBs){
+                //	TBtargetEffect (tb);
+                //}
+                TBmultiTargetEffect(targetTBs);
 			break;
 		case TargetMode.Cell:
 			break;

@@ -60,7 +60,7 @@ public class Loadout {
 		dmuscle = 20;
 
 		spells[0] = new Spell ("Cherrybomb", "FAM", 1, spellfx.Cherrybomb);
-        spells[1] = new Spell ("Zombify three", "FMF", 1, spellfx.HumanResources);
+        spells[1] = new Spell ("None", "FMF", 1, spellfx.HumanResources);
 		spells[2] = new Spell ("Company Luncheon", "FAF", 1, spellfx.CompanyLuncheon);
 		spells[3] = new Spell ("Zombie Synergy", "AFA", 1, spellfx.ZombieSynergy);
 	}
