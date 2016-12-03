@@ -167,6 +167,10 @@ public class Player {
 		matchesLeft = count;
 	}
 
+    public void ClearMatchEffect() {
+        matchesLeft = 0;
+    }
+
 	public void ResolveMatchEffect(){
 		if (matchesLeft > 0) {
 			matchEffect ();

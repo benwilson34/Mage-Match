@@ -64,7 +64,8 @@ public class Settings : MonoBehaviour {
 		case 4: // burning
 			spellfx.Ench_SetBurning (tb);
 			break;
-		case 5:
+		case 5: // zombify
+            spellfx.Ench_SetZombify(tb, false);
 			break;
 		}
 	}

@@ -64,23 +64,25 @@ public class Enchantment : Effect {
 
     public delegate void MyTileEffect(int id, TileBehav tb);
 
+    public enum EnchType { None, Cherrybomb, Burning, Zombify }
+    public EnchType type = EnchType.None; // private?
+
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
-    private bool skip;
+    private bool skip = false;
+    private int tier;
 
-    public Enchantment(bool skip, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
+    public Enchantment(MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
         playerID = MageMatch.ActiveP().id;
         turnsLeft = -1;
-        this.skip = skip;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
         this.cancelEffect = cancelEffect;
     }
 
-    public Enchantment(int turns, bool skip, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
+    public Enchantment(int turns, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
         playerID = MageMatch.ActiveP().id;
         turnsLeft = turns;
-        this.skip = skip;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
         this.cancelEffect = cancelEffect;
@@ -94,6 +96,16 @@ public class Enchantment : Effect {
         return enchantee;
     }
 
+    public void SetTypeTier(EnchType type, int tier) {
+        this.type = type;
+        this.tier = tier;
+    }
+
+    public void SkipCurrent() {
+        skip = true;
+    }
+
+    // TODO broken
     public override void TriggerEffect() {
         if(turnEffect != null)
             turnEffect(playerID, enchantee);

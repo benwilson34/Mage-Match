@@ -88,10 +88,17 @@ public class SpellEffects {
 		MageMatch.InactiveP ().ChangeBuff_DmgExtra (0); // reset
 	}
 
-	// TODO TurnEffect
+	// TODO test TurnEffect
 	public void Pivot(){
-		MageMatch.ActiveP().SetMatchEffect (1, Pivot_Match);
+        MageMatch.endTurnEffects.Add(new TurnEffect(1, Pivot_Turn, Pivot_End, null));
+        //MageMatch.ActiveP().SetMatchEffect (1, Pivot_Match);
 	}
+    void Pivot_Turn(int id) { // needed here?
+        MageMatch.ActiveP().SetMatchEffect(1, Pivot_Match);
+    }
+    void Pivot_End(int id) {
+        MageMatch.ActiveP().ClearMatchEffect();
+    }
 	void Pivot_Match(){
 		MageMatch.ActiveP().AP++;
 	}
@@ -108,20 +115,44 @@ public class SpellEffects {
 			Ench_SetBurning (tb);
 	}
 
-    // TODO
-    public void ZombieSynergy() { }
+    // TODO test
+    public void ZombieSynergy() {
+        int count = 0;
+        List<TileBehav> tbs = HexGrid.GetPlacedTiles();
+        foreach (TileBehav tb in tbs) {
+            if (tb.HasEnchantment() && tb.GetEnchType() == Enchantment.EnchType.Zombify) {
+                List<TileBehav> adjTBs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+                foreach (TileBehav adjTB in adjTBs) {
+                    if (adjTB.HasEnchantment() && adjTB.GetEnchType() == Enchantment.EnchType.Zombify) {
+                        count++;
+                    }
+                }
+            }
+        }
+        Debug.Log("SPELLEFFECTS: Zombie Synergy has counted " + count + " adjacent zombs");
+        MageMatch.ActiveP().DealDamage(count * 4);
+    }
 
     // TODO PLACEHOLDER
     public void HumanResources() {
-        Targeting.WaitForTileAreaTarget(false, HumanResources_Target);
+        //Targeting.WaitForTileTarget(3, HumanResources_Target);
     }
     void HumanResources_Target(TileBehav tb) {
-        Ench_SetZombify(tb, false);
+        //Ench_SetZombify(tb, false);
     }
 
     // TODO
-    public void CompanyLuncheon() { }
-    void CompanyLuncheon_Target(TileBehav tb) { }
+    public void CompanyLuncheon() {
+        Targeting.WaitForTileAreaTarget(false, CompanyLuncheon_Target);
+    }
+    void CompanyLuncheon_Target(TileBehav tb) {
+        List<TileBehav> tbs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+        foreach (TileBehav ctb in tbs) {
+            if (ctb.HasEnchantment() && ctb.GetEnchType() == Enchantment.EnchType.Zombify) {
+                ctb.TriggerEnchantment();
+            }
+        }
+    }
 
     // TODO
     public void RaiseZombie() { }
@@ -215,8 +246,9 @@ public class SpellEffects {
 	// -------------------------------- ENCHANTMENTS --------------------------------------
 
 	public void Ench_SetCherrybomb(TileBehav tb){
-		Enchantment effect = new Enchantment (false, null, null, Ench_Cherrybomb_Resolve);
-		tb.SetEnchantment (effect);
+		Enchantment ench = new Enchantment (null, null, Ench_Cherrybomb_Resolve);
+        ench.SetTypeTier(Enchantment.EnchType.Cherrybomb, 2);
+		tb.SetEnchantment (ench);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
 	}
 	void Ench_Cherrybomb_Resolve(int id, TileBehav tb){
@@ -233,10 +265,11 @@ public class SpellEffects {
 	public void Ench_SetBurning(TileBehav tb){
         // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
         //		Debug.Log("SPELLEFFECTS: Setting burning...");
-        Enchantment effect = new Enchantment(5, false, Ench_Burning_Turn, Ench_Burning_End, null);
-		tb.SetEnchantment (effect);
+        Enchantment ench = new Enchantment(5, Ench_Burning_Turn, Ench_Burning_End, null);
+        ench.SetTypeTier(Enchantment.EnchType.Burning, 1);
+		tb.SetEnchantment (ench);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
-		MageMatch.endTurnEffects.Add(effect);
+		MageMatch.endTurnEffects.Add(ench);
 	}
 	void Ench_Burning_Turn(int id, TileBehav tb){
 		MageMatch.GetOpponent(id).ChangeHealth (-3);
@@ -247,7 +280,10 @@ public class SpellEffects {
 
     // TODO
     public void Ench_SetZombify(TileBehav tb, bool skip){
-        Enchantment ench = new Enchantment(skip, Ench_Zombify_Turn, null, null);
+        Enchantment ench = new Enchantment(Ench_Zombify_Turn, null, null);
+        ench.SetTypeTier(Enchantment.EnchType.Zombify, 1);
+        if (skip)
+            ench.SkipCurrent();
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
         MageMatch.endTurnEffects.Add(ench);
@@ -258,6 +294,7 @@ public class SpellEffects {
             int tries = 10;
             for (int i = 0; i < 1 && tries > 0; i++) {
                 int rand = Random.Range(0, tbs.Count);
+                // TODO eat muscle tiles
                 if (tbs[rand].HasEnchantment()) { // TODO not enchantable
                     i--;
                     tries--;

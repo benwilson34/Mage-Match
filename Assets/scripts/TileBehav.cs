@@ -124,9 +124,16 @@ public class TileBehav : MonoBehaviour {
 	}
 	
 	public bool HasEnchantment(){
-//		return this.enchantEffect != null;
-		return this.enchantment != null;
+		return enchantment != null;
 	}
+
+    public Enchantment.EnchType GetEnchType() {
+        return enchantment.type;
+    }
+
+    public void TriggerEnchantment() {
+        enchantment.TriggerEffect();
+    }
 
 	public void ClearEnchantment(){
 //		this.enchantEffect = null;
