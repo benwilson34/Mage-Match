@@ -13,7 +13,8 @@ public class Player {
 	public List<TileBehav> hand;
 	public int handSize = 5;
 	public int tilesPlaced, tilesSwapped, matches;
-	public Loadout loadout;
+    //public Loadout loadout;
+    public Character character;
 	private Spell currentSpell;
 	private MageMatch mm;
 
@@ -37,19 +38,20 @@ public class Player {
 			SetName ("Maxsimilous Forza");
 			id = 1;
 			handSlot = GameObject.Find ("handslot1").transform;
-			loadout = new Loadout (UIController.GetLoadoutNum(1));
+			//loadout = new Loadout (UIController.GetLoadoutNum(1));
+            character = CharacterLoader.Load(UIController.GetLoadoutNum(1));
 			break;
 		case 2: 
 			SetName ("Quincy Shungle");
 			id = 2;
 			handSlot = GameObject.Find ("handslot2").transform;
-			loadout = new Loadout (UIController.GetLoadoutNum(2));
+            character = CharacterLoader.Load(UIController.GetLoadoutNum(2));
 			break;
 		default:
 			break;
 		}
 
-		health = loadout.maxHealth;
+		health = character.GetMaxHealth();
 	}
 
 	public void SetName(string name){
@@ -61,14 +63,14 @@ public class Player {
 		MageMatch.GetOpponent (id).ChangeHealth (-amount);
 	}
 
-	public void ChangeHealth(int amount){
+	public void ChangeHealth(int amount){ // TODO clamp instead?
 		if(amount < 0) { // damage
 			if (buff_dmgExtra > 0)
 				Debug.Log ("PLAYER: Wow, " + name + " is taking " + buff_dmgExtra + " extra damage!");
 			amount = (int)(amount * buff_dmgMult) + buff_dmgExtra;
 			amount = -1 * Mathf.Min (Mathf.Abs(amount), health); // prevent negative health
 		} else // healing
-			amount = Mathf.Min (amount, loadout.maxHealth - health);
+			amount = Mathf.Min (amount, character.GetMaxHealth() - health);
 		Debug.Log ("PLAYER: " + name + " had health changed from " + health + " to " + (health + amount) + ".");
 		health += amount;
 		if (health == 0)
@@ -77,7 +79,7 @@ public class Player {
 
 	public void DrawTiles(int numTiles){
 		for (int i = 0; i < numTiles && hand.Count < handSize; i++) {
-			GameObject go = mm.GenerateTile (loadout.GetTileElement());
+			GameObject go = mm.GenerateTile (character.GetTileElement());
 			if (id == 1)
 				go.transform.position = new Vector3 (-5, 2);
 			else if (id == 2)
@@ -143,7 +145,7 @@ public class Player {
 	}
 
 	public bool CastSpell(int index){ // TODO
-		Spell spell = loadout.GetSpell (index);
+		Spell spell = character.GetSpell (index);
 		if (AP >= spell.APcost) {
 			currentSpell = spell;
 			spell.Cast ();

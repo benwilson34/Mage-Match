@@ -133,7 +133,6 @@ public class SpellEffects {
         MageMatch.ActiveP().DealDamage(count * 4);
     }
 
-    // TODO
     public void HumanResources() {
         Targeting.WaitForTileAreaTarget(false, HumanResources_Target);
     }
@@ -144,15 +143,16 @@ public class SpellEffects {
         }
     }
 
-    // TODO
     public void CompanyLuncheon() {
         Targeting.WaitForTileAreaTarget(false, CompanyLuncheon_Target);
     }
     void CompanyLuncheon_Target(List<TileBehav> tbs) {
         for (int i = 0; i < tbs.Count; i++) {
             TileBehav tb = tbs[i];
-            if (!tb.HasEnchantment() || tb.GetEnchType() != Enchantment.EnchType.Zombify)
+            if (!tb.HasEnchantment() || tb.GetEnchType() != Enchantment.EnchType.Zombify) {
                 tbs.Remove(tb);
+                i--;
+            }
         }
         foreach(TileBehav tb in tbs)
             tb.TriggerEnchantment();
@@ -302,8 +302,7 @@ public class SpellEffects {
                 // TODO eat muscle tiles
                 ctb = tbs[rand];
                 if (ctb.tile.element == Tile.Element.Muscle) {
-                    if (ctb.HasEnchantment() && ctb.GetEnchType() == Enchantment.EnchType.Zombify) ;
-                    else {
+                    if (!ctb.HasEnchantment() || ctb.GetEnchType() != Enchantment.EnchType.Zombify) {
                         mm.RemoveTile(ctb.tile, true, true);
                         MageMatch.GetPlayer(id).DealDamage(10);
                         MageMatch.GetPlayer(id).ChangeHealth(10);

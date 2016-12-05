@@ -105,7 +105,7 @@ public class Enchantment : Effect {
         skip = true;
     }
 
-    // TODO broken
+    // TODO test
     public override void TriggerEffect() {
         if(turnEffect != null)
             turnEffect(playerID, enchantee);

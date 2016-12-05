@@ -25,9 +25,9 @@ public class MageMatch : MonoBehaviour {
 	void Start () {
 		BoardCheck.Init ();
 
-		Loadout.Init ();
+		//Loadout.Init ();
+        Character.Init();
 		Commish.Init ();
-//		EnchantEffects.Init ();
 
 		UIController.Init ();
 		Targeting.Init ();
@@ -65,12 +65,10 @@ public class MageMatch : MonoBehaviour {
 
 		p1 = new Player (1);
 		p1.DrawTiles (3);
-//		DealPlayerHand (p1, 3);
 		p1.AlignHand (.12f, true);
 
 		p2 = new Player (2);
 		p2.DrawTiles (3);
-//		DealPlayerHand (p2, 3);
 		p2.AlignHand (.12f, true);
 
 		currentState = GameState.PlayerTurn;
@@ -78,7 +76,8 @@ public class MageMatch : MonoBehaviour {
 		InactiveP().FlipHand ();
 		activep.InitAP();
 		activep.DrawTiles (2);
-//		DealPlayerHand (activep, 2);
+
+        Stats.Init(p1, p2);
 
 		UIController.UpdateTurnText();
 		UIController.UpdateDebugGrid ();
@@ -155,11 +154,12 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	void SpellCheck(){ // TODO clean up
-		List<TileSeq> spells = activep.loadout.GetTileSeqList ();
-		spells.AddRange (InactiveP ().loadout.GetTileSeqList ()); //?
+        Character c = activep.character;
+		List<TileSeq> spells = c.GetTileSeqList ();
+		spells.AddRange (InactiveP ().character.GetTileSeqList ()); // probably not needed?
 		spells = BoardCheck.SpellCheck (spells);
 		if (spells.Count > 0) {
-			List<TileSeq> spellList = activep.loadout.GetTileSeqList ();
+			List<TileSeq> spellList = c.GetTileSeqList ();
 			for (int s = 0; s < spellList.Count; s++) {
 				TileSeq spellSeq = spellList [s];
 				bool spellIsOnBoard = false;
@@ -167,7 +167,7 @@ public class MageMatch : MonoBehaviour {
 					TileSeq matchSeq = spells [i];
 					if (matchSeq.MatchesTileSeq (spellSeq)) {
 						spellIsOnBoard = true;
-						activep.loadout.GetSpell (s).SetBoardSeq (matchSeq);
+						c.GetSpell (s).SetBoardSeq (matchSeq);
 						break;
 					}
 				}
@@ -200,7 +200,8 @@ public class MageMatch : MonoBehaviour {
 			}
 		}
 		RemoveSeqList (seqList);
-		activep.matches += seqList.Count;
+        Stats.IncMatch(activep.id, seqList.Count);
+		//activep.matches += seqList.Count;
 	}
 
 	void ResolveBeginTurnEffects(){

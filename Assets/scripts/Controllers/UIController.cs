@@ -78,19 +78,20 @@ public static class UIController {
 
 		// TODO not great
 		Text nameText    = pinfo.transform.Find ("Text_Name").GetComponent<Text>();
-		Text matchesText = pinfo.transform.Find ("Text_Matches").GetComponent<Text>();
+		//Text matchesText = pinfo.transform.Find ("Text_Matches").GetComponent<Text>();
 		Text p1APText    = pinfo.transform.Find ("Text_AP").GetComponent<Text>();
 		Text healthText  = pinfo.transform.Find ("Health_Outline").Find ("Text_Health").GetComponent<Text>();
 		Image healthBar  = pinfo.transform.Find ("Health_Outline").Find("Healthbar").GetComponent<Image>();
 
 		nameText.text = "P" + player.id + " - " + player.name;
 		p1APText.text = "AP left: " + player.AP;
-		matchesText.text = "Matches: " + player.matches;
+        //matchesText.text = "Matches: " + player.matches;
 
-		// health bar text and width
-		healthText.text = player.health + "/" + player.loadout.maxHealth;
+        // health bar text and width
+        int maxHealth = player.character.GetMaxHealth();
+		healthText.text = player.health + "/" + maxHealth;
 		Vector3 healthScale = healthBar.rectTransform.localScale;
-		float healthRatio = (float)player.health / (float)player.loadout.maxHealth;
+		float healthRatio = (float)player.health / (float)maxHealth;
 		healthScale.x = healthRatio;
 		healthBar.rectTransform.localScale = healthScale;
 
@@ -108,11 +109,11 @@ public static class UIController {
 		else
 			pload = GameObject.Find ("Player2_Loadout").transform;
 		Text loadoutText = pload.Find ("Text_LoadoutName").GetComponent<Text>();
-		loadoutText.text = player.loadout.characterName + " - " + player.loadout.techniqueName;
+		loadoutText.text = player.character.characterName + " - " + player.character.techniqueName;
 
 		for (int i = 0; i < 4; i++){
 			Transform t = pload.Find ("Button_Spell" + i);
-			Spell currentSpell = player.loadout.GetSpell (i);
+			Spell currentSpell = player.character.GetSpell (i);
 
 			Text spellName = t.Find ("Text_SpellName").GetComponent<Text> ();
 			spellName.text = currentSpell.name + " " + currentSpell.APcost + " AP";

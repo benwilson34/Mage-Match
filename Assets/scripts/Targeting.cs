@@ -16,11 +16,11 @@ public static class Targeting {
 	private static List<GameObject> outlines;
 
 	public delegate void TBTargetEffect (TileBehav tb);
-	private static TBTargetEffect TBtargetEffect;
-	public delegate void CBTargetEffect (CellBehav cb);
-	private static CBTargetEffect CBtargetEffect;
 	public delegate void TBMultiTargetEffect (List<TileBehav> tbs);
+	public delegate void CBTargetEffect (CellBehav cb);
+	private static TBTargetEffect TBtargetEffect;
 	private static TBMultiTargetEffect TBmultiTargetEffect;
+	private static CBTargetEffect CBtargetEffect;
 
 	public static void Init(){
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -33,8 +33,8 @@ public static class Targeting {
 	static void DecTargets(){ // maybe remove?
 		Debug.Log ("INPUTCONTROLLER: Targets remaining = " + targetsLeft);
 		targetsLeft--;
-		if (targetsLeft == 0) //?
-			currentTMode = TargetMode.Tile;
+		//if (targetsLeft == 0) //?
+		//	currentTMode = TargetMode.Tile;
 	}
 
 	public static void WaitForTileTarget(int count, TBTargetEffect targetEffect){
@@ -49,7 +49,18 @@ public static class Targeting {
 		mm.StartCoroutine(TargetingScreen());
 	}
 
-	public static void OnTileTarget(TileBehav tb){
+    public static void WaitForTileAreaTarget(bool largeArea, TBMultiTargetEffect targetEffect){
+		currentTMode = TargetMode.TileArea;
+		targetsLeft = 1;
+		targetTBs = new List<TileBehav> ();
+		largeAreaMode = largeArea;
+		TBmultiTargetEffect = targetEffect;
+		Debug.Log ("TARGETING: Waiting for TileArea target. Targets = " + targetsLeft);
+
+		mm.StartCoroutine(TargetingScreen());
+	}
+
+	public static void OnTBTarget (TileBehav tb){
 		foreach (TileBehav ctb in targetTBs) // prevent targeting a tile that's already targeted
 			if (ctb.tile.HasSamePos(tb.tile))
 				return;
@@ -84,31 +95,6 @@ public static class Targeting {
 	}
 
 	// TODO
-	public static void WaitForTileAreaTarget(bool largeArea, TBMultiTargetEffect targetEffect){
-		currentTMode = TargetMode.TileArea;
-		targetsLeft = 1;
-		targetTBs = new List<TileBehav> ();
-		largeAreaMode = largeArea;
-		TBmultiTargetEffect = targetEffect;
-		Debug.Log ("TARGETING: Waiting for TileArea target. Targets = " + targetsLeft);
-
-		mm.StartCoroutine(TargetingScreen());
-	}
-
-	// not needed...
-	public static void OnTileAreaTarget(TileBehav tb){
-		foreach (TileBehav ctb in targetTBs) // prevent targeting a tile that's already targeted
-			if (ctb.tile.HasSamePos(tb.tile))
-				return;
-		foreach (Tile ct in MageMatch.ActiveP().GetCurrentBoardSeq().sequence) // prevent targeting prereq
-			if (ct.HasSamePos(tb.tile))
-				return;
-		// TODO if targetable
-
-
-	}
-
-	// TODO
 	public static void WaitForCellTarget(int count, CBTargetEffect targetEffect){
 		currentTMode = TargetMode.Cell;
 		targetsLeft = count;
@@ -116,7 +102,10 @@ public static class Targeting {
 		Debug.Log ("targets = " + targetsLeft);
 	}
 
-	public static void OnCellTarget(CellBehav cb){
+    // TODO
+    public static void WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) { }
+
+	public static void OnCBTarget(CellBehav cb){
 		DecTargets ();
 		Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
 		CBtargetEffect (cb);
@@ -153,21 +142,21 @@ public static class Targeting {
 		foreach(GameObject go in outlines){
 			GameObject.Destroy (go);
 		}
+
+        currentTMode = TargetMode.Tile; //?
 		outlines = null; // memory leak?
 	}
 
 	static void HandleTargets(){
 		switch (currentTMode) {
-		case TargetMode.Tile:
+        case TargetMode.Tile:
 			foreach(TileBehav tb in targetTBs){
 				TBtargetEffect (tb);
 			}
 			break;
 		case TargetMode.TileArea:
-                //foreach(TileBehav tb in targetTBs){
-                //	TBtargetEffect (tb);
-                //}
-                TBmultiTargetEffect(targetTBs);
+            Debug.Log("TARGETING: Handling TileArea effect...");
+            TBmultiTargetEffect(targetTBs);
 			break;
 		case TargetMode.Cell:
 			break;

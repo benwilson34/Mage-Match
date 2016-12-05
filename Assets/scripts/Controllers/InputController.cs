@@ -20,7 +20,7 @@ public class InputController : MonoBehaviour {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
-	void Update(){ // polling input
+	void Update(){ // polling input...change to events?
 		if (Input.GetMouseButton (0)) { // if left mouse is down
 			if (Targeting.currentTMode == Targeting.TargetMode.Drag){
 //				HandleDrag ();
@@ -131,7 +131,7 @@ public class InputController : MonoBehaviour {
 //					    && Targeting.currentTMode == Targeting.TargetMode.Tile
 						) {
 						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
-						Targeting.OnTileTarget (tb);
+						Targeting.OnTBTarget (tb);
 //					} else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
 					} else { // disable during targeting screen?
@@ -175,15 +175,7 @@ public class InputController : MonoBehaviour {
 				CellBehav cb = GetMouseCell (hits);
 				if (cb != null) {
 					mm.DropTile (cb.col);
-//					return; // void?
 				} else {
-//				foreach (RaycastHit2D hit in hits){
-//					CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-//					if (cb != null) {
-//						mm.DropTile(cb.col);
-//						return;
-//					}
-//				}
 					tb.transform.SetParent (parentT);
 					parentT = null;
 					MageMatch.ActiveP().AlignHand (.12f, false);
@@ -211,7 +203,7 @@ public class InputController : MonoBehaviour {
 				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 0))
 					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
 			} else if (angle < 180) { // NW
-				if(HexGrid.HasAdjacentCell(tile.col, tile.row, 5))
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 5))
 					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
 			} else if (angle < 240) { // SW
 				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 4))
@@ -220,7 +212,7 @@ public class InputController : MonoBehaviour {
 				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 3))
 					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
 			} else {                  // SE
-				if(HexGrid.HasAdjacentCell(tile.col, tile.row, 2))
+				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 2))
 					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
 			}
 		}
@@ -238,7 +230,7 @@ public class InputController : MonoBehaviour {
 				mm.DropTile (cb.col, go, .15f);
 			}
 		} else if(Targeting.IsTargetMode() && Targeting.currentTMode == Targeting.TargetMode.Cell) {
-			Targeting.OnCellTarget (cb);
+			Targeting.OnCBTarget (cb);
 			//Put target return here!
 		}
 	}

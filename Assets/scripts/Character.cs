@@ -1,0 +1,214 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public abstract class Character {
+
+    public string characterName;
+    public string techniqueName;
+
+    protected int maxHealth;
+    protected static SpellEffects spellfx;
+    protected int dfire, dwater, dearth, dair, dmuscle; // portions of 100 total
+    protected Spell[] spells;
+    protected int meter;
+
+    public static void Init() { //?
+        spellfx = new SpellEffects();
+        SpellEffects.Init();
+    }
+
+    public void SetDeckElements(int f, int w, int e, int a, int m) {
+        dfire = f;
+        dwater = w;
+        dearth = e;
+        dair = a;
+        dmuscle = m;
+    }
+
+    public int GetMaxHealth() { return maxHealth; }
+
+    public Spell GetSpell(int index) { return spells[index]; }
+
+    public List<TileSeq> GetTileSeqList() {
+        List<TileSeq> outlist = new List<TileSeq>();
+        foreach (Spell s in spells)
+            outlist.Add(s.GetTileSeq());
+        return outlist;
+    }
+
+    public Tile.Element GetTileElement() {
+        int rand = Random.Range(0, 100);
+        if (rand < dfire)
+            return Tile.Element.Fire;
+        else if (rand < dfire + dwater)
+            return Tile.Element.Water;
+        else if (rand < dfire + dwater + dearth)
+            return Tile.Element.Earth;
+        else if (rand < dfire + dwater + dearth + dair)
+            return Tile.Element.Air;
+        else
+            return Tile.Element.Muscle;
+    }
+}
+
+public class CharTest : Character {
+    public CharTest() {
+        spells = new Spell[4];
+
+        characterName = "Sample";
+        techniqueName = "Test Loadout";
+        maxHealth = 1000;
+
+        SetDeckElements(20, 20, 20, 20, 20);
+
+        spells[0] = new Spell("Cherrybomb", "FAM", 1, spellfx.Cherrybomb);
+        spells[1] = new Spell("None", "FMF", 1, spellfx.HumanResources);
+        spells[2] = new Spell("Company Luncheon", "FAF", 1, spellfx.CompanyLuncheon);
+        spells[3] = new Spell("Zombie Synergy", "AFA", 1, spellfx.ZombieSynergy);
+    }
+}
+
+public class Enfuego : Character {
+
+    public Enfuego(int loadout) {
+        characterName = "Enfuego";
+        spells = new Spell[4];
+
+        if (loadout == 1)
+            EnfuegoA();
+        else
+            EnfuegoB();
+    }
+
+    void EnfuegoA() { // Enfuego A - Supah Hot Fire
+        techniqueName = "Supah Hot Fire";
+        maxHealth = 1000;
+
+        SetDeckElements(50, 0, 0, 20, 30);
+
+        spells[0] = new Spell("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
+        spells[1] = new Spell("Baila!", "FMF", 1, spellfx.Baila);
+        spells[2] = new Spell("Incinerate", "FAFF", 1, spellfx.Incinerate);
+        spells[3] = new Spell("Phoenix Fire", "AFM", 1, spellfx.PhoenixFire);
+    }
+
+    // FOCUS
+    void EnfuegoB() { // Enfuego B - Hot Feet
+        techniqueName = "Hot Feet";
+        maxHealth = 1100;
+
+        SetDeckElements(50, 0, 15, 0, 35);
+
+        spells[0] = new Spell("White-Hot Combo Kick", "MFFM", 1, spellfx.WhiteHotComboKick);
+        spells[1] = new Spell("Hot Body", "FEFM", 1, spellfx.HotBody);
+        spells[2] = new Spell("Hot and Bothered", "FMF", 1, spellfx.HotAndBothered);
+        spells[3] = new Spell("Pivot", "MEF", 0, spellfx.Pivot);
+    }
+}
+
+public class Rocky : Character {
+    
+    // TODO passive
+
+    public Rocky(int loadout) {
+        characterName = "Rocky";
+        spells = new Spell[4];
+
+        if (loadout == 1)
+            RockyA();
+        else
+            RockyB();
+    }
+
+    // TODO
+    void RockyA() { // Rocky A - Tectonic Titan 
+        techniqueName = "Tectonic Titan";
+        maxHealth = 1100;
+
+        SetDeckElements(5, 0, 45, 30, 20);
+
+        spells[0] = new Spell("Magnitude 10", "EEMEE", 1, spellfx.Magnitude10);
+        spells[1] = new Spell("Sinkhole", "EAAE", 1, spellfx.Deal496Dmg); //
+        spells[2] = new Spell("Boulder Barrage", "MMEE", 1, spellfx.Deal496Dmg); //
+        spells[3] = new Spell("Stalagmite", "AEE", 1, spellfx.Stalagmite);
+    }
+
+    // TODO
+    void RockyB() { // Rocky B - Continental Champion
+        techniqueName = "Continental Champion";
+        maxHealth = 1300;
+
+        SetDeckElements(0, 25, 40, 10, 25);
+
+        spells[0] = new Spell("Magnitude 10", "EEMEE", 1, spellfx.Magnitude10);
+        spells[1] = new Spell("Living Flesh Armor", "EWWE", 1, spellfx.Deal496Dmg); //
+        spells[2] = new Spell("Figure-Four Leglock", "MEEM", 1, spellfx.Deal496Dmg); //
+        spells[3] = new Spell("Stalagmite", "AEE", 1, spellfx.Deal496Dmg); //
+    }
+}
+
+public class Gravekeeper : Character {
+
+    public Gravekeeper(int loadout) {
+
+        spells = new Spell[4];
+        characterName = "The Gravekeeper";
+        if (loadout == 1)
+            GravekeeperA();
+        else
+            GravekeeperB();
+    }
+
+    // FOCUS
+    void GravekeeperA() { // The Gravekeeper A - Business in the Front
+        techniqueName = "Business in the Front";
+        maxHealth = 1150;
+
+        SetDeckElements(0, 20, 40, 0, 40);
+
+        spells[0] = new Spell("Raise Zombie", "EMME", 1, spellfx.Deal496Dmg); //
+        spells[1] = new Spell("Zombie Synergy", "MEE", 1, spellfx.ZombieSynergy);
+        spells[2] = new Spell("Human Resources", "MEME", 1, spellfx.HumanResources);
+        spells[3] = new Spell("Company Luncheon", "EMWM", 1, spellfx.CompanyLuncheon);
+    }
+
+    void GravekeeperB() { // The Gravekeeper B - Party in the Back
+        techniqueName = "Party in the Back";
+        maxHealth = 1050;
+
+        SetDeckElements(25, 0, 35, 0, 40);
+
+        spells[0] = new Spell("Raise Zombie", "EMME", 1, spellfx.Deal496Dmg); //
+        spells[1] = new Spell("R.S.V.Z.", "MEM", 1, spellfx.Deal496Dmg); //
+        spells[2] = new Spell("The Oogie Boogie", "MFE", 1, spellfx.Deal496Dmg); //
+        spells[3] = new Spell("Bottle Rocket Mishap", "EMFM", 1, spellfx.Deal496Dmg); //
+    }
+}
+
+// TODO
+public static class CharacterLoader {
+
+    public static Character Load(int num) {
+        switch (num) {
+            case 0:
+                return new CharTest();
+            case 1:
+                return new Enfuego(1);
+            case 2:
+                return new Enfuego(2);
+            case 3:
+                return new Gravekeeper(1);
+            case 4:
+                return new Gravekeeper(2);
+            case 5:
+                return new Rocky(1);
+            case 6:
+                return new Rocky(2);
+            default:
+                Debug.Log("Loadout number must be 1 through 6.");
+                return null;
+        }
+    }
+
+}
