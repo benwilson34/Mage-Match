@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 
-public class Player {
+public class Player : MonoBehaviour {
 
-	public string name;
+	public string pname;
 	public int id;
 	public int health;
 	public int maxAP = 3; // Action points per round
@@ -55,7 +55,7 @@ public class Player {
 	}
 
 	public void SetName(string name){
-		this.name = name;	
+		this.pname = name;	
 	}
 
 	// hmmmm
@@ -66,12 +66,12 @@ public class Player {
 	public void ChangeHealth(int amount){ // TODO clamp instead?
 		if(amount < 0) { // damage
 			if (buff_dmgExtra > 0)
-				Debug.Log ("PLAYER: Wow, " + name + " is taking " + buff_dmgExtra + " extra damage!");
+				Debug.Log ("PLAYER: Wow, " + pname + " is taking " + buff_dmgExtra + " extra damage!");
 			amount = (int)(amount * buff_dmgMult) + buff_dmgExtra;
 			amount = -1 * Mathf.Min (Mathf.Abs(amount), health); // prevent negative health
 		} else // healing
 			amount = Mathf.Min (amount, character.GetMaxHealth() - health);
-		Debug.Log ("PLAYER: " + name + " had health changed from " + health + " to " + (health + amount) + ".");
+		Debug.Log ("PLAYER: " + pname + " had health changed from " + health + " to " + (health + amount) + ".");
 		health += amount;
 		if (health == 0)
 			MageMatch.EndTheGame ();
@@ -184,12 +184,12 @@ public class Player {
 	}
 
 	public void ChangeBuff_DmgMult(float d){
-		Debug.Log ("PLAYER: " + name + " had dmg multiply buff changed to " + d);
+		Debug.Log ("PLAYER: " + pname + " had dmg multiply buff changed to " + d);
 		buff_dmgMult = d;
 	}
 
 	public void ChangeBuff_DmgExtra(int amount){
-		Debug.Log ("PLAYER: " + name + " had dmg bonus buff changed to +" + amount);
+		Debug.Log ("PLAYER: " + pname + " had dmg bonus buff changed to +" + amount);
 		buff_dmgExtra = amount;
 	}
 }

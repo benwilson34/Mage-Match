@@ -12,8 +12,8 @@ public static class Stats {
     private static PlayerStat ps1, ps2;
 
     public static void Init(Player p1, Player p2) {
-        ps1 = new PlayerStat() { name = p1.name };
-        ps2 = new PlayerStat() { name = p2.name };
+        ps1 = new PlayerStat() { name = p1.pname };
+        ps2 = new PlayerStat() { name = p2.pname };
     }
 
     public static void IncMatch(int id, int count) {

@@ -438,7 +438,7 @@ public class MageMatch : MonoBehaviour {
 
 	public static void EndTheGame(){
 		endGame = true;
-		UIController.UpdateMoveText ("Wow!! " + activep.name + " has won!!");
+		UIController.UpdateMoveText ("Wow!! " + activep.pname + " has won!!");
 		UIController.DeactivateAllSpellButtons (p1);
 		UIController.DeactivateAllSpellButtons (p2);
 	}

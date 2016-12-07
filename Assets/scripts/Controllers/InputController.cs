@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 
 // TODO eventually handle mobile tap input instead of clicking
-public class InputController : MonoBehaviour {
+public class InputController : NetworkBehaviour {
 
 	private MageMatch mm;
 

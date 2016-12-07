@@ -83,7 +83,7 @@ public static class UIController {
 		Text healthText  = pinfo.transform.Find ("Health_Outline").Find ("Text_Health").GetComponent<Text>();
 		Image healthBar  = pinfo.transform.Find ("Health_Outline").Find("Healthbar").GetComponent<Image>();
 
-		nameText.text = "P" + player.id + " - " + player.name;
+		nameText.text = "P" + player.id + " - " + player.pname;
 		p1APText.text = "AP left: " + player.AP;
         //matchesText.text = "Matches: " + player.matches;
 

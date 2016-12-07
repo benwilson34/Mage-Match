@@ -89,6 +89,7 @@
     <Compile Include="Assets\scripts\HexGrid.cs" />
     <Compile Include="Assets\scripts\Loadout.cs" />
     <Compile Include="Assets\scripts\MageMatch.cs" />
+    <Compile Include="Assets\scripts\NetworkController.cs" />
     <Compile Include="Assets\scripts\Player.cs" />
     <Compile Include="Assets\scripts\Settings.cs" />
     <Compile Include="Assets\scripts\Spell.cs" />
