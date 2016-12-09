@@ -89,12 +89,8 @@ public class SpellEffects {
 		MageMatch.InactiveP ().ChangeBuff_DmgExtra (0); // reset
 	}
 
-	// TODO test TurnEffect
 	public void Pivot(){
-        MageMatch.endTurnEffects.Add(new TurnEffect(1, Pivot_Turn, Pivot_End, null));
-        //MageMatch.ActiveP().SetMatchEffect (1, Pivot_Match);
-	}
-    void Pivot_Turn(int id) { // needed here?
+        MageMatch.endTurnEffects.Add(new TurnEffect(1, null, Pivot_End, null));
         MageMatch.ActiveP().SetMatchEffect(1, Pivot_Match);
     }
     void Pivot_End(int id) {
@@ -120,10 +116,14 @@ public class SpellEffects {
         int count = 0;
         List<TileBehav> tbs = HexGrid.GetPlacedTiles();
         foreach (TileBehav tb in tbs) {
-            if (tb.HasEnchantment() && tb.GetEnchType() == Enchantment.EnchType.Zombify) {
+            if (tb.HasEnchantment() && 
+                (tb.GetEnchType() == Enchantment.EnchType.Zombify ||
+                tb.GetEnchType() == Enchantment.EnchType.ZombieTok)) {
                 List<TileBehav> adjTBs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 foreach (TileBehav adjTB in adjTBs) {
-                    if (adjTB.HasEnchantment() && adjTB.GetEnchType() == Enchantment.EnchType.Zombify) {
+                    if (adjTB.HasEnchantment() && 
+                        (adjTB.GetEnchType() == Enchantment.EnchType.Zombify ||
+                        adjTB.GetEnchType() == Enchantment.EnchType.ZombieTok)) {
                         count++;
                     }
                 }
@@ -138,8 +138,11 @@ public class SpellEffects {
     }
     void HumanResources_Target(List<TileBehav> tbs) {
         foreach (TileBehav tb in tbs) {
-            if(tb.tile.element == Tile.Element.Muscle)
-                Ench_SetZombify(tb, false);
+            if (tb.tile.element == Tile.Element.Muscle) {
+                if (tb.GetEnchType() != Enchantment.EnchType.Zombify ||
+                    tb.GetEnchType() != Enchantment.EnchType.ZombieTok)
+                    Ench_SetZombify(tb, false);
+            }
         }
     }
 
@@ -149,7 +152,9 @@ public class SpellEffects {
     void CompanyLuncheon_Target(List<TileBehav> tbs) {
         for (int i = 0; i < tbs.Count; i++) {
             TileBehav tb = tbs[i];
-            if (!tb.HasEnchantment() || tb.GetEnchType() != Enchantment.EnchType.Zombify) {
+            if (!tb.HasEnchantment() || 
+                tb.GetEnchType() != Enchantment.EnchType.Zombify ||
+                tb.GetEnchType() != Enchantment.EnchType.ZombieTok) {
                 tbs.Remove(tb);
                 i--;
             }
@@ -158,9 +163,19 @@ public class SpellEffects {
             tb.TriggerEnchantment();
     }
 
-    // TODO
-    public void RaiseZombie() { }
-    void RaiseZombie_Target(CellBehav cb) { }
+    public void RaiseZombie() {
+        Targeting.WaitForCellTarget(1, RaiseZombie_Target);
+    }
+    void RaiseZombie_Target(CellBehav cb) {
+        // TODO eventually HexGrid.RaiseColumn()
+        // hardset bottom cell
+        int col = cb.col;
+        int bottomr = HexGrid.BottomOfColumn(col);
+        GameObject zomb;
+        zomb = mm.GenerateToken("zombie");
+        zomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform); // move to MM.PutTile
+        MageMatch.PutTile(zomb, col, bottomr);
+    }
 
 	public void LightningPalm(){
 		Targeting.WaitForTileTarget(1, LightningPalm_Target);
@@ -299,10 +314,11 @@ public class SpellEffects {
             TileBehav ctb;
             for (int i = 0; i < 1 && tries > 0; i++) {
                 int rand = Random.Range(0, tbs.Count);
-                // TODO eat muscle tiles
                 ctb = tbs[rand];
                 if (ctb.tile.element == Tile.Element.Muscle) {
-                    if (!ctb.HasEnchantment() || ctb.GetEnchType() != Enchantment.EnchType.Zombify) {
+                    if (!ctb.HasEnchantment() || 
+                        (ctb.GetEnchType() != Enchantment.EnchType.Zombify &&
+                        ctb.GetEnchType() != Enchantment.EnchType.ZombieTok)) {
                         mm.RemoveTile(ctb.tile, true, true);
                         MageMatch.GetPlayer(id).DealDamage(10);
                         MageMatch.GetPlayer(id).ChangeHealth(10);
@@ -315,6 +331,17 @@ public class SpellEffects {
                 }
             }
         }
+    }
+
+    public void Ench_SetZombieTok(TileBehav tb) {
+        Enchantment ench = new Enchantment(Ench_ZombieTok_Turn, null, null);
+        ench.SetTypeTier(Enchantment.EnchType.ZombieTok, 3);
+        tb.SetEnchantment(ench);
+        MageMatch.endTurnEffects.Add(ench);
+    }
+    void Ench_ZombieTok_Turn(int id, TileBehav tb) {
+        Ench_Zombify_Turn(id, tb);
+        Ench_Zombify_Turn(id, tb);
     }
 
 }

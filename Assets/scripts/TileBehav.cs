@@ -14,16 +14,18 @@ public class TileBehav : MonoBehaviour {
 	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
 	public bool ableTarget = true; // will eventually need a list of valid spells - maybe a hierarchy? categories?
 
-//	public delegate void EnchantEffect(TileBehav tb);
-//	private EnchantEffect enchantEffect;
 	private Enchantment enchantment;
 //	private bool resolved = false;
 	private bool inPos = true;
 
 	void Awake(){
-		tile = new Tile (initElement);
-		currentState = TileState.Hand;
+        Init();
 	}
+
+    protected virtual void Init() {
+        tile = new Tile(initElement);
+        currentState = TileState.Hand;
+    }
 
 	public void ChangePos(int col, int row){
 		ChangePos(row, col, row);

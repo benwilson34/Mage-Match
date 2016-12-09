@@ -170,7 +170,7 @@ public class Player {
 	}
 
     public void ClearMatchEffect() {
-        matchesLeft = 0;
+        matchesLeft = 0; // change to matchEffect = null;
     }
 
 	public void ResolveMatchEffect(){

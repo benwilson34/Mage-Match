@@ -10,6 +10,7 @@ public static class Targeting {
 	private static MageMatch mm;
 	private static int targetsLeft = 0;
 	private static List<TileBehav> targetTBs; // static?
+    private static List<CellBehav> targetCBS;
 	private static Vector3 lastTCenter;       // static?
 	private static bool largeAreaMode = false;
 
@@ -100,7 +101,9 @@ public static class Targeting {
 		targetsLeft = count;
 		CBtargetEffect = targetEffect;
 		Debug.Log ("targets = " + targetsLeft);
-	}
+
+        mm.StartCoroutine(TargetingScreen());
+    }
 
     // TODO
     public static void WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) { }
@@ -108,7 +111,7 @@ public static class Targeting {
 	public static void OnCBTarget(CellBehav cb){
 		DecTargets ();
 		Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
-		CBtargetEffect (cb);
+		CBtargetEffect (cb); //  TODO move to HandleTargets()
 	}
 
 	// TODO
