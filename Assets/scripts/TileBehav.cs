@@ -125,12 +125,15 @@ public class TileBehav : MonoBehaviour {
 		return inPos;
 	}
 	
-	public bool HasEnchantment(){
+	public bool HasEnchantment(){ // just use GetEnchType?
 		return enchantment != null;
 	}
 
     public Enchantment.EnchType GetEnchType() {
-        return enchantment.type;
+        if (enchantment != null)
+            return enchantment.type;
+        else
+            return Enchantment.EnchType.None;
     }
 
     public void TriggerEnchantment() {

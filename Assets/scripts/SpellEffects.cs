@@ -139,7 +139,7 @@ public class SpellEffects {
     void HumanResources_Target(List<TileBehav> tbs) {
         foreach (TileBehav tb in tbs) {
             if (tb.tile.element == Tile.Element.Muscle) {
-                if (tb.GetEnchType() != Enchantment.EnchType.Zombify ||
+                if (tb.GetEnchType() != Enchantment.EnchType.Zombify &&
                     tb.GetEnchType() != Enchantment.EnchType.ZombieTok)
                     Ench_SetZombify(tb, false);
             }

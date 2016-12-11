@@ -11,6 +11,9 @@ public static class UIController {
 	private static UIResources uires;
 	private static Dropdown DD1, DD2;
 
+    private static GameObject gradient, targetingBG;
+    private static GameObject tCancelB, tClearB;
+
 	public static void Init(){
 		moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
 		moveText.text = "";
@@ -22,9 +25,17 @@ public static class UIController {
 
 		DD1 = GameObject.Find ("Dropdown_p1").GetComponent<Dropdown> ();
 		DD2 = GameObject.Find ("Dropdown_p2").GetComponent<Dropdown> ();
-	}
 
-	public static void UpdateDebugGrid(){
+        gradient = GameObject.Find("green-gradient");
+        targetingBG = GameObject.Find("targetingBG");
+        targetingBG.SetActive(false);
+        tCancelB = GameObject.Find("Button_CancelSpell");
+        tCancelB.SetActive(false);
+        tClearB = GameObject.Find("Button_ClearTargets");
+        tClearB.SetActive(false);
+    }
+
+    public static void UpdateDebugGrid(){
 		string grid = "   0  1  2  3  4  5  6 \n";
 		for (int r = HexGrid.numRows - 1; r >= 0; r--) {
 			grid += r + " ";
@@ -56,13 +67,19 @@ public static class UIController {
 	}
 
 	public static void FlipGradient(){
-		GameObject go = GameObject.Find ("green-gradient");
 //		Vector3 scale = go.transform.localScale;
 //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
-		go.transform.Rotate(0,0,180);
+		gradient.transform.Rotate(0,0,180);
 	}
 
-	public static void UpdatePlayerInfo(Player player){
+    public static void ToggleTargetingUI() {
+        gradient.SetActive(!gradient.activeSelf);
+        targetingBG.SetActive(!targetingBG.activeSelf);
+        tCancelB.SetActive(!tCancelB.activeSelf);
+        tClearB.SetActive(!tClearB.activeSelf);
+    }
+
+    public static void UpdatePlayerInfo(Player player){
 		GameObject pinfo;
 		if (player.id == 1) {
 			pinfo = GameObject.Find ("Player1_Info");
