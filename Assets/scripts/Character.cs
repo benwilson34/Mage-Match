@@ -167,7 +167,7 @@ public class Gravekeeper : Character {
 
         SetDeckElements(0, 20, 40, 0, 40);
 
-        spells[0] = new Spell("Raise Zombie", "EMME", 1, spellfx.Deal496Dmg); //
+        spells[0] = new Spell("Raise Zombie", "EMME", 1, spellfx.RaiseZombie);
         spells[1] = new Spell("Zombie Synergy", "MEE", 1, spellfx.ZombieSynergy);
         spells[2] = new Spell("Human Resources", "MEME", 1, spellfx.HumanResources);
         spells[3] = new Spell("Company Luncheon", "EMWM", 1, spellfx.CompanyLuncheon);

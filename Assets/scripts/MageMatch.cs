@@ -10,22 +10,19 @@ public class MageMatch : MonoBehaviour {
 	public static GameState currentState;
 
 	public GameObject firePF, waterPF, earthPF, airPF, musclePF;  // tile prefabs
-	public GameObject stonePF, emberPF, prereqPF, targetPF;       // token prefabs
-	[HideInInspector] public static int turns;                 // number of current turn
-	[HideInInspector] public static bool menu = false;         // is the settings menu open?
-	[HideInInspector] public static GameObject currentTile;    // current game tile
-	[HideInInspector] private static Player p1, p2, activep;
-	[HideInInspector] public static List<Effect> beginTurnEffects, endTurnEffects;
+	public GameObject stonePF, emberPF, prereqPF, targetPF, zombiePF;       // token prefabs
+	public static int turns;                 // number of current turn
+	public static bool menu = false;         // is the settings menu open?
+	public static GameObject currentTile;    // current game tile
+	public static List<Effect> beginTurnEffects, endTurnEffects;
 
+	private static Player p1, p2, activep;
 	private static bool endGame = false;             	       // is either player dead?
-//	private static bool boardChanged = false;                  // has the board changed?
-//	private static bool commishTurn = false;                  // has the board changed?
 	private static int animating = 0;                     // is something animating?
 
 	void Start () {
 		BoardCheck.Init ();
 
-		//Loadout.Init ();
         Character.Init();
 		Commish.Init ();
 
@@ -349,6 +346,8 @@ public class MageMatch : MonoBehaviour {
 			return Instantiate (stonePF);
 		case "ember":
 			return Instantiate (emberPF);
+        case "zombie":
+            return Instantiate (zombiePF);
 		case "prereq":
 			return Instantiate (prereqPF);
 		case "target":

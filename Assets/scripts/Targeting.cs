@@ -8,10 +8,11 @@ public static class Targeting {
 	public static TargetMode currentTMode = TargetMode.Tile;
 
 	private static MageMatch mm;
-	private static int targetsLeft = 0;
-	private static List<TileBehav> targetTBs; // static?
-	private static Vector3 lastTCenter;       // static?
-	private static bool largeAreaMode = false;
+	private static int targets, targetsLeft = 0;
+	private static List<TileBehav> targetTBs;
+    private static List<CellBehav> targetCBS;
+	private static Vector3 lastTCenter;
+	private static bool largeAreaMode = false, canceled = false;
 
 	private static List<GameObject> outlines;
 
@@ -39,9 +40,8 @@ public static class Targeting {
 
 	public static void WaitForTileTarget(int count, TBTargetEffect targetEffect){
 		// TODO handle fewer tiles on board than count
-		// TODO handle targeting same tile more than once
 		currentTMode = TargetMode.Tile;
-		targetsLeft = count;
+		targets = targetsLeft = count;
 		targetTBs = new List<TileBehav> ();
 		TBtargetEffect = targetEffect;
 		Debug.Log ("TARGETING: targets = " + targetsLeft);
@@ -51,7 +51,7 @@ public static class Targeting {
 
     public static void WaitForTileAreaTarget(bool largeArea, TBMultiTargetEffect targetEffect){
 		currentTMode = TargetMode.TileArea;
-		targetsLeft = 1;
+		targets = targetsLeft = 1;
 		targetTBs = new List<TileBehav> ();
 		largeAreaMode = largeArea;
 		TBmultiTargetEffect = targetEffect;
@@ -73,7 +73,8 @@ public static class Targeting {
 			OutlineTarget (t.col, t.row);
 			targetTBs.Add (tb);
 			DecTargets ();
-			Debug.Log ("TARGETING: Targeted tile (" + t.col + ", " + t.row + ")");
+            UIController.UpdateMoveText(MageMatch.ActiveP().name + ", choose " + targetsLeft + " more targets.");
+            Debug.Log ("TARGETING: Targeted tile (" + t.col + ", " + t.row + ")");
 		} else if (currentTMode == TargetMode.TileArea) {
 			List<TileBehav> tbs;
 			Tile t = tb.tile;
@@ -97,10 +98,12 @@ public static class Targeting {
 	// TODO
 	public static void WaitForCellTarget(int count, CBTargetEffect targetEffect){
 		currentTMode = TargetMode.Cell;
-		targetsLeft = count;
+		targets = targetsLeft = count;
 		CBtargetEffect = targetEffect;
 		Debug.Log ("targets = " + targetsLeft);
-	}
+
+        mm.StartCoroutine(TargetingScreen());
+    }
 
     // TODO
     public static void WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) { }
@@ -108,7 +111,7 @@ public static class Targeting {
 	public static void OnCBTarget(CellBehav cb){
 		DecTargets ();
 		Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
-		CBtargetEffect (cb);
+		CBtargetEffect (cb); //  TODO move to HandleTargets()
 	}
 
 	// TODO
@@ -125,26 +128,34 @@ public static class Targeting {
 	}
 
 	static IEnumerator TargetingScreen(){
+        canceled = false;
+        Player p = MageMatch.ActiveP();
 		MageMatch.currentState = MageMatch.GameState.TargetMode;
-		// TODO color background
-		TileSeq seq = MageMatch.ActiveP().GetCurrentBoardSeq();
+
+        UIController.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
+        UIController.ToggleTargetingUI();
+		TileSeq seq = p.GetCurrentBoardSeq();
 		OutlinePrereq(seq);
 		// TODO implement cast and cancel mechanics???
 		yield return new WaitUntil(() => targetsLeft == 0);
 		Debug.Log ("TARGETING: no more targets.");
-		// if targets is 0, change back to Tile targetmode
 
-		mm.RemoveSeq (seq);
-		HandleTargets ();
-		MageMatch.BoardChanged ();
-		MageMatch.ActiveP().ApplyAPCost ();
+        if (!canceled) {
+            mm.RemoveSeq(seq);
+            HandleTargets();
+            MageMatch.BoardChanged();
+            p.ApplyAPCost();
+        }
 
 		foreach(GameObject go in outlines){
 			GameObject.Destroy (go);
 		}
+        UIController.ToggleTargetingUI();
+        UIController.UpdateMoveText("");
 
-        currentTMode = TargetMode.Tile; //?
+        currentTMode = TargetMode.Tile; // needed?
 		outlines = null; // memory leak?
+        //targetTBs = null?
 	}
 
 	static void HandleTargets(){
@@ -182,4 +193,25 @@ public static class Targeting {
 		go.transform.position = HexGrid.GridCoordToPos (col, row);
 		outlines.Add (go);
 	}
+
+    public static void ClearTargets() {
+        Player p = MageMatch.ActiveP();
+        int prereqs = p.GetCurrentBoardSeq().sequence.Count;
+        for (int i = 0; i < outlines.Count - prereqs;) {
+            GameObject go = outlines[prereqs];
+            GameObject.Destroy(go);
+            outlines.Remove(go);
+        }
+        for (int i = 0; i < targetTBs.Count;) {
+            targetTBs.RemoveAt(0); //?
+        }
+
+        targetsLeft = targets;
+        UIController.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
+    }
+
+    public static void CancelTargeting() {
+        canceled = true;
+        targetsLeft = 0;
+    }
 }
