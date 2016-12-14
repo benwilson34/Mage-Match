@@ -10,7 +10,7 @@ public static class Targeting {
 	private static MageMatch mm;
 	private static int targets, targetsLeft = 0;
 	private static List<TileBehav> targetTBs;
-    private static List<CellBehav> targetCBS;
+    private static List<CellBehav> targetCBs;
 	private static Vector3 lastTCenter;
 	private static bool largeAreaMode = false, canceled = false;
 
@@ -99,6 +99,7 @@ public static class Targeting {
 	public static void WaitForCellTarget(int count, CBTargetEffect targetEffect){
 		currentTMode = TargetMode.Cell;
 		targets = targetsLeft = count;
+        targetCBs = new List<CellBehav>();
 		CBtargetEffect = targetEffect;
 		Debug.Log ("targets = " + targetsLeft);
 
@@ -109,10 +110,41 @@ public static class Targeting {
     public static void WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) { }
 
 	public static void OnCBTarget(CellBehav cb){
-		DecTargets ();
+		//DecTargets ();
 		Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
-		CBtargetEffect (cb); //  TODO move to HandleTargets()
-	}
+
+        foreach (CellBehav ccb in targetCBs) // prevent targeting a tile that's already targeted
+            if (ccb.HasSamePos(cb))
+                return;
+        //foreach (Tile ct in MageMatch.ActiveP().GetCurrentBoardSeq().sequence) // prevent targeting prereq
+        //    if (ct.HasSamePos(tb.tile))
+        //        return;
+        // TODO if targetable
+        if (currentTMode == TargetMode.Cell) {
+            OutlineTarget(cb.col, cb.row);
+            targetCBs.Add(cb);
+            DecTargets();
+            UIController.UpdateMoveText(MageMatch.ActiveP().name + ", choose " + targetsLeft + " more targets.");
+            Debug.Log("TARGETING: Targeted tile (" + cb.col + ", " + cb.row + ")");
+        } else if (currentTMode == TargetMode.CellArea) {
+            //List<TileBehav> tbs;
+            //Tile t = tb.tile;
+            //if (largeAreaMode)
+            //    tbs = HexGrid.GetLargeAreaTiles(t.col, t.row);
+            //else
+            //    tbs = HexGrid.GetSmallAreaTiles(t.col, t.row);
+            //tbs.Add(tb);
+
+            //foreach (TileBehav ctb in tbs) {
+            //    Tile ct = ctb.tile;
+            //    OutlineTarget(ct.col, ct.row);
+            //    // TODO if targetable
+            //    targetTBs.Add(ctb);
+            //}
+            //DecTargets();
+            //Debug.Log("TARGETING: Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+        }
+    }
 
 	// TODO
 	public static void WaitForDragTarget(int count, TBMultiTargetEffect targetEffect){
@@ -170,7 +202,10 @@ public static class Targeting {
             TBmultiTargetEffect(targetTBs);
 			break;
 		case TargetMode.Cell:
-			break;
+                foreach (CellBehav cb in targetCBs) {
+                    CBtargetEffect(cb);
+                }
+                break;
 		case TargetMode.CellArea:
 			break;
 		case TargetMode.Drag:
@@ -202,8 +237,13 @@ public static class Targeting {
             GameObject.Destroy(go);
             outlines.Remove(go);
         }
-        for (int i = 0; i < targetTBs.Count;) {
-            targetTBs.RemoveAt(0); //?
+
+        if (currentTMode == TargetMode.Cell || currentTMode == TargetMode.CellArea) {
+            for (int i = 0; i < targetCBs.Count;)
+                targetCBs.RemoveAt(0); //?
+        } else {
+            for (int i = 0; i < targetTBs.Count;)
+                targetTBs.RemoveAt(0); //?
         }
 
         targetsLeft = targets;

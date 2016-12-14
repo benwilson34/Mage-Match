@@ -8,19 +8,15 @@ public class Player {
 	public string name;
 	public int id;
 	public int health;
-	public int maxAP = 3; // Action points per round
 	public int AP;
-	public List<TileBehav> hand;
+	public List<TileBehav> hand; // private
 	public int handSize = 5;
 	public int tilesPlaced, tilesSwapped, matches;
-    //public Loadout loadout;
     public Character character;
+
 	private Spell currentSpell;
 	private MageMatch mm;
-
-	public delegate void MatchEffect();
 	private MatchEffect matchEffect;
-	private int matchesLeft = 0;
 
 	private float buff_dmgMult = 1;
 	private int buff_dmgExtra;
@@ -58,7 +54,6 @@ public class Player {
 		this.name = name;	
 	}
 
-	// hmmmm
 	public void DealDamage(int amount){
 		MageMatch.GetOpponent (id).ChangeHealth (-amount);
 	}
@@ -140,8 +135,15 @@ public class Player {
 		}
 	}
 
+    public void EmptyHand() {
+        while (hand.Count > 0) {
+            GameObject.Destroy(hand[0].gameObject);
+            hand.RemoveAt(0);
+        }
+    }
+
 	public void InitAP(){
-		AP = maxAP;
+		AP = 3;
 	}
 
 	public bool CastSpell(int index){ // TODO
@@ -164,23 +166,18 @@ public class Player {
 		return currentSpell.GetBoardSeq ();
 	}
 
-	public void SetMatchEffect(int count, MatchEffect effect){
+	public void SetMatchEffect(MatchEffect effect){
+        // TODO bool for success? able to overwrite?
 		matchEffect = effect;
-		matchesLeft = count;
 	}
 
     public void ClearMatchEffect() {
-        matchesLeft = 0; // change to matchEffect = null;
+        matchEffect = null;
     }
 
 	public void ResolveMatchEffect(){
-		if (matchesLeft > 0) {
-			matchEffect ();
-			matchesLeft--;
-		}
-		if (matchesLeft == 0) {
-			matchEffect = null; //?
-		}
+        if (matchEffect != null && matchEffect.ResolveEffect())
+            matchEffect = null;
 	}
 
 	public void ChangeBuff_DmgMult(float d){

@@ -142,9 +142,10 @@ public class TileBehav : MonoBehaviour {
     }
 
 	public void ClearEnchantment(){
-//		this.enchantEffect = null;
+        //		this.enchantEffect = null;
         // TODO remove Effect from whichever list in MageMatch...
-		this.enchantment = null;
+        EffectController.RemoveEndTurnEffect(enchantment);
+		enchantment = null;
 		this.GetComponent<SpriteRenderer> ().color = Color.white;
 	}
 
@@ -166,7 +167,7 @@ public class TileBehav : MonoBehaviour {
 			currentState = TileState.Removed;
 //			this.enchantEffect (this);
 			enchantment.CancelEffect();
-			MageMatch.endTurnEffects.Remove (enchantment); // TODO assumes end-of-turn list
+			EffectController.RemoveEndTurnEffect (enchantment); // TODO assumes end-of-turn list
 			return true;
 		}
 		return false;

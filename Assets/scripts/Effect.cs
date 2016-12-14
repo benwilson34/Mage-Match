@@ -8,12 +8,14 @@ public abstract class Effect {
 
     protected int turnsLeft;
     protected int playerID;
+    public int priority; // protected eventually?
 
     public abstract void TriggerEffect();
     public abstract bool ResolveEffect();
     public abstract void EndEffect();
-    public abstract void CancelEffect();
-    public abstract int TurnsRemaining();
+    public virtual void CancelEffect() { }
+    public int TurnsRemaining() { return turnsLeft; }
+    //public void SetPriority(int p) { priority = p; }
 }
 
 public class TurnEffect : Effect {
@@ -53,10 +55,6 @@ public class TurnEffect : Effect {
     public override void CancelEffect() {
         if (cancelEffect != null)
             cancelEffect(playerID);
-    }
-
-    public override int TurnsRemaining() {
-        return turnsLeft;
     }
 }
 
@@ -136,8 +134,37 @@ public class Enchantment : Effect {
             cancelEffect(playerID, enchantee);
     }
 
-    public override int TurnsRemaining() {
-        return turnsLeft;
+}
+
+public class MatchEffect : Effect {
+
+    private MyEffect matchEffect, endEffect;
+
+    public MatchEffect(int turns, MyEffect matchEffect, MyEffect endEffect) {
+        playerID = MageMatch.ActiveP().id;
+        turnsLeft = turns;
+        this.matchEffect = matchEffect;
+        this.endEffect = endEffect;
     }
 
+    public override void TriggerEffect() {
+        if (matchEffect != null)
+            matchEffect(playerID);
+    }
+
+    public override bool ResolveEffect() {
+        TriggerEffect();
+        turnsLeft--;
+        if (turnsLeft != 0) {
+            return false;
+        } else {
+            EndEffect();
+            return true;
+        }
+    }
+
+    public override void EndEffect() {
+        if (endEffect != null)
+            endEffect(playerID);
+    }
 }

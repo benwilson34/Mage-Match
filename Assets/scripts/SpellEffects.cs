@@ -63,9 +63,9 @@ public class SpellEffects {
 	
 	// TODO
 	public void HotBody(){
-		MageMatch.ActiveP().SetMatchEffect (3, Hotbody_Match);
+		MageMatch.ActiveP().SetMatchEffect (new MatchEffect(3, Hotbody_Match, null));
 	}
-	public void Hotbody_Match(){
+	public void Hotbody_Match(int id){
 		// TODO threshold to prevent infinite loop
 		List<TileBehav> tbs = HexGrid.GetPlacedTiles();
 		for (int i = 0; i < 3; i++) {
@@ -80,7 +80,9 @@ public class SpellEffects {
 
 	public void HotAndBothered(){
 		MageMatch.InactiveP ().ChangeBuff_DmgExtra (15);
-		MageMatch.endTurnEffects.Add( new TurnEffect (5, HAB_Turn, HAB_End, null));
+        TurnEffect t = new TurnEffect(5, HAB_Turn, HAB_End, null);
+        t.priority = 3;
+        EffectController.AddEndTurnEffect(t);
 	}
 	void HAB_Turn(int id){
 		MageMatch.InactiveP ().ChangeBuff_DmgExtra (15); // technically not needed
@@ -90,13 +92,16 @@ public class SpellEffects {
 	}
 
 	public void Pivot(){
-        MageMatch.endTurnEffects.Add(new TurnEffect(1, null, Pivot_End, null));
-        MageMatch.ActiveP().SetMatchEffect(1, Pivot_Match);
+        TurnEffect t = new TurnEffect(1, null, Pivot_End, null);
+        t.priority = 3;
+        EffectController.AddEndTurnEffect(t);
+
+        MageMatch.ActiveP().SetMatchEffect(new MatchEffect(1, Pivot_Match, null));
     }
     void Pivot_End(int id) {
         MageMatch.ActiveP().ClearMatchEffect();
     }
-	void Pivot_Match(){
+	void Pivot_Match(int id){
 		MageMatch.ActiveP().AP++;
 	}
 	
@@ -194,7 +199,9 @@ public class SpellEffects {
 
 	public void CaughtYouMirin(){
 		MageMatch.ActiveP().ChangeBuff_DmgMult (.5f); // 50% damage multiplier
-		MageMatch.endTurnEffects.Add( new TurnEffect (4, CaughtYouMirin_Turn, CaughtYouMirin_End, null));
+        TurnEffect t = new TurnEffect(4, CaughtYouMirin_Turn, CaughtYouMirin_End, null);
+        t.priority = 3;
+        EffectController.AddEndTurnEffect(t);
 	}
 	void CaughtYouMirin_Turn(int id){ // technically this isn't needed
 		MageMatch.GetPlayer(id).ChangeBuff_DmgMult (.5f); // 50% damage multiplier
@@ -211,7 +218,9 @@ public class SpellEffects {
 	}
 
 	public void Magnitude10(){
-		MageMatch.endTurnEffects.Add (new TurnEffect (3, Magnitude10_Turn, Magnitude10_End, null));
+        TurnEffect t = new TurnEffect(3, Magnitude10_Turn, Magnitude10_End, null);
+        t.priority = 4;
+        EffectController.AddEndTurnEffect (t);
 	}
 	void Magnitude10_Turn(int id){
 		int dmg = 0;
@@ -286,9 +295,10 @@ public class SpellEffects {
         //		Debug.Log("SPELLEFFECTS: Setting burning...");
         Enchantment ench = new Enchantment(5, Ench_Burning_Turn, Ench_Burning_End, null);
         ench.SetTypeTier(Enchantment.EnchType.Burning, 1);
+        ench.priority = 1;
 		tb.SetEnchantment (ench);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
-		MageMatch.endTurnEffects.Add(ench);
+		EffectController.AddEndTurnEffect(ench);
 	}
 	void Ench_Burning_Turn(int id, TileBehav tb){
 		MageMatch.GetOpponent(id).ChangeHealth (-3);
@@ -300,11 +310,12 @@ public class SpellEffects {
     public void Ench_SetZombify(TileBehav tb, bool skip){
         Enchantment ench = new Enchantment(Ench_Zombify_Turn, null, null);
         ench.SetTypeTier(Enchantment.EnchType.Zombify, 1);
+        ench.priority = 6;
         if (skip)
             ench.SkipCurrent();
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
-        MageMatch.endTurnEffects.Add(ench);
+        EffectController.AddEndTurnEffect(ench);
     }
     void Ench_Zombify_Turn(int id, TileBehav tb) {
         // TODO filter list before rand
@@ -336,8 +347,9 @@ public class SpellEffects {
     public void Ench_SetZombieTok(TileBehav tb) {
         Enchantment ench = new Enchantment(Ench_ZombieTok_Turn, null, null);
         ench.SetTypeTier(Enchantment.EnchType.ZombieTok, 3);
+        ench.priority = 6; // TODO 6.1?
         tb.SetEnchantment(ench);
-        MageMatch.endTurnEffects.Add(ench);
+        EffectController.AddEndTurnEffect(ench);
     }
     void Ench_ZombieTok_Turn(int id, TileBehav tb) {
         Ench_Zombify_Turn(id, tb);

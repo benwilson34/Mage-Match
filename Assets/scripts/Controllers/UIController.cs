@@ -35,6 +35,17 @@ public static class UIController {
         tClearB.SetActive(false);
     }
 
+    public static void Reset(Player p1, Player p2) { // could just get players from MM
+        UpdateTurnText();
+        UpdateDebugGrid();
+        UpdateMoveText("");
+
+        ShowLoadout(p1);
+        ShowLoadout(p2);
+        DeactivateAllSpellButtons(p1);
+        DeactivateAllSpellButtons(p2);
+    }
+
     public static void UpdateDebugGrid(){
 		string grid = "   0  1  2  3  4  5  6 \n";
 		for (int r = HexGrid.numRows - 1; r >= 0; r--) {

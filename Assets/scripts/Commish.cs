@@ -5,7 +5,7 @@ public static class Commish  {
 
 	private static int mood = 0;
 	private static MageMatch mm;
-    private static bool active = false;
+    private static bool active = true;
 
 	public static void Init() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();

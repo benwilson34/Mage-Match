@@ -9,24 +9,24 @@ public class MageMatch : MonoBehaviour {
 	public enum GameState { PlayerTurn, TargetMode, BoardChecking, CommishTurn };
 	public static GameState currentState;
 
-	public GameObject firePF, waterPF, earthPF, airPF, musclePF;  // tile prefabs
-	public GameObject stonePF, emberPF, prereqPF, targetPF, zombiePF;       // token prefabs
+	public GameObject firePF, waterPF, earthPF, airPF, musclePF;      // tile prefabs
+	public GameObject stonePF, emberPF, prereqPF, targetPF, zombiePF; // token prefabs
 	public static int turns;                 // number of current turn
 	public static bool menu = false;         // is the settings menu open?
 	public static GameObject currentTile;    // current game tile
-	public static List<Effect> beginTurnEffects, endTurnEffects;
 
 	private static Player p1, p2, activep;
-	private static bool endGame = false;             	       // is either player dead?
-	private static int animating = 0;                     // is something animating?
+	private static bool endGame = false;     // is either player dead?
+	private static int animating = 0;        // is something animating?
 
 	void Start () {
 		BoardCheck.Init ();
 
-        Character.Init();
+        Character.Init(); //bad
 		Commish.Init ();
 
 		UIController.Init ();
+        EffectController.Init();
 		Targeting.Init ();
 		AudioController.Init ();
 		Reset ();
@@ -35,38 +35,26 @@ public class MageMatch : MonoBehaviour {
 	public void Reset(){ // initialize board/game
 		//clear tiles
 		GameObject tileFolder = transform.Find ("tilesOnBoard").gameObject;
-		if (tileFolder != null) {
+		if (tileFolder != null)
 			Destroy (tileFolder);
-		}
 		tileFolder = new GameObject ("tilesOnBoard");
 		tileFolder.transform.SetParent (this.transform);
-		if(p1 != null){ // empty player1 hand
-			while (p1.hand.Count > 0) {
-				Destroy (p1.hand [0].gameObject);
-				p1.hand.RemoveAt (0);
-			}
-		}
-		if(p2 != null){ // empty player2 hand
-			while (p2.hand.Count > 0) {
-				Destroy (p2.hand [0].gameObject);
-				p2.hand.RemoveAt (0);
-			}
-		}
+
+		if(p1 != null)
+            p1.EmptyHand();
+		if(p2 != null)
+            p2.EmptyHand();
 
 		HexGrid.Init(); // init game board
-		beginTurnEffects = new List<Effect>(); // init beginning-of-turn effects
-		endTurnEffects = new List<Effect>(); // init end-of-turn effects
 
 		turns = 0;
 		endGame = false;
 
 		p1 = new Player (1);
 		p1.DrawTiles (3);
-		p1.AlignHand (.12f, true);
 
 		p2 = new Player (2);
 		p2.DrawTiles (3);
-		p2.AlignHand (.12f, true);
 
 		currentState = GameState.PlayerTurn;
 		activep = p1;
@@ -75,19 +63,11 @@ public class MageMatch : MonoBehaviour {
 		activep.DrawTiles (2);
 
         Stats.Init(p1, p2);
-
-		UIController.UpdateTurnText();
-		UIController.UpdateDebugGrid ();
-		UIController.UpdateMoveText ("");
-
-		UIController.ShowLoadout (p1);
-		UIController.ShowLoadout (p2);
-		UIController.DeactivateAllSpellButtons (p1);
-		UIController.DeactivateAllSpellButtons (p2);
+        UIController.Reset(p1, p2);
 	}
 
 
-	// ---------------------------- Update is called once per frame - MAIN GAME LOOP ----------------------------
+	// ----------------- Update is called once per frame - MAIN GAME LOOP -----------------------
 	void Update () {
 		// if there is no winning player and the settings menu is not open
 		if (!endGame && !menu && !IsTargetMode() && !IsAnimating()) { 
@@ -122,11 +102,11 @@ public class MageMatch : MonoBehaviour {
 			}
 		}
 	}
-	// -----------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------
 
 
 	IEnumerator TurnSystem(){
-		ResolveEndTurnEffects ();
+		EffectController.ResolveEndTurnEffects ();
 		turns++;
 		UIController.UpdateTurnText ();
 		UIController.DeactivateAllSpellButtons (activep);
@@ -143,8 +123,7 @@ public class MageMatch : MonoBehaviour {
 		activep.FlipHand ();
 		UIController.FlipGradient (); // ugly
 		activep.DrawTiles(2);
-//		DealPlayerHand (activep, 2); // deal 2 tiles to activep at beginning of turn
-		ResolveBeginTurnEffects ();
+		EffectController.ResolveBeginTurnEffects ();
 
 		SpellCheck ();
 		currentState = GameState.BoardChecking;
@@ -199,36 +178,6 @@ public class MageMatch : MonoBehaviour {
 		RemoveSeqList (seqList);
         Stats.IncMatch(activep.id, seqList.Count);
 		//activep.matches += seqList.Count;
-	}
-
-	void ResolveBeginTurnEffects(){
-		Effect effect;
-		for (int i = 0; i < beginTurnEffects.Count; i++) {
-			effect = beginTurnEffects [i];
-			if (effect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
-				beginTurnEffects.Remove (effect);
-				if(effect is Enchantment)
-					((Enchantment)effect).GetEnchantee ().ClearEnchantment ();
-				i--;
-			} else {
-				Debug.Log ("MAGEMATCH: Beginning-of-turn effect " + i + " has " + effect.TurnsRemaining () + " turns left.");
-			}
-		}
-	}
-		
-	void ResolveEndTurnEffects(){
-		Effect effect;
-		for (int i = 0; i < endTurnEffects.Count; i++) {
-			effect = endTurnEffects [i];
-			if (effect.ResolveEffect ()) { // if it's the last pass of the effect (turnsLeft == 0)
-				endTurnEffects.Remove (effect);
-				if(effect is Enchantment)
-					((Enchantment)effect).GetEnchantee ().ClearEnchantment ();
-				i--;
-			} else {
-				Debug.Log ("MAGEMATCH: End-of-turn effect " + i + " has " + effect.TurnsRemaining () + " turns left.");
-			}
-		}
 	}
 		
 	public bool DropTile(int col){
@@ -400,14 +349,16 @@ public class MageMatch : MonoBehaviour {
 		RemoveTile(tile.col, tile.row, checkGrav, resolveEnchant);
 	}
 
-	public void RemoveTile(int col, int row, bool checkGrav, bool resolveEnchant){
-//		Debug.Log ("Removing (" + col + ", " + row + ")");
-		TileBehav tb = HexGrid.GetTileBehavAt (col, row);
-		if (resolveEnchant && tb.HasEnchantment ()) {
-			Debug.Log ("MAGEMATCH: About to resolve enchant on tile (" + col + ", " + row + ")");
-			tb.ResolveEnchantment ();
-		}
-//		if (tb.ResolveEnchantment ()) TODO
+    public void RemoveTile(int col, int row, bool checkGrav, bool resolveEnchant) {
+        //		Debug.Log ("Removing (" + col + ", " + row + ")");
+        TileBehav tb = HexGrid.GetTileBehavAt(col, row);
+        if (tb.HasEnchantment()) {
+            if (resolveEnchant ) {
+                Debug.Log("MAGEMATCH: About to resolve enchant on tile (" + col + ", " + row + ")");
+                tb.ResolveEnchantment();
+            }
+            tb.ClearEnchantment(); // TODO
+        }
 
 		StartCoroutine (Remove_Anim (col, row, tb, true)); // FIXME hardcode
 	}
