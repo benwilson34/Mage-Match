@@ -17,11 +17,11 @@ public class ButtonController : MonoBehaviour {
 
     public void OnSpellCancelButtonClick() {
         Debug.Log("BUTTONCONTROLLER: Spell canceled.");
-        Targeting.CancelTargeting();
+        mm.targeting.CancelTargeting();
     }
 
     public void OnClearTargetsButtonClick() {
         Debug.Log("BUTTONCONTROLLER: Targets cleared.");
-        Targeting.ClearTargets();
+        mm.targeting.ClearTargets();
     }
 }

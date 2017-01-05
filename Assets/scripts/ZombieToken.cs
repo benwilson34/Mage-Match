@@ -10,7 +10,6 @@ public class ZombieToken : TileBehav {
         currentState = TileState.Placed; //?
 
         SpellEffects spellfx = new SpellEffects();
-        SpellEffects.Init();
         spellfx.Ench_SetZombieTok(this);
     }
 }

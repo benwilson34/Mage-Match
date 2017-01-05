@@ -8,14 +8,13 @@ public abstract class Character {
     public string techniqueName;
 
     protected int maxHealth;
-    protected static SpellEffects spellfx;
+    protected SpellEffects spellfx;
     protected int dfire, dwater, dearth, dair, dmuscle; // portions of 100 total
     protected Spell[] spells;
     protected int meter;
 
-    public static void Init() { //?
+    public Character() { //?
         spellfx = new SpellEffects();
-        SpellEffects.Init();
     }
 
     public void SetDeckElements(int f, int w, int e, int a, int m) {
@@ -54,6 +53,7 @@ public abstract class Character {
 
 public class CharTest : Character {
     public CharTest() {
+        spellfx = new SpellEffects();
         spells = new Spell[4];
 
         characterName = "Sample";
@@ -72,6 +72,7 @@ public class CharTest : Character {
 public class Enfuego : Character {
 
     public Enfuego(int loadout) {
+        spellfx = new SpellEffects();
         characterName = "Enfuego";
         spells = new Spell[4];
 
@@ -112,6 +113,7 @@ public class Rocky : Character {
     // TODO passive
 
     public Rocky(int loadout) {
+        spellfx = new SpellEffects();
         characterName = "Rocky";
         spells = new Spell[4];
 
@@ -151,7 +153,7 @@ public class Rocky : Character {
 public class Gravekeeper : Character {
 
     public Gravekeeper(int loadout) {
-
+        spellfx = new SpellEffects();
         spells = new Spell[4];
         characterName = "The Gravekeeper";
         if (loadout == 1)

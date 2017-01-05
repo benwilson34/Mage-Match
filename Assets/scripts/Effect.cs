@@ -6,6 +6,7 @@ public abstract class Effect {
 
     public delegate void MyEffect(int id); // move to TurnEffect?
 
+    protected MageMatch mm;
     protected int turnsLeft;
     protected int playerID;
     public int priority; // protected eventually?
@@ -24,7 +25,8 @@ public class TurnEffect : Effect {
 
     // TODO add infinite Constructor
     public TurnEffect(int turns, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect) {
-        playerID = MageMatch.ActiveP().id;
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = mm.ActiveP().id;
         turnsLeft = turns;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
@@ -71,7 +73,8 @@ public class Enchantment : Effect {
     private int tier;
 
     public Enchantment(MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
-        playerID = MageMatch.ActiveP().id;
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = mm.ActiveP().id;
         turnsLeft = -1;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
@@ -79,7 +82,8 @@ public class Enchantment : Effect {
     }
 
     public Enchantment(int turns, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
-        playerID = MageMatch.ActiveP().id;
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = mm.ActiveP().id;
         turnsLeft = turns;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
@@ -141,7 +145,7 @@ public class MatchEffect : Effect {
     private MyEffect matchEffect, endEffect;
 
     public MatchEffect(int turns, MyEffect matchEffect, MyEffect endEffect) {
-        playerID = MageMatch.ActiveP().id;
+        playerID = mm.ActiveP().id;
         turnsLeft = turns;
         this.matchEffect = matchEffect;
         this.endEffect = endEffect;

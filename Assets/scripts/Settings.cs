@@ -5,28 +5,30 @@ using System.Collections;
 // TODO move to UIController.cs
 public class Settings : MonoBehaviour {
 
+    private MageMatch mm;
 	private GameObject settingsMenu;
-	private static SpellEffects spellfx;
+	private SpellEffects spellfx;
 
 	void Start () {
-		settingsMenu = GameObject.Find("SettingsMenu");
-		settingsMenu.SetActive(MageMatch.menu); //?
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        settingsMenu = GameObject.Find("SettingsMenu");
+		settingsMenu.SetActive(mm.menu); //?
 		spellfx = new SpellEffects();
 	}
 
 	public void ToggleMenu(){
-		MageMatch.menu = !MageMatch.menu;
+		mm.menu = !mm.menu;
 		Text menuButtonText = GameObject.Find ("MenuButtonText").GetComponent<Text> ();
-		if (MageMatch.menu) {
+		if (mm.menu) {
 			menuButtonText.text = "Close Menu";
 		} else {
 			menuButtonText.text = "Menu";
 		}
-		settingsMenu.SetActive(MageMatch.menu);
+		settingsMenu.SetActive(mm.menu);
 	}
 
 	// TODO methods for two edit dropdowns
-	public static Tile.Element GetClickElement(){
+	public Tile.Element GetClickElement(){
 		Dropdown dd = GameObject.Find ("Dropdown_DropColor").GetComponent<Dropdown> ();
 		switch (dd.value) {
 		default:
@@ -44,7 +46,7 @@ public class Settings : MonoBehaviour {
 		}
 	}
 
-	public static void GetClickEffect(TileBehav tb){
+	public void GetClickEffect(TileBehav tb){
 		Dropdown dd = GameObject.Find ("Dropdown_ClickEffect").GetComponent<Dropdown> ();
 		MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 

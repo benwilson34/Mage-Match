@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // TODO events for beginning-of-turn effects and for passive/trigger effects
-public static class EffectController {
+public class EffectController {
 
-    private static List<Effect> beginTurnEffects, endTurnEffects;
+    private List<Effect> beginTurnEffects, endTurnEffects;
 
-    public static void Init() {
+    public EffectController() {
         beginTurnEffects = new List<Effect>();
         endTurnEffects = new List<Effect>();
     }
 
-    public static void AddBeginTurnEffect(Effect e) {
+    public void AddBeginTurnEffect(Effect e) {
         // TODO insert at correct position for priority
         beginTurnEffects.Add(e);
     }
 
-    public static void AddEndTurnEffect(Effect e) {
+    public void AddEndTurnEffect(Effect e) {
         // TODO test somehow?
         int i;
         for (i = 0; i < endTurnEffects.Count; i++) {
@@ -29,11 +29,11 @@ public static class EffectController {
     }
 
     // TODO not the right way to do this
-    public static void RemoveEndTurnEffect(Effect e) {
+    public void RemoveEndTurnEffect(Effect e) {
         endTurnEffects.Remove(e);
     }
 
-    public static void ResolveBeginTurnEffects() {
+    public void ResolveBeginTurnEffects() {
         Effect effect;
         for (int i = 0; i < beginTurnEffects.Count; i++) {
             effect = beginTurnEffects[i];
@@ -48,7 +48,7 @@ public static class EffectController {
         }
     }
 
-    public static void ResolveEndTurnEffects() { // TODO test priority
+    public void ResolveEndTurnEffects() { // TODO test priority
         Effect e;
         for (int i = 0; i < endTurnEffects.Count; i++) {
             e = endTurnEffects[i];

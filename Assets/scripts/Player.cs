@@ -35,13 +35,13 @@ public class Player {
 			id = 1;
 			handSlot = GameObject.Find ("handslot1").transform;
 			//loadout = new Loadout (UIController.GetLoadoutNum(1));
-            character = CharacterLoader.Load(UIController.GetLoadoutNum(1));
+            character = CharacterLoader.Load(mm.uiCont.GetLoadoutNum(1));
 			break;
 		case 2: 
 			SetName ("Quincy Shungle");
 			id = 2;
 			handSlot = GameObject.Find ("handslot2").transform;
-            character = CharacterLoader.Load(UIController.GetLoadoutNum(2));
+            character = CharacterLoader.Load(mm.uiCont.GetLoadoutNum(2));
 			break;
 		default:
 			break;
@@ -55,7 +55,7 @@ public class Player {
 	}
 
 	public void DealDamage(int amount){
-		MageMatch.GetOpponent (id).ChangeHealth (-amount);
+		mm.GetOpponent (id).ChangeHealth (-amount);
 	}
 
 	public void ChangeHealth(int amount){ // TODO clamp instead?
@@ -69,7 +69,7 @@ public class Player {
 		Debug.Log ("PLAYER: " + name + " had health changed from " + health + " to " + (health + amount) + ".");
 		health += amount;
 		if (health == 0)
-			MageMatch.EndTheGame ();
+			mm.EndTheGame ();
 	}
 
 	public void DrawTiles(int numTiles){
@@ -85,7 +85,7 @@ public class Player {
 			TileBehav tb = go.GetComponent<TileBehav> ();
 			hand.Add (tb);
 		}
-		AudioController.PickupSound (mm.GetComponent<AudioSource> ());
+		mm.audioCont.PickupSound (mm.GetComponent<AudioSource> ());
 		AlignHand (.12f, true);
 	}
 

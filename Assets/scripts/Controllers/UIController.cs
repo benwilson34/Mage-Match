@@ -4,17 +4,17 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 
-public static class UIController {
+public class UIController {
 
-	private static Text moveText, turnText, debugGridText;
-	private static MageMatch mm;
-	private static UIResources uires;
-	private static Dropdown DD1, DD2;
+	private Text moveText, turnText, debugGridText;
+	private MageMatch mm;
+	private UIResources uires;
+	private Dropdown DD1, DD2;
 
-    private static GameObject gradient, targetingBG;
-    private static GameObject tCancelB, tClearB;
+    private GameObject gradient, targetingBG;
+    private GameObject tCancelB, tClearB;
 
-	public static void Init(){
+	public UIController(){
 		moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
 		moveText.text = "";
 		turnText = GameObject.Find ("Text_Turns").GetComponent<Text> (); // UI turn counter
@@ -35,7 +35,7 @@ public static class UIController {
         tClearB.SetActive(false);
     }
 
-    public static void Reset(Player p1, Player p2) { // could just get players from MM
+    public void Reset(Player p1, Player p2) { // could just get players from MM
         UpdateTurnText();
         UpdateDebugGrid();
         UpdateMoveText("");
@@ -46,14 +46,14 @@ public static class UIController {
         DeactivateAllSpellButtons(p2);
     }
 
-    public static void UpdateDebugGrid(){
+    public void UpdateDebugGrid(){
 		string grid = "   0  1  2  3  4  5  6 \n";
 		for (int r = HexGrid.numRows - 1; r >= 0; r--) {
 			grid += r + " ";
 			for (int c = 0; c < HexGrid.numCols; c++) {
-				if (r <= HexGrid.TopOfColumn (c) && r >= HexGrid.BottomOfColumn (c)) {
-					if (HexGrid.IsSlotFilled (c, r))
-						grid += "[" + HexGrid.GetTileAt (c, r).ThisElementToChar() + "]";
+				if (r <= mm.hexGrid.TopOfColumn (c) && r >= mm.hexGrid.BottomOfColumn (c)) {
+					if (mm.hexGrid.IsSlotFilled (c, r))
+						grid += "[" + mm.hexGrid.GetTileAt (c, r).ThisElementToChar() + "]";
 					else
 						grid += "[ ]";
 				} else
@@ -64,33 +64,33 @@ public static class UIController {
 		debugGridText.text = grid;
 	}
 
-	public static void UpdateTurnText(){
-		turnText.text = "Completed Turns: " + MageMatch.turns;
+	public void UpdateTurnText(){
+		turnText.text = "Completed Turns: " + mm.turns; // eventually Stats
 	}
 
-	public static void UpdateMoveText(string str){
+	public void UpdateMoveText(string str){
 		moveText.text = str;
 	}
 
-	public static void UpdatePlayerInfo(){
-		UpdatePlayerInfo (MageMatch.ActiveP());
-		UpdatePlayerInfo (MageMatch.InactiveP());
+	public void UpdatePlayerInfo(){
+		UpdatePlayerInfo (mm.ActiveP());
+		UpdatePlayerInfo (mm.InactiveP());
 	}
 
-	public static void FlipGradient(){
+	public void FlipGradient(){
 //		Vector3 scale = go.transform.localScale;
 //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
 		gradient.transform.Rotate(0,0,180);
 	}
 
-    public static void ToggleTargetingUI() {
+    public void ToggleTargetingUI() {
         gradient.SetActive(!gradient.activeSelf);
         targetingBG.SetActive(!targetingBG.activeSelf);
         tCancelB.SetActive(!tCancelB.activeSelf);
         tClearB.SetActive(!tClearB.activeSelf);
     }
 
-    public static void UpdatePlayerInfo(Player player){
+    public void UpdatePlayerInfo(Player player){
 		GameObject pinfo;
 		if (player.id == 1) {
 			pinfo = GameObject.Find ("Player1_Info");
@@ -98,7 +98,7 @@ public static class UIController {
 			pinfo = GameObject.Find ("Player2_Info");
 		}
 
-		if (player.id == MageMatch.ActiveP().id) {
+		if (player.id == mm.ActiveP().id) {
 			pinfo.GetComponent<Image> ().color = new Color (0, 1, 0, .4f);
 		} else {
 			pinfo.GetComponent<Image> ().color = new Color (1, 1, 1, .4f);
@@ -130,7 +130,7 @@ public static class UIController {
 		healthBar.color = new Color (r, g, 0);
 	}
 
-	public static void ShowLoadout(Player player){
+	public void ShowLoadout(Player player){
 		Transform pload;
 		if(player.id == 1)
 			pload = GameObject.Find ("Player1_Loadout").transform;
@@ -178,7 +178,7 @@ public static class UIController {
 		}
 	}
 
-	static Button GetButton(Player player, int index){
+    Button GetButton(Player player, int index){
 		Transform pload;
 		if(player.id == 1)
 			pload = GameObject.Find ("Player1_Loadout").transform;
@@ -187,24 +187,24 @@ public static class UIController {
 		return pload.Find ("Button_Spell" + index).GetComponent<Button>();
 	}
 
-	public static void ActivateSpellButton(Player player, int index){
+	public void ActivateSpellButton(Player player, int index){
 		Button button = GetButton (player, index);
 		button.interactable = true;
 	}
 
-	public static void DeactivateSpellButton(Player player, int index){
+	public void DeactivateSpellButton(Player player, int index){
 		Button button = GetButton (player, index);
 		button.interactable = false;
 	}
 
-	public static void DeactivateAllSpellButtons(Player player){
+	public void DeactivateAllSpellButtons(Player player){
 		for (int i = 0; i < 4; i++) {
 			Button button = GetButton (player, i);
 			button.interactable = false;
 		}
 	}
 
-	public static int GetLoadoutNum(int p){
+	public int GetLoadoutNum(int p){
 		if (p == 1) {
 			return DD1.value;
 		} else {
@@ -212,13 +212,13 @@ public static class UIController {
 		}
 	}
 
-	public static void UpdateCommishMeter(){
+	public void UpdateCommishMeter(){
 		mm.StartAnim(SlideMoodMarker());
 	}
 
-	static IEnumerator SlideMoodMarker(){
+	IEnumerator SlideMoodMarker(){
 		RectTransform moodmarker = GameObject.Find ("MoodMarker").GetComponent<RectTransform> ();
-		float slideRatio = (float)(Commish.GetMood() + 100) / 200f;
+		float slideRatio = (float)(mm.commish.GetMood() + 100) / 200f;
 		float meterwidth = GameObject.Find ("MoodMeter").GetComponent<RectTransform> ().rect.width;
 		yield return moodmarker.DOAnchorPosX(slideRatio * meterwidth, .4f, false);
 	}
