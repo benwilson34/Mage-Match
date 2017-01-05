@@ -11,7 +11,6 @@ public class MageMatch : MonoBehaviour {
 
 	public GameObject firePF, waterPF, earthPF, airPF, musclePF;      // tile prefabs
 	public GameObject stonePF, emberPF, prereqPF, targetPF, zombiePF; // token prefabs
-	public int turns;                 // number of current turn
 	public bool menu = false;         // is the settings menu open?
 	public GameObject currentTile;    // current game tile
 
@@ -29,7 +28,7 @@ public class MageMatch : MonoBehaviour {
     public Stats stats;
 
 	void Start () {
-        uiCont = new UIController();
+        uiCont = GameObject.Find("ui").GetComponent<UIController>();
         effectCont = new EffectController();
         targeting = new Targeting();
         audioCont = new AudioController();
@@ -53,7 +52,6 @@ public class MageMatch : MonoBehaviour {
         hexGrid = new HexGrid();
         boardCheck = new BoardCheck(hexGrid);
 
-        turns = 0;
 		endGame = false;
 
 		p1 = new Player (1);
@@ -115,7 +113,7 @@ public class MageMatch : MonoBehaviour {
 
 	IEnumerator TurnSystem(){
 		effectCont.ResolveEndTurnEffects ();
-		turns++;
+		stats.turns++;
 		uiCont.UpdateTurnText ();
 		uiCont.DeactivateAllSpellButtons (activep);
 		

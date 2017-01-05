@@ -123,7 +123,6 @@
     <Compile Include="Assets\scripts\Tile.cs" />
     <Compile Include="Assets\scripts\TileBehav.cs" />
     <Compile Include="Assets\scripts\TileSeq.cs" />
-    <Compile Include="Assets\scripts\UIResources.cs" />
     <Compile Include="Assets\scripts\ZombieToken.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -145,6 +145,7 @@ public class MatchEffect : Effect {
     private MyEffect matchEffect, endEffect;
 
     public MatchEffect(int turns, MyEffect matchEffect, MyEffect endEffect) {
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = mm.ActiveP().id;
         turnsLeft = turns;
         this.matchEffect = matchEffect;

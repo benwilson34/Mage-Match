@@ -6,13 +6,11 @@ public class SpellEffects {
 
 	private MageMatch mm;
     private Targeting targeting;
-    private UIController uiCont;
     private HexGrid hexGrid;
 
 	public SpellEffects(){
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
-        uiCont = mm.uiCont;
         hexGrid = mm.hexGrid;
 	}
 

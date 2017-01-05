@@ -4,26 +4,32 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 
-public class UIController {
+public class UIController : MonoBehaviour {
 
 	private Text moveText, turnText, debugGridText;
 	private MageMatch mm;
-	private UIResources uires;
 	private Dropdown DD1, DD2;
 
+    private Transform p1info, p2info, p1load, p2load;
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
+    private RectTransform moodMarker, moodMeter;
 
-	public UIController(){
+    public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
+
+    void Start(){
+		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+
 		moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
 		moveText.text = "";
 		turnText = GameObject.Find ("Text_Turns").GetComponent<Text> (); // UI turn counter
 		debugGridText = GameObject.Find ("Text_Debug1").GetComponent<Text> (); // UI debug grid
+        p1info = GameObject.Find("Player1_Info").transform;
+        p2info = GameObject.Find("Player2_Info").transform;
+        p1load = GameObject.Find("Player1_Loadout").transform;
+        p2load = GameObject.Find("Player2_Loadout").transform;
 
-		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-		uires = GameObject.Find ("Canvas").GetComponent<UIResources> ();
-
-		DD1 = GameObject.Find ("Dropdown_p1").GetComponent<Dropdown> ();
+        DD1 = GameObject.Find ("Dropdown_p1").GetComponent<Dropdown> ();
 		DD2 = GameObject.Find ("Dropdown_p2").GetComponent<Dropdown> ();
 
         gradient = GameObject.Find("green-gradient");
@@ -33,6 +39,9 @@ public class UIController {
         tCancelB.SetActive(false);
         tClearB = GameObject.Find("Button_ClearTargets");
         tClearB.SetActive(false);
+
+        moodMarker = GameObject.Find("MoodMarker").GetComponent<RectTransform>();
+        moodMeter = GameObject.Find("MoodMeter").GetComponent<RectTransform>();
     }
 
     public void Reset(Player p1, Player p2) { // could just get players from MM
@@ -65,7 +74,7 @@ public class UIController {
 	}
 
 	public void UpdateTurnText(){
-		turnText.text = "Completed Turns: " + mm.turns; // eventually Stats
+		turnText.text = "Completed Turns: " + mm.stats.turns;
 	}
 
 	public void UpdateMoveText(string str){
@@ -77,25 +86,12 @@ public class UIController {
 		UpdatePlayerInfo (mm.InactiveP());
 	}
 
-	public void FlipGradient(){
-//		Vector3 scale = go.transform.localScale;
-//		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
-		gradient.transform.Rotate(0,0,180);
-	}
-
-    public void ToggleTargetingUI() {
-        gradient.SetActive(!gradient.activeSelf);
-        targetingBG.SetActive(!targetingBG.activeSelf);
-        tCancelB.SetActive(!tCancelB.activeSelf);
-        tClearB.SetActive(!tClearB.activeSelf);
-    }
-
     public void UpdatePlayerInfo(Player player){
-		GameObject pinfo;
+		Transform pinfo;
 		if (player.id == 1) {
-			pinfo = GameObject.Find ("Player1_Info");
+            pinfo = p1info;
 		} else {
-			pinfo = GameObject.Find ("Player2_Info");
+            pinfo = p2info;
 		}
 
 		if (player.id == mm.ActiveP().id) {
@@ -105,11 +101,11 @@ public class UIController {
 		}
 
 		// TODO not great
-		Text nameText    = pinfo.transform.Find ("Text_Name").GetComponent<Text>();
+		Text nameText    = pinfo.Find ("Text_Name").GetComponent<Text>();
 		//Text matchesText = pinfo.transform.Find ("Text_Matches").GetComponent<Text>();
-		Text p1APText    = pinfo.transform.Find ("Text_AP").GetComponent<Text>();
-		Text healthText  = pinfo.transform.Find ("Health_Outline").Find ("Text_Health").GetComponent<Text>();
-		Image healthBar  = pinfo.transform.Find ("Health_Outline").Find("Healthbar").GetComponent<Image>();
+		Text p1APText    = pinfo.Find ("Text_AP").GetComponent<Text>();
+		Text healthText  = pinfo.Find ("Health_Outline").Find ("Text_Health").GetComponent<Text>();
+		Image healthBar  = pinfo.Find ("Health_Outline").Find("Healthbar").GetComponent<Image>();
 
 		nameText.text = "P" + player.id + " - " + player.name;
 		p1APText.text = "AP left: " + player.AP;
@@ -132,10 +128,10 @@ public class UIController {
 
 	public void ShowLoadout(Player player){
 		Transform pload;
-		if(player.id == 1)
-			pload = GameObject.Find ("Player1_Loadout").transform;
-		else
-			pload = GameObject.Find ("Player2_Loadout").transform;
+        if (player.id == 1)
+            pload = p1load;
+        else
+            pload = p2load;
 		Text loadoutText = pload.Find ("Text_LoadoutName").GetComponent<Text>();
 		loadoutText.text = player.character.characterName + " - " + player.character.techniqueName;
 
@@ -154,19 +150,19 @@ public class UIController {
 				if (!currentEl.Equals(Tile.Element.None)) {
 					switch (currentEl) {
 					case Tile.Element.Fire:
-						minitile.sprite = uires.miniFire;
+						minitile.sprite = miniFire;
 						break;
 					case Tile.Element.Water:
-						minitile.sprite = uires.miniWater;
+						minitile.sprite = miniWater;
 						break;
 					case Tile.Element.Earth:
-						minitile.sprite = uires.miniEarth;
+						minitile.sprite = miniEarth;
 						break;
 					case Tile.Element.Air:
-						minitile.sprite = uires.miniAir;
+						minitile.sprite = miniAir;
 						break;
 					case Tile.Element.Muscle:
-						minitile.sprite = uires.miniMuscle;
+						minitile.sprite = miniMuscle;
 						break;
 					}
 				} else {
@@ -178,12 +174,25 @@ public class UIController {
 		}
 	}
 
+    public void FlipGradient() {
+        //		Vector3 scale = go.transform.localScale;
+        //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
+        gradient.transform.Rotate(0, 0, 180);
+    }
+
+    public void ToggleTargetingUI() {
+        gradient.SetActive(!gradient.activeSelf);
+        targetingBG.SetActive(!targetingBG.activeSelf);
+        tCancelB.SetActive(!tCancelB.activeSelf);
+        tClearB.SetActive(!tClearB.activeSelf);
+    }
+
     Button GetButton(Player player, int index){
 		Transform pload;
-		if(player.id == 1)
-			pload = GameObject.Find ("Player1_Loadout").transform;
-		else
-			pload = GameObject.Find ("Player2_Loadout").transform;
+        if (player.id == 1)
+            pload = p1load;
+        else
+            pload = p2load;
 		return pload.Find ("Button_Spell" + index).GetComponent<Button>();
 	}
 
@@ -217,9 +226,8 @@ public class UIController {
 	}
 
 	IEnumerator SlideMoodMarker(){
-		RectTransform moodmarker = GameObject.Find ("MoodMarker").GetComponent<RectTransform> ();
 		float slideRatio = (float)(mm.commish.GetMood() + 100) / 200f;
-		float meterwidth = GameObject.Find ("MoodMeter").GetComponent<RectTransform> ().rect.width;
-		yield return moodmarker.DOAnchorPosX(slideRatio * meterwidth, .4f, false);
+		float meterwidth = moodMeter.rect.width;
+		yield return moodMarker.DOAnchorPosX(slideRatio * meterwidth, .4f, false);
 	}
 }

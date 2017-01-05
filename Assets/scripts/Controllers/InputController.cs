@@ -21,7 +21,7 @@ public class InputController : MonoBehaviour {
 	void Start () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
-        settings = GameObject.Find("Canvas").GetComponent<Settings>();
+        settings = GameObject.Find("ui").GetComponent<Settings>();
     }
 
 	void Update(){ // polling input...change to events?

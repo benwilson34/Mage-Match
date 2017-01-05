@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Stats {
 
+    public int turns = 0;
+
     struct PlayerStat {
         public string name;
         public string character;
@@ -12,8 +14,8 @@ public class Stats {
     private PlayerStat ps1, ps2;
 
     public Stats(Player p1, Player p2) {
-        ps1 = new PlayerStat() { name = p1.name };
-        ps2 = new PlayerStat() { name = p2.name };
+        ps1 = new PlayerStat() { name = p1.name, character = p1.character.characterName };
+        ps2 = new PlayerStat() { name = p2.name, character = p2.character.characterName };
     }
 
     public void IncMatch(int id, int count) {

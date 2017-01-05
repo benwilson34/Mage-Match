@@ -13114,6 +13114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d8aa892b6e7d804d84100d7e7017175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentState: 0
   firePF: {fileID: 108886, guid: 6b42f6fb5d6281b4ab0e28a7e33cb376, type: 2}
   waterPF: {fileID: 146332, guid: bc62e25fc8de6864496bb95caf16af1d, type: 2}
   earthPF: {fileID: 187288, guid: e3327746c4b675c44bac4d152b735d99, type: 2}
@@ -13124,6 +13125,10 @@ MonoBehaviour:
   prereqPF: {fileID: 1000011731886290, guid: 4a0493b90d2da834a9cad3447bcd236f, type: 2}
   targetPF: {fileID: 1000011697063918, guid: 380fe264545b5b24989ab0c55256c7ad, type: 2}
   zombiePF: {fileID: 1290115943295652, guid: 3664136539ebdbb4693d0661d5f72c39, type: 2}
+  turns: 0
+  menu: 0
+  currentTile: {fileID: 0}
+  uiCont: {fileID: 0}
 --- !u!82 &1888761541
 AudioSource:
   m_ObjectHideFlags: 0
@@ -14888,7 +14893,7 @@ GameObject:
   - component: {fileID: 2101497891}
   - component: {fileID: 2101497892}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: ui
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15000,7 +15005,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2101497886}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dcd6d4f6a3f4044f8c9e56e6b59c94e, type: 3}
+  m_Script: {fileID: 11500000, guid: eb2f3a2480c98e14fb0a2bbe8b45f915, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   miniFire: {fileID: 21300002, guid: c132b7527a90ed34090eacdbca824bb3, type: 3}
