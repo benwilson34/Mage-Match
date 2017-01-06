@@ -13,11 +13,13 @@ public class UIController : MonoBehaviour {
     private Transform p1info, p2info, p1load, p2load;
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
+    private GameObject settingsMenu; // ?
     private RectTransform moodMarker, moodMeter;
+    private SpellEffects spellfx;
 
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
 
-    void Start(){
+    public void Init(){ // Awake()?
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 
 		moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
@@ -40,8 +42,12 @@ public class UIController : MonoBehaviour {
         tClearB = GameObject.Find("Button_ClearTargets");
         tClearB.SetActive(false);
 
+        settingsMenu = GameObject.Find("SettingsMenu");
+
         moodMarker = GameObject.Find("MoodMarker").GetComponent<RectTransform>();
         moodMeter = GameObject.Find("MoodMeter").GetComponent<RectTransform>();
+
+        spellfx = new SpellEffects();
     }
 
     public void Reset(Player p1, Player p2) { // could just get players from MM
@@ -53,6 +59,8 @@ public class UIController : MonoBehaviour {
         ShowLoadout(p2);
         DeactivateAllSpellButtons(p1);
         DeactivateAllSpellButtons(p2);
+
+        settingsMenu.SetActive(mm.menu); //?
     }
 
     public void UpdateDebugGrid(){
@@ -213,15 +221,69 @@ public class UIController : MonoBehaviour {
 		}
 	}
 
-	public int GetLoadoutNum(int p){
-		if (p == 1) {
-			return DD1.value;
-		} else {
+	public int GetLoadoutNum(int id){
+		if (id == 1)
+            return DD1.value; 
+        else
 			return DD2.value;
-		}
 	}
 
-	public void UpdateCommishMeter(){
+    public void ToggleMenu() {
+        mm.menu = !mm.menu;
+        Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
+        if (mm.menu) {
+            menuButtonText.text = "Close Menu";
+        } else {
+            menuButtonText.text = "Menu";
+        }
+        settingsMenu.SetActive(mm.menu);
+    }
+
+    // TODO methods for two edit dropdowns
+    public Tile.Element GetClickElement() {
+        Dropdown dd = GameObject.Find("Dropdown_DropColor").GetComponent<Dropdown>();
+        switch (dd.value) {
+            default:
+                return Tile.Element.None;
+            case 1:
+                return Tile.Element.Fire;
+            case 2:
+                return Tile.Element.Water;
+            case 3:
+                return Tile.Element.Earth;
+            case 4:
+                return Tile.Element.Air;
+            case 5:
+                return Tile.Element.Muscle;
+        }
+    }
+
+    public void GetClickEffect(TileBehav tb) {
+        Dropdown dd = GameObject.Find("Dropdown_ClickEffect").GetComponent<Dropdown>();
+        MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
+
+        switch (dd.value) {
+            default: // none
+                break;
+            case 1: // destroy tile
+                mm.RemoveTile(tb.tile, true, false); // FIXME will probably throw null reference exception
+                break;
+            case 2: // clear enchant
+                tb.ClearEnchantment();
+                break;
+            case 3: // cherrybomb
+                spellfx.Ench_SetCherrybomb(tb);
+                break;
+            case 4: // burning
+                spellfx.Ench_SetBurning(tb);
+                break;
+            case 5: // zombify
+                spellfx.Ench_SetZombify(tb, false);
+                break;
+        }
+    }
+
+    public void UpdateCommishMeter(){
 		mm.StartAnim(SlideMoodMarker());
 	}
 

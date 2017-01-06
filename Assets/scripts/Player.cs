@@ -34,19 +34,17 @@ public class Player {
 			SetName ("Maxsimilous Forza");
 			id = 1;
 			handSlot = GameObject.Find ("handslot1").transform;
-			//loadout = new Loadout (UIController.GetLoadoutNum(1));
-            character = CharacterLoader.Load(mm.uiCont.GetLoadoutNum(1));
 			break;
 		case 2: 
 			SetName ("Quincy Shungle");
 			id = 2;
 			handSlot = GameObject.Find ("handslot2").transform;
-            character = CharacterLoader.Load(mm.uiCont.GetLoadoutNum(2));
 			break;
 		default:
 			break;
 		}
 
+        character = CharacterLoader.Load(mm.uiCont.GetLoadoutNum(id));
 		health = character.GetMaxHealth();
 	}
 

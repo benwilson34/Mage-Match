@@ -102,27 +102,27 @@
     <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyServerEntry.cs" />
     <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyServerList.cs" />
     <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyTopPanel.cs" />
-    <Compile Include="Assets\scripts\BoardCheck.cs" />
     <Compile Include="Assets\scripts\CellBehav.cs" />
     <Compile Include="Assets\scripts\Character.cs" />
     <Compile Include="Assets\scripts\Commish.cs" />
-    <Compile Include="Assets\scripts\Controllers\AudioController.cs" />
-    <Compile Include="Assets\scripts\Controllers\ButtonController.cs" />
-    <Compile Include="Assets\scripts\Controllers\EffectController.cs" />
-    <Compile Include="Assets\scripts\Controllers\InputController.cs" />
-    <Compile Include="Assets\scripts\Controllers\UIController.cs" />
     <Compile Include="Assets\scripts\Effect.cs" />
     <Compile Include="Assets\scripts\HexGrid.cs" />
     <Compile Include="Assets\scripts\MageMatch.cs" />
     <Compile Include="Assets\scripts\Player.cs" />
-    <Compile Include="Assets\scripts\Settings.cs" />
     <Compile Include="Assets\scripts\Spell.cs" />
     <Compile Include="Assets\scripts\SpellEffects.cs" />
     <Compile Include="Assets\scripts\Stats.cs" />
-    <Compile Include="Assets\scripts\Targeting.cs" />
     <Compile Include="Assets\scripts\Tile.cs" />
     <Compile Include="Assets\scripts\TileBehav.cs" />
     <Compile Include="Assets\scripts\TileSeq.cs" />
+    <Compile Include="Assets\scripts\Utility\AudioController.cs" />
+    <Compile Include="Assets\scripts\Utility\BoardCheck.cs" />
+    <Compile Include="Assets\scripts\Utility\ButtonController.cs" />
+    <Compile Include="Assets\scripts\Utility\EffectController.cs" />
+    <Compile Include="Assets\scripts\Utility\EventController.cs" />
+    <Compile Include="Assets\scripts\Utility\InputController.cs" />
+    <Compile Include="Assets\scripts\Utility\Targeting.cs" />
+    <Compile Include="Assets\scripts\Utility\UIController.cs" />
     <Compile Include="Assets\scripts\ZombieToken.cs" />
   </ItemGroup>
   <ItemGroup>

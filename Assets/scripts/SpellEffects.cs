@@ -67,9 +67,14 @@ public class SpellEffects {
 	
 	// TODO
 	public void HotBody(){
-		mm.ActiveP().SetMatchEffect (new MatchEffect(3, Hotbody_Match, null));
+		mm.ActiveP().SetMatchEffect (new MatchEffect(3, HotBody_Match, HotBody_End));
+        mm.eventCont.turnChange += HotBody_OnTurnChange;
 	}
-	public void Hotbody_Match(int id){
+    public void HotBody_OnTurnChange(int id) {
+        mm.GetPlayer(id).DealDamage(25);
+        mm.GetOpponent(id).DealDamage(25);
+    }
+	public void HotBody_Match(int id){
 		// TODO threshold to prevent infinite loop
 		List<TileBehav> tbs = hexGrid.GetPlacedTiles();
 		for (int i = 0; i < 3; i++) {
@@ -81,6 +86,9 @@ public class SpellEffects {
 			}
 		}
 	}
+    public void HotBody_End(int id) {
+        mm.eventCont.turnChange -= HotBody_OnTurnChange;
+    }
 
 	public void HotAndBothered(){
 		mm.InactiveP ().ChangeBuff_DmgExtra (15);

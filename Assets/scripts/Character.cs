@@ -188,7 +188,7 @@ public class Gravekeeper : Character {
     }
 }
 
-// TODO
+// TODO non-static
 public static class CharacterLoader {
 
     public static Character Load(int num) {

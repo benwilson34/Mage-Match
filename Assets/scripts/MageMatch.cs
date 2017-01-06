@@ -11,24 +11,27 @@ public class MageMatch : MonoBehaviour {
 
 	public GameObject firePF, waterPF, earthPF, airPF, musclePF;      // tile prefabs
 	public GameObject stonePF, emberPF, prereqPF, targetPF, zombiePF; // token prefabs
-	public bool menu = false;         // is the settings menu open?
+	public bool menu = false;         // is the settings menu open? ->move to UICont
 	public GameObject currentTile;    // current game tile
 
 	private Player p1, p2, activep;
+    public Commish commish;
 	private bool endGame = false;     // is either player dead?
 	private int animating = 0;        // is something animating?
 
     public BoardCheck boardCheck;
+    public HexGrid hexGrid;
     public UIController uiCont;
     public EffectController effectCont;
     public AudioController audioCont;
-    public Commish commish;
     public Targeting targeting;
-    public HexGrid hexGrid;
     public Stats stats;
+    public EventController eventCont;
+    // should SpellEffects instance be here?
 
 	void Start () {
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
+        uiCont.Init();
         effectCont = new EffectController();
         targeting = new Targeting();
         audioCont = new AudioController();
@@ -68,7 +71,9 @@ public class MageMatch : MonoBehaviour {
 		activep.InitAP();
 		activep.DrawTiles (2);
 
+        eventCont = new EventController();
         stats = new Stats(p1, p2);
+
         uiCont.Reset(p1, p2);
 	}
 
@@ -113,7 +118,7 @@ public class MageMatch : MonoBehaviour {
 
 	IEnumerator TurnSystem(){
 		effectCont.ResolveEndTurnEffects ();
-		stats.turns++;
+        eventCont.TurnChange(activep.id); //?
 		uiCont.UpdateTurnText ();
 		uiCont.DeactivateAllSpellButtons (activep);
 		
@@ -182,8 +187,8 @@ public class MageMatch : MonoBehaviour {
 			}
 		}
 		RemoveSeqList (seqList);
-        stats.IncMatch(activep.id, seqList.Count);
-		//activep.matches += seqList.Count;
+        //stats.IncMatch(activep.id, seqList.Count);
+        eventCont.Match(activep.id, seqList.Count);
 	}
 		
 	public bool DropTile(int col){
@@ -206,6 +211,7 @@ public class MageMatch : MonoBehaviour {
 			currentTileBehav.SetPlaced();
 			currentTileBehav.ChangePos (hexGrid.TopOfColumn(col) + 1, col, row, dur); // move to appropriate spot in column
 			BoardChanged();
+            eventCont.Drop(col); // etc...
 			return true;
 		}
 		return false;
@@ -339,7 +345,7 @@ public class MageMatch : MonoBehaviour {
 	}
 
 	public void RemoveSeq(TileSeq seq){ // TODO messy stuff
-		Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + boardCheck.PrintSeq(seq, true));
+		//Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + boardCheck.PrintSeq(seq, true));
 		Tile tile;
 		for (int i = 0; i < seq.sequence.Count;) {
 			tile = seq.sequence [0];

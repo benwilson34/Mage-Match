@@ -7,7 +7,7 @@ public class InputController : MonoBehaviour {
 
 	private MageMatch mm;
     private Targeting targeting;
-    private Settings settings;
+    private UIController uiCont;
 
 	private Vector3 dragClick;
 	private Transform parentT;
@@ -21,7 +21,8 @@ public class InputController : MonoBehaviour {
 	void Start () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
-        settings = GameObject.Find("ui").GetComponent<Settings>();
+        //settings = GameObject.Find("ui").GetComponent<Settings>();
+        uiCont = mm.uiCont;
     }
 
 	void Update(){ // polling input...change to events?
@@ -145,8 +146,7 @@ public class InputController : MonoBehaviour {
 					break;
 				}
 			} else { // menu mode
-                
-                settings.GetClickEffect(tb);
+                uiCont.GetClickEffect(tb);
 			}
 		}
 	}
@@ -227,7 +227,7 @@ public class InputController : MonoBehaviour {
 //		Debug.Log ("OnMouseDown hit on column " + cb.col);
 		if (mm.menu) {
 			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-			Tile.Element element = settings.GetClickElement ();
+			Tile.Element element = uiCont.GetClickElement ();
 			if (element != Tile.Element.None) {
 //				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
 				GameObject go = mm.GenerateTile (element);
