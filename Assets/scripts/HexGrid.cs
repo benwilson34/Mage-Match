@@ -23,7 +23,27 @@ public class HexGrid {
 		SetTileBehavAt (tb, col, row);
 	}
 
-	public void SetTileBehavAt(TileBehav tb, int col, int row){
+    public void RaiseTileBehavIntoColumn(TileBehav tb, int col) {
+        //TODO test
+        int top = TopOfColumn(col);
+        int bot = BottomOfColumn(col);
+        for (int r = top; r >= bot; r--) {
+            if (IsSlotFilled(col, r)) {
+                if (r == top) {
+                    // TODO handle top of column getting pushed out
+                    mm.RemoveTile(col, r, false, false);
+                    continue;
+                }
+                //tileGrid[col, r + 1] = tileGrid[col, r];
+                tileGrid[col, r].ChangePos(col, r + 1);
+                tileGrid[col, r] = null;
+            }
+        }
+        //tileGrid[col, bot] = tb;
+        tb.ChangePos(col, bot);
+    }
+
+    public void SetTileBehavAt(TileBehav tb, int col, int row){
 		tileGrid [col, row] = tb;
 		mm.BoardChanged ();
 	}

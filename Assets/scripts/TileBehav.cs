@@ -138,8 +138,12 @@ public class TileBehav : MonoBehaviour {
             return Enchantment.EnchType.None;
     }
 
+    public int GetEnchTier() {
+        return enchantment.tier;
+    }
+
     public void TriggerEnchantment() {
-        Debug.Log("Triggering enchantment at " + tile.col + ", " + tile.row);
+        Debug.Log("TILEBEHAV: Triggering enchantment at " + tile.col + ", " + tile.row);
         enchantment.TriggerEffect();
     }
 
@@ -152,13 +156,11 @@ public class TileBehav : MonoBehaviour {
 	}
 
 	public bool SetEnchantment(Enchantment ench){
-		if (HasEnchantment()) {
-			return false; // where we decide whether new enchantments should overwrite current ones
+		if (HasEnchantment() && ench.tier <= enchantment.tier) {
+			return false; // if ench tier is not greater than current enchantment
 		}
-//		resolved = false;
-//		this.enchantEffect = effect;
 		ench.SetAsEnchantment(this);
-		this.enchantment = ench; 
+		enchantment = ench; 
 		return true;
 	}
 

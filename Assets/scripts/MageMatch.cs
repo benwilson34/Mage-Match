@@ -187,7 +187,6 @@ public class MageMatch : MonoBehaviour {
 			}
 		}
 		RemoveSeqList (seqList);
-        //stats.IncMatch(activep.id, seqList.Count);
         eventCont.Match(activep.id, seqList.Count);
 	}
 		
@@ -238,7 +237,7 @@ public class MageMatch : MonoBehaviour {
 		BoardChanged();
 	}
 
-	public void Transmute(int col, int row, Tile.Element element){
+    public void Transmute(int col, int row, Tile.Element element){
 		Destroy(hexGrid.GetTileBehavAt (col, row).gameObject);
 		hexGrid.ClearTileBehavAt (col, row);
 		TileBehav tb = GenerateTile (element).GetComponent<TileBehav>();

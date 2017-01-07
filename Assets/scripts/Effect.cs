@@ -70,7 +70,7 @@ public class Enchantment : Effect {
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
     private bool skip = false;
-    private int tier;
+    public int tier;
 
     public Enchantment(MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();

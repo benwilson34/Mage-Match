@@ -71,22 +71,28 @@ public class SpellEffects {
         mm.eventCont.turnChange += HotBody_OnTurnChange;
 	}
     public void HotBody_OnTurnChange(int id) {
-        mm.GetPlayer(id).DealDamage(25);
+        mm.GetPlayer(id).DealDamage(25); // should just be ChangeHealth(-25)?
         mm.GetOpponent(id).DealDamage(25);
     }
-	public void HotBody_Match(int id){
-		// TODO threshold to prevent infinite loop
+	void HotBody_Match(int id){
+        // TODO test
 		List<TileBehav> tbs = hexGrid.GetPlacedTiles();
+        for (int i = 0; i < tbs.Count; i++) {
+            TileBehav tb = tbs[i];
+            if (tb.HasEnchantment()) {
+                tbs.Remove(tb);
+                i--;
+            }
+        }
 		for (int i = 0; i < 3; i++) {
 			int rand = Random.Range (0, tbs.Count);
-			if (tbs[rand].HasEnchantment()) {
-				i--;
-			} else {
-				Ench_SetBurning (tbs [rand]);
-			}
+            if (tbs[rand].HasEnchantment()) {
+                Ench_SetBurning(tbs[rand]);
+                tbs.RemoveAt(rand);
+            }
 		}
 	}
-    public void HotBody_End(int id) {
+    void HotBody_End(int id) {
         mm.eventCont.turnChange -= HotBody_OnTurnChange;
     }
 
@@ -186,12 +192,10 @@ public class SpellEffects {
     void RaiseZombie_Target(CellBehav cb) {
         // TODO eventually HexGrid.RaiseColumn()
         // hardset bottom cell
-        int col = cb.col;
-        int bottomr = hexGrid.BottomOfColumn(col);
-        GameObject zomb;
-        zomb = mm.GenerateToken("zombie");
+        GameObject zomb = mm.GenerateToken("zombie");
         zomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform); // move to MM.PutTile
-        mm.PutTile(zomb, col, bottomr);
+        //mm.PutTile(zomb, col, bottomr);
+        mm.hexGrid.RaiseTileBehavIntoColumn(zomb.GetComponent<TileBehav>(), cb.col);
     }
 
 	public void LightningPalm(){
