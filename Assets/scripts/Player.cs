@@ -64,7 +64,7 @@ public class Player {
 			amount = -1 * Mathf.Min (Mathf.Abs(amount), health); // prevent negative health
 		} else // healing
 			amount = Mathf.Min (amount, character.GetMaxHealth() - health);
-		Debug.Log ("PLAYER: " + name + " had health changed from " + health + " to " + (health + amount) + ".");
+		Debug.Log ("PLAYER: " + mm.GetOpponent(id).name + " dealt " + (-1*amount) + " damage; " + name + "'s health changed from " + health + " to " + (health + amount));
 		health += amount;
 		if (health == 0)
 			mm.EndTheGame ();

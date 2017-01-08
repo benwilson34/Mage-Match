@@ -57,7 +57,7 @@ public class TileBehav : MonoBehaviour {
 
 		yield return moveTween.WaitForCompletion ();
 //		MageMatch.DecAnimating ();
-		mm.BoardChanged (); //?
+		//mm.BoardChanged (); //?
 		StartCoroutine(Grav_Anim());
 	}
 
@@ -83,7 +83,7 @@ public class TileBehav : MonoBehaviour {
 		yield return tween.WaitForCompletion ();
 //		Debug.Log (transform.name + " is in position: (" + tile.col + ", " + tile.row + ")");
 //		if(vy < -.1f) // swapping sound fix - kinda sloppy
-			mm.audioCont.DropSound (this.GetComponent<AudioSource>());
+		mm.audioCont.DropSound (this.GetComponent<AudioSource>());
 		inPos = true;
 		mm.DecAnimating ();
 	}

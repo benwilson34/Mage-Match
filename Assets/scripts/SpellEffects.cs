@@ -75,7 +75,8 @@ public class SpellEffects {
         mm.GetOpponent(id).DealDamage(25);
     }
 	void HotBody_Match(int id){
-        // TODO test
+        // TODO still doesn't seem to function properly...seems to be whiffing at least once
+        // maybe it's enchanting part of the match??
 		List<TileBehav> tbs = hexGrid.GetPlacedTiles();
         for (int i = 0; i < tbs.Count; i++) {
             TileBehav tb = tbs[i];
@@ -86,10 +87,8 @@ public class SpellEffects {
         }
 		for (int i = 0; i < 3; i++) {
 			int rand = Random.Range (0, tbs.Count);
-            if (tbs[rand].HasEnchantment()) {
-                Ench_SetBurning(tbs[rand]);
-                tbs.RemoveAt(rand);
-            }
+            Ench_SetBurning(tbs[rand]);
+            tbs.RemoveAt(rand);
 		}
 	}
     void HotBody_End(int id) {

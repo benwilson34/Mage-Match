@@ -24,9 +24,27 @@ public class EventController {
     public event MatchEvent match;
 
     public void Match(int id, int count) {
-        Debug.Log("EVENTCONTROLLER: Match event raised, dispatching to " + turnChange.GetInvocationList().Length + " subscribers.");
-        if (match != null) // never will due to Stats
+        Debug.Log("EVENTCONTROLLER: Match event raised, dispatching to " + match.GetInvocationList().Length + " subscribers.");
+        if (match != null) // never will be due to Stats
             match.Invoke(id, count);
+    }
+
+    public delegate void CommishMatchEvent(int count);
+    public event CommishMatchEvent commishMatch;
+
+    public void CommishMatch(int count) {
+        Debug.Log("EVENTCONTROLLER: CommishMatch event raised, dispatching to " + commishMatch.GetInvocationList().Length + " subscribers.");
+        if (commishMatch != null) // never will be due to Stats
+            commishMatch.Invoke(count);
+    }
+
+    public delegate void BoardActionEvent();
+    public BoardActionEvent boardAction;
+
+    public void BoardAction() {
+        //Debug.Log("EVENTCONTROLLER: BoardAction event raised, dispatching to " + boardAction.GetInvocationList().Length + " subscribers.");
+        if (boardAction != null)
+            boardAction.Invoke();
     }
 
     public delegate void TurnChangeEvent(int id);
@@ -34,7 +52,7 @@ public class EventController {
 
     public void TurnChange(int id) {
         Debug.Log("EVENTCONTROLLER: TurnChange event raised, dispatching to " + turnChange.GetInvocationList().Length + " subscribers.");
-        if (turnChange != null) // never will due to Stats
+        if (turnChange != null) // never will be due to Stats
             turnChange.Invoke(id);
     }
 

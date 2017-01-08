@@ -19,8 +19,8 @@ public class HexGrid {
 
     public void HardSetTileBehavAt(TileBehav tb, int col, int row){
 		if (IsSlotFilled (col, row))
-			ClearTileBehavAt (col, row);
-		SetTileBehavAt (tb, col, row);
+            tileGrid[col, row] = null;
+        SetTileBehavAt (tb, col, row);
 	}
 
     public void RaiseTileBehavIntoColumn(TileBehav tb, int col) {
@@ -224,11 +224,16 @@ public class HexGrid {
 			for (int r = BottomOfColumn(c); r < TopOfColumn(c) && !skip; r++) { // for each row in the col
 				if (tileGrid [c, r] == null) { // if there's not something there...
 					for (int r2 = r + 1; r2 <= TopOfColumn(c); r2++) { // ...loop thru the cells above it until something is hit
-						if (tileGrid [c, r2] != null) {
-							tileGrid [c, r] = tileGrid [c, r2];
-							tileGrid [c, r2] = null;
-							tileGrid [c, r].ChangePos (r2, c, r, .01f);
-							break;
+                        if (tileGrid[c, r2] != null) {
+                            if (tileGrid[c, r2].ableGrav) {
+                                tileGrid[c, r] = tileGrid[c, r2];
+                                tileGrid[c, r2] = null;
+                                tileGrid[c, r].ChangePos(r2, c, r, .01f);
+                                break;
+                            } else { // TODO test with a floating tile
+                                r = r2;
+                                break;
+                            }
 						} else if (r2 == TopOfColumn(c)) { // catch empty column
 							skip = true;
 						}
