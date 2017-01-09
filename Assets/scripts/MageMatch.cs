@@ -59,18 +59,19 @@ public class MageMatch : MonoBehaviour {
 		endGame = false;
 
 		p1 = new Player (1);
-		p1.DrawTiles (3);
+		p1.DrawTiles (4);
 
 		p2 = new Player (2);
-		p2.DrawTiles (3);
+		p2.DrawTiles (4);
 
         commish = new Commish();
 
         currentState = GameState.PlayerTurn;
 		activep = p1;
 		InactiveP().FlipHand ();
+        uiCont.SetDrawButton(InactiveP(), false); // eh
 		activep.InitAP();
-		activep.DrawTiles (2);
+		activep.DrawTiles (1);
 
         eventCont = new EventController();
         stats = new Stats(p1, p2);
@@ -105,7 +106,7 @@ public class MageMatch : MonoBehaviour {
 				if (activep.AP == 0) {
 					StartCoroutine(TurnSystem());
 				}
-				uiCont.UpdatePlayerInfo(); // ditto here
+				uiCont.UpdatePlayerInfo(); // TODO don't call every frame!!!!!!
 				uiCont.UpdateCommishMeter();
 				break;
 
@@ -121,11 +122,11 @@ public class MageMatch : MonoBehaviour {
     public void OnBoardAction() {
         if (!checking) {
             Debug.Log("MAGEMATCH: About to check the board.");
-            StartCoroutine(BoardThang());
+            StartCoroutine(BoardChecking());
         }
     }
 
-    public IEnumerator BoardThang() {
+    public IEnumerator BoardChecking() {
         checking = true; // prevents overcalling/retriggering
         while (true) {
             yield return new WaitUntil(() => !menu && !IsTargetMode() && !IsAnimating());
@@ -148,8 +149,9 @@ public class MageMatch : MonoBehaviour {
 	IEnumerator TurnSystem(){
 		effectCont.ResolveEndTurnEffects ();
         eventCont.TurnChange(activep.id); //?
-		uiCont.UpdateTurnText ();
+		uiCont.UpdateMoveText ("Completed turns: " + stats.turns);
 		uiCont.DeactivateAllSpellButtons (activep);
+        uiCont.SetDrawButton(activep, false);
 		
 		currentState = GameState.CommishTurn;
 		yield return commish.CTurn(); // place 5 random tiles
@@ -159,12 +161,13 @@ public class MageMatch : MonoBehaviour {
 		activep = InactiveP ();
 		activep.InitAP ();
 		activep.FlipHand ();
-		uiCont.FlipGradient (); // ugly
-		activep.DrawTiles(2);
+        uiCont.SetDrawButton(activep, true);
+        uiCont.FlipGradient (); // ugly
+		activep.DrawTiles(1);
 		effectCont.ResolveBeginTurnEffects ();
 
 		SpellCheck ();
-        yield return new WaitUntil(() => !checking);
+        yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
 		currentState = GameState.PlayerTurn;
 	}
 
@@ -219,7 +222,22 @@ public class MageMatch : MonoBehaviour {
 		}
 		RemoveSeqList (seqList);
 	}
-		
+
+    public bool DrawTile() {
+        if (activep.IsHandFull()) {
+            uiCont.UpdateMoveText("Your hand is full!");
+            return false;
+        } else {
+            activep.AP--;
+            if (activep.AP == 0) {
+                activep.FlipHand();
+                uiCont.SetDrawButton(activep, false);
+            }
+            activep.DrawTiles(1);
+            return true;
+        }
+    }
+
 	public bool DropTile(int col){
 		if (DropTile(col, currentTile, .08f)) {
 			activep.hand.Remove (currentTile.GetComponent<TileBehav>()); // remove from hand
@@ -227,6 +245,7 @@ public class MageMatch : MonoBehaviour {
 			activep.AP--;
 			if (activep.AP == 0) {
 				activep.FlipHand ();
+                uiCont.SetDrawButton(activep, false);
 			}
 			return true;
 		} else
@@ -250,8 +269,10 @@ public class MageMatch : MonoBehaviour {
 		if (!IsCommishTurn ()) {
 			if (hexGrid.Swap (c1, r1, c2, r2)) {
 				activep.AP--;
-				if (activep.AP == 0)
-					activep.FlipHand ();
+                if (activep.AP == 0) {
+                    activep.FlipHand();
+                    uiCont.SetDrawButton(activep, false); 
+                }
 				audioCont.SwapSound ();
 			}
 		}

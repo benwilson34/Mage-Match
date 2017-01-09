@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// eventually, this will be where the output file stuff happens?
 public class Stats {
 
     public int turns = 0;
@@ -21,10 +22,11 @@ public class Stats {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         ps1 = new PlayerStat() { name = p1.name, character = p1.character.characterName };
         ps2 = new PlayerStat() { name = p2.name, character = p2.character.characterName };
-        // TODO init with mm.eventCont
+
         mm.eventCont.match += OnMatch;
         mm.eventCont.turnChange += OnTurnChange;
         mm.eventCont.commishMatch += OnCommishMatch;
+        mm.eventCont.spellCast += OnSpellCast;
     }
 
     public void OnMatch(int id, int count) {
@@ -48,6 +50,13 @@ public class Stats {
 
     public void OnCommishMatch(int count) {
         commishMatches += count;
+    }
+
+    public void OnSpellCast(int id, Spell spell) {
+        if (id == 1)
+            ps1.spellsCast++;
+        else
+            ps2.spellsCast++;
     }
 
 }

@@ -10,7 +10,7 @@ public class Player {
 	public int health;
 	public int AP;
 	public List<TileBehav> hand; // private
-	public int handSize = 5;
+	public int handSize = 7;
 	public int tilesPlaced, tilesSwapped, matches;
     public Character character;
 
@@ -71,7 +71,7 @@ public class Player {
 	}
 
 	public void DrawTiles(int numTiles){
-		for (int i = 0; i < numTiles && hand.Count < handSize; i++) {
+		for (int i = 0; i < numTiles && !IsHandFull(); i++) {
 			GameObject go = mm.GenerateTile (character.GetTileElement());
 			if (id == 1)
 				go.transform.position = new Vector3 (-5, 2);
@@ -84,7 +84,7 @@ public class Player {
 			hand.Add (tb);
 		}
 		mm.audioCont.PickupSound (mm.GetComponent<AudioSource> ());
-		AlignHand (.12f, true);
+		AlignHand (.1f, false);
 	}
 
 	public void AlignHand(float duration, bool linear){
@@ -98,15 +98,19 @@ public class Player {
 			tb = hand[i];
 //			Debug.Log ("AlignHand hand[" + i + "] = " + tb.transform.name + ", position is (" + handSlot.position.x + ", " + handSlot.position.y + ")");
 			if (id == 1) {
-				if (i < 3)
-					tween = tb.transform.DOMove (new Vector3 (handSlot.position.x - i, handSlot.position.y), dur, false);
-				else 
-					tween = tb.transform.DOMove (new Vector3 (handSlot.position.x - (i - 3) - .5f, handSlot.position.y - vert), dur, false);
-			} else {
-				if (i < 3)
-					tween = tb.transform.DOMove (new Vector3 (handSlot.position.x + i, handSlot.position.y), dur, false);
+                if (i < 2)
+                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x - i - .5f, handSlot.position.y + vert), dur, false);
+                else if (i < 5)
+                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x - (i - 2), handSlot.position.y), dur, false);
+                else
+                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x - (i - 5) - .5f, handSlot.position.y - vert), dur, false);
+            } else {
+                if(i < 2)
+                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x + i + .5f, handSlot.position.y + vert), dur, false);
+                else if (i < 5)
+					tween = tb.transform.DOMove (new Vector3 (handSlot.position.x + (i-2), handSlot.position.y), dur, false);
 				else
-					tween = tb.transform.DOMove (new Vector3 (handSlot.position.x + (i - 3) + .5f, handSlot.position.y - vert), dur, false);
+					tween = tb.transform.DOMove (new Vector3 (handSlot.position.x + (i - 5) + .5f, handSlot.position.y - vert), dur, false);
 			}
 			if (linear || i == hand.Count - 1)
 				yield return tween.WaitForCompletion ();
@@ -139,6 +143,8 @@ public class Player {
             hand.RemoveAt(0);
         }
     }
+
+    public bool IsHandFull() { return hand.Count == handSize; }
 
 	public void InitAP(){
 		AP = 3;

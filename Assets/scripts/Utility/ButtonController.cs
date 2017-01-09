@@ -24,4 +24,8 @@ public class ButtonController : MonoBehaviour {
         Debug.Log("BUTTONCONTROLLER: Targets cleared.");
         mm.targeting.ClearTargets();
     }
+
+    public void OnDrawButtonClick() {
+        mm.DrawTile();
+    }
 }

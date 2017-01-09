@@ -56,6 +56,13 @@ public class EventController {
             turnChange.Invoke(id);
     }
 
+    public delegate void SpellCastEvent(int id, Spell spell);
+    public event SpellCastEvent spellCast;
 
+    public void SpellCast(int id, Spell spell) {
+        if (spellCast != null) {
+            spellCast.Invoke(id, spell);
+        }
+    }
 
 }

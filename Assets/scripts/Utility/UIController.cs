@@ -6,7 +6,7 @@ using DG.Tweening;
 
 public class UIController : MonoBehaviour {
 
-	private Text moveText, turnText, debugGridText;
+	private Text moveText, debugGridText;
 	private MageMatch mm;
 	private Dropdown DD1, DD2;
 
@@ -24,7 +24,6 @@ public class UIController : MonoBehaviour {
 
 		moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
 		moveText.text = "";
-		turnText = GameObject.Find ("Text_Turns").GetComponent<Text> (); // UI turn counter
 		debugGridText = GameObject.Find ("Text_Debug1").GetComponent<Text> (); // UI debug grid
         p1info = GameObject.Find("Player1_Info").transform;
         p2info = GameObject.Find("Player2_Info").transform;
@@ -51,7 +50,6 @@ public class UIController : MonoBehaviour {
     }
 
     public void Reset(Player p1, Player p2) { // could just get players from MM
-        UpdateTurnText();
         UpdateDebugGrid();
         UpdateMoveText("");
 
@@ -81,10 +79,6 @@ public class UIController : MonoBehaviour {
 		debugGridText.text = grid;
 	}
 
-	public void UpdateTurnText(){
-		turnText.text = "Completed Turns: " + mm.stats.turns;
-	}
-
 	public void UpdateMoveText(string str){
 		moveText.text = str;
 	}
@@ -96,28 +90,26 @@ public class UIController : MonoBehaviour {
 
     public void UpdatePlayerInfo(Player player){
 		Transform pinfo;
-		if (player.id == 1) {
+		if (player.id == 1)
             pinfo = p1info;
-		} else {
+		else
             pinfo = p2info;
-		}
 
 		if (player.id == mm.ActiveP().id) {
 			pinfo.GetComponent<Image> ().color = new Color (0, 1, 0, .4f);
+            //pinfo.Find("Button_Draw").GetComponent<Button>().interactable = true;
 		} else {
 			pinfo.GetComponent<Image> ().color = new Color (1, 1, 1, .4f);
-		}
+            //pinfo.Find("Button_Draw").GetComponent<Button>().interactable = false;
+        }
 
-		// TODO not great
 		Text nameText    = pinfo.Find ("Text_Name").GetComponent<Text>();
-		//Text matchesText = pinfo.transform.Find ("Text_Matches").GetComponent<Text>();
 		Text p1APText    = pinfo.Find ("Text_AP").GetComponent<Text>();
 		Text healthText  = pinfo.Find ("Health_Outline").Find ("Text_Health").GetComponent<Text>();
 		Image healthBar  = pinfo.Find ("Health_Outline").Find("Healthbar").GetComponent<Image>();
 
 		nameText.text = "P" + player.id + " - " + player.name;
 		p1APText.text = "AP left: " + player.AP;
-        //matchesText.text = "Matches: " + player.matches;
 
         // health bar text and width
         int maxHealth = player.character.GetMaxHealth();
@@ -193,6 +185,13 @@ public class UIController : MonoBehaviour {
         targetingBG.SetActive(!targetingBG.activeSelf);
         tCancelB.SetActive(!tCancelB.activeSelf);
         tClearB.SetActive(!tClearB.activeSelf);
+    }
+
+    public void SetDrawButton(Player p, bool interactable) {
+        if (p.id == 1)
+            p1info.Find("Button_Draw").GetComponent<Button>().interactable = interactable;
+        else
+            p2info.Find("Button_Draw").GetComponent<Button>().interactable = interactable;
     }
 
     Button GetButton(Player player, int index){
