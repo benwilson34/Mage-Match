@@ -53,9 +53,14 @@ public class UIController : MonoBehaviour {
         UpdateDebugGrid();
         UpdateMoveText("");
 
+        Text nameText = p1info.Find("Text_Name").GetComponent<Text>();
+        nameText.text = "P" + p1.id + " - " + p1.name;
         ShowLoadout(p1);
-        ShowLoadout(p2);
         DeactivateAllSpellButtons(p1);
+
+        nameText = p2info.Find("Text_Name").GetComponent<Text>();
+        nameText.text = "P" + p2.id + " - " + p2.name;
+        ShowLoadout(p2);
         DeactivateAllSpellButtons(p2);
 
         settingsMenu.SetActive(mm.menu); //?
@@ -88,43 +93,49 @@ public class UIController : MonoBehaviour {
 		UpdatePlayerInfo (mm.InactiveP());
 	}
 
-    public void UpdatePlayerInfo(Player player){
+    public void UpdatePlayerInfo(Player p){
 		Transform pinfo;
-		if (player.id == 1)
+		if (p.id == 1)
             pinfo = p1info;
 		else
             pinfo = p2info;
 
-		if (player.id == mm.ActiveP().id) {
+		if (p.id == mm.ActiveP().id)
 			pinfo.GetComponent<Image> ().color = new Color (0, 1, 0, .4f);
-            //pinfo.Find("Button_Draw").GetComponent<Button>().interactable = true;
-		} else {
+		else
 			pinfo.GetComponent<Image> ().color = new Color (1, 1, 1, .4f);
-            //pinfo.Find("Button_Draw").GetComponent<Button>().interactable = false;
-        }
 
-		Text nameText    = pinfo.Find ("Text_Name").GetComponent<Text>();
-		Text p1APText    = pinfo.Find ("Text_AP").GetComponent<Text>();
-		Text healthText  = pinfo.Find ("Health_Outline").Find ("Text_Health").GetComponent<Text>();
-		Image healthBar  = pinfo.Find ("Health_Outline").Find("Healthbar").GetComponent<Image>();
+		Text APText = pinfo.Find ("Text_AP").GetComponent<Text>();
+		APText.text = "AP left: " + p.AP;
 
-		nameText.text = "P" + player.id + " - " + player.name;
-		p1APText.text = "AP left: " + player.AP;
-
-        // health bar text and width
-        int maxHealth = player.character.GetMaxHealth();
-		healthText.text = player.health + "/" + maxHealth;
-		Vector3 healthScale = healthBar.rectTransform.localScale;
-		float healthRatio = (float)player.health / (float)maxHealth;
-		healthScale.x = healthRatio;
-		healthBar.rectTransform.localScale = healthScale;
-
-		// health bar coloring; green -> yellow -> red
-		float thresh = .6f; // point where health bar is yellow (0.6 = 60% health)
-		float r = (((Mathf.Clamp(healthRatio, thresh, 1) - thresh)/(1 - thresh)) * -1 + 1);
-		float g = Mathf.Clamp(healthRatio, 0, thresh) / thresh;
-		healthBar.color = new Color (r, g, 0);
+        StartCoroutine(UpdateHealthbar(p, pinfo.Find("Health_Outline")));
+        StartCoroutine(UpdateMeterbar(p, pinfo.Find("Meter_Outline")));
 	}
+
+    IEnumerator UpdateHealthbar(Player p, Transform healthOutline) {
+        RectTransform healthbar = healthOutline.Find("Healthbar").GetComponent<RectTransform>();
+        Text healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
+        int maxHealth = p.character.GetMaxHealth();
+
+        healthText.text = p.health + "/" + maxHealth;
+        float slideRatio = (float)p.health / maxHealth;
+
+        // health bar coloring; green -> yellow -> red
+        float thresh = .6f; // point where health bar is yellow (0.6 = 60% health)
+        float r = (((Mathf.Clamp(slideRatio, thresh, 1) - thresh) / (1 - thresh)) * -1 + 1);
+        float g = Mathf.Clamp(slideRatio, 0, thresh) / thresh;
+        healthbar.GetComponent<Image>().color = new Color(r, g, 0);
+
+        yield return healthbar.DOScaleX(slideRatio, .4f);
+    }
+
+    IEnumerator UpdateMeterbar(Player p, Transform meterOutline) { // no args eventually?
+        RectTransform meter = meterOutline.Find("Meterbar").GetComponent<RectTransform>();
+        Text meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
+        meterText.text = p.character.meter + "/" + p.character.meterMax;
+        float slideRatio = (float) p.character.meter / p.character.meterMax;
+        yield return meter.DOScaleX(slideRatio, .8f);
+    }
 
 	public void ShowLoadout(Player player){
 		Transform pload;

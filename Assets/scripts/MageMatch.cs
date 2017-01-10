@@ -66,6 +66,9 @@ public class MageMatch : MonoBehaviour {
 
         commish = new Commish();
 
+        eventCont = new EventController();
+        eventCont.boardAction += OnBoardAction;
+
         currentState = GameState.PlayerTurn;
 		activep = p1;
 		InactiveP().FlipHand ();
@@ -73,9 +76,7 @@ public class MageMatch : MonoBehaviour {
 		activep.InitAP();
 		activep.DrawTiles (1);
 
-        eventCont = new EventController();
         stats = new Stats(p1, p2);
-        eventCont.boardAction += OnBoardAction;
 
         uiCont.Reset(p1, p2);
 	}
@@ -229,6 +230,7 @@ public class MageMatch : MonoBehaviour {
             return false;
         } else {
             activep.DrawTiles(1, false);
+            eventCont.Draw(activep.id);
             activep.AP--;
             if (activep.AP == 0) {
                 activep.FlipHand();

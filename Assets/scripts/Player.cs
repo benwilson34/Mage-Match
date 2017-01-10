@@ -54,6 +54,7 @@ public class Player {
 
 	public void DealDamage(int amount){
 		mm.GetOpponent (id).ChangeHealth (-amount);
+        character.ChangeMeter(amount / 3); // TODO tentative
 	}
 
 	public void ChangeHealth(int amount){ // TODO clamp instead?

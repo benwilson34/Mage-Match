@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class EventController {
 
+    public delegate void DrawEvent(int id); // add the tile they drew
+    public event DrawEvent draw;
+
+    public void Draw(int id) {
+        if (draw != null)
+            draw.Invoke(id);
+    }
+
     public delegate void DropEvent(int col);
     public event DropEvent drop;
 

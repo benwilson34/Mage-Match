@@ -11,7 +11,7 @@ public abstract class Character {
     protected SpellEffects spellfx;
     protected int dfire, dwater, dearth, dair, dmuscle; // portions of 100 total
     protected Spell[] spells;
-    protected int meter;
+    public int meter, meterMax = 100; // protected?
 
     public Character() { //?
         spellfx = new SpellEffects();
@@ -23,6 +23,11 @@ public abstract class Character {
         dearth = e;
         dair = a;
         dmuscle = m;
+    }
+
+    public void ChangeMeter(int amount) {
+        meter += amount;
+        meter = Mathf.Clamp(meter, 0, 100);
     }
 
     public int GetMaxHealth() { return maxHealth; }
