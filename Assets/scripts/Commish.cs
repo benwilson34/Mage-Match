@@ -5,7 +5,7 @@ public class Commish  {
 
 	private int mood = 0;
 	private MageMatch mm;
-    private bool activeEffects = false;
+    private bool activeEffects = true;
 
 	public Commish() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -13,12 +13,13 @@ public class Commish  {
 
 	public IEnumerator CTurn(){
         if (activeEffects) {
-            if (mood <= -100) {
+            if (mood == -100)
                 AngryDamage();
-            } else if (mood >= 100) {
+            else if (mood == 100)
                 HappyHealing();
-            } else
+            else
                 ChangeMood(-35);
+
         }
         yield return PlaceTiles();
 //		Debug.Log ("CTurn: done placing tiles.");
@@ -83,7 +84,7 @@ public class Commish  {
 
 	public void ChangeMood(int amount){
 		mood += amount;
-		Mathf.Clamp(mood, -100, 100);
+		mood = Mathf.Clamp(mood, -100, 100);
 	}
 	
 	public int GetMood(){
@@ -91,7 +92,7 @@ public class Commish  {
 	}
 	
 	public void AngryDamage(){
-		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
+        mm.uiCont.UpdateMoveText("The Commissioner is furious! Both players take 50 dmg and discard one tile!");
 		Player p = mm.InactiveP ();
 		p.ChangeHealth (-50);
 		p.DiscardRandom (1);
@@ -105,7 +106,7 @@ public class Commish  {
 	}
 	
 	public void HappyHealing(){
-		Debug.Log ("The Commissioner is pleased, and has decided to heal both players for 100!");
+        mm.uiCont.UpdateMoveText("The Commissioner is pleased, and has decided to heal both players for 100!");
 		mm.InactiveP ().ChangeHealth (100);
 		mm.InactiveP ().DrawTiles (1);
 

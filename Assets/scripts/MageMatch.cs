@@ -163,7 +163,7 @@ public class MageMatch : MonoBehaviour {
 		activep.FlipHand ();
         uiCont.SetDrawButton(activep, true);
         uiCont.FlipGradient (); // ugly
-		activep.DrawTiles(1);
+		activep.DrawTiles(1, false);
 		effectCont.ResolveBeginTurnEffects ();
 
 		SpellCheck ();
@@ -228,12 +228,12 @@ public class MageMatch : MonoBehaviour {
             uiCont.UpdateMoveText("Your hand is full!");
             return false;
         } else {
+            activep.DrawTiles(1, false);
             activep.AP--;
             if (activep.AP == 0) {
                 activep.FlipHand();
                 uiCont.SetDrawButton(activep, false);
             }
-            activep.DrawTiles(1);
             return true;
         }
     }

@@ -70,7 +70,12 @@ public class Player {
 			mm.EndTheGame ();
 	}
 
-	public void DrawTiles(int numTiles){
+    // TODO should this linear stuff be here anyway?
+    public void DrawTiles(int numTiles) {
+        DrawTiles(numTiles, true);
+    }
+
+	public void DrawTiles(int numTiles, bool linear){
 		for (int i = 0; i < numTiles && !IsHandFull(); i++) {
 			GameObject go = mm.GenerateTile (character.GetTileElement());
 			if (id == 1)
@@ -84,7 +89,7 @@ public class Player {
 			hand.Add (tb);
 		}
 		mm.audioCont.PickupSound (mm.GetComponent<AudioSource> ());
-		AlignHand (.1f, false);
+		AlignHand (.1f, linear);
 	}
 
 	public void AlignHand(float duration, bool linear){
