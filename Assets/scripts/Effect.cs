@@ -64,7 +64,7 @@ public class Enchantment : Effect {
 
     public delegate void MyTileEffect(int id, TileBehav tb);
 
-    public enum EnchType { None, Cherrybomb, Burning, Zombify, ZombieTok }
+    public enum EnchType { None, Cherrybomb, Burning, Zombify, ZombieTok, StoneTok }
     public EnchType type = EnchType.None; // private?
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;

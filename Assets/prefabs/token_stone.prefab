@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4000012429547778}
   - component: {fileID: 212000012009928186}
   - component: {fileID: 58000012777136104}
-  - component: {fileID: 114000014273905814}
+  - component: {fileID: 114958436545665636}
   - component: {fileID: 82000013909829994}
   m_Layer: 0
   m_Name: token_stone
@@ -137,7 +137,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
---- !u!114 &114000014273905814
+--- !u!114 &114958436545665636
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -145,12 +145,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1000012655875964}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 924ab45f123053b4fa06dffc1c92c199, type: 3}
+  m_Script: {fileID: 11500000, guid: dfe967f71d55a02488dbd46b2bdf1c9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 0
-  initElement: 3
-  flipSprite: {fileID: 21300014, guid: 2b6ea0b184347d54c9567aa5402a8149, type: 3}
+  currentState: 2
+  initElement: 0
+  flipSprite: {fileID: 0}
   ableSwap: 0
   ableMatch: 0
   ableGrav: 1

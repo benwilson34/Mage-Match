@@ -19,6 +19,7 @@ public class MageMatch : MonoBehaviour {
 	private bool endGame = false;     // is either player dead?
 	private int animating = 0;        // is something animating?
     private bool checking = false;
+    bool turnSwitching = false;
 
     public BoardCheck boardCheck;
     public HexGrid hexGrid;
@@ -104,11 +105,11 @@ public class MageMatch : MonoBehaviour {
 			//	break;
 
 			case GameState.PlayerTurn:
-				if (activep.AP == 0) {
+				if (activep.AP == 0 && !turnSwitching) {
 					StartCoroutine(TurnSystem());
 				}
 				uiCont.UpdatePlayerInfo(); // TODO don't call every frame!!!!!!
-				uiCont.UpdateCommishMeter();
+				uiCont.UpdateCommishMeter(); // same here kinda
 				break;
 
 			case GameState.CommishTurn:
@@ -130,9 +131,12 @@ public class MageMatch : MonoBehaviour {
     public IEnumerator BoardChecking() {
         checking = true; // prevents overcalling/retriggering
         while (true) {
+            Debug.Log("boardcheck point 1");
             yield return new WaitUntil(() => !menu && !IsTargetMode() && !IsAnimating());
+            Debug.Log("boardcheck point 2");
             hexGrid.CheckGrav(); // TODO! move into v(that)v?
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
+            Debug.Log("boardcheck point 3");
             List<TileSeq> seqMatches = boardCheck.MatchCheck();
             if (seqMatches.Count > 0) { // if there's at least one MATCH
                 ResolveMatchEffects(seqMatches);
@@ -148,6 +152,8 @@ public class MageMatch : MonoBehaviour {
     }
 
 	IEnumerator TurnSystem(){
+        turnSwitching = true;
+        yield return new WaitUntil(() => !checking);
 		effectCont.ResolveEndTurnEffects ();
         eventCont.TurnChange(activep.id); //?
 		uiCont.UpdateMoveText ("Completed turns: " + stats.turns);
@@ -170,6 +176,7 @@ public class MageMatch : MonoBehaviour {
 		SpellCheck ();
         yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
 		currentState = GameState.PlayerTurn;
+        turnSwitching = false;
 	}
 
 	void SpellCheck(){ // TODO clean up
@@ -402,18 +409,18 @@ public class MageMatch : MonoBehaviour {
 		for (int i = 0; i < seq.sequence.Count;) {
 			tile = seq.sequence [0];
 			if (hexGrid.IsSlotFilled (tile.col, tile.row))
-				RemoveTile (tile, false, true);
+				RemoveTile (tile, true);
 			else
 				Debug.Log ("RemoveSeq(): The tile at (" + tile.col + ", " + tile.row + ") is already gone.");
 			seq.sequence.Remove (tile);
 		}
 	}
 
-	public void RemoveTile(Tile tile, bool checkGrav, bool resolveEnchant){
-		RemoveTile(tile.col, tile.row, checkGrav, resolveEnchant);
+	public void RemoveTile(Tile tile, bool resolveEnchant){
+		RemoveTile(tile.col, tile.row, resolveEnchant);
 	}
 
-    public void RemoveTile(int col, int row, bool checkGrav, bool resolveEnchant) {
+    public void RemoveTile(int col, int row, bool resolveEnchant) {
         //		Debug.Log ("Removing (" + col + ", " + row + ")");
         TileBehav tb = hexGrid.GetTileBehavAt(col, row);
         if (tb.HasEnchantment()) {
@@ -424,10 +431,10 @@ public class MageMatch : MonoBehaviour {
             tb.ClearEnchantment(); // TODO
         }
 
-		StartCoroutine (Remove_Anim (col, row, tb, true)); // FIXME hardcode
+		StartCoroutine (Remove_Anim (col, row, tb)); // FIXME hardcode
 	}
 
-	IEnumerator Remove_Anim(int col, int row, TileBehav tb, bool checkGrav){
+	IEnumerator Remove_Anim(int col, int row, TileBehav tb){
 		animating++;
 		Tween swellTween = tb.transform.DOScale (new Vector3 (1.25f, 1.25f), .15f);
 		tb.GetComponent<SpriteRenderer> ().DOColor (new Color (0, 1, 0, 0), .15f);
@@ -439,9 +446,9 @@ public class MageMatch : MonoBehaviour {
 		Destroy (tb.gameObject);
 		hexGrid.ClearTileBehavAt(col, row);
 
-		if(checkGrav){
-			BoardChanged ();
-		}
+        eventCont.TileRemove(activep.id, tb); //? not needed for checking but idk
+        
+		BoardChanged ();
 	}
 
 	public void BoardChanged(){

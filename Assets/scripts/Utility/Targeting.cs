@@ -101,7 +101,7 @@ public class Targeting {
 		targets = targetsLeft = count;
         targetCBs = new List<CellBehav>();
 		CBtargetEffect = targetEffect;
-		Debug.Log ("targets = " + targetsLeft);
+		//Debug.Log ("targets = " + targetsLeft);
 
         mm.StartCoroutine(TargetingScreen());
     }
@@ -111,7 +111,7 @@ public class Targeting {
 
 	public void OnCBTarget(CellBehav cb){
 		//DecTargets ();
-		Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
+		//Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
 
         foreach (CellBehav ccb in targetCBs) // prevent targeting a tile that's already targeted
             if (ccb.HasSamePos(cb))
@@ -188,6 +188,8 @@ public class Targeting {
         currentTMode = TargetMode.Tile; // needed?
 		outlines = null; // memory leak?
         //targetTBs = null?
+
+        mm.currentState = MageMatch.GameState.PlayerTurn;
 	}
 
 	void HandleTargets(){

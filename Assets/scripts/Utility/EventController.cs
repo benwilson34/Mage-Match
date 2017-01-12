@@ -55,6 +55,14 @@ public class EventController {
             boardAction.Invoke();
     }
 
+    public delegate void TileRemoveEvent(int id, TileBehav tb);
+    public event TileRemoveEvent tileRemove;
+
+    public void TileRemove(int id, TileBehav tb) {
+        if (tileRemove != null)
+            tileRemove.Invoke(id, tb);
+    }
+
     public delegate void TurnChangeEvent(int id);
     public event TurnChangeEvent turnChange;
 

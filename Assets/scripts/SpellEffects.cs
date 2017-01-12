@@ -20,6 +20,8 @@ public class SpellEffects {
 		mm.InactiveP ().ChangeHealth (-496);
 	}
 
+    // ----- Enfuego Martin -----
+
 	public void WhiteHotComboKick(){
 		targeting.WaitForTileTarget (3, WHCK_Target);
 	}
@@ -48,7 +50,7 @@ public class SpellEffects {
 			mm.InactiveP().DiscardRandom(1);
 		}
 		
-		mm.RemoveTile (tb.tile, true, true);
+		mm.RemoveTile (tb.tile, true);
 	}
 
 	// PLACEHOLDER
@@ -134,6 +136,8 @@ public class SpellEffects {
 			Ench_SetBurning (tb);
 	}
 
+    // ----- The Gravekeeper -----
+
     public void ZombieSynergy() {
         int count = 0;
         List<TileBehav> tbs = hexGrid.GetPlacedTiles();
@@ -197,6 +201,8 @@ public class SpellEffects {
         mm.hexGrid.RaiseTileBehavIntoColumn(zomb.GetComponent<TileBehav>(), cb.col);
     }
 
+    // ----- 
+
 	public void LightningPalm(){
         targeting.WaitForTileTarget(1, LightningPalm_Target);
 	}
@@ -206,7 +212,7 @@ public class SpellEffects {
 		for (int i = 0; i < tileList.Count; i++) {
 			tile = tileList [i].tile;
 			if (tile.element.Equals (tb.tile.element)) {
-				mm.RemoveTile(tile, true, true);
+				mm.RemoveTile(tile, true);
 				mm.InactiveP ().ChangeHealth (-15);
 			}
 		}
@@ -244,7 +250,7 @@ public class SpellEffects {
 			if (hexGrid.IsSlotFilled (col, row)) {
 				Tile t = hexGrid.GetTileAt (col, row);
 				if (!t.element.Equals (Tile.Element.Earth)) {
-					mm.RemoveTile (t, true, true);
+					mm.RemoveTile (t, true);
 					dmg -= 15;
 				}
 			}
@@ -301,7 +307,7 @@ public class SpellEffects {
 		List<TileBehav> tbs = hexGrid.GetSmallAreaTiles (tb.tile.col, tb.tile.row);
 		foreach(TileBehav ctb in tbs){
 			if (ctb.ableDestroy)
-				mm.RemoveTile (ctb.tile.col, ctb.tile.row, false, true);
+				mm.RemoveTile (ctb.tile.col, ctb.tile.row, true);
 		}
 	}
 
@@ -345,7 +351,7 @@ public class SpellEffects {
                     if (!ctb.HasEnchantment() || 
                         (ctb.GetEnchType() != Enchantment.EnchType.Zombify &&
                         ctb.GetEnchType() != Enchantment.EnchType.ZombieTok)) {
-                        mm.RemoveTile(ctb.tile, true, true);
+                        mm.RemoveTile(ctb.tile, true);
                         mm.GetPlayer(id).DealDamage(10);
                         mm.GetPlayer(id).ChangeHealth(10);
                     }
@@ -369,6 +375,23 @@ public class SpellEffects {
     void Ench_ZombieTok_Turn(int id, TileBehav tb) {
         Ench_Zombify_Turn(id, tb);
         Ench_Zombify_Turn(id, tb);
+    }
+
+    public void Ench_SetStoneTok(TileBehav tb) {
+        Enchantment ench = new Enchantment(Ench_StoneTok_Turn, Ench_StoneTok_End, null);
+        ench.SetTypeTier(Enchantment.EnchType.StoneTok, 3);
+        ench.priority = 4;
+        tb.SetEnchantment(ench);
+        mm.effectCont.AddEndTurnEffect(ench);
+    }
+    void Ench_StoneTok_Turn(int id, TileBehav tb) {
+        int c = tb.tile.col, r = tb.tile.row;
+        if (hexGrid.CellExists(c, r - 1) && hexGrid.IsSlotFilled(c, r - 1)) {
+            hexGrid.ClearTileBehavAt(c, r - 1);
+        }
+    }
+    void Ench_StoneTok_End(int id, TileBehav tb) {
+        mm.RemoveTile(tb.tile, false);
     }
 
 }

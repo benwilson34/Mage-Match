@@ -31,7 +31,7 @@ public class HexGrid {
             if (IsSlotFilled(col, r)) {
                 if (r == top) {
                     // TODO handle top of column getting pushed out
-                    mm.RemoveTile(col, r, false, false);
+                    mm.RemoveTile(col, r, false);
                     continue;
                 }
                 //tileGrid[col, r + 1] = tileGrid[col, r];

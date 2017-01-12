@@ -13,7 +13,7 @@ public class Stats {
     struct PlayerStat {
         public string name;
         public string character;
-        public int draws, drops, swaps, matches, spellsCast;
+        public int draws, drops, swaps, matches, tilesRemoved, spellsCast;
     }
 
     private PlayerStat ps1, ps2;
@@ -29,6 +29,7 @@ public class Stats {
         mm.eventCont.commishMatch += OnCommishMatch;
         mm.eventCont.spellCast += OnSpellCast;
         mm.eventCont.draw += OnDraw;
+        mm.eventCont.tileRemove += OnTileRemove;
     }
 
     public void OnMatch(int id, int count) {
@@ -43,6 +44,13 @@ public class Stats {
             ps1.draws++;
         else
             ps2.draws++;
+    }
+
+    public void OnTileRemove(int id, TileBehav tb) {
+        if (id == 1)
+            ps1.tilesRemoved++;
+        else
+            ps2.tilesRemoved++;
     }
 
     //public void OnDrop(int id) {

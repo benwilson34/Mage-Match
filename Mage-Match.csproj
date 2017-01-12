@@ -115,6 +115,8 @@
     <Compile Include="Assets\scripts\Tile.cs" />
     <Compile Include="Assets\scripts\TileBehav.cs" />
     <Compile Include="Assets\scripts\TileSeq.cs" />
+    <Compile Include="Assets\scripts\Tokens\StoneToken.cs" />
+    <Compile Include="Assets\scripts\Tokens\ZombieToken.cs" />
     <Compile Include="Assets\scripts\Utility\AudioController.cs" />
     <Compile Include="Assets\scripts\Utility\BoardCheck.cs" />
     <Compile Include="Assets\scripts\Utility\ButtonController.cs" />
@@ -123,7 +125,6 @@
     <Compile Include="Assets\scripts\Utility\InputController.cs" />
     <Compile Include="Assets\scripts\Utility\Targeting.cs" />
     <Compile Include="Assets\scripts\Utility\UIController.cs" />
-    <Compile Include="Assets\scripts\ZombieToken.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Demigiant\DOTween\DOTween.XML" />

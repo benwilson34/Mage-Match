@@ -67,8 +67,8 @@ public class CharTest : Character {
 
         SetDeckElements(20, 20, 20, 20, 20);
 
-        spells[0] = new Spell("Cherrybomb", "FAM", 1, spellfx.Cherrybomb);
-        spells[1] = new Spell("None", "FMF", 1, spellfx.HumanResources);
+        spells[0] = new Spell("Cherrybomb", "FFA", 1, spellfx.Cherrybomb);
+        spells[1] = new Spell("Stalagmite", "FFA", 1, spellfx.Stalagmite);
         spells[2] = new Spell("Company Luncheon", "FAF", 1, spellfx.CompanyLuncheon);
         spells[3] = new Spell("Zombie Synergy", "AFA", 1, spellfx.ZombieSynergy);
     }

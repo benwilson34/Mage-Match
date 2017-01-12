@@ -51,7 +51,7 @@ public class UIController : MonoBehaviour {
 
     public void Reset(Player p1, Player p2) { // could just get players from MM
         UpdateDebugGrid();
-        UpdateMoveText("");
+        UpdateMoveText("Fight!!");
 
         Text nameText = p1info.Find("Text_Name").GetComponent<Text>();
         nameText.text = "P" + p1.id + " - " + p1.name;
@@ -276,7 +276,7 @@ public class UIController : MonoBehaviour {
             default: // none
                 break;
             case 1: // destroy tile
-                mm.RemoveTile(tb.tile, true, false); // FIXME will probably throw null reference exception
+                mm.RemoveTile(tb.tile, false); // FIXME will probably throw null reference exception
                 break;
             case 2: // clear enchant
                 tb.ClearEnchantment();
