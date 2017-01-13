@@ -37,6 +37,14 @@ public class EventController {
             match.Invoke(id, count);
     }
 
+    public delegate void CascadeEvent(int id, int chain);
+    public event CascadeEvent cascade;
+
+    public void Cascade(int id, int chain) {
+        if (cascade != null)
+            cascade.Invoke(id, chain);
+    }
+
     public delegate void CommishMatchEvent(int count);
     public event CommishMatchEvent commishMatch;
 

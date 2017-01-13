@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public abstract class Character {
 
     public string characterName;
-    public string techniqueName;
+    public string loadoutName;
 
     protected int maxHealth;
     protected SpellEffects spellfx;
@@ -62,7 +62,7 @@ public class CharTest : Character {
         spells = new Spell[4];
 
         characterName = "Sample";
-        techniqueName = "Test Loadout";
+        loadoutName = "Test Loadout";
         maxHealth = 1000;
 
         SetDeckElements(20, 20, 20, 20, 20);
@@ -88,7 +88,7 @@ public class Enfuego : Character {
     }
 
     void EnfuegoA() { // Enfuego A - Supah Hot Fire
-        techniqueName = "Supah Hot Fire";
+        loadoutName = "Supah Hot Fire";
         maxHealth = 1000;
 
         SetDeckElements(50, 0, 0, 20, 30);
@@ -101,7 +101,7 @@ public class Enfuego : Character {
 
     // FOCUS
     void EnfuegoB() { // Enfuego B - Hot Feet
-        techniqueName = "Hot Feet";
+        loadoutName = "Hot Feet";
         maxHealth = 1100;
 
         SetDeckElements(50, 0, 15, 0, 35);
@@ -130,7 +130,7 @@ public class Rocky : Character {
 
     // TODO
     void RockyA() { // Rocky A - Tectonic Titan 
-        techniqueName = "Tectonic Titan";
+        loadoutName = "Tectonic Titan";
         maxHealth = 1100;
 
         SetDeckElements(5, 0, 45, 30, 20);
@@ -143,7 +143,7 @@ public class Rocky : Character {
 
     // TODO
     void RockyB() { // Rocky B - Continental Champion
-        techniqueName = "Continental Champion";
+        loadoutName = "Continental Champion";
         maxHealth = 1300;
 
         SetDeckElements(0, 25, 40, 10, 25);
@@ -169,7 +169,7 @@ public class Gravekeeper : Character {
 
     // FOCUS
     void GravekeeperA() { // The Gravekeeper A - Business in the Front
-        techniqueName = "Business in the Front";
+        loadoutName = "Business in the Front";
         maxHealth = 1150;
 
         SetDeckElements(0, 20, 40, 0, 40);
@@ -181,7 +181,7 @@ public class Gravekeeper : Character {
     }
 
     void GravekeeperB() { // The Gravekeeper B - Party in the Back
-        techniqueName = "Party in the Back";
+        loadoutName = "Party in the Back";
         maxHealth = 1050;
 
         SetDeckElements(25, 0, 35, 0, 40);

@@ -144,7 +144,7 @@ public class UIController : MonoBehaviour {
         else
             pload = p2load;
 		Text loadoutText = pload.Find ("Text_LoadoutName").GetComponent<Text>();
-		loadoutText.text = player.character.characterName + " - " + player.character.techniqueName;
+		loadoutText.text = player.character.characterName + " - " + player.character.loadoutName;
 
 		for (int i = 0; i < 4; i++){
 			Transform t = pload.Find ("Button_Spell" + i);

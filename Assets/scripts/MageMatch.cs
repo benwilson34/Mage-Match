@@ -130,19 +130,23 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator BoardChecking() {
         checking = true; // prevents overcalling/retriggering
+        int cascade = 0;
         while (true) {
-            Debug.Log("boardcheck point 1");
             yield return new WaitUntil(() => !menu && !IsTargetMode() && !IsAnimating());
-            Debug.Log("boardcheck point 2");
             hexGrid.CheckGrav(); // TODO! move into v(that)v?
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
-            Debug.Log("boardcheck point 3");
             List<TileSeq> seqMatches = boardCheck.MatchCheck();
             if (seqMatches.Count > 0) { // if there's at least one MATCH
                 ResolveMatchEffects(seqMatches);
+                cascade++;
             } else {
-                if (currentState == GameState.PlayerTurn)
+                if (currentState == GameState.PlayerTurn) {
+                    if (cascade > 0) {
+                        uiCont.UpdateMoveText("Wow, a cascade of " + cascade + " matches!");
+                        eventCont.Cascade(activep.id, cascade);
+                    }
                     SpellCheck();
+                }
                 uiCont.UpdateDebugGrid();
                 break;
             }
@@ -386,7 +390,6 @@ public class MageMatch : MonoBehaviour {
 			if(currentState != GameState.TargetMode){ // kinda shitty
 				RemoveSeq (p.GetCurrentBoardSeq ());
 				p.ApplyAPCost();
-				//BoardChanged ();
 			}
 //			UIController.UpdateMoveText (activep.name + " casts " + spell.name + " for " + spell.APcost + " AP!!");
 			uiCont.UpdatePlayerInfo(); // move to BoardChecking handling??

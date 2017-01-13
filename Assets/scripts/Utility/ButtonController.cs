@@ -28,4 +28,8 @@ public class ButtonController : MonoBehaviour {
     public void OnDrawButtonClick() {
         mm.DrawTile();
     }
+
+    public void OnFileButtonClick() {
+        mm.stats.SaveCSV();
+    }
 }
