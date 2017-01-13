@@ -4,54 +4,10 @@ using UnityEngine;
 
 public class EventController {
 
-    public delegate void DrawEvent(int id); // add the tile they drew
-    public event DrawEvent draw;
+    MageMatch mm;
 
-    public void Draw(int id) {
-        if (draw != null)
-            draw.Invoke(id);
-    }
-
-    public delegate void DropEvent(int col);
-    public event DropEvent drop;
-
-    public void Drop(int col) {
-        if (drop != null)
-            drop.Invoke(col);
-    }
-
-    public delegate void SwapEvent(int c1, int r1, int c2, int r2);
-    public event SwapEvent swap;
-
-    public void Swap(int c1, int r1, int c2, int r2) {
-        if (swap != null)
-            swap.Invoke(c1, r1, c2, r2);
-    }
-
-    public delegate void MatchEvent(int id, int count);
-    public event MatchEvent match;
-
-    public void Match(int id, int count) {
-        Debug.Log("EVENTCONTROLLER: Match event raised, dispatching to " + match.GetInvocationList().Length + " subscribers.");
-        if (match != null) // never will be due to Stats
-            match.Invoke(id, count);
-    }
-
-    public delegate void CascadeEvent(int id, int chain);
-    public event CascadeEvent cascade;
-
-    public void Cascade(int id, int chain) {
-        if (cascade != null)
-            cascade.Invoke(id, chain);
-    }
-
-    public delegate void CommishMatchEvent(int count);
-    public event CommishMatchEvent commishMatch;
-
-    public void CommishMatch(int count) {
-        Debug.Log("EVENTCONTROLLER: CommishMatch event raised, dispatching to " + commishMatch.GetInvocationList().Length + " subscribers.");
-        if (commishMatch != null) // never will be due to Stats
-            commishMatch.Invoke(count);
+    public EventController(MageMatch mm) {
+        this.mm = mm;
     }
 
     public delegate void BoardActionEvent();
@@ -63,29 +19,77 @@ public class EventController {
             boardAction.Invoke();
     }
 
-    public delegate void TileRemoveEvent(int id, TileBehav tb);
-    public event TileRemoveEvent tileRemove;
-
-    public void TileRemove(int id, TileBehav tb) {
-        if (tileRemove != null)
-            tileRemove.Invoke(id, tb);
-    }
-
     public delegate void TurnChangeEvent(int id);
     public event TurnChangeEvent turnChange;
 
-    public void TurnChange(int id) {
-        Debug.Log("EVENTCONTROLLER: TurnChange event raised, dispatching to " + turnChange.GetInvocationList().Length + " subscribers.");
+    public void TurnChange() {
         if (turnChange != null) // never will be due to Stats
-            turnChange.Invoke(id);
+            turnChange.Invoke(mm.ActiveP().id);
+    }
+
+    public delegate void CommishMatchEvent(int count);
+    public event CommishMatchEvent commishMatch;
+
+    public void CommishMatch(int count) {
+        if (commishMatch != null) // never will be due to Stats
+            commishMatch.Invoke(count);
+    }
+
+    public delegate void DrawEvent(int id); // TODO add the tile they drew
+    public event DrawEvent draw;
+
+    public void Draw() {
+        if (draw != null)
+            draw.Invoke(mm.ActiveP().id);
+    }
+
+    public delegate void DropEvent(int id, int col);
+    public event DropEvent drop;
+
+    public void Drop(int col) {
+        if (drop != null)
+            drop.Invoke(mm.ActiveP().id, col);
+    }
+
+    public delegate void SwapEvent(int id, int c1, int r1, int c2, int r2);
+    public event SwapEvent swap;
+
+    public void Swap(int c1, int r1, int c2, int r2) {
+        if (swap != null)
+            swap.Invoke(mm.ActiveP().id, c1, r1, c2, r2);
+    }
+
+    public delegate void MatchEvent(int id, int count);
+    public event MatchEvent match;
+
+    public void Match(int count) {
+        Debug.Log("EVENTCONTROLLER: Match event raised, dispatching to " + match.GetInvocationList().Length + " subscribers.");
+        if (match != null) // never will be due to Stats
+            match.Invoke(mm.ActiveP().id, count);
+    }
+
+    public delegate void CascadeEvent(int id, int chain);
+    public event CascadeEvent cascade;
+
+    public void Cascade(int chain) {
+        if (cascade != null)
+            cascade.Invoke(mm.ActiveP().id, chain);
+    }
+
+    public delegate void TileRemoveEvent(int id, TileBehav tb);
+    public event TileRemoveEvent tileRemove;
+
+    public void TileRemove(TileBehav tb) {
+        if (tileRemove != null)
+            tileRemove.Invoke(mm.ActiveP().id, tb);
     }
 
     public delegate void SpellCastEvent(int id, Spell spell);
     public event SpellCastEvent spellCast;
 
-    public void SpellCast(int id, Spell spell) {
+    public void SpellCast(Spell spell) {
         if (spellCast != null) {
-            spellCast.Invoke(id, spell);
+            spellCast.Invoke(mm.ActiveP().id, spell);
         }
     }
 

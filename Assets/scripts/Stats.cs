@@ -36,14 +36,45 @@ public class Stats {
             loadout = p2.character.loadoutName
         };
 
-        // TODO reorder methods and subscriptions to make more sense (visually)
-        mm.eventCont.match += OnMatch;
         mm.eventCont.turnChange += OnTurnChange;
         mm.eventCont.commishMatch += OnCommishMatch;
-        mm.eventCont.spellCast += OnSpellCast;
+
         mm.eventCont.draw += OnDraw;
-        mm.eventCont.tileRemove += OnTileRemove;
+        mm.eventCont.drop += OnDrop;
+        mm.eventCont.swap += OnSwap;
+        mm.eventCont.match += OnMatch;
         mm.eventCont.cascade += OnCascade;
+        mm.eventCont.tileRemove += OnTileRemove;
+        mm.eventCont.spellCast += OnSpellCast;
+    }
+
+    public void OnTurnChange(int id) {
+        turns++;
+    }
+
+    public void OnCommishMatch(int count) {
+        commishMatches += count;
+    }
+
+    public void OnDraw(int id) {
+        if (id == 1)
+            ps1.draws++;
+        else
+            ps2.draws++;
+    }
+
+    public void OnDrop(int id, int col) {
+        if (id == 1)
+            ps1.drops++;
+        else
+            ps2.drops++;
+    }
+
+    public void OnSwap(int id, int c1, int r1, int c2, int r2) {
+        if (id == 1)
+            ps1.swaps++;
+        else
+            ps2.swaps++;
     }
 
     public void OnMatch(int id, int count) {
@@ -54,7 +85,7 @@ public class Stats {
     }
 
     public void OnCascade(int id, int chain) {
-        Debug.Log("STATS: OnCascade called. chain = " + chain);
+        //Debug.Log("STATS: OnCascade called. chain = " + chain);
         if (id == 1)
             OnCascade(ref ps1, chain);
         else
@@ -66,34 +97,11 @@ public class Stats {
             ps.longestCascade = chain;
     }
 
-    public void OnDraw(int id) {
-        if (id == 1)
-            ps1.draws++;
-        else
-            ps2.draws++;
-    }
-
     public void OnTileRemove(int id, TileBehav tb) {
         if (id == 1)
             ps1.tilesRemoved++;
         else
             ps2.tilesRemoved++;
-    }
-
-    //public void OnDrop(int id) {
-    //    if (id == 1)
-    //        ps1.drops++;
-    //    else
-    //        ps2.drops++;
-    //}
-
-    public void OnTurnChange(int id) {
-        turns++;
-        //Debug.Log("STATS: Turns incremented to " + turns);
-    }
-
-    public void OnCommishMatch(int count) {
-        commishMatches += count;
     }
 
     public void OnSpellCast(int id, Spell spell) {
@@ -105,34 +113,27 @@ public class Stats {
 
     public void SaveCSV() {
         DateTime dt = DateTime.Now;
-        string filePath = "MageMatchStats-" + dt.Year + "-" + dt.Month + "-" + dt.Day;
+        string filePath = "MageMatchStats_" + dt.Year + "-" + dt.Month + "-" + dt.Day;
+        filePath += "_" + dt.Hour + "-" + dt.Minute + "-" + dt.Second;
         filePath = @"/" + filePath + ".csv";
-        string delimiter = ",";
 
-        string[][] output = new string[][]{
-             new string[]{ "Turns complete", turns.ToString() },
-             new string[]{ "Commish matches", commishMatches.ToString() },
-             new string[]{ "" },
-             new string[]{ "Player 1" },
-             new string[]{ ps1.name, ps1.character, ps1.loadout },
-             new string[]{ "Matches", ps1.matches.ToString() },
-             new string[]{ "Cascades", ps1.cascades.ToString(), "...longest", ps1.longestCascade.ToString() },
-             new string[]{ "Spells cast", ps1.spellsCast.ToString() },
-             new string[]{ "Tiles drawn", ps1.draws.ToString() },
-             new string[]{ "Tiles removed", ps1.tilesRemoved.ToString() },
-             new string[]{ "" },
-             new string[]{ "Player 2" },
-             new string[]{ ps2.name, ps2.character, ps2.loadout },
-             new string[]{ "Matches", ps2.matches.ToString() },
-             new string[]{ "Cascades", ps2.cascades.ToString(), "...longest", ps2.longestCascade.ToString() },
-             new string[]{ "Spells cast", ps2.spellsCast.ToString() },
-             new string[]{ "Tiles drawn", ps2.draws.ToString() },
-             new string[]{ "Tiles removed", ps2.tilesRemoved.ToString() }
-         };
-        int length = output.GetLength(0);
         StringBuilder sb = new StringBuilder();
-        for (int index = 0; index < length; index++)
-            sb.AppendLine(string.Join(delimiter, output[index]));
+        sb.AppendLine("Turns complete," + turns);
+        sb.AppendLine("Commish matches," + commishMatches).AppendLine("");
+        for (int i = 1; i <= 2; i++) {
+            PlayerStat ps;
+            if (i == 1) ps = ps1;
+            else ps = ps2;
+            sb.AppendLine("Player " + i);
+            sb.AppendLine(ps.name + "," + ps.character + "," + ps.loadout);
+            sb.AppendLine("Tiles drawn," + ps.draws);
+            sb.AppendLine("Tiles dropped," + ps.drops);
+            sb.AppendLine("Tiles swapped," + ps.swaps);
+            sb.AppendLine("Matches," + ps.matches);
+            sb.AppendLine("Cascades," + ps.cascades + ",...longest," + ps.longestCascade);
+            sb.AppendLine("Tiles removed," + ps.tilesRemoved);
+            sb.AppendLine("Spells cast," + ps.spellsCast).AppendLine("");
+        }
 
         File.WriteAllText(filePath, sb.ToString());
     }

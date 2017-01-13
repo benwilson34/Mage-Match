@@ -168,7 +168,7 @@ public class Player {
 
 	public void ApplyAPCost(){
 		AP -= currentSpell.APcost;
-        mm.eventCont.SpellCast(id, currentSpell);
+        mm.eventCont.SpellCast(currentSpell);
 		if (AP == 0) // won't need once the event is set up
 			FlipHand ();
 	}

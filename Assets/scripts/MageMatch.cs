@@ -67,7 +67,7 @@ public class MageMatch : MonoBehaviour {
 
         commish = new Commish();
 
-        eventCont = new EventController();
+        eventCont = new EventController(this);
         eventCont.boardAction += OnBoardAction;
 
         currentState = GameState.PlayerTurn;
@@ -141,9 +141,9 @@ public class MageMatch : MonoBehaviour {
                 cascade++;
             } else {
                 if (currentState == GameState.PlayerTurn) {
-                    if (cascade > 0) {
+                    if (cascade > 1) {
                         uiCont.UpdateMoveText("Wow, a cascade of " + cascade + " matches!");
-                        eventCont.Cascade(activep.id, cascade);
+                        eventCont.Cascade(cascade);
                     }
                     SpellCheck();
                 }
@@ -159,7 +159,7 @@ public class MageMatch : MonoBehaviour {
         turnSwitching = true;
         yield return new WaitUntil(() => !checking);
 		effectCont.ResolveEndTurnEffects ();
-        eventCont.TurnChange(activep.id); //?
+        eventCont.TurnChange();
 		uiCont.UpdateMoveText ("Completed turns: " + stats.turns);
 		uiCont.DeactivateAllSpellButtons (activep);
         uiCont.SetDrawButton(activep, false);
@@ -215,7 +215,7 @@ public class MageMatch : MonoBehaviour {
 		Debug.Log("MAGEMATCH: At least one match: " + boardCheck.PrintSeqList(seqList));
 		for (int i = 0; i < seqList.Count; i++) {
             if (currentState != GameState.CommishTurn) {
-                eventCont.Match(activep.id, seqList.Count); // raise player Match event
+                eventCont.Match(seqList.Count); // raise player Match event
 		        activep.ResolveMatchEffect (); // match-based effects ->EventCont
 
                 if (seqList[i].GetSeqLength() == 3) {
@@ -241,7 +241,7 @@ public class MageMatch : MonoBehaviour {
             return false;
         } else {
             activep.DrawTiles(1, false);
-            eventCont.Draw(activep.id);
+            eventCont.Draw();
             activep.AP--;
             if (activep.AP == 0) {
                 activep.FlipHand();
@@ -281,10 +281,13 @@ public class MageMatch : MonoBehaviour {
 	public void SwapTiles(int c1, int r1, int c2, int r2){
 		if (!IsCommishTurn ()) {
 			if (hexGrid.Swap (c1, r1, c2, r2)) {
-				activep.AP--;
-                if (activep.AP == 0) {
-                    activep.FlipHand();
-                    uiCont.SetDrawButton(activep, false); 
+                if (!menu) {
+                    eventCont.Swap(c1, r1, c2, r2);
+                    activep.AP--;
+                    if (activep.AP == 0) {
+                        activep.FlipHand();
+                        uiCont.SetDrawButton(activep, false);
+                    }
                 }
 				audioCont.SwapSound ();
 			}
@@ -449,7 +452,7 @@ public class MageMatch : MonoBehaviour {
 		Destroy (tb.gameObject);
 		hexGrid.ClearTileBehavAt(col, row);
 
-        eventCont.TileRemove(activep.id, tb); //? not needed for checking but idk
+        eventCont.TileRemove(tb); //? not needed for checking but idk
         
 		BoardChanged ();
 	}

@@ -117,76 +117,81 @@ public class InputController : MonoBehaviour {
 
 	void TBMouseDown(TileBehav tb){
 		if (!mm.IsEnded () && !mm.IsCommishTurn()) { // if the game isn't done
-			if (!mm.menu) { // if the menu isn't open
-				switch(tb.currentState){
-				case TileBehav.TileState.Hand:
-					if (!targeting.IsTargetMode ()) {
-						parentT = tb.transform.parent;
-						tb.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-						// TODO
-						//tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
+			//if (!mm.menu) { // if the menu isn't open
+                switch (tb.currentState) {
+                    case TileBehav.TileState.Hand:
+                        if (!targeting.IsTargetMode() && !mm.menu) {
+                            parentT = tb.transform.parent;
+                            tb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
+                            // TODO
+                            //tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
 
-						mm.currentTile = tb.gameObject;
-						mm.audioCont.PickupSound (tb.gameObject.GetComponent<AudioSource> ());
-					}
-					break;
-				case TileBehav.TileState.Placed:
-//					Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
-					if (targeting.IsTargetMode ()
-//					    && Targeting.currentTMode == Targeting.TargetMode.Tile
-						) {
-						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
-						targeting.OnTBTarget (tb);
-//					} else if (IsTargetMode () && currentTMode == TargetMode.Drag){
+                            mm.currentTile = tb.gameObject;
+                            mm.audioCont.PickupSound(tb.gameObject.GetComponent<AudioSource>());
+                        }
+                        break;
+                    case TileBehav.TileState.Placed:
+//					    Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
+                        if (targeting.IsTargetMode()
+//					        && Targeting.currentTMode == Targeting.TargetMode.Tile
+                            ) {
+                            Debug.Log("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
+                            targeting.OnTBTarget(tb);
+//					    } else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
-					} else { // disable during targeting screen?
-						dragClick = Camera.main.WorldToScreenPoint (tb.transform.position);
-						dragged = true;
-					}
-					break;
-				}
-			} else { // menu mode
-                uiCont.GetClickEffect(tb);
-			}
+                        } else { // disable during targeting screen?
+                            dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+                            dragged = true;
+                        }
+                        break;
+                }
+			//} else { // menu mode
+                //uiCont.GetClickEffect(tb); //?
+			//}
 		}
 	}
 
 	void TBMouseDrag(TileBehav tb){
 //		Debug.Log ("TBMouseDrag called.");
-		if (!mm.IsEnded () && !mm.menu 
-			&& !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
+		if (!mm.IsEnded () && !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
 			switch (tb.currentState) {
-			case TileBehav.TileState.Hand:
-				Vector3 cursor = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-				cursor.z = 0;
-				tb.transform.position = cursor;
-				break;
-			case TileBehav.TileState.Placed:
-				SwapCheck (tb);
-				break;
+			    case TileBehav.TileState.Hand:
+                    if (!mm.menu) {
+                        Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        cursor.z = 0;
+                        tb.transform.position = cursor;
+                    }
+				    break;
+			    case TileBehav.TileState.Placed:
+				    SwapCheck (tb);
+				    break;
 			}
 		}
 	}
 
 	void TBMouseUp(TileBehav tb){
 //		Debug.Log ("TBMouseUp called.");
-		if (!mm.IsEnded () && !mm.menu 
-			&& !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
-			switch (tb.currentState) {
-			case TileBehav.TileState.Hand:
-				Vector3 mouse = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-				RaycastHit2D[] hits = Physics2D.LinecastAll (mouse, mouse);
+		if (!mm.IsEnded () && !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
+            if (!mm.menu) {
+                switch (tb.currentState) {
+                    case TileBehav.TileState.Hand:
+                        Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
 
-				CellBehav cb = GetMouseCell (hits);
-				if (cb != null) {
-					mm.DropTile (cb.col);
-				} else {
-					tb.transform.SetParent (parentT);
-					parentT = null;
-					mm.ActiveP().AlignHand (.12f, false);
-				}
-				break;
-			}
+                        CellBehav cb = GetMouseCell(hits);
+                        if (cb != null) {
+                            mm.DropTile(cb.col);
+                        } else {
+                            tb.transform.SetParent(parentT);
+                            parentT = null;
+                            mm.ActiveP().AlignHand(.12f, false);
+                        }
+                        break;
+                }
+            } else {
+                // TODO bool menuSwap
+                uiCont.GetClickEffect(tb);
+            }
 		}
 	}
 
