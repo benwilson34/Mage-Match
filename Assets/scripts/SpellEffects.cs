@@ -20,6 +20,16 @@ public class SpellEffects {
 		mm.InactiveP ().ChangeHealth (-496);
 	}
 
+    public void StoneTest() {
+        targeting.WaitForCellTarget(1, StoneTest_Target);
+    }
+    void StoneTest_Target(CellBehav cb) {
+        GameObject stone;
+        stone = mm.GenerateToken("stone");
+        stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
+        mm.DropTile(cb.col, stone, .08f);
+    }
+
     // ----- Enfuego Martin -----
 
 	public void WhiteHotComboKick(){
@@ -387,7 +397,7 @@ public class SpellEffects {
     void Ench_StoneTok_Turn(int id, TileBehav tb) {
         int c = tb.tile.col, r = tb.tile.row;
         if (hexGrid.CellExists(c, r - 1) && hexGrid.IsSlotFilled(c, r - 1)) {
-            hexGrid.ClearTileBehavAt(c, r - 1);
+            mm.RemoveTile(c, r - 1, false);
         }
     }
     void Ench_StoneTok_End(int id, TileBehav tb) {

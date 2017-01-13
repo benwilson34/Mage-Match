@@ -69,7 +69,7 @@ public class CharTest : Character {
 
         spells[0] = new Spell("Cherrybomb", "FFA", 1, spellfx.Cherrybomb);
         spells[1] = new Spell("Stalagmite", "FFA", 1, spellfx.Stalagmite);
-        spells[2] = new Spell("Company Luncheon", "FAF", 1, spellfx.CompanyLuncheon);
+        spells[2] = new Spell("Stone Test", "FAF", 1, spellfx.StoneTest);
         spells[3] = new Spell("Zombie Synergy", "AFA", 1, spellfx.ZombieSynergy);
     }
 }

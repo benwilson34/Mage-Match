@@ -158,7 +158,9 @@ public class MageMatch : MonoBehaviour {
 	IEnumerator TurnSystem(){
         turnSwitching = true;
         yield return new WaitUntil(() => !checking);
-		effectCont.ResolveEndTurnEffects ();
+        effectCont.ResolveEndTurnEffects ();
+        BoardChanged(); // why doesn't this happen when resolving turn effects?
+        yield return new WaitUntil(() => !checking);
         eventCont.TurnChange();
 		uiCont.UpdateMoveText ("Completed turns: " + stats.turns);
 		uiCont.DeactivateAllSpellButtons (activep);
