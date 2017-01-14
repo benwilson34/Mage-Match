@@ -30,6 +30,7 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void OnFileButtonClick() {
-        mm.stats.SaveCSV();
+        mm.stats.SaveStatsCSV();
+        mm.stats.SaveReportTXT();
     }
 }

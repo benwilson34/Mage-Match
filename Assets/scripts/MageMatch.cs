@@ -170,8 +170,9 @@ public class MageMatch : MonoBehaviour {
 		yield return commish.CTurn(); // place 5 random tiles
 		yield return new WaitUntil(() => animating == 0); // needed anymore?
 //		Debug.Log("MAGEMATCH: Commish turn done.");
-
 		activep = InactiveP ();
+        eventCont.CommishTurnDone(activep.id);
+
 		activep.InitAP ();
 		activep.FlipHand ();
         uiCont.SetDrawButton(activep, true);
@@ -283,8 +284,8 @@ public class MageMatch : MonoBehaviour {
 	public void SwapTiles(int c1, int r1, int c2, int r2){
 		if (!IsCommishTurn ()) {
 			if (hexGrid.Swap (c1, r1, c2, r2)) {
-                if (!menu) {
-                    eventCont.Swap(c1, r1, c2, r2);
+                eventCont.Swap(c1, r1, c2, r2);
+                if (!menu) { // move to stats?
                     activep.AP--;
                     if (activep.AP == 0) {
                         activep.FlipHand();

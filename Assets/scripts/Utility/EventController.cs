@@ -35,6 +35,14 @@ public class EventController {
             commishMatch.Invoke(count);
     }
 
+    public delegate void CommishTurnDoneEvent(int id);
+    public event CommishTurnDoneEvent commishTurnDone;
+
+    public void CommishTurnDone(int id) {
+        if (commishTurnDone != null) // never will be due to Stats
+            commishTurnDone.Invoke(id);
+    }
+
     public delegate void DrawEvent(int id); // TODO add the tile they drew
     public event DrawEvent draw;
 
@@ -63,7 +71,7 @@ public class EventController {
     public event MatchEvent match;
 
     public void Match(int count) {
-        Debug.Log("EVENTCONTROLLER: Match event raised, dispatching to " + match.GetInvocationList().Length + " subscribers.");
+        //Debug.Log("EVENTCONTROLLER: Match event raised, dispatching to " + match.GetInvocationList().Length + " subscribers.");
         if (match != null) // never will be due to Stats
             match.Invoke(mm.ActiveP().id, count);
     }

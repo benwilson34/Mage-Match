@@ -12,6 +12,7 @@ public class Stats {
     private int commishMatches;
 
     private MageMatch mm;
+    private StringBuilder report;
 
     struct PlayerStat {
         public string name;
@@ -36,8 +37,11 @@ public class Stats {
             loadout = p2.character.loadoutName
         };
 
+        InitReport();
+
         mm.eventCont.turnChange += OnTurnChange;
         mm.eventCont.commishMatch += OnCommishMatch;
+        mm.eventCont.commishTurnDone += OnCommishTurnDone;
 
         mm.eventCont.draw += OnDraw;
         mm.eventCont.drop += OnDrop;
@@ -48,15 +52,31 @@ public class Stats {
         mm.eventCont.spellCast += OnSpellCast;
     }
 
+    void InitReport() {
+        report = new StringBuilder();
+        report.Append(ps1.name + " (" + ps1.character + " - " + ps1.loadout + ") vs ");
+        report.AppendLine(ps2.name + " (" + ps2.character + " - " + ps2.loadout + ")");
+        int rand = UnityEngine.Random.state.GetHashCode(); //?
+        report.AppendLine("random seed - " + rand);
+        report.AppendLine("...setup - deal p1 4, deal p2 4");
+        report.AppendLine("T1 - deal p1 1");
+    }
+
     public void OnTurnChange(int id) {
         turns++;
+        report.AppendLine("\nC" + turns + " - ");
     }
 
     public void OnCommishMatch(int count) {
         commishMatches += count;
     }
 
+    public void OnCommishTurnDone(int id) {
+        report.AppendLine("\nT" + turns + " - deal p" + id + " 1");
+    }
+
     public void OnDraw(int id) {
+        report.AppendLine("Draw");
         if (id == 1)
             ps1.draws++;
         else
@@ -64,20 +84,31 @@ public class Stats {
     }
 
     public void OnDrop(int id, int col) {
-        if (id == 1)
-            ps1.drops++;
-        else
-            ps2.drops++;
+        if (!mm.menu) {
+            report.AppendLine("Drop col" + col);
+            if (!mm.IsCommishTurn()) {
+                if (id == 1)
+                    ps1.drops++;
+                else
+                    ps2.drops++;
+            }
+        } else
+            report.AppendLine("menu Drop col" + col);
     }
 
     public void OnSwap(int id, int c1, int r1, int c2, int r2) {
-        if (id == 1)
-            ps1.swaps++;
-        else
-            ps2.swaps++;
+        if (!mm.menu) {
+            report.AppendLine("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
+            if (id == 1)
+                ps1.swaps++;
+            else
+                ps2.swaps++;
+        } else
+            report.AppendLine("menu Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
     }
 
     public void OnMatch(int id, int count) {
+        report.AppendLine("...match");
         if (id == 1)
             ps1.matches += count;
         else
@@ -98,23 +129,26 @@ public class Stats {
     }
 
     public void OnTileRemove(int id, TileBehav tb) {
-        if (id == 1)
-            ps1.tilesRemoved++;
-        else
-            ps2.tilesRemoved++;
+        if (!mm.IsCommishTurn() && !mm.menu) {
+            if (id == 1)
+                ps1.tilesRemoved++;
+            else
+                ps2.tilesRemoved++;
+        }
     }
 
     public void OnSpellCast(int id, Spell spell) {
+        report.AppendLine("Spell " + spell.name);
         if (id == 1)
             ps1.spellsCast++;
         else
             ps2.spellsCast++;
     }
 
-    public void SaveCSV() {
+    public void SaveStatsCSV() {
         DateTime dt = DateTime.Now;
-        string filePath = "MageMatchStats_" + dt.Year + "-" + dt.Month + "-" + dt.Day;
-        filePath += "_" + dt.Hour + "-" + dt.Minute + "-" + dt.Second;
+        string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
+        filePath += dt.Hour + "-" + dt.Minute + "-" + dt.Second + "_Stats";
         filePath = @"/" + filePath + ".csv";
 
         StringBuilder sb = new StringBuilder();
@@ -136,6 +170,15 @@ public class Stats {
         }
 
         File.WriteAllText(filePath, sb.ToString());
+    }
+
+    public void SaveReportTXT() {
+        DateTime dt = DateTime.Now;
+        string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
+        filePath += dt.Hour + "-" + dt.Minute + "-" + dt.Second + "_Report";
+        filePath = @"/" + filePath + ".txt";
+
+        File.WriteAllText(filePath, report.ToString());
     }
 
 }
