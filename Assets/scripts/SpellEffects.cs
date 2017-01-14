@@ -388,7 +388,7 @@ public class SpellEffects {
     }
 
     public void Ench_SetStoneTok(TileBehav tb) {
-        Enchantment ench = new Enchantment(Ench_StoneTok_Turn, Ench_StoneTok_End, null);
+        Enchantment ench = new Enchantment(5, Ench_StoneTok_Turn, Ench_StoneTok_End, null);
         ench.SetTypeTier(Enchantment.EnchType.StoneTok, 3);
         ench.priority = 4;
         tb.SetEnchantment(ench);
