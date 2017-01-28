@@ -87,12 +87,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Mage-Match.Plugins.csproj">
-      <Project>{AB610701-DBD4-13BC-599F-41C7A40514EB}</Project>
-      <Name>Mage-Match.Plugins</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Assets\Demigiant\DOTween\Examples\Basics.cs" />
     <Compile Include="Assets\Demigiant\DOTween\Examples\Sequences.cs" />
     <Compile Include="Assets\Lobby\MyHook.cs" />
