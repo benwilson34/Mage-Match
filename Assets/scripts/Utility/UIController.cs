@@ -6,7 +6,7 @@ using DG.Tweening;
 
 public class UIController : MonoBehaviour {
 
-	private Text moveText, debugGridText;
+	private Text moveText, debugGridText, turnTimerText;
 	private MageMatch mm;
 	private Dropdown DD1, DD2;
 
@@ -14,7 +14,7 @@ public class UIController : MonoBehaviour {
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
-    private RectTransform moodMarker, moodMeter;
+    //private RectTransform moodMarker, moodMeter;
     private SpellEffects spellfx;
 
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
@@ -43,8 +43,10 @@ public class UIController : MonoBehaviour {
 
         settingsMenu = GameObject.Find("SettingsMenu");
 
-        moodMarker = GameObject.Find("MoodMarker").GetComponent<RectTransform>();
-        moodMeter = GameObject.Find("MoodMeter").GetComponent<RectTransform>();
+        //moodMarker = GameObject.Find("MoodMarker").GetComponent<RectTransform>();
+        //moodMeter = GameObject.Find("MoodMeter").GetComponent<RectTransform>();
+
+        turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
 
         spellfx = new SpellEffects();
     }
@@ -293,13 +295,17 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    public void UpdateCommishMeter(){
-		mm.StartAnim(SlideMoodMarker());
-	}
+    //   public void UpdateCommishMeter(){
+    //	mm.StartAnim(SlideMoodMarker());
+    //}
 
-	IEnumerator SlideMoodMarker(){
-		float slideRatio = (float)(mm.commish.GetMood() + 100) / 200f;
-		float meterwidth = moodMeter.rect.width;
-		yield return moodMarker.DOAnchorPosX(slideRatio * meterwidth, .4f, false);
-	}
+    //IEnumerator SlideMoodMarker(){
+    //	float slideRatio = (float)(mm.commish.GetMood() + 100) / 200f;
+    //	float meterwidth = moodMeter.rect.width;
+    //	yield return moodMarker.DOAnchorPosX(slideRatio * meterwidth, .4f, false);
+    //}
+
+    public void UpdateTurnTimer(float time) {
+        turnTimerText.text = time.ToString("0.0");
+    } 
 }

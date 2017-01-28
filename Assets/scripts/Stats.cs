@@ -18,7 +18,7 @@ public class Stats {
         public string name;
         public string character;
         public string loadout;
-        public int draws, drops, swaps, matches, cascades, tilesRemoved, spellsCast;
+        public int draws, drops, swaps, matches, cascades, tilesRemoved, spellsCast, timeouts;
         public int longestCascade;
     }
 
@@ -50,6 +50,7 @@ public class Stats {
         mm.eventCont.cascade += OnCascade;
         mm.eventCont.tileRemove += OnTileRemove;
         mm.eventCont.spellCast += OnSpellCast;
+        mm.eventCont.timeout += OnTimeout;
     }
 
     void InitReport() {
@@ -74,6 +75,7 @@ public class Stats {
     public void OnCommishTurnDone(int id) {
         report.AppendLine("\nT" + turns + " - deal p" + id + " 1");
     }
+
 
     public void OnDraw(int id) {
         report.AppendLine("Draw");
@@ -145,6 +147,14 @@ public class Stats {
             ps2.spellsCast++;
     }
 
+    public void OnTimeout(int id) {
+        report.AppendLine("...the turn timer timed out!");
+        if (id == 1)
+            ps1.timeouts++;
+        else
+            ps2.timeouts++;
+    }
+
     public void SaveStatsCSV() {
         DateTime dt = DateTime.Now;
         string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
@@ -166,7 +176,8 @@ public class Stats {
             sb.AppendLine("Matches," + ps.matches);
             sb.AppendLine("Cascades," + ps.cascades + ",...longest," + ps.longestCascade);
             sb.AppendLine("Tiles removed," + ps.tilesRemoved);
-            sb.AppendLine("Spells cast," + ps.spellsCast).AppendLine("");
+            sb.AppendLine("Spells cast," + ps.spellsCast);
+            sb.AppendLine("Turns timed out," + ps.timeouts).AppendLine("");
         }
 
         File.WriteAllText(filePath, sb.ToString());

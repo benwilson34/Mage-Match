@@ -27,6 +27,15 @@ public class EventController {
             turnChange.Invoke(mm.ActiveP().id);
     }
 
+    public delegate void TimeoutEvent(int id);
+    public event TimeoutEvent timeout;
+
+    public void Timeout() {
+        Debug.Log("EVENTCONTROLLER: Timeout event raised.");
+        if (timeout != null) // never will be due to Stats
+            timeout.Invoke(mm.ActiveP().id);
+    }
+
     public delegate void CommishMatchEvent(int count);
     public event CommishMatchEvent commishMatch;
 

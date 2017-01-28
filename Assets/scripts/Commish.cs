@@ -102,18 +102,18 @@ public class Commish  {
 		p.DiscardRandom (1);
 		
 		mood = 0;
-		mm.uiCont.UpdateCommishMeter ();
+		//mm.uiCont.UpdateCommishMeter ();
 	}
 	
 	public void HappyHealing(){
         mm.uiCont.UpdateMoveText("The Commissioner is pleased, and has decided to heal both players for 100!");
 		mm.InactiveP ().ChangeHealth (100);
-		mm.InactiveP ().DrawTiles (1);
+		//mm.InactiveP ().DrawTiles (1); // buggy
 
 		mm.ActiveP ().ChangeHealth (100);
-		mm.ActiveP ().DrawTiles (1);
+		//mm.ActiveP ().DrawTiles (1); // buggy
 		
 		mood = 0;
-		mm.uiCont.UpdateCommishMeter ();
+		//mm.uiCont.UpdateCommishMeter ();
 	}
 }

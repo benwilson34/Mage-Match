@@ -29,11 +29,13 @@ public class MageMatch : MonoBehaviour {
     public Targeting targeting;
     public Stats stats;
     public EventController eventCont;
+    public TurnTimer timer;
     // should SpellEffects instance be here?
 
 	void Start () {
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
+        timer = gameObject.GetComponent<TurnTimer>();
         effectCont = new EffectController();
         targeting = new Targeting();
         audioCont = new AudioController();
@@ -79,6 +81,7 @@ public class MageMatch : MonoBehaviour {
 
         stats = new Stats(p1, p2);
 
+        timer.InitTimer();
         uiCont.Reset(p1, p2);
 	}
 
@@ -109,7 +112,7 @@ public class MageMatch : MonoBehaviour {
 					StartCoroutine(TurnSystem());
 				}
 				uiCont.UpdatePlayerInfo(); // TODO don't call every frame!!!!!!
-				uiCont.UpdateCommishMeter(); // same here kinda
+				//uiCont.UpdateCommishMeter(); // same here kinda
 				break;
 
 			case GameState.CommishTurn:
@@ -157,6 +160,7 @@ public class MageMatch : MonoBehaviour {
 
 	IEnumerator TurnSystem(){
         turnSwitching = true;
+        timer.Pause();
         yield return new WaitUntil(() => !checking);
         effectCont.ResolveEndTurnEffects ();
         BoardChanged(); // why doesn't this happen when resolving turn effects?
@@ -183,6 +187,7 @@ public class MageMatch : MonoBehaviour {
 		SpellCheck ();
         yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
 		currentState = GameState.PlayerTurn;
+        timer.InitTimer();
         turnSwitching = false;
 	}
 
