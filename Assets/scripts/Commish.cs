@@ -1,35 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class Commish  {
+public class Commish  {
 
-	private static int mood = 0;
-	private static MageMatch mm;
-    private static bool active = false;
+	private int mood = 0;
+	private MageMatch mm;
+    private bool activeEffects = true;
 
-	public static void Init() {
+	public Commish() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 	}
 
-	public static IEnumerator CTurn(){
-        if (active) {
-            if (mood <= -100) {
+	public IEnumerator CTurn(){
+        if (activeEffects) {
+            if (mood == -100)
                 AngryDamage();
-            } else if (mood >= 100) {
+            else if (mood == 100)
                 HappyHealing();
-            } else
+            else
                 ChangeMood(-35);
 
-            yield return PlaceTiles();
-//		Debug.Log ("CTurn: done placing tiles.");
         }
+        yield return PlaceTiles();
+//		Debug.Log ("CTurn: done placing tiles.");
 	}
 
-	public static IEnumerator PlaceTiles(){
+	public IEnumerator PlaceTiles(){
 		int numTiles = 5;
 		int tries = 20;
 		float[] ratios;
-		yield return ratios = BoardCheck.EmptyCheck ();
+		yield return ratios = mm.boardCheck.EmptyCheck ();
 
 		GameObject go = mm.GenerateTile (GetTileElement());
 
@@ -55,7 +55,7 @@ public static class Commish  {
 		}
 	}
 
-	static Tile.Element GetTileElement (){
+	Tile.Element GetTileElement (){
 		int rand = Random.Range (0, 100);
 		if      (rand < 20)
 			return Tile.Element.Fire;
@@ -69,7 +69,7 @@ public static class Commish  {
 			return Tile.Element.Muscle;
 	}
 
-	static int GetSemiRandomCol(float[] ratios){
+	int GetSemiRandomCol(float[] ratios){
 		float val = Random.Range (0f, 1f);
 		//		Debug.Log ("GetSemiRandomCol: val = " + val);
 		float thresh = 0;
@@ -82,38 +82,38 @@ public static class Commish  {
 		return 6;
 	}
 
-	public static void ChangeMood(int amount){
+	public void ChangeMood(int amount){
 		mood += amount;
-		Mathf.Clamp(mood, -100, 100);
+		mood = Mathf.Clamp(mood, -100, 100);
 	}
 	
-	public static int GetMood(){
+	public int GetMood(){
 		return mood;
 	}
 	
-	public static void AngryDamage(){
-		Debug.Log ("The Commissioner is furious! He deals damage to both players and makes them discard one tile!");
-		Player p = MageMatch.InactiveP ();
+	public void AngryDamage(){
+        mm.uiCont.UpdateMoveText("The Commissioner is furious! Both players take 50 dmg and discard one tile!");
+		Player p = mm.InactiveP ();
 		p.ChangeHealth (-50);
 		p.DiscardRandom (1);
 
-		p = MageMatch.ActiveP();
+		p = mm.ActiveP();
 		p.ChangeHealth (-50);
 		p.DiscardRandom (1);
 		
 		mood = 0;
-		UIController.UpdateCommishMeter ();
+		//mm.uiCont.UpdateCommishMeter ();
 	}
 	
-	public static void HappyHealing(){
-		Debug.Log ("The Commissioner is pleased, and has decided to heal both players for 100!");
-		MageMatch.InactiveP ().ChangeHealth (100);
-		MageMatch.InactiveP ().DrawTiles (1);
+	public void HappyHealing(){
+        mm.uiCont.UpdateMoveText("The Commissioner is pleased, and has decided to heal both players for 100!");
+		mm.InactiveP ().ChangeHealth (100);
+		//mm.InactiveP ().DrawTiles (1); // buggy
 
-		MageMatch.ActiveP ().ChangeHealth (100);
-		MageMatch.ActiveP ().DrawTiles (1);
+		mm.ActiveP ().ChangeHealth (100);
+		//mm.ActiveP ().DrawTiles (1); // buggy
 		
 		mood = 0;
-		UIController.UpdateCommishMeter ();
+		//mm.uiCont.UpdateCommishMeter ();
 	}
 }

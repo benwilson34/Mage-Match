@@ -473,10 +473,16 @@ public class MageMatch : MonoBehaviour {
 
 	public void EndTheGame(){
 		endGame = true;
+<<<<<<< HEAD
+		UIController.UpdateMoveText ("Wow!! " + activep.pname + " has won!!");
+		UIController.DeactivateAllSpellButtons (p1);
+		UIController.DeactivateAllSpellButtons (p2);
+=======
 		uiCont.UpdateMoveText ("Wow!! " + activep.name + " has won!!");
         uiCont.DeactivateAllSpellButtons (p1);
         uiCont.DeactivateAllSpellButtons (p2);
         eventCont.boardAction -= OnBoardAction; //?
+>>>>>>> master
 	}
 
 	public bool IsEnded(){

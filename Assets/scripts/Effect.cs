@@ -6,14 +6,17 @@ public abstract class Effect {
 
     public delegate void MyEffect(int id); // move to TurnEffect?
 
+    protected MageMatch mm;
     protected int turnsLeft;
     protected int playerID;
+    public int priority; // protected eventually?
 
     public abstract void TriggerEffect();
     public abstract bool ResolveEffect();
     public abstract void EndEffect();
-    public abstract void CancelEffect();
-    public abstract int TurnsRemaining();
+    public virtual void CancelEffect() { }
+    public int TurnsRemaining() { return turnsLeft; }
+    //public void SetPriority(int p) { priority = p; }
 }
 
 public class TurnEffect : Effect {
@@ -22,7 +25,8 @@ public class TurnEffect : Effect {
 
     // TODO add infinite Constructor
     public TurnEffect(int turns, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect) {
-        playerID = MageMatch.ActiveP().id;
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = mm.ActiveP().id;
         turnsLeft = turns;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
@@ -54,26 +58,23 @@ public class TurnEffect : Effect {
         if (cancelEffect != null)
             cancelEffect(playerID);
     }
-
-    public override int TurnsRemaining() {
-        return turnsLeft;
-    }
 }
 
 public class Enchantment : Effect {
 
     public delegate void MyTileEffect(int id, TileBehav tb);
 
-    public enum EnchType { None, Cherrybomb, Burning, Zombify, ZombieTok }
+    public enum EnchType { None, Cherrybomb, Burning, Zombify, ZombieTok, StoneTok }
     public EnchType type = EnchType.None; // private?
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
     private bool skip = false;
-    private int tier;
+    public int tier;
 
     public Enchantment(MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
-        playerID = MageMatch.ActiveP().id;
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = mm.ActiveP().id;
         turnsLeft = -1;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
@@ -81,7 +82,8 @@ public class Enchantment : Effect {
     }
 
     public Enchantment(int turns, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
-        playerID = MageMatch.ActiveP().id;
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = mm.ActiveP().id;
         turnsLeft = turns;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
@@ -136,8 +138,38 @@ public class Enchantment : Effect {
             cancelEffect(playerID, enchantee);
     }
 
-    public override int TurnsRemaining() {
-        return turnsLeft;
+}
+
+public class MatchEffect : Effect {
+
+    private MyEffect matchEffect, endEffect;
+
+    public MatchEffect(int turns, MyEffect matchEffect, MyEffect endEffect) {
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = mm.ActiveP().id;
+        turnsLeft = turns;
+        this.matchEffect = matchEffect;
+        this.endEffect = endEffect;
     }
 
+    public override void TriggerEffect() {
+        if (matchEffect != null)
+            matchEffect(playerID);
+    }
+
+    public override bool ResolveEffect() {
+        TriggerEffect();
+        turnsLeft--;
+        if (turnsLeft != 0) {
+            return false;
+        } else {
+            EndEffect();
+            return true;
+        }
+    }
+
+    public override void EndEffect() {
+        if (endEffect != null)
+            endEffect(playerID);
+    }
 }

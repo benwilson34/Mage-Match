@@ -4,27 +4,43 @@ using System.Collections.Generic;
 
 public class SpellEffects {
 
-	private static MageMatch mm;
+	private MageMatch mm;
+    private Targeting targeting;
+    private HexGrid hexGrid;
 
-	public static void Init(){
+	public SpellEffects(){
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+        targeting = mm.targeting;
+        hexGrid = mm.hexGrid;
 	}
 
 	// -------------------------------------- SPELLS ---------------------------------------------
 
 	public void Deal496Dmg(){
-		MageMatch.InactiveP ().ChangeHealth (-496);
+		mm.InactiveP ().ChangeHealth (-496);
 	}
 
+    public void StoneTest() {
+        targeting.WaitForCellTarget(1, StoneTest_Target);
+    }
+    void StoneTest_Target(CellBehav cb) {
+        GameObject stone;
+        stone = mm.GenerateToken("stone");
+        stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
+        mm.DropTile(cb.col, stone, .08f);
+    }
+
+    // ----- Enfuego Martin -----
+
 	public void WhiteHotComboKick(){
-		Targeting.WaitForTileTarget (3, WHCK_Target);
+		targeting.WaitForTileTarget (3, WHCK_Target);
 	}
 	void WHCK_Target(TileBehav tb){
-		MageMatch.InactiveP ().ChangeHealth (-70);
+		mm.InactiveP ().ChangeHealth (-70);
 		
 		if (tb.tile.element.Equals (Tile.Element.Fire)){
 			// TODO spread Burning
-			List<TileBehav> tbs =  HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+			List<TileBehav> tbs =  hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
 			int burns = Mathf.Min (3, tbs.Count);
 			int tries = 10; // TODO generalize this form of randomization. see Commish spell also.
 			for (int i = 0; i < burns; i++) {
@@ -41,15 +57,15 @@ public class SpellEffects {
 					break;
 			}
 		} else if (tb.tile.element.Equals (Tile.Element.Muscle)) {
-			MageMatch.InactiveP().DiscardRandom(1);
+			mm.InactiveP().DiscardRandom(1);
 		}
 		
-		mm.RemoveTile (tb.tile, true, true);
+		mm.RemoveTile (tb.tile, true);
 	}
 
 	// PLACEHOLDER
 	public void Baila(){
-		Targeting.WaitForTileAreaTarget (true, Baila_Target);
+        targeting.WaitForTileAreaTarget (true, Baila_Target);
 	}
 	void Baila_Target(List<TileBehav> tbs){
         foreach(TileBehav tb in tbs)
@@ -63,63 +79,83 @@ public class SpellEffects {
 	
 	// TODO
 	public void HotBody(){
-		MageMatch.ActiveP().SetMatchEffect (3, Hotbody_Match);
+		mm.ActiveP().SetMatchEffect (new MatchEffect(3, HotBody_Match, HotBody_End));
+        mm.eventCont.turnChange += HotBody_OnTurnChange;
 	}
-	public void Hotbody_Match(){
-		// TODO threshold to prevent infinite loop
-		List<TileBehav> tbs = HexGrid.GetPlacedTiles();
+    public void HotBody_OnTurnChange(int id) {
+        mm.GetPlayer(id).DealDamage(25); // should just be ChangeHealth(-25)?
+        mm.GetOpponent(id).DealDamage(25);
+    }
+	void HotBody_Match(int id){
+        // TODO still doesn't seem to function properly...seems to be whiffing at least once
+        // maybe it's enchanting part of the match??
+		List<TileBehav> tbs = hexGrid.GetPlacedTiles();
+        for (int i = 0; i < tbs.Count; i++) {
+            TileBehav tb = tbs[i];
+            if (tb.HasEnchantment()) {
+                tbs.Remove(tb);
+                i--;
+            }
+        }
 		for (int i = 0; i < 3; i++) {
 			int rand = Random.Range (0, tbs.Count);
-			if (tbs[rand].HasEnchantment()) {
-				i--;
-			} else {
-				Ench_SetBurning (tbs [rand]);
-			}
+            Ench_SetBurning(tbs[rand]);
+            tbs.RemoveAt(rand);
 		}
 	}
+    void HotBody_End(int id) {
+        mm.eventCont.turnChange -= HotBody_OnTurnChange;
+    }
 
 	public void HotAndBothered(){
-		MageMatch.InactiveP ().ChangeBuff_DmgExtra (15);
-		MageMatch.endTurnEffects.Add( new TurnEffect (5, HAB_Turn, HAB_End, null));
+		mm.InactiveP ().ChangeBuff_DmgExtra (15);
+        TurnEffect t = new TurnEffect(5, HAB_Turn, HAB_End, null);
+        t.priority = 3;
+        mm.effectCont.AddEndTurnEffect(t);
 	}
 	void HAB_Turn(int id){
-		MageMatch.InactiveP ().ChangeBuff_DmgExtra (15); // technically not needed
+		mm.InactiveP ().ChangeBuff_DmgExtra (15); // technically not needed
 	}
 	void HAB_End(int id){
-		MageMatch.InactiveP ().ChangeBuff_DmgExtra (0); // reset
+		mm.InactiveP ().ChangeBuff_DmgExtra (0); // reset
 	}
 
 	public void Pivot(){
-        MageMatch.endTurnEffects.Add(new TurnEffect(1, null, Pivot_End, null));
-        MageMatch.ActiveP().SetMatchEffect(1, Pivot_Match);
+        TurnEffect t = new TurnEffect(1, null, Pivot_End, null);
+        t.priority = 3;
+        mm.effectCont.AddEndTurnEffect(t);
+
+        mm.ActiveP().SetMatchEffect(new MatchEffect(1, Pivot_Match, null));
     }
     void Pivot_End(int id) {
-        MageMatch.ActiveP().ClearMatchEffect();
+        mm.ActiveP().ClearMatchEffect();
     }
-	void Pivot_Match(){
-		MageMatch.ActiveP().AP++;
+	void Pivot_Match(int id){
+		mm.ActiveP().AP++;
 	}
 	
 	public void Incinerate(){
 		// TODO drag targeting
-		int burnCount = MageMatch.InactiveP().hand.Count * 2;
+		int burnCount = mm.InactiveP().hand.Count * 2;
 		Debug.Log ("SPELLFX: Incinerate burnCount = " + burnCount);
-		MageMatch.InactiveP().DiscardRandom (2);
-		Targeting.WaitForDragTarget (burnCount, Incinerate_Target);
+		mm.InactiveP().DiscardRandom (2);
+        targeting.WaitForDragTarget (burnCount, Incinerate_Target);
 	}
 	void Incinerate_Target(List<TileBehav> tbs){
 		foreach(TileBehav tb in tbs)
 			Ench_SetBurning (tb);
 	}
 
+    // ----- The Gravekeeper -----
+
     public void ZombieSynergy() {
         int count = 0;
-        List<TileBehav> tbs = HexGrid.GetPlacedTiles();
+        List<TileBehav> tbs = hexGrid.GetPlacedTiles();
         foreach (TileBehav tb in tbs) {
             if (tb.HasEnchantment() && 
                 (tb.GetEnchType() == Enchantment.EnchType.Zombify ||
                 tb.GetEnchType() == Enchantment.EnchType.ZombieTok)) {
-                List<TileBehav> adjTBs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+                List<TileBehav> adjTBs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 foreach (TileBehav adjTB in adjTBs) {
                     if (adjTB.HasEnchantment() && 
                         (adjTB.GetEnchType() == Enchantment.EnchType.Zombify ||
@@ -130,11 +166,11 @@ public class SpellEffects {
             }
         }
         Debug.Log("SPELLEFFECTS: Zombie Synergy has counted " + count + " adjacent zombs");
-        MageMatch.ActiveP().DealDamage(count * 4);
+        mm.ActiveP().DealDamage(count * 4);
     }
 
     public void HumanResources() {
-        Targeting.WaitForTileAreaTarget(false, HumanResources_Target);
+        targeting.WaitForTileAreaTarget(false, HumanResources_Target);
     }
     void HumanResources_Target(List<TileBehav> tbs) {
         foreach (TileBehav tb in tbs) {
@@ -147,7 +183,7 @@ public class SpellEffects {
     }
 
     public void CompanyLuncheon() {
-        Targeting.WaitForTileAreaTarget(false, CompanyLuncheon_Target);
+        targeting.WaitForTileAreaTarget(false, CompanyLuncheon_Target);
     }
     void CompanyLuncheon_Target(List<TileBehav> tbs) {
         for (int i = 0; i < tbs.Count; i++) {
@@ -164,68 +200,72 @@ public class SpellEffects {
     }
 
     public void RaiseZombie() {
-        Targeting.WaitForCellTarget(1, RaiseZombie_Target);
+        targeting.WaitForCellTarget(1, RaiseZombie_Target);
     }
     void RaiseZombie_Target(CellBehav cb) {
         // TODO eventually HexGrid.RaiseColumn()
         // hardset bottom cell
-        int col = cb.col;
-        int bottomr = HexGrid.BottomOfColumn(col);
-        GameObject zomb;
-        zomb = mm.GenerateToken("zombie");
+        GameObject zomb = mm.GenerateToken("zombie");
         zomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform); // move to MM.PutTile
-        MageMatch.PutTile(zomb, col, bottomr);
+        //mm.PutTile(zomb, col, bottomr);
+        mm.hexGrid.RaiseTileBehavIntoColumn(zomb.GetComponent<TileBehav>(), cb.col);
     }
 
+    // ----- 
+
 	public void LightningPalm(){
-		Targeting.WaitForTileTarget(1, LightningPalm_Target);
+        targeting.WaitForTileTarget(1, LightningPalm_Target);
 	}
 	void LightningPalm_Target(TileBehav tb){
-		List<TileBehav> tileList = HexGrid.GetPlacedTiles ();
+		List<TileBehav> tileList = hexGrid.GetPlacedTiles ();
 		Tile tile;
 		for (int i = 0; i < tileList.Count; i++) {
 			tile = tileList [i].tile;
 			if (tile.element.Equals (tb.tile.element)) {
-				mm.RemoveTile(tile, true, true);
-				MageMatch.InactiveP ().ChangeHealth (-15);
+				mm.RemoveTile(tile, true);
+				mm.InactiveP ().ChangeHealth (-15);
 			}
 		}
 	}
 
 	public void CaughtYouMirin(){
-		MageMatch.ActiveP().ChangeBuff_DmgMult (.5f); // 50% damage multiplier
-		MageMatch.endTurnEffects.Add( new TurnEffect (4, CaughtYouMirin_Turn, CaughtYouMirin_End, null));
+		mm.ActiveP().ChangeBuff_DmgMult (.5f); // 50% damage multiplier
+        TurnEffect t = new TurnEffect(4, CaughtYouMirin_Turn, CaughtYouMirin_End, null);
+        t.priority = 3;
+        mm.effectCont.AddEndTurnEffect(t);
 	}
 	void CaughtYouMirin_Turn(int id){ // technically this isn't needed
-		MageMatch.GetPlayer(id).ChangeBuff_DmgMult (.5f); // 50% damage multiplier
+		mm.GetPlayer(id).ChangeBuff_DmgMult (.5f); // 50% damage multiplier
 	}
 	void CaughtYouMirin_End(int id){
-		MageMatch.GetPlayer(id).ChangeBuff_DmgMult (1f); // reset back to 100% dmg
+		mm.GetPlayer(id).ChangeBuff_DmgMult (1f); // reset back to 100% dmg
 	}
 
 	public void Cherrybomb(){
-		Targeting.WaitForTileTarget(1, Cherrybomb_Target);
+        targeting.WaitForTileTarget(1, Cherrybomb_Target);
 	}
 	void Cherrybomb_Target(TileBehav tb){
 		Ench_SetCherrybomb(tb);
 	}
 
 	public void Magnitude10(){
-		MageMatch.endTurnEffects.Add (new TurnEffect (3, Magnitude10_Turn, Magnitude10_End, null));
+        TurnEffect t = new TurnEffect(3, Magnitude10_Turn, Magnitude10_End, null);
+        t.priority = 4;
+        mm.effectCont.AddEndTurnEffect (t);
 	}
 	void Magnitude10_Turn(int id){
 		int dmg = 0;
 		for (int col = 0; col < 7; col++) {
-			int row = HexGrid.BottomOfColumn (col);
-			if (HexGrid.IsSlotFilled (col, row)) {
-				Tile t = HexGrid.GetTileAt (col, row);
+			int row = hexGrid.BottomOfColumn (col);
+			if (hexGrid.IsSlotFilled (col, row)) {
+				Tile t = hexGrid.GetTileAt (col, row);
 				if (!t.element.Equals (Tile.Element.Earth)) {
-					mm.RemoveTile (t, true, true);
+					mm.RemoveTile (t, true);
 					dmg -= 15;
 				}
 			}
 		}
-		MageMatch.GetOpponent(id).ChangeHealth (dmg);
+		mm.GetOpponent(id).ChangeHealth (dmg);
 	}
 	void Magnitude10_End(int id){
 		Magnitude10_Turn (id);
@@ -240,17 +280,17 @@ public class SpellEffects {
 	}
 
 	public void Stalagmite(){
-		Targeting.WaitForCellTarget(1, Stalagmite_Target);
+        targeting.WaitForCellTarget(1, Stalagmite_Target);
 	}
 	void Stalagmite_Target(CellBehav cb){
 		int col = cb.col;
-		int bottomr = HexGrid.BottomOfColumn (col);
+		int bottomr = hexGrid.BottomOfColumn (col);
 		// hardset bottom three cells of column
 		GameObject stone;
 		for (int i = 0; i < 3; i++){
 			stone = mm.GenerateToken ("stone");
 			stone.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-			MageMatch.PutTile (stone, col, bottomr + i);
+			mm.PutTile (stone, col, bottomr + i);
 		}
 	}
 
@@ -272,12 +312,12 @@ public class SpellEffects {
 	}
 	void Ench_Cherrybomb_Resolve(int id, TileBehav tb){
 		Debug.Log ("SPELLEFFECTS: Resolving Cherrybomb at (" + tb.tile.col + ", " + tb.tile.row + ")");
-		MageMatch.GetOpponent(id).ChangeHealth (-200);
+		mm.GetOpponent(id).ChangeHealth (-200);
 
-		List<TileBehav> tbs = HexGrid.GetSmallAreaTiles (tb.tile.col, tb.tile.row);
+		List<TileBehav> tbs = hexGrid.GetSmallAreaTiles (tb.tile.col, tb.tile.row);
 		foreach(TileBehav ctb in tbs){
 			if (ctb.ableDestroy)
-				mm.RemoveTile (ctb.tile.col, ctb.tile.row, false, true);
+				mm.RemoveTile (ctb.tile.col, ctb.tile.row, true);
 		}
 	}
 
@@ -286,29 +326,31 @@ public class SpellEffects {
         //		Debug.Log("SPELLEFFECTS: Setting burning...");
         Enchantment ench = new Enchantment(5, Ench_Burning_Turn, Ench_Burning_End, null);
         ench.SetTypeTier(Enchantment.EnchType.Burning, 1);
+        ench.priority = 1;
 		tb.SetEnchantment (ench);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
-		MageMatch.endTurnEffects.Add(ench);
+		mm.effectCont.AddEndTurnEffect(ench);
 	}
 	void Ench_Burning_Turn(int id, TileBehav tb){
-		MageMatch.GetOpponent(id).ChangeHealth (-3);
+		mm.GetOpponent(id).ChangeHealth (-3);
 	}
 	void Ench_Burning_End(int id, TileBehav tb){
-		MageMatch.GetOpponent(id).ChangeHealth (-6);
+		mm.GetOpponent(id).ChangeHealth (-6);
 	}
 
     public void Ench_SetZombify(TileBehav tb, bool skip){
         Enchantment ench = new Enchantment(Ench_Zombify_Turn, null, null);
         ench.SetTypeTier(Enchantment.EnchType.Zombify, 1);
+        ench.priority = 6;
         if (skip)
             ench.SkipCurrent();
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
-        MageMatch.endTurnEffects.Add(ench);
+        mm.effectCont.AddEndTurnEffect(ench);
     }
     void Ench_Zombify_Turn(int id, TileBehav tb) {
         // TODO filter list before rand
-        List<TileBehav> tbs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+        List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
         if (tbs.Count > 0){
             int tries = 15;
             TileBehav ctb;
@@ -319,9 +361,9 @@ public class SpellEffects {
                     if (!ctb.HasEnchantment() || 
                         (ctb.GetEnchType() != Enchantment.EnchType.Zombify &&
                         ctb.GetEnchType() != Enchantment.EnchType.ZombieTok)) {
-                        mm.RemoveTile(ctb.tile, true, true);
-                        MageMatch.GetPlayer(id).DealDamage(10);
-                        MageMatch.GetPlayer(id).ChangeHealth(10);
+                        mm.RemoveTile(ctb.tile, true);
+                        mm.GetPlayer(id).DealDamage(10);
+                        mm.GetPlayer(id).ChangeHealth(10);
                     }
                 } else if (ctb.HasEnchantment()) { // TODO TB - ableEnchant
                     i--;
@@ -336,12 +378,30 @@ public class SpellEffects {
     public void Ench_SetZombieTok(TileBehav tb) {
         Enchantment ench = new Enchantment(Ench_ZombieTok_Turn, null, null);
         ench.SetTypeTier(Enchantment.EnchType.ZombieTok, 3);
+        ench.priority = 6; // TODO 6.1?
         tb.SetEnchantment(ench);
-        MageMatch.endTurnEffects.Add(ench);
+        mm.effectCont.AddEndTurnEffect(ench);
     }
     void Ench_ZombieTok_Turn(int id, TileBehav tb) {
         Ench_Zombify_Turn(id, tb);
         Ench_Zombify_Turn(id, tb);
+    }
+
+    public void Ench_SetStoneTok(TileBehav tb) {
+        Enchantment ench = new Enchantment(5, Ench_StoneTok_Turn, Ench_StoneTok_End, null);
+        ench.SetTypeTier(Enchantment.EnchType.StoneTok, 3);
+        ench.priority = 4;
+        tb.SetEnchantment(ench);
+        mm.effectCont.AddEndTurnEffect(ench);
+    }
+    void Ench_StoneTok_Turn(int id, TileBehav tb) {
+        int c = tb.tile.col, r = tb.tile.row;
+        if (hexGrid.CellExists(c, r - 1) && hexGrid.IsSlotFilled(c, r - 1)) {
+            mm.RemoveTile(c, r - 1, false);
+        }
+    }
+    void Ench_StoneTok_End(int id, TileBehav tb) {
+        mm.RemoveTile(tb.tile, false);
     }
 
 }

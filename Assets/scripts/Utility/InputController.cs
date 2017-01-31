@@ -7,6 +7,8 @@ using System.Collections.Generic;
 public class InputController : NetworkBehaviour {
 
 	private MageMatch mm;
+    private Targeting targeting;
+    private UIController uiCont;
 
 	private Vector3 dragClick;
 	private Transform parentT;
@@ -17,13 +19,16 @@ public class InputController : NetworkBehaviour {
 	private CellBehav clickCB; // needed?
 	private bool isClickTB = false;
 
-	void Awake () {
+	void Start () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-	}
+        targeting = mm.targeting;
+        //settings = GameObject.Find("ui").GetComponent<Settings>();
+        uiCont = mm.uiCont;
+    }
 
 	void Update(){ // polling input...change to events?
 		if (Input.GetMouseButton (0)) { // if left mouse is down
-			if (Targeting.currentTMode == Targeting.TargetMode.Drag){
+			if (targeting.currentTMode == Targeting.TargetMode.Drag){
 //				HandleDrag ();
 			} else 
 				HandleMouse ();
@@ -94,7 +99,7 @@ public class InputController : NetworkBehaviour {
 		Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
 
-		if (Targeting.currentTMode != Targeting.TargetMode.Cell) {
+		if (targeting.currentTMode != Targeting.TargetMode.Cell) {
 			TileBehav tb = GetMouseTile (hits);
 			if (tb != null) {
 				clickTB = tb;
@@ -112,77 +117,82 @@ public class InputController : NetworkBehaviour {
 	}
 
 	void TBMouseDown(TileBehav tb){
-		if (!MageMatch.IsEnded () && !MageMatch.IsCommishTurn()) { // if the game isn't done
-			if (!MageMatch.menu) { // if the menu isn't open
-				switch(tb.currentState){
-				case TileBehav.TileState.Hand:
-					if (!Targeting.IsTargetMode ()) {
-						parentT = tb.transform.parent;
-						tb.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-						// TODO
-						//tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
+		if (!mm.IsEnded () && !mm.IsCommishTurn()) { // if the game isn't done
+			//if (!mm.menu) { // if the menu isn't open
+                switch (tb.currentState) {
+                    case TileBehav.TileState.Hand:
+                        if (!targeting.IsTargetMode() && !mm.menu) {
+                            parentT = tb.transform.parent;
+                            tb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
+                            // TODO
+                            //tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
 
-						MageMatch.currentTile = tb.gameObject;
-						AudioController.PickupSound (tb.gameObject.GetComponent<AudioSource> ());
-					}
-					break;
-				case TileBehav.TileState.Placed:
-//					Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
-					if (Targeting.IsTargetMode ()
-//					    && Targeting.currentTMode == Targeting.TargetMode.Tile
-						) {
-						Debug.Log ("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
-						Targeting.OnTBTarget (tb);
-//					} else if (IsTargetMode () && currentTMode == TargetMode.Drag){
+                            mm.currentTile = tb.gameObject;
+                            mm.audioCont.PickupSound(tb.gameObject.GetComponent<AudioSource>());
+                        }
+                        break;
+                    case TileBehav.TileState.Placed:
+//					    Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
+                        if (targeting.IsTargetMode()
+//					        && Targeting.currentTMode == Targeting.TargetMode.Tile
+                            ) {
+                            Debug.Log("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
+                            targeting.OnTBTarget(tb);
+//					    } else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
-					} else { // disable during targeting screen?
-						dragClick = Camera.main.WorldToScreenPoint (tb.transform.position);
-						dragged = true;
-					}
-					break;
-				}
-			} else { // menu mode
-				Settings.GetClickEffect(tb);
-			}
+                        } else { // disable during targeting screen?
+                            dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+                            dragged = true;
+                        }
+                        break;
+                }
+			//} else { // menu mode
+                //uiCont.GetClickEffect(tb); //?
+			//}
 		}
 	}
 
 	void TBMouseDrag(TileBehav tb){
 //		Debug.Log ("TBMouseDrag called.");
-		if (!MageMatch.IsEnded () && !MageMatch.menu 
-			&& !MageMatch.IsCommishTurn() && !Targeting.IsTargetMode()) {
+		if (!mm.IsEnded () && !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
 			switch (tb.currentState) {
-			case TileBehav.TileState.Hand:
-				Vector3 cursor = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-				cursor.z = 0;
-				tb.transform.position = cursor;
-				break;
-			case TileBehav.TileState.Placed:
-				SwapCheck (tb);
-				break;
+			    case TileBehav.TileState.Hand:
+                    if (!mm.menu) {
+                        Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        cursor.z = 0;
+                        tb.transform.position = cursor;
+                    }
+				    break;
+			    case TileBehav.TileState.Placed:
+				    SwapCheck (tb);
+				    break;
 			}
 		}
 	}
 
 	void TBMouseUp(TileBehav tb){
 //		Debug.Log ("TBMouseUp called.");
-		if (!MageMatch.IsEnded () && !MageMatch.menu 
-			&& !MageMatch.IsCommishTurn() && !Targeting.IsTargetMode()) {
-			switch (tb.currentState) {
-			case TileBehav.TileState.Hand:
-				Vector3 mouse = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-				RaycastHit2D[] hits = Physics2D.LinecastAll (mouse, mouse);
+		if (!mm.IsEnded () && !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
+            if (!mm.menu) {
+                switch (tb.currentState) {
+                    case TileBehav.TileState.Hand:
+                        Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
 
-				CellBehav cb = GetMouseCell (hits);
-				if (cb != null) {
-					mm.DropTile (cb.col);
-				} else {
-					tb.transform.SetParent (parentT);
-					parentT = null;
-					MageMatch.ActiveP().AlignHand (.12f, false);
-				}
-				break;
-			}
+                        CellBehav cb = GetMouseCell(hits);
+                        if (cb != null) {
+                            mm.DropTile(cb.col);
+                        } else {
+                            tb.transform.SetParent(parentT);
+                            parentT = null;
+                            mm.ActiveP().AlignHand(.12f, false);
+                        }
+                        break;
+                }
+            } else {
+                // TODO bool menuSwap
+                uiCont.GetClickEffect(tb);
+            }
 		}
 	}
 
@@ -198,22 +208,22 @@ public class InputController : NetworkBehaviour {
 			//				Debug.Log("mouse = " + mouse.ToString() + "; angle = " + angle);
 			dragged = false; // TODO move into cases below for continuous dragging
 			if (angle < 60) {         // NE
-				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 1))
+				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 1))
 					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
 			} else if (angle < 120) { // N
-				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 0))
+				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 0))
 					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
 			} else if (angle < 180) { // NW
-				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 5))
+				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 5))
 					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
 			} else if (angle < 240) { // SW
-				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 4))
+				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 4))
 					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
 			} else if (angle < 300) { // S
-				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 3))
+				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 3))
 					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
 			} else {                  // SE
-				if (HexGrid.HasAdjacentCell(tile.col, tile.row, 2))
+				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 2))
 					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
 			}
 		}
@@ -221,17 +231,17 @@ public class InputController : NetworkBehaviour {
 
 	void CBMouseDown(CellBehav cb){
 //		Debug.Log ("OnMouseDown hit on column " + cb.col);
-		if (MageMatch.menu) {
+		if (mm.menu) {
 			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-			Tile.Element element = Settings.GetClickElement ();
+			Tile.Element element = uiCont.GetClickElement ();
 			if (element != Tile.Element.None) {
 //				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
 				GameObject go = mm.GenerateTile (element);
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
 				mm.DropTile (cb.col, go, .15f);
 			}
-		} else if(Targeting.IsTargetMode() && Targeting.currentTMode == Targeting.TargetMode.Cell) {
-			Targeting.OnCBTarget (cb);
+		} else if(targeting.IsTargetMode() && targeting.currentTMode == Targeting.TargetMode.Cell) {
+			targeting.OnCBTarget (cb);
 			//Put target return here!
 		}
 	}

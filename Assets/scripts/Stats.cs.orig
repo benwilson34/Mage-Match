@@ -43,6 +43,11 @@ public class Stats {
         mm.eventCont.commishMatch += OnCommishMatch;
         mm.eventCont.commishTurnDone += OnCommishTurnDone;
 
+<<<<<<< HEAD
+    public static void Init(Player p1, Player p2) {
+        ps1 = new PlayerStat() { name = p1.pname };
+        ps2 = new PlayerStat() { name = p2.pname };
+=======
         mm.eventCont.draw += OnDraw;
         mm.eventCont.drop += OnDrop;
         mm.eventCont.swap += OnSwap;
@@ -51,6 +56,7 @@ public class Stats {
         mm.eventCont.tileRemove += OnTileRemove;
         mm.eventCont.spellCast += OnSpellCast;
         mm.eventCont.timeout += OnTimeout;
+>>>>>>> master
     }
 
     void InitReport() {

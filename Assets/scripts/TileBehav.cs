@@ -14,11 +14,13 @@ public class TileBehav : MonoBehaviour {
 	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
 	public bool ableTarget = true; // will eventually need a list of valid spells - maybe a hierarchy? categories?
 
+    private MageMatch mm;
 	private Enchantment enchantment;
 //	private bool resolved = false;
 	private bool inPos = true;
 
 	void Awake(){
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
         Init();
 	}
 
@@ -41,29 +43,29 @@ public class TileBehav : MonoBehaviour {
 //		Debug.Log ("ChangePos: pos set to = (" + pos [0] + ", " + pos [1] + ")");
 		//		transform.position = new Vector3 (pos[0], HexGrid.GridRowToPos(col, startrow));
 		tile.SetPos(col, row);
-		HexGrid.SetTileBehavAt (this, col, row);
+		mm.hexGrid.SetTileBehavAt (this, col, row);
 
 		inPos = false;
 		StartCoroutine(ChangePos_Anim(col, startrow, duration));
 	}
 
 	IEnumerator ChangePos_Anim(int col, int row, float duration){
-		MageMatch.IncAnimating ();
+		mm.IncAnimating ();
 //		inPos = false;
-		Tween moveTween = transform.DOMove(new Vector3(HexGrid.GridColToPos(col), HexGrid.GridRowToPos(col, row)),
+		Tween moveTween = transform.DOMove(new Vector3(mm.hexGrid.GridColToPos(col), mm.hexGrid.GridRowToPos(col, row)),
 			duration, false);
 
 		yield return moveTween.WaitForCompletion ();
 //		MageMatch.DecAnimating ();
-		MageMatch.BoardChanged (); //?
+		//mm.BoardChanged (); //?
 		StartCoroutine(Grav_Anim());
 	}
 
 	public void HardSetPos(int col, int row){ // essentially a "teleport"
 		tile.SetPos(col, row);
-		HexGrid.HardSetTileBehavAt (this, col, row);
-		transform.position = HexGrid.GridCoordToPos (col, row);
-		MageMatch.BoardChanged ();
+        mm.hexGrid.HardSetTileBehavAt (this, col, row);
+		transform.position = mm.hexGrid.GridCoordToPos (col, row);
+		mm.BoardChanged ();
 	}
 
 	public void SetPlaced(){
@@ -72,7 +74,7 @@ public class TileBehav : MonoBehaviour {
 
 	// TODO TODO
 	public IEnumerator Grav_Anim(){
-		Vector2 newPos = HexGrid.GridCoordToPos (tile.col, tile.row);
+		Vector2 newPos = mm.hexGrid.GridCoordToPos (tile.col, tile.row);
 		float height = transform.position.y - newPos.y;
 		Tween tween = transform.DOMove (newPos, .08f * height, false);
 		tween.SetEase (Ease.InQuad);
@@ -81,9 +83,9 @@ public class TileBehav : MonoBehaviour {
 		yield return tween.WaitForCompletion ();
 //		Debug.Log (transform.name + " is in position: (" + tile.col + ", " + tile.row + ")");
 //		if(vy < -.1f) // swapping sound fix - kinda sloppy
-			AudioController.DropSound (this.GetComponent<AudioSource>());
+		mm.audioCont.DropSound (this.GetComponent<AudioSource>());
 		inPos = true;
-		MageMatch.DecAnimating ();
+		mm.DecAnimating ();
 	}
 
 	// TODO
@@ -136,26 +138,29 @@ public class TileBehav : MonoBehaviour {
             return Enchantment.EnchType.None;
     }
 
+    public int GetEnchTier() {
+        return enchantment.tier;
+    }
+
     public void TriggerEnchantment() {
-        Debug.Log("Triggering enchantment at " + tile.col + ", " + tile.row);
+        Debug.Log("TILEBEHAV: Triggering enchantment at " + tile.col + ", " + tile.row);
         enchantment.TriggerEffect();
     }
 
 	public void ClearEnchantment(){
-//		this.enchantEffect = null;
+        //		this.enchantEffect = null;
         // TODO remove Effect from whichever list in MageMatch...
-		this.enchantment = null;
+        mm.effectCont.RemoveEndTurnEffect(enchantment);
+		enchantment = null;
 		this.GetComponent<SpriteRenderer> ().color = Color.white;
 	}
 
 	public bool SetEnchantment(Enchantment ench){
-		if (HasEnchantment()) {
-			return false; // where we decide whether new enchantments should overwrite current ones
+		if (HasEnchantment() && ench.tier <= enchantment.tier) {
+			return false; // if ench tier is not greater than current enchantment
 		}
-//		resolved = false;
-//		this.enchantEffect = effect;
 		ench.SetAsEnchantment(this);
-		this.enchantment = ench; 
+		enchantment = ench; 
 		return true;
 	}
 
@@ -166,7 +171,7 @@ public class TileBehav : MonoBehaviour {
 			currentState = TileState.Removed;
 //			this.enchantEffect (this);
 			enchantment.CancelEffect();
-			MageMatch.endTurnEffects.Remove (enchantment); // TODO assumes end-of-turn list
+            mm.effectCont.RemoveEndTurnEffect (enchantment); // TODO assumes end-of-turn list
 			return true;
 		}
 		return false;

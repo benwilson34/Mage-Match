@@ -5,12 +5,6 @@ public class CellBehav : MonoBehaviour {
 
 	public int col, row;
 
-	// TODO hovers/arrows?
-//	void OnMouseDown(){
-//		InputController.CorrectMouseDown ();
-//	}
-//
-//	void OnMouseUp(){
-//		InputController.CorrectMouseUp ();
-//	}
+    public bool HasSamePos(CellBehav cb) { return cb.col == col && cb.row == row; }
+
 }

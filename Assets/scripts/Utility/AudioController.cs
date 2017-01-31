@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class AudioController {
+public class AudioController {
 
-	private static AudioSource source;
-	private static AudioClip[] swap, drop, hand, match;
+	private AudioSource source;
+	private AudioClip[] swap, drop, hand, match;
 
-	public static void Init(){
+	public AudioController(){
 		source = GameObject.Find ("board").GetComponent<AudioSource> ();
 
 		AudioListener.volume = .6f;
@@ -40,22 +40,22 @@ public static class AudioController {
 		match[4] = (AudioClip)Resources.Load ("Match-7-5");
 	}
 
-	public static void SwapSound(){
+	public void SwapSound(){
 		source.clip = swap [Random.Range (0, 5)];
 		source.Play ();
 	}	
 
-	public static void DropSound(AudioSource source){
+	public void DropSound(AudioSource source){
 		source.clip = drop [Random.Range (0, 5)];
 		source.Play ();
 	}
 	
-	public static void PickupSound(AudioSource source){
+	public void PickupSound(AudioSource source){
 		source.clip = hand [Random.Range (0, 5)];
 		source.Play ();
 	}
 
-	public static void BreakSound(){
+	public void BreakSound(){
 		source.clip = match [Random.Range (0, 5)];
 		source.Play ();
 	}

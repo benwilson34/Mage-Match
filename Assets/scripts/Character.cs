@@ -5,17 +5,16 @@ using System.Collections.Generic;
 public abstract class Character {
 
     public string characterName;
-    public string techniqueName;
+    public string loadoutName;
 
     protected int maxHealth;
-    protected static SpellEffects spellfx;
+    protected SpellEffects spellfx;
     protected int dfire, dwater, dearth, dair, dmuscle; // portions of 100 total
     protected Spell[] spells;
-    protected int meter;
+    public int meter, meterMax = 100; // protected?
 
-    public static void Init() { //?
+    public Character() { //?
         spellfx = new SpellEffects();
-        SpellEffects.Init();
     }
 
     public void SetDeckElements(int f, int w, int e, int a, int m) {
@@ -24,6 +23,11 @@ public abstract class Character {
         dearth = e;
         dair = a;
         dmuscle = m;
+    }
+
+    public void ChangeMeter(int amount) {
+        meter += amount;
+        meter = Mathf.Clamp(meter, 0, 100);
     }
 
     public int GetMaxHealth() { return maxHealth; }
@@ -54,17 +58,18 @@ public abstract class Character {
 
 public class CharTest : Character {
     public CharTest() {
+        spellfx = new SpellEffects();
         spells = new Spell[4];
 
         characterName = "Sample";
-        techniqueName = "Test Loadout";
+        loadoutName = "Test Loadout";
         maxHealth = 1000;
 
         SetDeckElements(20, 20, 20, 20, 20);
 
-        spells[0] = new Spell("Cherrybomb", "FAM", 1, spellfx.Cherrybomb);
-        spells[1] = new Spell("None", "FMF", 1, spellfx.HumanResources);
-        spells[2] = new Spell("Company Luncheon", "FAF", 1, spellfx.CompanyLuncheon);
+        spells[0] = new Spell("Cherrybomb", "FFA", 1, spellfx.Cherrybomb);
+        spells[1] = new Spell("Stalagmite", "FFA", 1, spellfx.Stalagmite);
+        spells[2] = new Spell("Stone Test", "FAF", 1, spellfx.StoneTest);
         spells[3] = new Spell("Zombie Synergy", "AFA", 1, spellfx.ZombieSynergy);
     }
 }
@@ -72,6 +77,7 @@ public class CharTest : Character {
 public class Enfuego : Character {
 
     public Enfuego(int loadout) {
+        spellfx = new SpellEffects();
         characterName = "Enfuego";
         spells = new Spell[4];
 
@@ -82,7 +88,7 @@ public class Enfuego : Character {
     }
 
     void EnfuegoA() { // Enfuego A - Supah Hot Fire
-        techniqueName = "Supah Hot Fire";
+        loadoutName = "Supah Hot Fire";
         maxHealth = 1000;
 
         SetDeckElements(50, 0, 0, 20, 30);
@@ -95,7 +101,7 @@ public class Enfuego : Character {
 
     // FOCUS
     void EnfuegoB() { // Enfuego B - Hot Feet
-        techniqueName = "Hot Feet";
+        loadoutName = "Hot Feet";
         maxHealth = 1100;
 
         SetDeckElements(50, 0, 15, 0, 35);
@@ -112,6 +118,7 @@ public class Rocky : Character {
     // TODO passive
 
     public Rocky(int loadout) {
+        spellfx = new SpellEffects();
         characterName = "Rocky";
         spells = new Spell[4];
 
@@ -123,7 +130,7 @@ public class Rocky : Character {
 
     // TODO
     void RockyA() { // Rocky A - Tectonic Titan 
-        techniqueName = "Tectonic Titan";
+        loadoutName = "Tectonic Titan";
         maxHealth = 1100;
 
         SetDeckElements(5, 0, 45, 30, 20);
@@ -136,7 +143,7 @@ public class Rocky : Character {
 
     // TODO
     void RockyB() { // Rocky B - Continental Champion
-        techniqueName = "Continental Champion";
+        loadoutName = "Continental Champion";
         maxHealth = 1300;
 
         SetDeckElements(0, 25, 40, 10, 25);
@@ -151,7 +158,7 @@ public class Rocky : Character {
 public class Gravekeeper : Character {
 
     public Gravekeeper(int loadout) {
-
+        spellfx = new SpellEffects();
         spells = new Spell[4];
         characterName = "The Gravekeeper";
         if (loadout == 1)
@@ -162,7 +169,7 @@ public class Gravekeeper : Character {
 
     // FOCUS
     void GravekeeperA() { // The Gravekeeper A - Business in the Front
-        techniqueName = "Business in the Front";
+        loadoutName = "Business in the Front";
         maxHealth = 1150;
 
         SetDeckElements(0, 20, 40, 0, 40);
@@ -174,7 +181,7 @@ public class Gravekeeper : Character {
     }
 
     void GravekeeperB() { // The Gravekeeper B - Party in the Back
-        techniqueName = "Party in the Back";
+        loadoutName = "Party in the Back";
         maxHealth = 1050;
 
         SetDeckElements(25, 0, 35, 0, 40);
@@ -186,7 +193,7 @@ public class Gravekeeper : Character {
     }
 }
 
-// TODO
+// TODO non-static
 public static class CharacterLoader {
 
     public static Character Load(int num) {
