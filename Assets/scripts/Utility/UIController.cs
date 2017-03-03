@@ -56,12 +56,22 @@ public class UIController : MonoBehaviour {
         UpdateMoveText("Fight!!");
 
         Text nameText = p1info.Find("Text_Name").GetComponent<Text>();
-        nameText.text = "P" + p1.id + " - " + p1.name;
+
+        if (p1.id == PhotonNetwork.player.ID)
+            nameText.text = "P1 - ME!";
+        else
+            nameText.text = "P1 - " + p1.name;
+
         ShowLoadout(p1);
         DeactivateAllSpellButtons(p1);
 
         nameText = p2info.Find("Text_Name").GetComponent<Text>();
-        nameText.text = "P" + p2.id + " - " + p2.name;
+
+        if (p2.id == PhotonNetwork.player.ID)
+            nameText.text = "P2 - ME!";
+        else
+            nameText.text = "P2 - " + p2.name;
+
         ShowLoadout(p2);
         DeactivateAllSpellButtons(p2);
 

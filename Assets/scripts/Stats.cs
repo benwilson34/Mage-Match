@@ -4,7 +4,6 @@ using System.Text;
 using System.IO;
 using System;
 
-// eventually, this will be where the output file stuff happens?
 public class Stats {
 
     public int turns = 0;
@@ -40,8 +39,8 @@ public class Stats {
         InitReport();
 
         mm.eventCont.turnChange += OnTurnChange;
+        mm.eventCont.turnBegin += OnTurnBegin;
         mm.eventCont.commishMatch += OnCommishMatch;
-        mm.eventCont.commishTurnDone += OnCommishTurnDone;
 
         mm.eventCont.draw += OnDraw;
         mm.eventCont.drop += OnDrop;
@@ -72,22 +71,25 @@ public class Stats {
         commishMatches += count;
     }
 
-    public void OnCommishTurnDone(int id) {
-        report.AppendLine("\nT" + turns + " - deal p" + id + " 1");
+    public void OnTurnBegin(int id) {
+        report.AppendLine("\nT" + turns + " - ");
     }
 
 
-    public void OnDraw(int id) {
-        report.AppendLine("Draw");
+    public void OnDraw(int id, Tile.Element elem, bool dealt) {
+        if(dealt)
+            report.AppendLine("Deal p"+id+" " + Tile.ElementToChar(elem));
+        else
+            report.AppendLine("Draw " + Tile.ElementToChar(elem));
         if (id == 1)
             ps1.draws++;
         else
             ps2.draws++;
     }
 
-    public void OnDrop(int id, int col) {
+    public void OnDrop(int id, Tile.Element elem, int col) {
         if (!mm.menu) {
-            report.AppendLine("Drop col" + col);
+            report.AppendLine("Drop " + Tile.ElementToChar(elem) + " col" + col);
             if (!mm.IsCommishTurn()) {
                 if (id == 1)
                     ps1.drops++;

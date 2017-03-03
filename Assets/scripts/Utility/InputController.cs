@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 
 // TODO eventually handle mobile tap input instead of clicking
-public class InputController : NetworkBehaviour {
+public class InputController : MonoBehaviour {
 
 	private MageMatch mm;
     private Targeting targeting;
     private UIController uiCont;
+    private GameObject dropTile;
+    private bool dropping = false;
 
 	private Vector3 dragClick;
 	private Transform parentT;
@@ -27,16 +28,18 @@ public class InputController : NetworkBehaviour {
     }
 
 	void Update(){ // polling input...change to events?
-		if (Input.GetMouseButton (0)) { // if left mouse is down
-			if (targeting.currentTMode == Targeting.TargetMode.Drag){
-//				HandleDrag ();
-			} else 
-				HandleMouse ();
-			nowClick = true; // move up?
-		} else if (Input.GetMouseButtonUp (0)) { // if left mouse was JUST released
-			nowClick = false;
-			HandleMouse ();
-		}
+        if (mm.MyTurn()) {
+            if (Input.GetMouseButton(0)) { // if left mouse is down
+                if (targeting.currentTMode == Targeting.TargetMode.Drag) {
+                    //				HandleDrag ();
+                } else
+                    HandleMouse();
+                nowClick = true; // move up?
+            } else if (Input.GetMouseButtonUp(0)) { // if left mouse was JUST released
+                nowClick = false;
+                HandleMouse();
+            }
+        }
 	}
 
 	TileBehav GetMouseTile(RaycastHit2D[] hits){
@@ -121,13 +124,14 @@ public class InputController : NetworkBehaviour {
 			//if (!mm.menu) { // if the menu isn't open
                 switch (tb.currentState) {
                     case TileBehav.TileState.Hand:
-                        if (!targeting.IsTargetMode() && !mm.menu) {
+                        if (!targeting.IsTargetMode() && !mm.menu && mm.LocalP().IsTileMine(tb)) {
+                            dropping = true;
                             parentT = tb.transform.parent;
                             tb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
                             // TODO
                             //tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
 
-                            mm.currentTile = tb.gameObject;
+                            dropTile = tb.gameObject;
                             mm.audioCont.PickupSound(tb.gameObject.GetComponent<AudioSource>());
                         }
                         break;
@@ -157,7 +161,7 @@ public class InputController : NetworkBehaviour {
 		if (!mm.IsEnded () && !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
 			switch (tb.currentState) {
 			    case TileBehav.TileState.Hand:
-                    if (!mm.menu) {
+                    if (!mm.menu && dropping) {
                         Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                         cursor.z = 0;
                         tb.transform.position = cursor;
@@ -176,16 +180,19 @@ public class InputController : NetworkBehaviour {
             if (!mm.menu) {
                 switch (tb.currentState) {
                     case TileBehav.TileState.Hand:
-                        Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
+                        if (dropping) {
+                            Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                            RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
 
-                        CellBehav cb = GetMouseCell(hits);
-                        if (cb != null) {
-                            mm.DropTile(cb.col);
-                        } else {
-                            tb.transform.SetParent(parentT);
-                            parentT = null;
-                            mm.ActiveP().AlignHand(.12f, false);
+                            CellBehav cb = GetMouseCell(hits);
+                            if (cb != null) {
+                                mm.DropTile(cb.col, dropTile);
+                            } else {
+                                tb.transform.SetParent(parentT);
+                                parentT = null;
+                                mm.ActiveP().AlignHand(.12f, false);
+                            }
+                            dropping = false;
                         }
                         break;
                 }

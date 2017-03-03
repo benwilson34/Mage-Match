@@ -9,9 +9,9 @@ public class Commish  {
 
 	public Commish() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-	}
+    }
 
-	public IEnumerator CTurn(){
+    public IEnumerator CTurn(){
         if (activeEffects) {
             if (mood == -100)
                 AngryDamage();
@@ -26,7 +26,8 @@ public class Commish  {
 	}
 
 	public IEnumerator PlaceTiles(){
-		int numTiles = 5;
+        Random.InitState(69420); //?
+        int numTiles = 5;
 		int tries = 20;
 		float[] ratios;
 		yield return ratios = mm.boardCheck.EmptyCheck ();
@@ -71,8 +72,8 @@ public class Commish  {
 
 	int GetSemiRandomCol(float[] ratios){
 		float val = Random.Range (0f, 1f);
-		//		Debug.Log ("GetSemiRandomCol: val = " + val);
-		float thresh = 0;
+        //Debug.Log("COMMISH: GetSemiRandomCol val=" + val);
+        float thresh = 0;
 		for (int i = 0; i < HexGrid.numCols; i++) {
 			thresh += ratios [i];
 			if (val < thresh)
