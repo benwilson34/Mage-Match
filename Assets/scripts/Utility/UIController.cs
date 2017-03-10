@@ -211,6 +211,8 @@ public class UIController : MonoBehaviour {
     }
 
     public void SetDrawButton(Player p, bool interactable) {
+        if (interactable && mm.myID != p.id) // if not the localp, don't turn on the draw button
+            return;
         if (p.id == 1)
             p1info.Find("Button_Draw").GetComponent<Button>().interactable = interactable;
         else

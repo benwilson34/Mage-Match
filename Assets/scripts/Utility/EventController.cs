@@ -18,12 +18,11 @@ public class EventController {
             boardAction.Invoke();
     }
 
-    // TODO refactor to TurnEndEvent
-    public delegate void TurnChangeEvent(int id);
-    public event TurnChangeEvent turnChange;
-    public void TurnChange() {
-        if (turnChange != null) // never will be due to Stats
-            turnChange.Invoke(mm.ActiveP().id);
+    public delegate void TurnEndEvent(int id);
+    public event TurnEndEvent turnEnd;
+    public void TurnEnd() {
+        if (turnEnd != null) // never will be due to Stats
+            turnEnd.Invoke(mm.ActiveP().id);
     }
 
     public delegate void TurnBeginEvent(int id);
@@ -128,4 +127,11 @@ public class EventController {
             tileRemove.Invoke(mm.ActiveP().id, tb);
     }
 
+    // NOTE: id is ALWAYS the receiver
+    public delegate void PlayerHealthChangeEvent(int id, int amount, bool dealt, bool sent);
+    public event PlayerHealthChangeEvent playerHealthChange;
+    public void PlayerHealthChange(int id, int amount, bool dealt, bool sent) {
+        if (playerHealthChange != null)
+            playerHealthChange.Invoke(id, amount, dealt, sent);
+    }
 }

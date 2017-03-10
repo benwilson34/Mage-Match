@@ -52,7 +52,7 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void Reset() { // initialize board/game
-                          //clear tiles
+        //clear tiles
         GameObject tileFolder = transform.Find("tilesOnBoard").gameObject;
         if (tileFolder != null)
             Destroy(tileFolder);
@@ -175,7 +175,7 @@ public class MageMatch : MonoBehaviour {
         effectCont.ResolveEndTurnEffects();
         BoardChanged(); // why doesn't this happen when resolving turn effects?
         yield return new WaitUntil(() => !checking);
-        eventCont.TurnChange();
+        eventCont.TurnEnd();
         uiCont.UpdateMoveText("Completed turns: " + stats.turns);
         uiCont.DeactivateAllSpellButtons(activep);
         uiCont.SetDrawButton(activep, false);
@@ -247,13 +247,16 @@ public class MageMatch : MonoBehaviour {
                 activep.ResolveMatchEffect(); // match-based effects ->EventCont
 
                 if (seqList[i].GetSeqLength() == 3) {
-                    ActiveP().DealDamage(Random.Range(30, 50)); // diff 20
+
+                    // TODO prevent both clients from choosing dmg amount!!
+
+                    ActiveP().DealDamage(Random.Range(30, 50), false); // diff 20
                     commish.ChangeMood(10);
                 } else if (seqList[i].GetSeqLength() == 4) {
-                    ActiveP().DealDamage(Random.Range(60, 85)); // diff 25
+                    ActiveP().DealDamage(Random.Range(60, 85), false); // diff 25
                     commish.ChangeMood(15);
                 } else { // TODO critical matches
-                    ActiveP().DealDamage(Random.Range(95, 125)); // diff 30
+                    ActiveP().DealDamage(Random.Range(95, 125), false); // diff 30
                     commish.ChangeMood(20);
                 }
             } else {

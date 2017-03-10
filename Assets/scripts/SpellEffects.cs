@@ -14,10 +14,10 @@ public class SpellEffects {
         hexGrid = mm.hexGrid;
 	}
 
-	// -------------------------------------- SPELLS ---------------------------------------------
+	// -------------------------------------- SPELLS ------------------------------------------
 
 	public void Deal496Dmg(){
-		mm.InactiveP ().ChangeHealth (-496);
+		mm.ActiveP ().DealDamage (496, false);
 	}
 
     public void StoneTest() {
@@ -36,7 +36,7 @@ public class SpellEffects {
 		targeting.WaitForTileTarget (3, WHCK_Target);
 	}
 	void WHCK_Target(TileBehav tb){
-		mm.InactiveP ().ChangeHealth (-70);
+		mm.ActiveP ().DealDamage (70, false);
 		
 		if (tb.tile.element.Equals (Tile.Element.Fire)){
 			// TODO spread Burning
@@ -80,11 +80,11 @@ public class SpellEffects {
 	// TODO
 	public void HotBody(){
 		mm.ActiveP().SetMatchEffect (new MatchEffect(3, HotBody_Match, HotBody_End));
-        mm.eventCont.turnChange += HotBody_OnTurnChange;
+        mm.eventCont.turnEnd += HotBody_OnTurnChange;
 	}
     public void HotBody_OnTurnChange(int id) {
-        mm.GetPlayer(id).DealDamage(25); // should just be ChangeHealth(-25)?
-        mm.GetOpponent(id).DealDamage(25);
+        mm.GetPlayer(id).DealDamage(25, false); // should just be ChangeHealth(-25)?
+        mm.GetOpponent(id).DealDamage(25, false);
     }
 	void HotBody_Match(int id){
         // TODO still doesn't seem to function properly...seems to be whiffing at least once
@@ -104,7 +104,7 @@ public class SpellEffects {
 		}
 	}
     void HotBody_End(int id) {
-        mm.eventCont.turnChange -= HotBody_OnTurnChange;
+        mm.eventCont.turnEnd -= HotBody_OnTurnChange;
     }
 
 	public void HotAndBothered(){
@@ -166,7 +166,7 @@ public class SpellEffects {
             }
         }
         Debug.Log("SPELLEFFECTS: Zombie Synergy has counted " + count + " adjacent zombs");
-        mm.ActiveP().DealDamage(count * 4);
+        mm.ActiveP().DealDamage(count * 4, false);
     }
 
     public void HumanResources() {
@@ -223,7 +223,7 @@ public class SpellEffects {
 			tile = tileList [i].tile;
 			if (tile.element.Equals (tb.tile.element)) {
 				mm.RemoveTile(tile, true);
-				mm.InactiveP ().ChangeHealth (-15);
+				mm.ActiveP ().DealDamage (15, false);
 			}
 		}
 	}
@@ -265,7 +265,7 @@ public class SpellEffects {
 				}
 			}
 		}
-		mm.GetOpponent(id).ChangeHealth (dmg);
+		mm.GetPlayer(id).DealDamage (-dmg, false); // TODO not negative
 	}
 	void Magnitude10_End(int id){
 		Magnitude10_Turn (id);
@@ -312,7 +312,7 @@ public class SpellEffects {
 	}
 	void Ench_Cherrybomb_Resolve(int id, TileBehav tb){
 		Debug.Log ("SPELLEFFECTS: Resolving Cherrybomb at (" + tb.tile.col + ", " + tb.tile.row + ")");
-		mm.GetOpponent(id).ChangeHealth (-200);
+		mm.GetPlayer(id).DealDamage (200, false);
 
 		List<TileBehav> tbs = hexGrid.GetSmallAreaTiles (tb.tile.col, tb.tile.row);
 		foreach(TileBehav ctb in tbs){
@@ -332,10 +332,10 @@ public class SpellEffects {
 		mm.effectCont.AddEndTurnEffect(ench);
 	}
 	void Ench_Burning_Turn(int id, TileBehav tb){
-		mm.GetOpponent(id).ChangeHealth (-3);
+		mm.GetPlayer(id).DealDamage (3, false);
 	}
 	void Ench_Burning_End(int id, TileBehav tb){
-		mm.GetOpponent(id).ChangeHealth (-6);
+		mm.GetPlayer(id).DealDamage (6, false);
 	}
 
     public void Ench_SetZombify(TileBehav tb, bool skip){
@@ -362,8 +362,8 @@ public class SpellEffects {
                         (ctb.GetEnchType() != Enchantment.EnchType.Zombify &&
                         ctb.GetEnchType() != Enchantment.EnchType.ZombieTok)) {
                         mm.RemoveTile(ctb.tile, true);
-                        mm.GetPlayer(id).DealDamage(10);
-                        mm.GetPlayer(id).ChangeHealth(10);
+                        mm.GetPlayer(id).DealDamage(10, false);
+                        mm.GetPlayer(id).ChangeHealth(10, false, false);
                     }
                 } else if (ctb.HasEnchantment()) { // TODO TB - ableEnchant
                     i--;

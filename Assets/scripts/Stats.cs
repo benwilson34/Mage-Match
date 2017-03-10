@@ -8,16 +8,17 @@ public class Stats {
 
     public int turns = 0;
 
-    private int commishMatches;
+    private int commishMatches, commishDrops;
 
     private MageMatch mm;
     private StringBuilder report;
 
-    struct PlayerStat {
+    private class PlayerStat {
         public string name;
         public string character;
         public string loadout;
         public int draws, drops, swaps, matches, cascades, tilesRemoved, spellsCast, timeouts;
+        public int dmgDealt, dmgTaken, healingDone;
         public int longestCascade;
     }
 
@@ -38,18 +39,21 @@ public class Stats {
 
         InitReport();
 
-        mm.eventCont.turnChange += OnTurnChange;
         mm.eventCont.turnBegin += OnTurnBegin;
+        mm.eventCont.turnEnd += OnTurnEnd;
+        mm.eventCont.timeout += OnTimeout;
+        mm.eventCont.commishDrop += OnCommishDrop;
         mm.eventCont.commishMatch += OnCommishMatch;
 
         mm.eventCont.draw += OnDraw;
         mm.eventCont.drop += OnDrop;
         mm.eventCont.swap += OnSwap;
+        mm.eventCont.spellCast += OnSpellCast;
+
         mm.eventCont.match += OnMatch;
         mm.eventCont.cascade += OnCascade;
         mm.eventCont.tileRemove += OnTileRemove;
-        mm.eventCont.spellCast += OnSpellCast;
-        mm.eventCont.timeout += OnTimeout;
+        mm.eventCont.playerHealthChange += OnPlayerHealthChange;
     }
 
     void InitReport() {
@@ -62,40 +66,58 @@ public class Stats {
         report.AppendLine("T1 - deal p1 1");
     }
 
-    public void OnTurnChange(int id) {
-        turns++;
-        report.AppendLine("\nC" + turns + " - ");
+    PlayerStat GetPS(int id) {
+        if (id == 1)
+            return ps1;
+        else
+            return ps2;
     }
 
-    public void OnCommishMatch(int count) {
-        commishMatches += count;
+    int GetOpponentID(int id) {
+        if (id == 1)
+            return 2;
+        else
+            return 1;
     }
 
     public void OnTurnBegin(int id) {
         report.AppendLine("\nT" + turns + " - ");
     }
 
+    public void OnTurnEnd(int id) {
+        turns++;
+        report.AppendLine("\nC" + turns + " - ");
+    }
+
+    public void OnTimeout(int id) {
+        report.AppendLine("...the turn timer timed out!");
+        GetPS(id).timeouts++;
+    }
+
+    public void OnCommishDrop(Tile.Element elem, int col) {
+        commishDrops++;
+        report.AppendLine("C-drop " + Tile.ElementToChar(elem) + " col" + col);
+    }
+
+    public void OnCommishMatch(int count) {
+        commishMatches += count;
+        report.AppendLine("...Commish match.");
+    }
+
+    #region GameAction subscriptions
 
     public void OnDraw(int id, Tile.Element elem, bool dealt) {
         if(dealt)
             report.AppendLine("Deal p"+id+" " + Tile.ElementToChar(elem));
         else
             report.AppendLine("Draw " + Tile.ElementToChar(elem));
-        if (id == 1)
-            ps1.draws++;
-        else
-            ps2.draws++;
+        GetPS(id).draws++;
     }
 
     public void OnDrop(int id, Tile.Element elem, int col) {
         if (!mm.menu) {
             report.AppendLine("Drop " + Tile.ElementToChar(elem) + " col" + col);
-            if (!mm.IsCommishTurn()) {
-                if (id == 1)
-                    ps1.drops++;
-                else
-                    ps2.drops++;
-            }
+            GetPS(id).drops++;
         } else
             report.AppendLine("menu Drop col" + col);
     }
@@ -103,59 +125,52 @@ public class Stats {
     public void OnSwap(int id, int c1, int r1, int c2, int r2) {
         if (!mm.menu) {
             report.AppendLine("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
-            if (id == 1)
-                ps1.swaps++;
-            else
-                ps2.swaps++;
+            GetPS(id).swaps++;
         } else
             report.AppendLine("menu Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
     }
 
+    public void OnSpellCast(int id, Spell spell) {
+        report.AppendLine("Spell " + spell.name);
+        GetPS(id).spellsCast++;
+    }
+
+    #endregion
+
     public void OnMatch(int id, int count) {
         report.AppendLine("...match");
-        if (id == 1)
-            ps1.matches += count;
-        else
-            ps2.matches += count;
+        GetPS(id).matches += count;
     }
 
     public void OnCascade(int id, int chain) {
         //Debug.Log("STATS: OnCascade called. chain = " + chain);
-        if (id == 1)
-            OnCascade(ref ps1, chain);
-        else
-            OnCascade(ref ps2, chain);
-    }
-    void OnCascade(ref PlayerStat ps, int chain) {
+        PlayerStat ps = GetPS(id);
         ps.cascades++;
         if (ps.longestCascade < chain)
             ps.longestCascade = chain;
     }
 
     public void OnTileRemove(int id, TileBehav tb) {
-        if (!mm.IsCommishTurn() && !mm.menu) {
-            if (id == 1)
-                ps1.tilesRemoved++;
+        if (!mm.IsCommishTurn()) {
+            if (!mm.menu)
+                GetPS(id).tilesRemoved++;
             else
-                ps2.tilesRemoved++;
+                report.AppendLine("menu Remove (" + tb.tile.col + "," + tb.tile.row + ")");
         }
     }
 
-    public void OnSpellCast(int id, Spell spell) {
-        report.AppendLine("Spell " + spell.name);
-        if (id == 1)
-            ps1.spellsCast++;
+    public void OnPlayerHealthChange(int id, int amount, bool dealt, bool sent) {
+        if (dealt) {
+            GetPS(GetOpponentID(id)).dmgDealt -= amount;
+            report.AppendLine("...p" + GetOpponentID(id) + " dealt " + (-amount) + " dmg...");
+        }
+        if (amount < 0)
+            GetPS(id).dmgTaken -= amount;
         else
-            ps2.spellsCast++;
+            GetPS(id).healingDone += amount;
+        report.AppendLine("...p"+id+" changes health by " + amount);
     }
 
-    public void OnTimeout(int id) {
-        report.AppendLine("...the turn timer timed out!");
-        if (id == 1)
-            ps1.timeouts++;
-        else
-            ps2.timeouts++;
-    }
 
     public void SaveStatsCSV() {
         DateTime dt = DateTime.Now;
@@ -165,12 +180,11 @@ public class Stats {
 
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("Turns complete," + turns);
+        sb.AppendLine("Commish drops," + commishDrops).AppendLine("");
         sb.AppendLine("Commish matches," + commishMatches).AppendLine("");
-        for (int i = 1; i <= 2; i++) {
-            PlayerStat ps;
-            if (i == 1) ps = ps1;
-            else ps = ps2;
-            sb.AppendLine("Player " + i);
+        for (int id = 1; id <= 2; id++) {
+            PlayerStat ps = GetPS(id);
+            sb.AppendLine("Player " + id);
             sb.AppendLine(ps.name + "," + ps.character + "," + ps.loadout);
             sb.AppendLine("Tiles drawn," + ps.draws);
             sb.AppendLine("Tiles dropped," + ps.drops);

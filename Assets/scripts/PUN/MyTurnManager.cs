@@ -30,6 +30,7 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
         eventCont.swap += OnSwapLocal;
         eventCont.commishDrop += OnCommishDrop;
         eventCont.commishTurnDone += OnCommishTurnDone;
+        eventCont.playerHealthChange += OnPlayerHealthChange;
     }
 
     #region PunTurnManager Callbacks
@@ -61,7 +62,7 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
     #endregion
 
     public void OnDrawLocal(int id, Tile.Element elem, bool dealt) {
-        Debug.Log("TURNMANAGER: id=" + id + " myID="+mm.myID);
+        Debug.Log("TURNMANAGER: id=" + id + " myID=" + mm.myID);
         if (id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDraw", PhotonTargets.Others, id, elem, dealt);
@@ -80,7 +81,7 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
         }
     }
 
-   [PunRPC]
+    [PunRPC]
     public void HandleDrop(int id, Tile.Element elem, int col) {
         if (mm.currentState == MageMatch.GameState.CommishTurn) { // TODO hacky - change event
             return;
@@ -124,5 +125,22 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
     [PunRPC]
     public void HandleCommishTurnDone() {
         mm.commishTurn = false;
+    }
+
+    public void OnPlayerHealthChange(int id, int amount, bool dealt, bool sent) {
+        if (!sent) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandlePlayerHealthChange", PhotonTargets.Others, id, amount, dealt);
+        }
+    }
+
+    [PunRPC]
+    public void HandlePlayerHealthChange(int id, int amount, bool dealt) {
+        Debug.Log("TURNMANAGER: HandlePlayerHealthChange; id=" + id + " amount=" + amount + " dealt=" + dealt);
+        if (dealt) {
+            mm.GetOpponent(id).DealDamage(-amount, true);
+        } else {
+            mm.GetPlayer(id).ChangeHealth(amount, dealt, true);
+        }
     }
 }

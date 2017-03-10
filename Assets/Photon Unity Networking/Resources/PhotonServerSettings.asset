@@ -48,4 +48,6 @@ MonoBehaviour:
   - HandleSwap
   - HandleCommishDrop
   - HandleCommishTurnDone
+  - HandlePlayerDamage
+  - HandlePlayerHealthChange
   DisableAutoOpenWizard: 1

@@ -32,11 +32,11 @@ public class Player {
 
         switch (playerNum) {
             case 1:
-                SetName("Maxsimilous Forza");
+                name = "Maxsimilous Forza";
                 handSlot = GameObject.Find("handslot1").transform;
                 break;
             case 2:
-                SetName("Quincy Shungle");
+                name = "Quincy Shungle";
                 handSlot = GameObject.Find("handslot2").transform;
                 break;
             default:
@@ -48,27 +48,29 @@ public class Player {
         health = character.GetMaxHealth();
     }
 
-    public void SetName(string name) {
-        this.name = name;
+    public void DealDamage(int amount, bool sent) {
+        Debug.Log("PLAYER: >>>Dealing " + (-amount) + "dmg to p" + id);
+        if (ThisIsLocal() || sent) {
+            mm.GetOpponent(id).ChangeHealth(-amount, true, sent);
+            character.ChangeMeter(amount / 3); // TODO tentative
+        }
     }
 
-    public void DealDamage(int amount) {
-        mm.GetOpponent(id).ChangeHealth(-amount);
-        character.ChangeMeter(amount / 3); // TODO tentative
-    }
+    public void ChangeHealth(int amount, bool dealt, bool sent) { // TODO clamp instead?
+        if (ThisIsLocal() || dealt) {
+            int newAmount = 0;
+            if (amount < 0) { // damage
+                newAmount = (int)(amount * buff_dmgMult) + buff_dmgExtra;
+            } else { } // healing?
 
-    public void ChangeHealth(int amount) { // TODO clamp instead?
-        if (amount < 0) { // damage
-            if (buff_dmgExtra > 0)
-                Debug.Log("PLAYER: Wow, " + name + " is taking " + buff_dmgExtra + " extra damage!");
-            amount = (int)(amount * buff_dmgMult) + buff_dmgExtra;
-            amount = -1 * Mathf.Min(Mathf.Abs(amount), health); // prevent negative health
-        } else // healing
-            amount = Mathf.Min(amount, character.GetMaxHealth() - health);
-        Debug.Log("PLAYER: " + mm.GetOpponent(id).name + " dealt " + (-1 * amount) + " damage; " + name + "'s health changed from " + health + " to " + (health + amount));
-        health += amount;
-        if (health == 0)
-            mm.EndTheGame();
+            Debug.Log("PLAYER: " + mm.GetOpponent(id).name + " dealt " + (-1 * newAmount) + " damage; " + name + "'s health changed from " + health + " to " + (health + newAmount));
+            health += newAmount;
+            health = Mathf.Clamp(health, 0, character.GetMaxHealth());
+            mm.eventCont.PlayerHealthChange(id, amount, dealt, sent);
+
+            if (health == 0)
+                mm.EndTheGame();
+        }
     }
 
     public bool DealTile() {
@@ -179,6 +181,8 @@ public class Player {
     public bool IsTileMine(TileBehav tb) {
         return tb.transform.parent.position.Equals(handSlot.position);
     }
+
+    public bool ThisIsLocal() { return mm.myID == id; }
 
     public void InitAP() {
         AP = 3;

@@ -5,22 +5,22 @@ public class Commish  {
 
 	private int mood = 0;
 	private MageMatch mm;
-    private bool activeEffects = true;
+    //private bool activeEffects = true;
 
 	public Commish() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
     }
 
     public IEnumerator CTurn(){
-        if (activeEffects) {
-            if (mood == -100)
-                AngryDamage();
-            else if (mood == 100)
-                HappyHealing();
-            else
-                ChangeMood(-35);
+        //if (activeEffects) {
+        //    if (mood == -100)
+        //        AngryDamage();
+        //    else if (mood == 100)
+        //        HappyHealing();
+        //    else
+        //        ChangeMood(-35);
 
-        }
+        //}
         yield return PlaceTiles();
 //		Debug.Log ("CTurn: done placing tiles.");
 	}
@@ -92,29 +92,29 @@ public class Commish  {
 		return mood;
 	}
 	
-	public void AngryDamage(){
-        mm.uiCont.UpdateMoveText("The Commissioner is furious! Both players take 50 dmg and discard one tile!");
-		Player p = mm.InactiveP ();
-		p.ChangeHealth (-50);
-		p.DiscardRandom (1);
+	//public void AngryDamage(){
+ //       mm.uiCont.UpdateMoveText("The Commissioner is furious! Both players take 50 dmg and discard one tile!");
+	//	Player p = mm.InactiveP ();
+	//	p.ChangeHealth (-50);
+	//	p.DiscardRandom (1);
 
-		p = mm.ActiveP();
-		p.ChangeHealth (-50);
-		p.DiscardRandom (1);
+	//	p = mm.ActiveP();
+	//	p.ChangeHealth (-50);
+	//	p.DiscardRandom (1);
 		
-		mood = 0;
-		//mm.uiCont.UpdateCommishMeter ();
-	}
+	//	mood = 0;
+	//	//mm.uiCont.UpdateCommishMeter ();
+	//}
 	
-	public void HappyHealing(){
-        mm.uiCont.UpdateMoveText("The Commissioner is pleased, and has decided to heal both players for 100!");
-		mm.InactiveP ().ChangeHealth (100);
-		//mm.InactiveP ().DrawTiles (1); // buggy
+	//public void HappyHealing(){
+ //       mm.uiCont.UpdateMoveText("The Commissioner is pleased, and has decided to heal both players for 100!");
+	//	mm.InactiveP ().ChangeHealth (100);
+	//	//mm.InactiveP ().DrawTiles (1); // buggy
 
-		mm.ActiveP ().ChangeHealth (100);
-		//mm.ActiveP ().DrawTiles (1); // buggy
+	//	mm.ActiveP ().ChangeHealth (100);
+	//	//mm.ActiveP ().DrawTiles (1); // buggy
 		
-		mood = 0;
-		//mm.uiCont.UpdateCommishMeter ();
-	}
+	//	mood = 0;
+	//	//mm.uiCont.UpdateCommishMeter ();
+	//}
 }
