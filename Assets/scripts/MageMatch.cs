@@ -69,15 +69,8 @@ public class MageMatch : MonoBehaviour {
 
         endGame = false;
 
-        PhotonPlayer[] pps = PhotonNetwork.playerList;
-        Debug.Log("MAGEMATCH: Player IDs are " + pps[0].ID + ", " + pps[1].ID);
-        if (pps[0].ID == 1) { // should just be the way it was?
-            p1 = new Player(pps[0].ID); //?
-            p2 = new Player(pps[1].ID); //?
-        } else {
-            p1 = new Player(pps[1].ID); //?
-            p2 = new Player(pps[0].ID); //?    
-        }
+        p1 = new Player(1);
+        p2 = new Player(2);
         activep = p1;
 
         commish = new Commish();
@@ -91,7 +84,7 @@ public class MageMatch : MonoBehaviour {
             LocalP().DealTile();
 
         currentState = GameState.PlayerTurn;
-        uiCont.SetDrawButton(InactiveP(), false); // eh
+        uiCont.SetDrawButton(activep, true);
         activep.InitAP();
         if (MyTurn())
             activep.DealTile();
@@ -117,9 +110,7 @@ public class MageMatch : MonoBehaviour {
         targetPF = Resources.Load("prefabs/outline_target") as GameObject;
     }
 
-
     #region EventCont calls
-
     public void OnBoardAction() {
         if (!checking) {
             Debug.Log("MAGEMATCH: About to check the board.");
@@ -139,7 +130,6 @@ public class MageMatch : MonoBehaviour {
             uiCont.UpdatePlayerInfo();
         }
     }
-
     #endregion
 
     public IEnumerator BoardChecking() {
@@ -177,13 +167,11 @@ public class MageMatch : MonoBehaviour {
         BoardChanged(); // why doesn't this happen when resolving turn effects?
         yield return new WaitUntil(() => !checking);
         eventCont.TurnEnd();
-        uiCont.UpdateMoveText("Completed turns: " + stats.turns);
         uiCont.DeactivateAllSpellButtons(activep);
         uiCont.SetDrawButton(activep, false);
 
         currentState = GameState.CommishTurn;
 
-        // sync variable - lock?
         Debug.Log("MAGEMATCH: TurnSystem: About to check for MyTurn...");
         if (MyTurn()) {
             Debug.Log("MAGEMATCH: Turnsystem: My turn; waiting for the go-ahead from the other player.");
@@ -200,6 +188,7 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => animating == 0); // needed anymore?
         Debug.Log("MAGEMATCH: Commish turn done.");
         eventCont.CommishTurnDone();
+        uiCont.UpdateMoveText("Completed turns: " + stats.turns);
 
         activep = InactiveP();
         eventCont.TurnBegin();

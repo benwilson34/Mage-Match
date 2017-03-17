@@ -6,7 +6,7 @@ using DG.Tweening;
 
 public class UIController : MonoBehaviour {
 
-	private Text moveText, debugGridText, turnTimerText;
+	private Text moveText, debugGridText, turnTimerText, slidingText;
 	private MageMatch mm;
 	private Dropdown DD1, DD2;
 
@@ -14,8 +14,8 @@ public class UIController : MonoBehaviour {
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
-    //private RectTransform moodMarker, moodMeter;
     private SpellEffects spellfx;
+    private Vector3 slidingTextStart;
 
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
 
@@ -25,6 +25,11 @@ public class UIController : MonoBehaviour {
 		moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
 		moveText.text = "";
 		debugGridText = GameObject.Find ("Text_Debug1").GetComponent<Text> (); // UI debug grid
+        slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
+
+        slidingTextStart = new Vector3(Screen.width, slidingText.rectTransform.position.y);
+        slidingText.rectTransform.position = slidingTextStart;
+
         p1info = GameObject.Find("Player1_Info").transform;
         p2info = GameObject.Find("Player2_Info").transform;
         p1load = GameObject.Find("Player1_Loadout").transform;
@@ -42,9 +47,6 @@ public class UIController : MonoBehaviour {
         tClearB.SetActive(false);
 
         settingsMenu = GameObject.Find("SettingsMenu");
-
-        //moodMarker = GameObject.Find("MoodMarker").GetComponent<RectTransform>();
-        //moodMeter = GameObject.Find("MoodMeter").GetComponent<RectTransform>();
 
         turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
 
@@ -98,7 +100,25 @@ public class UIController : MonoBehaviour {
 
 	public void UpdateMoveText(string str){
 		moveText.text = str;
+        SendSlidingText(str);
 	}
+
+    public void SendSlidingText(string str) {
+        slidingText.text = str;
+        StartCoroutine(_SlidingText());
+    }
+    IEnumerator _SlidingText() {
+        RectTransform boxRect = slidingText.rectTransform;
+        //Vector3 start = Camera.main.ScreenToWorldPoint(boxRect.position);
+        Vector3 end = new Vector3(-boxRect.rect.width, slidingTextStart.y);
+        Debug.Log("UICONT: _SlidingText: start=" + slidingTextStart.ToString() + ", end=" + end.ToString());
+        float x = Vector3.Lerp(slidingTextStart, end, 0.5f).x; // just lerp floats?
+        Tween t = slidingText.rectTransform.DOMoveX(x, 1.5f).SetEase(Ease.OutSine);
+        yield return t.WaitForCompletion();
+        t = slidingText.rectTransform.DOMoveX(end.x, 1.5f).SetEase(Ease.InSine);
+        yield return t.WaitForCompletion();
+        slidingText.rectTransform.position = slidingTextStart;
+    }
 
 	public void UpdatePlayerInfo(){
 		UpdatePlayerInfo (mm.ActiveP());
