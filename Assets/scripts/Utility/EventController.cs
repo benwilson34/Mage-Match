@@ -63,13 +63,12 @@ public class EventController {
 
 
     #region GameAction events
-
-    public delegate void GameActionEvent(int id);
+    public delegate void GameActionEvent(int id, bool costsAP);
     public event GameActionEvent gameAction;
-    public void GameAction() {
+    public void GameAction(bool costsAP) {
         //Debug.Log("EVENTCONTROLLER: GameAction called.");
         if (gameAction != null)
-            gameAction.Invoke(mm.ActiveP().id);
+            gameAction.Invoke(mm.ActiveP().id, costsAP);
     }
 
     public delegate void DrawEvent(int id, Tile.Element elem, bool dealt);
@@ -101,7 +100,6 @@ public class EventController {
             spellCast.Invoke(mm.ActiveP().id, spell);
         }
     }
-
     #endregion
 
 

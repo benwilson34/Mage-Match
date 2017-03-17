@@ -26,7 +26,6 @@ public class Commish  {
 	}
 
 	public IEnumerator PlaceTiles(){
-        Random.InitState(69420); //?
         int numTiles = 5;
 		int tries = 20;
 		float[] ratios;

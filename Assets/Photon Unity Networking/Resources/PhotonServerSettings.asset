@@ -50,4 +50,8 @@ MonoBehaviour:
   - HandleCommishTurnDone
   - HandlePlayerDamage
   - HandlePlayerHealthChange
+  - HandleCommishTurnStart
+  - HandleSpellCast
+  - HandleTBTarget
+  - HandleCBTarget
   DisableAutoOpenWizard: 1

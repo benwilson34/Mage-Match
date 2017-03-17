@@ -60,7 +60,7 @@ public class Player {
         if (ThisIsLocal() || dealt) {
             int newAmount = 0;
             if (amount < 0) { // damage
-                newAmount = (int)(amount * buff_dmgMult) + buff_dmgExtra;
+                newAmount = (int)(amount * buff_dmgMult) - buff_dmgExtra;
             } else { } // healing?
 
             Debug.Log("PLAYER: " + mm.GetOpponent(id).name + " dealt " + (-1 * newAmount) + " damage; " + name + "'s health changed from " + health + " to " + (health + newAmount));
@@ -103,7 +103,7 @@ public class Player {
 
             mm.eventCont.Draw(id, tb.tile.element, dealt);
             if (!dealt)
-                mm.eventCont.GameAction(); //?
+                mm.eventCont.GameAction(true); //?
         }
         mm.audioCont.PickupSound(mm.GetComponent<AudioSource>());
         AlignHand(.1f, linear);
@@ -192,6 +192,7 @@ public class Player {
         Spell spell = character.GetSpell(index);
         if (AP >= spell.APcost) {
             currentSpell = spell;
+            mm.eventCont.SpellCast(currentSpell); // here?
             spell.Cast();
             return true;
         } else
@@ -199,11 +200,9 @@ public class Player {
     }
 
     public void ApplyAPCost() {
+        Debug.Log("PLAYER: Applying AP cost...which is " + currentSpell.APcost);
         AP -= currentSpell.APcost;
-        mm.eventCont.SpellCast(currentSpell);
-        mm.eventCont.GameAction();
-        //if (AP == 0) // won't need once the event is set up
-            //FlipHand();
+        mm.eventCont.GameAction(false);
     }
 
     public TileSeq GetCurrentBoardSeq() {

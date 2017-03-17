@@ -3,31 +3,16 @@ using UnityEngine.UI;
 
 namespace Com.SoupSkull.MageMatch {
     public class Launcher : Photon.PunBehaviour {
-        #region Public Variables
+
         public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
-
-        [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
         public byte MaxPlayersPerRoom = 2;
-        #endregion
-
-        #region Private Variables
 
         string _gameVersion = "1";
-
-        /// <summary>
-        /// Keep track of the current process. Since connection is asynchronous and is based on several callbacks from Photon, 
-        /// we need to keep track of this to properly adjust the behavior when we receive call back by Photon.
-        /// Typically this is used for the OnConnectedToMaster() callback.
-        /// </summary>
         bool isConnecting;
         private GameObject controlPanel, progressLabel;
         private Text progText;
-        #endregion
-
-        #region MonoBehaviour CallBacks
 
         void Awake() {
-
             // #Critical
             // we don't join the lobby. There is no need to join a lobby to get the list of rooms.
             PhotonNetwork.autoJoinLobby = false;
@@ -50,10 +35,6 @@ namespace Com.SoupSkull.MageMatch {
             controlPanel.SetActive(true);
         }
 
-        #endregion
-
-        #region Public Methods
-
         /// <summary>
         /// Start the connection process. 
         /// - If already connected, we attempt joining a random room
@@ -75,10 +56,6 @@ namespace Com.SoupSkull.MageMatch {
                 PhotonNetwork.ConnectUsingSettings(_gameVersion);
             }
         }
-
-        #endregion
-
-        #region Photon.PunBehaviour CallBacks
 
         public override void OnConnectedToMaster() {
             Debug.Log("DemoAnimator/Launcher: OnConnectedToMaster() was called by PUN");
@@ -106,17 +83,6 @@ namespace Com.SoupSkull.MageMatch {
             progText.text = "Connected to PUN, waiting for opponent!";
         }
 
-        //public override void OnJoinedRoom() {
-        //    Debug.Log("DemoAnimator/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
-        //    // #Critical: We only load if we are the first player, else we rely on  PhotonNetwork.automaticallySyncScene to sync our instance scene.
-        //    if (PhotonNetwork.room.PlayerCount == 2) {
-        //        Debug.Log("LAUNCHER: loading the MM game screen...");
-        //        // #Critical
-        //        // Load the Room Level. 
-        //        PhotonNetwork.LoadLevel("MM Game Screen (Landscape) PHOTON");
-        //    }
-        //}
-
         public override void OnPhotonPlayerConnected(PhotonPlayer other) {
             Debug.Log("OnPhotonPlayerConnected() " + other.NickName); // not seen if you're the player connecting
 
@@ -125,7 +91,5 @@ namespace Com.SoupSkull.MageMatch {
                 PhotonNetwork.LoadLevel("MM Game Screen (Landscape) PHOTON");
             }
         }
-
-        #endregion
     }
 }

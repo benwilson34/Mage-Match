@@ -36,7 +36,7 @@ public class MageMatch : MonoBehaviour {
     // should SpellEffects instance be here?
 
     void Start() {
-        Random.InitState(69420);
+        Random.InitState(1337);
 
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
@@ -127,10 +127,11 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
-    public void OnGameAction(int id) {
-        if (currentState == GameState.PlayerTurn) {
+    public void OnGameAction(int id, bool costsAP) { // eventually just pass in int for cost?
+        if (currentState != GameState.CommishTurn) { //?
             Debug.Log("MAGEMATCH: OnGameAction called!");
-            activep.AP--;
+            if(costsAP)
+                activep.AP--;
             if (activep.AP == 0) {
                 uiCont.SetDrawButton(activep, false);
                 StartCoroutine(TurnSystem());
@@ -182,10 +183,17 @@ public class MageMatch : MonoBehaviour {
 
         currentState = GameState.CommishTurn;
 
+        // sync variable - lock?
+        Debug.Log("MAGEMATCH: TurnSystem: About to check for MyTurn...");
         if (MyTurn()) {
+            Debug.Log("MAGEMATCH: Turnsystem: My turn; waiting for the go-ahead from the other player.");
+            yield return new WaitUntil(() => commishTurn);
+            Debug.Log("MAGEMATCH: TurnSystem: My turn, about to start the Commish's turn.");
             yield return commish.CTurn(); // place 5 random tiles
         } else {
-            commishTurn = true;
+            turnManager.CommishTurnStart();
+            
+            Debug.Log("MAGEMATCH: Turnsystem: Not my turn, but the Commish's turn just started.");
             yield return new WaitUntil(() => !commishTurn);
         }
 
@@ -284,7 +292,7 @@ public class MageMatch : MonoBehaviour {
     public bool DropTile(int col, GameObject go) {
         if (DropTile(col, go, .08f)) {
             activep.hand.Remove(go.GetComponent<TileBehav>()); // remove from hand
-            eventCont.GameAction(); // could get moved into case below...
+            eventCont.GameAction(true); // could get moved into case below...
             return true;
         } else
             return false;
@@ -310,7 +318,7 @@ public class MageMatch : MonoBehaviour {
             if (hexGrid.Swap(c1, r1, c2, r2)) {
                 eventCont.Swap(c1, r1, c2, r2);
                 if (!menu) { // move to stats?
-                    eventCont.GameAction();
+                    eventCont.GameAction(true);
                 }
                 audioCont.SwapSound();
             }
@@ -318,8 +326,8 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void CastSpell(int spellNum) { // IEnumerator?
+        Debug.Log("MAGEMATCH: CastSpell called...");
         Player p = activep;
-        //		Spell spell = activep.loadout.GetSpell (spellNum);
         if (p.CastSpell(spellNum)) {
             commish.ChangeMood(45);
             uiCont.DeactivateAllSpellButtons(activep); // ?

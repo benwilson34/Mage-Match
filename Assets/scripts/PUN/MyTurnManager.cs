@@ -31,6 +31,7 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
         eventCont.commishDrop += OnCommishDrop;
         eventCont.commishTurnDone += OnCommishTurnDone;
         eventCont.playerHealthChange += OnPlayerHealthChange;
+        eventCont.spellCast += OnSpellCast;
     }
 
     #region PunTurnManager Callbacks
@@ -113,6 +114,8 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
     public void HandleCommishDrop(Tile.Element elem, int col) {
         GameObject go = mm.GenerateTile(elem);
         mm.DropTile(col, go, .08f);
+
+        //mm.commishTurn = true;
     }
 
     public void OnCommishTurnDone() {
@@ -142,5 +145,54 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
         } else {
             mm.GetPlayer(id).ChangeHealth(amount, dealt, true);
         }
+    }
+
+    // eventually should be an event?
+    public void CommishTurnStart() {
+        if (!mm.MyTurn()) { // not totally necessary...
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleCommishTurnStart", PhotonTargets.Others);
+        }
+    }
+
+    [PunRPC]
+    public void HandleCommishTurnStart() {
+        mm.commishTurn = true;
+    }
+
+    public void OnSpellCast(int id, Spell spell) {
+        if (mm.MyTurn()) { // not totally necessary...
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleSpellCast", PhotonTargets.Others, spell.index);
+        }
+    }
+
+    [PunRPC]
+    public void HandleSpellCast(int spellNum) {
+        mm.CastSpell(spellNum);
+    }
+
+    public void SendTBTarget(TileBehav tb) {
+        if (mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleTBTarget", PhotonTargets.Others, tb.tile.col, tb.tile.row);
+        }
+    }
+
+    [PunRPC]
+    public void HandleTBTarget(int col, int row) {
+        mm.targeting.OnTBTarget(mm.hexGrid.GetTileBehavAt(col, row));
+    }
+
+    public void SendCBTarget(CellBehav cb) {
+        if (mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleCBTarget", PhotonTargets.Others, cb.col, cb.row);
+        }
+    }
+
+    [PunRPC]
+    public void HandleCBTarget(int col, int row) {
+        mm.targeting.OnCBTarget(mm.hexGrid.GetCellBehavAt(col, row));
     }
 }

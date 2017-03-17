@@ -206,12 +206,14 @@ public class UIController : MonoBehaviour {
     public void ToggleTargetingUI() {
         gradient.SetActive(!gradient.activeSelf);
         targetingBG.SetActive(!targetingBG.activeSelf);
-        tCancelB.SetActive(!tCancelB.activeSelf);
-        tClearB.SetActive(!tClearB.activeSelf);
+        if (mm.MyTurn()) {
+            tCancelB.SetActive(!tCancelB.activeSelf);
+            tClearB.SetActive(!tClearB.activeSelf);
+        }
     }
 
     public void SetDrawButton(Player p, bool interactable) {
-        if (interactable && mm.myID != p.id) // if not the localp, don't turn on the draw button
+        if (interactable && !p.ThisIsLocal()) // if not the localp, no draw button
             return;
         if (p.id == 1)
             p1info.Find("Button_Draw").GetComponent<Button>().interactable = interactable;
@@ -229,8 +231,10 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void ActivateSpellButton(Player player, int index){
-		Button button = GetButton (player, index);
-		button.interactable = true;
+        if (player.ThisIsLocal()) {
+            Button button = GetButton(player, index);
+            button.interactable = true;
+        }
 	}
 
 	public void DeactivateSpellButton(Player player, int index){

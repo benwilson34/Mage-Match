@@ -5,7 +5,7 @@ public class Spell {
 
 	public string name;
 	public int APcost;
-	public int turns; // TODO
+    public int index;
 
 	private TileSeq seq;
 	private TileSeq boardSeq;
@@ -13,7 +13,8 @@ public class Spell {
 	public delegate void MySpellEffect();
 	private MySpellEffect effect;
 	
-	public Spell(string name, string seq, int APcost, MySpellEffect effect){
+	public Spell(int index, string name, string seq, int APcost, MySpellEffect effect){
+        this.index = index;
 		this.name = name;
 		this.seq = new TileSeq (seq);
 		this.APcost = APcost;

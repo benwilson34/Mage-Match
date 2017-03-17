@@ -217,7 +217,7 @@ public class SpellEffects {
         targeting.WaitForTileTarget(1, LightningPalm_Target);
 	}
 	void LightningPalm_Target(TileBehav tb){
-		List<TileBehav> tileList = hexGrid.GetPlacedTiles ();
+        List<TileBehav> tileList = hexGrid.GetPlacedTiles ();
 		Tile tile;
 		for (int i = 0; i < tileList.Count; i++) {
 			tile = tileList [i].tile;
@@ -245,7 +245,7 @@ public class SpellEffects {
         targeting.WaitForTileTarget(1, Cherrybomb_Target);
 	}
 	void Cherrybomb_Target(TileBehav tb){
-		Ench_SetCherrybomb(tb);
+        Ench_SetCherrybomb(tb);
 	}
 
 	public void Magnitude10(){

@@ -64,6 +64,10 @@ public class HexGrid {
 			return null;
 	}
 
+    public CellBehav GetCellBehavAt(int col, int row) {
+        return GameObject.Find("cell" + col + row).GetComponent<CellBehav>();
+    }
+
 	public int BottomOfColumn(int col){ // 0, 0, 0, 0, 1, 2, 3
 		if (col >= 0 && col <= 6)
 			return (int)Mathf.Max (0, col - 3);

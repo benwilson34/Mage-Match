@@ -3833,7 +3833,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: The Gravekeeper - Business
+  m_Text: Rocky - Tectonic Titan
 --- !u!222 &520853934
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6216,7 +6216,7 @@ MonoBehaviour:
   m_CaptionImage: {fileID: 0}
   m_ItemText: {fileID: 2021457019}
   m_ItemImage: {fileID: 0}
-  m_Value: 3
+  m_Value: 5
   m_Options:
     m_Options:
     - m_Text: TEST
@@ -13713,7 +13713,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentState: 0
   menu: 0
-  net: 0
+  myID: 0
+  commishTurn: 0
   uiCont: {fileID: 0}
   timer: {fileID: 0}
   turnManager: {fileID: 0}
