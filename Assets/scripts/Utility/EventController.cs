@@ -74,7 +74,7 @@ public class EventController {
     public delegate void DrawEvent(int id, Tile.Element elem, bool dealt);
     public event DrawEvent draw;
     public void Draw(int id, Tile.Element elem, bool dealt) {
-        Debug.Log("EVENTCONTROLLER: Draw called.");
+        //Debug.Log("EVENTCONTROLLER: Draw called.");
         if (draw != null)
             draw.Invoke(id, elem, dealt);
     }

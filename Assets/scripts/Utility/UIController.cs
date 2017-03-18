@@ -109,15 +109,19 @@ public class UIController : MonoBehaviour {
     }
     IEnumerator _SlidingText() {
         RectTransform boxRect = slidingText.rectTransform;
-        //Vector3 start = Camera.main.ScreenToWorldPoint(boxRect.position);
         Vector3 end = new Vector3(-boxRect.rect.width, slidingTextStart.y);
-        Debug.Log("UICONT: _SlidingText: start=" + slidingTextStart.ToString() + ", end=" + end.ToString());
-        float x = Vector3.Lerp(slidingTextStart, end, 0.5f).x; // just lerp floats?
-        Tween t = slidingText.rectTransform.DOMoveX(x, 1.5f).SetEase(Ease.OutSine);
-        yield return t.WaitForCompletion();
-        t = slidingText.rectTransform.DOMoveX(end.x, 1.5f).SetEase(Ease.InSine);
+        //Debug.Log("UICONT: _SlidingText: start=" + slidingTextStart.ToString() + ", end=" + end.ToString());
+        Tween t = slidingText.rectTransform.DOMoveX(end.x, 2f).SetEase(SlideEase);
         yield return t.WaitForCompletion();
         slidingText.rectTransform.position = slidingTextStart;
+    }
+
+    // maybe use an AnimationCurve instead? Editor stuff but much easier...!
+    public float SlideEase(float t, float d, float b, float c) {
+        t /= d;
+        float ts = t * t;
+        float tc = ts * t;
+        return 3.85f * tc * ts + -9.7f * ts * ts + 11.8f * tc + -8f * ts + 3.05f * t;
     }
 
 	public void UpdatePlayerInfo(){
