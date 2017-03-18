@@ -84,7 +84,7 @@ public class SpellEffects {
 	}
     public void HotBody_OnTurnChange(int id) {
         mm.GetPlayer(id).DealDamage(25, false); // should just be ChangeHealth(-25)?
-        mm.GetOpponent(id).DealDamage(25, false);
+        mm.GetPlayer(id).ChangeHealth(-25);
     }
 	void HotBody_Match(int id){
         // TODO still doesn't seem to function properly...seems to be whiffing at least once
@@ -363,7 +363,7 @@ public class SpellEffects {
                         ctb.GetEnchType() != Enchantment.EnchType.ZombieTok)) {
                         mm.RemoveTile(ctb.tile, true);
                         mm.GetPlayer(id).DealDamage(10, false);
-                        mm.GetPlayer(id).ChangeHealth(10, false, false);
+                        mm.GetPlayer(id).ChangeHealth(10);
                     }
                 } else if (ctb.HasEnchantment()) { // TODO TB - ableEnchant
                     i--;

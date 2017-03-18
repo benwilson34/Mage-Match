@@ -6,8 +6,8 @@ public class HexGrid {
 
 	public const int numCols = 7, numRows = 7;
 	public const int numCells = 37;
+    public const float horiz = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 
-	private const float horiz = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 	private TileBehav[,] tileGrid;
     private MageMatch mm;
 	// TODO public static List<TileBehav> tilesOnBoard?

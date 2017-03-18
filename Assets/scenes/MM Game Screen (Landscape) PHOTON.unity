@@ -13747,6 +13747,7 @@ GameObject:
   - component: {fileID: 1888761543}
   - component: {fileID: 1888761544}
   - component: {fileID: 1888761545}
+  - component: {fileID: 1888761546}
   m_Layer: 0
   m_Name: board
   m_TagString: Untagged
@@ -13792,6 +13793,7 @@ MonoBehaviour:
   uiCont: {fileID: 0}
   timer: {fileID: 0}
   turnManager: {fileID: 0}
+  animCont: {fileID: 0}
 --- !u!82 &1888761541
 AudioSource:
   m_ObjectHideFlags: 0
@@ -13931,6 +13933,47 @@ MonoBehaviour:
   instantiationId: 1
   currentMasterID: -1
   isRuntimeInstantiated: 0
+--- !u!114 &1888761546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1888761538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ee2f7173516e13448589eecf4c3464c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravEase:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: -0.0019381528
+      value: 0.0053477557
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.6858782
+      value: 0.9964073
+      inSlope: 3.8283944
+      outSlope: -0.8443088
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.8589173
+      value: 0.91439056
+      inSlope: 0.03423545
+      outSlope: -0.00456501
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.9962106
+      value: 1.0001221
+      inSlope: 0.62444067
+      outSlope: 0
+      tangentMode: 5
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!1 &1905753981
 GameObject:
   m_ObjectHideFlags: 0

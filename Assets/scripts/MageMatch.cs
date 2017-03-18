@@ -2,25 +2,17 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using DG.Tweening;
 
 public class MageMatch : MonoBehaviour {
 
     public enum GameState { PlayerTurn, TargetMode, CommishTurn };
     public GameState currentState;
-
-    private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
-    private GameObject stonePF, emberPF, zombiePF, prereqPF, targetPF; // token prefabs
     [HideInInspector]
     public bool menu = false; // is the settings menu open? ->move to UICont
-    public int myID;
-
-    private Player p1, p2, activep;
-    private bool endGame = false;     // is either player dead?
-    private int animating = 0;        // is something animating?
-    private bool checking = false;
     [HideInInspector]
-    public bool commishTurn = false;
+    public int myID;
+    [HideInInspector]
+    public bool commishTurn = false; // maybe make getters/setters?
 
     public Commish commish;
     public BoardCheck boardCheck;
@@ -33,7 +25,14 @@ public class MageMatch : MonoBehaviour {
     public EventController eventCont;
     public TurnTimer timer;
     public MyTurnManager turnManager;
+    public AnimationController animCont;
     // should SpellEffects instance be here?
+
+    private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
+    private GameObject stonePF, emberPF, zombiePF, prereqPF, targetPF; // token prefabs
+    private Player p1, p2, activep;
+    private bool endGame = false;     // is either player dead?
+    private bool checking = false;
 
     void Start() {
         Random.InitState(1337);
@@ -46,6 +45,7 @@ public class MageMatch : MonoBehaviour {
         audioCont = new AudioController();
         LoadPrefabs();
         turnManager = GetComponent<MyTurnManager>();
+        animCont = GetComponent<AnimationController>();
         myID = PhotonNetwork.player.ID;
 
         Reset();
@@ -79,6 +79,7 @@ public class MageMatch : MonoBehaviour {
         eventCont.boardAction += OnBoardAction;
         eventCont.gameAction += OnGameAction;
         turnManager.InitEvents(this, eventCont);
+        effectCont.InitEvents(eventCont);
 
         for (int i = 0; i < 4; i++)
             LocalP().DealTile();
@@ -120,7 +121,7 @@ public class MageMatch : MonoBehaviour {
 
     public void OnGameAction(int id, bool costsAP) { // eventually just pass in int for cost?
         if (currentState != GameState.CommishTurn) { //?
-            Debug.Log("MAGEMATCH: OnGameAction called!");
+            //Debug.Log("MAGEMATCH: OnGameAction called!");
             if(costsAP)
                 activep.AP--;
             if (activep.AP == 0) {
@@ -136,7 +137,7 @@ public class MageMatch : MonoBehaviour {
         checking = true; // prevents overcalling/retriggering
         int cascade = 0;
         while (true) {
-            yield return new WaitUntil(() => !menu && !IsTargetMode() && !IsAnimating());
+            yield return new WaitUntil(() => !menu && !IsTargetMode() && !animCont.IsAnimating());
             hexGrid.CheckGrav(); // TODO! move into v(that)v?
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
             List<TileSeq> seqMatches = boardCheck.MatchCheck();
@@ -163,10 +164,9 @@ public class MageMatch : MonoBehaviour {
         Debug.Log("MAGEMATCH: Starting TurnSystem.");
         timer.Pause();
         yield return new WaitUntil(() => !checking);
-        effectCont.ResolveEndTurnEffects();
+        eventCont.TurnEnd();
         BoardChanged(); // why doesn't this happen when resolving turn effects?
         yield return new WaitUntil(() => !checking);
-        eventCont.TurnEnd();
         uiCont.DeactivateAllSpellButtons(activep);
         uiCont.SetDrawButton(activep, false);
 
@@ -185,7 +185,7 @@ public class MageMatch : MonoBehaviour {
             yield return new WaitUntil(() => !commishTurn);
         }
 
-        yield return new WaitUntil(() => animating == 0); // needed anymore?
+        yield return new WaitUntil(() => !animCont.IsAnimating()); // needed anymore?
         Debug.Log("MAGEMATCH: Commish turn done.");
         eventCont.CommishTurnDone();
         uiCont.UpdateMoveText("Completed turns: " + stats.turns);
@@ -193,14 +193,12 @@ public class MageMatch : MonoBehaviour {
         activep = InactiveP();
         eventCont.TurnBegin();
         activep.InitAP();
-        //activep.FlipHand ();
         uiCont.SetDrawButton(activep, true);
         uiCont.FlipGradient(); // ugly
         uiCont.UpdatePlayerInfo();
 
         if (MyTurn())
             activep.DealTile();
-        effectCont.ResolveBeginTurnEffects();
 
         SpellCheck();
         yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
@@ -384,7 +382,6 @@ public class MageMatch : MonoBehaviour {
         return GenerateTile(element, GameObject.Find("tileSpawn").transform.position);
     }
 
-    // TODO Resource.Load() calls
     public GameObject GenerateTile(Tile.Element element, Vector3 position) {
         GameObject go;
         switch (element) {
@@ -457,10 +454,14 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void RemoveTile(Tile tile, bool resolveEnchant) {
-        RemoveTile(tile.col, tile.row, resolveEnchant);
+        StartCoroutine(_RemoveTile(tile.col, tile.row, resolveEnchant));
     }
 
     public void RemoveTile(int col, int row, bool resolveEnchant) {
+        StartCoroutine(_RemoveTile(col, row, resolveEnchant));
+    }
+
+    IEnumerator _RemoveTile(int col, int row, bool resolveEnchant) {
         //		Debug.Log ("Removing (" + col + ", " + row + ")");
         TileBehav tb = hexGrid.GetTileBehavAt(col, row);
         if (tb.HasEnchantment()) {
@@ -471,23 +472,11 @@ public class MageMatch : MonoBehaviour {
             tb.ClearEnchantment(); // TODO
         }
 
-        StartCoroutine(Remove_Anim(col, row, tb)); // FIXME hardcode
-    }
+        yield return animCont._RemoveTile(tb);
 
-    IEnumerator Remove_Anim(int col, int row, TileBehav tb) {
-        animating++;
-        Tween swellTween = tb.transform.DOScale(new Vector3(1.25f, 1.25f), .15f);
-        tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .15f);
-        //		Camera.main.DOShakePosition (.1f, 1.5f, 20, 90, false);
-        audioCont.BreakSound();
-
-        yield return swellTween.WaitForCompletion();
-        animating--;
         Destroy(tb.gameObject);
         hexGrid.ClearTileBehavAt(col, row);
-
         eventCont.TileRemove(tb); //? not needed for checking but idk
-
         BoardChanged();
     }
 
@@ -521,19 +510,4 @@ public class MageMatch : MonoBehaviour {
         return currentState == GameState.TargetMode;
     }
 
-    public void IncAnimating() {
-        animating++;
-    }
-
-    public void DecAnimating() {
-        animating--;
-    }
-
-    public bool IsAnimating() {
-        return animating > 0;
-    }
-
-    public void StartAnim(IEnumerator anim) {
-        StartCoroutine(anim);
-    }
 }

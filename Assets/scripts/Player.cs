@@ -1,18 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using DG.Tweening;
 
 public class Player {
 
-    public string name;
     public int id;
+    public string name;
+    public Character character;
     public int health;
     public int AP;
+    public Transform handSlot;
     public List<TileBehav> hand; // private
     public int handSize = 7;
-    public int tilesPlaced, tilesSwapped, matches;
-    public Character character;
 
     private Spell currentSpell;
     private MageMatch mm;
@@ -20,9 +19,6 @@ public class Player {
 
     private float buff_dmgMult = 1;
     private int buff_dmgExtra;
-
-    public Transform handSlot;
-    private const float vert = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 
     public Player(int playerNum) {
         AP = 0;
@@ -56,7 +52,11 @@ public class Player {
         }
     }
 
-    public void ChangeHealth(int amount, bool dealt, bool sent) { // TODO clamp instead?
+    public void ChangeHealth(int amount) {
+        ChangeHealth(amount, false, false);
+    }
+
+    public void ChangeHealth(int amount, bool dealt, bool sent) {
         if (ThisIsLocal() || dealt) {
             int newAmount = 0;
             if (amount < 0) { // damage
@@ -112,33 +112,7 @@ public class Player {
     }
 
     public void AlignHand(float duration, bool linear) {
-        GameObject.Find("board").GetComponent<MageMatch>().StartAnim(AlignHand_Anim(duration, linear));
-    }
-
-    public IEnumerator AlignHand_Anim(float dur, bool linear) {
-        TileBehav tb;
-        Tween tween;
-        for (int i = 0; i < hand.Count; i++) {
-            tb = hand[i];
-            //			Debug.Log ("AlignHand hand[" + i + "] = " + tb.transform.name + ", position is (" + handSlot.position.x + ", " + handSlot.position.y + ")");
-            if (id == 1) {
-                if (i < 2)
-                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x - i - .5f, handSlot.position.y + vert), dur, false);
-                else if (i < 5)
-                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x - (i - 2), handSlot.position.y), dur, false);
-                else
-                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x - (i - 5) - .5f, handSlot.position.y - vert), dur, false);
-            } else {
-                if (i < 2)
-                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x + i + .5f, handSlot.position.y + vert), dur, false);
-                else if (i < 5)
-                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x + (i - 2), handSlot.position.y), dur, false);
-                else
-                    tween = tb.transform.DOMove(new Vector3(handSlot.position.x + (i - 5) + .5f, handSlot.position.y - vert), dur, false);
-            }
-            if (linear || i == hand.Count - 1)
-                yield return tween.WaitForCompletion();
-        }
+        mm.animCont.PlayAnim(mm.animCont._AlignHand(this, duration, linear));
     }
 
     public int DiscardRandom(int count) {

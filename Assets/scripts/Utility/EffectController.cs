@@ -12,6 +12,21 @@ public class EffectController {
         endTurnEffects = new List<Effect>();
     }
 
+    public void InitEvents(EventController eventCont) {
+        eventCont.turnBegin += OnTurnBegin;
+        eventCont.turnEnd += OnTurnEnd;
+    }
+
+    #region EventCont calls
+    public void OnTurnBegin(int id) {
+        ResolveBeginTurnEffects();
+    }
+
+    public void OnTurnEnd(int id) {
+        ResolveEndTurnEffects();
+    }
+    #endregion
+
     public void AddBeginTurnEffect(Effect e) {
         // TODO insert at correct position for priority
         beginTurnEffects.Add(e);
@@ -34,16 +49,16 @@ public class EffectController {
     }
 
     public void ResolveBeginTurnEffects() {
-        Effect effect;
+        Effect e;
         for (int i = 0; i < beginTurnEffects.Count; i++) {
-            effect = beginTurnEffects[i];
-            if (effect.ResolveEffect()) { // if it's the last pass of the effect (turnsLeft == 0)
-                beginTurnEffects.Remove(effect);
-                if (effect is Enchantment)
-                    ((Enchantment)effect).GetEnchantee().ClearEnchantment();
+            e = beginTurnEffects[i];
+            if (e.ResolveEffect()) { // if it's the last pass of the effect (turnsLeft == 0)
+                beginTurnEffects.Remove(e);
+                if (e is Enchantment)
+                    ((Enchantment)e).GetEnchantee().ClearEnchantment();
                 i--;
             } else {
-                Debug.Log("MAGEMATCH: Beginning-of-turn effect " + i + " has " + effect.TurnsRemaining() + " turns left.");
+                Debug.Log("MAGEMATCH: Beginning-of-turn effect " + i + " has " + e.TurnsRemaining() + " turns left.");
             }
         }
     }
