@@ -6,18 +6,18 @@ using DG.Tweening;
 
 public class UIController : MonoBehaviour {
 
+    public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
+    public AnimationCurve slidingEase;
+
 	private Text moveText, debugGridText, turnTimerText, slidingText;
 	private MageMatch mm;
 	private Dropdown DD1, DD2;
-
     private Transform p1info, p2info, p1load, p2load;
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
     private SpellEffects spellfx;
     private Vector3 slidingTextStart;
-
-    public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
 
     public void Init(){ // Awake()?
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -52,6 +52,33 @@ public class UIController : MonoBehaviour {
 
         spellfx = new SpellEffects();
     }
+
+    public void InitEvents() {
+        mm.eventCont.turnBegin += OnTurnBegin;
+        mm.eventCont.match += OnMatch;
+        mm.eventCont.cascade += OnCascade;
+    }
+
+    #region EventCont calls
+    public void OnTurnBegin(int id) {
+        if (mm.MyTurn())
+            SendSlidingText(mm.ActiveP().name + ", make your move!");
+        UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
+        SetDrawButton(mm.ActiveP(), true);
+        FlipGradient(); // ugly
+        UpdatePlayerInfo();
+    }
+
+    public void OnMatch(int id, int[] lens) {
+        if (lens.Length > 1)
+            SendSlidingText("Wow, nice combo!");
+    }
+
+    public void OnCascade(int id, int chain) {
+        UpdateMoveText("Wow, a cascade of " + chain + " matches!");
+        SendSlidingText("Wow, a cascade of " + chain + " matches!");
+    }
+    #endregion
 
     public void Reset(Player p1, Player p2) { // could just get players from MM
         UpdateDebugGrid();
@@ -100,28 +127,21 @@ public class UIController : MonoBehaviour {
 
 	public void UpdateMoveText(string str){
 		moveText.text = str;
-        SendSlidingText(str);
 	}
 
     public void SendSlidingText(string str) {
         slidingText.text = str;
         StartCoroutine(_SlidingText());
     }
+
+    // TODO prevent retriggering
     IEnumerator _SlidingText() {
         RectTransform boxRect = slidingText.rectTransform;
         Vector3 end = new Vector3(-boxRect.rect.width, slidingTextStart.y);
         //Debug.Log("UICONT: _SlidingText: start=" + slidingTextStart.ToString() + ", end=" + end.ToString());
-        Tween t = slidingText.rectTransform.DOMoveX(end.x, 2f).SetEase(SlideEase);
+        Tween t = slidingText.rectTransform.DOMoveX(end.x, 2f).SetEase(slidingEase);
         yield return t.WaitForCompletion();
         slidingText.rectTransform.position = slidingTextStart;
-    }
-
-    // maybe use an AnimationCurve instead? Editor stuff but much easier...!
-    public float SlideEase(float t, float d, float b, float c) {
-        t /= d;
-        float ts = t * t;
-        float tc = ts * t;
-        return 3.85f * tc * ts + -9.7f * ts * ts + 11.8f * tc + -8f * ts + 3.05f * t;
     }
 
 	public void UpdatePlayerInfo(){

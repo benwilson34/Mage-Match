@@ -44,6 +44,29 @@ public class Player {
         health = character.GetMaxHealth();
     }
 
+    public void InitEvents() {
+        mm.eventCont.match += OnMatch;
+    }
+
+    public void OnMatch(int id, int[] lens) {
+        if (id == this.id) {
+            foreach (int count in lens) {
+                ResolveMatchEffect();
+                switch (count) {
+                    case 3:
+                        DealDamage(Random.Range(30, 50), false); // diff 20
+                        break;
+                    case 4:
+                        DealDamage(Random.Range(60, 85), false); // diff 25
+                        break;
+                    case 5:
+                        DealDamage(Random.Range(95, 125), false); // diff 30
+                        break;
+                }
+            }
+        }
+    }
+
     public void DealDamage(int amount, bool sent) {
         Debug.Log("PLAYER: >>>Dealing " + (-amount) + "dmg to p" + id);
         if (ThisIsLocal() || sent) {

@@ -6,7 +6,7 @@ using System;
 
 public class Stats {
 
-    public int turns = 0;
+    public int turns = 1;
 
     private int commishMatches, commishDrops;
 
@@ -17,7 +17,7 @@ public class Stats {
         public string name;
         public string character;
         public string loadout;
-        public int draws, drops, swaps, matches, cascades, tilesRemoved, spellsCast, timeouts;
+        public int draws, drops, swaps, matches, match3s, match4s, match5s, cascades, tilesRemoved, spellsCast, timeouts;
         public int dmgDealt, dmgTaken, healingDone;
         public int longestCascade;
     }
@@ -62,8 +62,8 @@ public class Stats {
         report.AppendLine(ps2.name + " (" + ps2.character + " - " + ps2.loadout + ")");
         int rand = UnityEngine.Random.state.GetHashCode(); //?
         report.AppendLine("random seed - " + rand);
-        report.AppendLine("...setup - deal p1 4, deal p2 4");
-        report.AppendLine("T1 - deal p1 1");
+        report.AppendLine("...setup - deal p1 4, deal p2 4"); //?
+        report.AppendLine("T1 - ");
     }
 
     PlayerStat GetPS(int id) {
@@ -81,12 +81,12 @@ public class Stats {
     }
 
     public void OnTurnBegin(int id) {
-        report.AppendLine("\nT" + turns + " - ");
+        report.Append("\nT" + turns + " - ");
     }
 
     public void OnTurnEnd(int id) {
-        turns++;
         report.AppendLine("\nC" + turns + " - ");
+        turns++;
     }
 
     public void OnTimeout(int id) {
@@ -99,13 +99,12 @@ public class Stats {
         report.AppendLine("C-drop " + Tile.ElementToChar(elem) + " col" + col);
     }
 
-    public void OnCommishMatch(int count) {
-        commishMatches += count;
-        report.AppendLine("...Commish match.");
+    public void OnCommishMatch(int[] lens) {
+        commishMatches += lens.Length;
+        report.AppendLine("...Commish made "+lens.Length+" match(es)");
     }
 
     #region GameAction subscriptions
-
     public void OnDraw(int id, Tile.Element elem, bool dealt) {
         if(dealt)
             report.AppendLine("Deal p"+id+" " + Tile.ElementToChar(elem));
@@ -134,16 +133,23 @@ public class Stats {
         report.AppendLine("Spell " + spell.name);
         GetPS(id).spellsCast++;
     }
-
     #endregion
 
-    public void OnMatch(int id, int count) {
-        report.AppendLine("...match");
-        GetPS(id).matches += count;
+    public void OnMatch(int id, int[] lens) {
+        report.AppendLine("...made " + lens.Length + " match(es)");
+        GetPS(id).matches += lens.Length;
+        foreach (int len in lens) {
+            if (len == 3)
+                GetPS(id).match3s++;
+            else if(len == 4)
+                GetPS(id).match4s++;
+            else
+                GetPS(id).match5s++;
+        }
     }
 
     public void OnCascade(int id, int chain) {
-        //Debug.Log("STATS: OnCascade called. chain = " + chain);
+        report.AppendLine("...cascade of " + chain + " matches");
         PlayerStat ps = GetPS(id);
         ps.cascades++;
         if (ps.longestCascade < chain)
@@ -189,7 +195,9 @@ public class Stats {
             sb.AppendLine("Tiles drawn," + ps.draws);
             sb.AppendLine("Tiles dropped," + ps.drops);
             sb.AppendLine("Tiles swapped," + ps.swaps);
-            sb.AppendLine("Matches," + ps.matches);
+            sb.AppendLine("Matches," + ps.matches + ",...match-3s," + ps.match3s);
+            sb.AppendLine(",,...match-4s," + ps.match4s);
+            sb.AppendLine(",,...match-5s," + ps.match5s);
             sb.AppendLine("Cascades," + ps.cascades + ",...longest," + ps.longestCascade);
             sb.AppendLine("Tiles removed," + ps.tilesRemoved);
             sb.AppendLine("Spells cast," + ps.spellsCast);

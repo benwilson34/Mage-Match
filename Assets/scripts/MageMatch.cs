@@ -73,13 +73,18 @@ public class MageMatch : MonoBehaviour {
         p2 = new Player(2);
         activep = p1;
 
-        commish = new Commish();
+        commish = new Commish(this);
 
+        // TODO make its own method
         eventCont = new EventController(this);
         eventCont.boardAction += OnBoardAction;
         eventCont.gameAction += OnGameAction;
         turnManager.InitEvents(this, eventCont);
         effectCont.InitEvents(eventCont);
+        commish.InitEvents();
+        uiCont.InitEvents();
+        p1.InitEvents();
+        p2.InitEvents();
 
         for (int i = 0; i < 4; i++)
             LocalP().DealTile();
@@ -122,7 +127,7 @@ public class MageMatch : MonoBehaviour {
     public void OnGameAction(int id, bool costsAP) { // eventually just pass in int for cost?
         if (currentState != GameState.CommishTurn) { //?
             //Debug.Log("MAGEMATCH: OnGameAction called!");
-            if(costsAP)
+            if (costsAP)
                 activep.AP--;
             if (activep.AP == 0) {
                 uiCont.SetDrawButton(activep, false);
@@ -132,6 +137,47 @@ public class MageMatch : MonoBehaviour {
         }
     }
     #endregion
+
+    IEnumerator TurnSystem() {
+        Debug.Log("MAGEMATCH: Starting TurnSystem.");
+        timer.Pause();
+        yield return new WaitUntil(() => !checking);
+        eventCont.TurnEnd();
+        BoardChanged(); // why doesn't this happen when resolving turn effects?
+        yield return new WaitUntil(() => !checking);
+        uiCont.DeactivateAllSpellButtons(activep);
+        uiCont.SetDrawButton(activep, false);
+
+        currentState = GameState.CommishTurn;
+
+        //Debug.Log("MAGEMATCH: TurnSystem: About to check for MyTurn...currentState="+currentState.ToString());
+        if (MyTurn()) {
+            //Debug.Log("MAGEMATCH: Turnsystem: My turn; waiting for the go-ahead from the other player.");
+            yield return new WaitUntil(() => commishTurn);
+            Debug.Log("MAGEMATCH: TurnSystem: My turn, about to start the Commish's turn.");
+            yield return commish.CTurn(); // place 5 random tiles
+        } else {
+            turnManager.CommishTurnStart();
+            commishTurn = true; //?
+            Debug.Log("MAGEMATCH: Turnsystem: Not my turn, but the Commish's turn just started.");
+            yield return new WaitUntil(() => !commishTurn);
+        }
+
+        yield return new WaitUntil(() => !checking); // needed anymore?
+
+        activep = InactiveP();
+        activep.InitAP();
+        eventCont.TurnBegin();
+
+        if (MyTurn()) {
+            activep.DealTile();
+        }
+
+        SpellCheck();
+        yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
+        currentState = GameState.PlayerTurn;
+        timer.InitTimer();
+    }
 
     public IEnumerator BoardChecking() {
         checking = true; // prevents overcalling/retriggering
@@ -146,10 +192,8 @@ public class MageMatch : MonoBehaviour {
                 cascade++;
             } else {
                 if (currentState == GameState.PlayerTurn) {
-                    if (cascade > 1) {
-                        uiCont.UpdateMoveText("Wow, a cascade of " + cascade + " matches!");
+                    if (cascade > 1)
                         eventCont.Cascade(cascade);
-                    }
                     SpellCheck();
                 }
                 uiCont.UpdateDebugGrid();
@@ -158,52 +202,6 @@ public class MageMatch : MonoBehaviour {
             uiCont.UpdatePlayerInfo(); // try to move out of main loop
         }
         checking = false;
-    }
-
-    IEnumerator TurnSystem() {
-        Debug.Log("MAGEMATCH: Starting TurnSystem.");
-        timer.Pause();
-        yield return new WaitUntil(() => !checking);
-        eventCont.TurnEnd();
-        BoardChanged(); // why doesn't this happen when resolving turn effects?
-        yield return new WaitUntil(() => !checking);
-        uiCont.DeactivateAllSpellButtons(activep);
-        uiCont.SetDrawButton(activep, false);
-
-        currentState = GameState.CommishTurn;
-
-        Debug.Log("MAGEMATCH: TurnSystem: About to check for MyTurn...");
-        if (MyTurn()) {
-            Debug.Log("MAGEMATCH: Turnsystem: My turn; waiting for the go-ahead from the other player.");
-            yield return new WaitUntil(() => commishTurn);
-            Debug.Log("MAGEMATCH: TurnSystem: My turn, about to start the Commish's turn.");
-            yield return commish.CTurn(); // place 5 random tiles
-        } else {
-            turnManager.CommishTurnStart();
-            
-            Debug.Log("MAGEMATCH: Turnsystem: Not my turn, but the Commish's turn just started.");
-            yield return new WaitUntil(() => !commishTurn);
-        }
-
-        yield return new WaitUntil(() => !animCont.IsAnimating()); // needed anymore?
-        Debug.Log("MAGEMATCH: Commish turn done.");
-        eventCont.CommishTurnDone();
-        uiCont.UpdateMoveText("Completed turns: " + stats.turns);
-
-        activep = InactiveP();
-        eventCont.TurnBegin();
-        activep.InitAP();
-        uiCont.SetDrawButton(activep, true);
-        uiCont.FlipGradient(); // ugly
-        uiCont.UpdatePlayerInfo();
-
-        if (MyTurn())
-            activep.DealTile();
-
-        SpellCheck();
-        yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
-        currentState = GameState.PlayerTurn;
-        timer.InitTimer();
     }
 
     void SpellCheck() { // TODO clean up
@@ -235,28 +233,12 @@ public class MageMatch : MonoBehaviour {
     }
 
     void ResolveMatchEffects(List<TileSeq> seqList) {
-        Debug.Log("MAGEMATCH: At least one match: " + boardCheck.PrintSeqList(seqList));
-        for (int i = 0; i < seqList.Count; i++) {
-            if (currentState != GameState.CommishTurn) {
-                eventCont.Match(seqList.Count); // raise player Match event
-                activep.ResolveMatchEffect(); // match-based effects ->EventCont
-
-                if (seqList[i].GetSeqLength() == 3) {
-
-                    // TODO prevent both clients from choosing dmg amount!!
-
-                    ActiveP().DealDamage(Random.Range(30, 50), false); // diff 20
-                    commish.ChangeMood(10);
-                } else if (seqList[i].GetSeqLength() == 4) {
-                    ActiveP().DealDamage(Random.Range(60, 85), false); // diff 25
-                    commish.ChangeMood(15);
-                } else { // TODO critical matches
-                    ActiveP().DealDamage(Random.Range(95, 125), false); // diff 30
-                    commish.ChangeMood(20);
-                }
-            } else {
-                eventCont.CommishMatch(seqList.Count); // raise CommishMatch event
-            }
+        Debug.Log("MAGEMATCH: At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
+        if (currentState != GameState.CommishTurn) {
+            Debug.Log("MAGEMATCH: Match was made by a player!!");
+            eventCont.Match(GetTileSeqsLens(seqList)); // raise player Match event
+        } else {
+            eventCont.CommishMatch(GetTileSeqsLens(seqList)); // raise CommishMatch event
         }
         RemoveSeqList(seqList);
     }
@@ -480,9 +462,18 @@ public class MageMatch : MonoBehaviour {
         BoardChanged();
     }
 
+    // move to BoardCheck?
+    public int[] GetTileSeqsLens(List<TileSeq> seqs) {
+        int[] lens = new int[seqs.Count];
+        int i = 0;
+        foreach (TileSeq seq in seqs) {
+            lens[i] = seq.GetSeqLength();
+            i++;
+        }
+        return lens;
+    }
+
     public void BoardChanged() {
-        //if(currentState != GameState.CommishTurn)
-        //	currentState = GameState.BoardChecking;
         eventCont.BoardAction();
     }
 
@@ -494,20 +485,12 @@ public class MageMatch : MonoBehaviour {
         eventCont.boardAction -= OnBoardAction; //?
     }
 
-    public bool IsEnded() {
-        return endGame;
-    }
+    public bool IsEnded() { return endGame; }
 
-    public bool IsCommishTurn() {
-        //		if (currentState == GameState.CommishTurn)
-        //			Debug.Log ("IsCommishTurn evaluates to true!");
-        //		else
-        //			Debug.Log ("IsCommishTurn evaluates to false!");
-        return currentState == GameState.CommishTurn;
-    }
+    public bool IsCommishTurn() { return currentState == GameState.CommishTurn; }
 
-    public bool IsTargetMode() {
-        return currentState == GameState.TargetMode;
-    }
+    public bool IsTargetMode() { return currentState == GameState.TargetMode; }
+
+    public bool IsBoardChecking() { return checking; }
 
 }

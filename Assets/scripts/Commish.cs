@@ -3,12 +3,33 @@ using System.Collections;
 
 public class Commish  {
 
-	private int mood = 0;
+	private int mood = 0, numTiles;
 	private MageMatch mm;
     //private bool activeEffects = true;
 
-	public Commish() {
-		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+	public Commish(MageMatch mm) {
+        this.mm = mm;
+    }
+
+    public void InitEvents() {
+        mm.eventCont.commishMatch += OnCommishMatch;
+        mm.eventCont.match += OnMatch;
+    }
+
+    public void OnCommishMatch(int[] lens) {
+        int sum = 0;
+        string s = "{";
+        foreach (int i in lens) {
+            sum += i;
+            s += i + ",";
+        }
+        s = s.Remove(s.Length - 1, 1) + "}";
+        Debug.Log("COMMISH: CommishMatch: lens=" + s + ", sum=" + sum);
+        numTiles += sum;
+    }
+
+    public void OnMatch(int id, int[] lens) {
+        // TODO mood stuff etc.
     }
 
     public IEnumerator CTurn(){
@@ -21,16 +42,17 @@ public class Commish  {
         //        ChangeMood(-35);
 
         //}
+        numTiles = 5;
         yield return PlaceTiles();
 //		Debug.Log ("CTurn: done placing tiles.");
 	}
 
 	public IEnumerator PlaceTiles(){
-        int numTiles = 5;
 		int tries = 20;
 		float[] ratios;
 		yield return ratios = mm.boardCheck.EmptyCheck ();
 
+        bool finalSuccess = false;
 		GameObject go = mm.GenerateTile (GetTileElement());
 
 		for (int i = 0; i < numTiles && tries > 0; i++) {
@@ -46,13 +68,24 @@ public class Commish  {
 			} else {
 				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
 				tries = 20;
-			}
+                if (i == numTiles - 1)
+                    finalSuccess = true;
+            }
+
+            if (finalSuccess) {
+                yield return new WaitUntil(() => !mm.IsBoardChecking());
+                finalSuccess = false;
+            }
 		}
 
 		if (tries == 0) {
 			Debug.Log ("COMMISH: The board is full. The Commissioner ends his turn early.");
 			GameObject.Destroy (go);
 		}
+
+        // TODO timing???
+	    Debug.Log ("COMMISH: CommishTurnDone.");
+        mm.eventCont.CommishTurnDone();
 	}
 
 	Tile.Element GetTileElement (){

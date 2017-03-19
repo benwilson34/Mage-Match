@@ -3907,7 +3907,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Rocky - Tectonic Titan
+  m_Text: The Gravekeeper - Business
 --- !u!222 &520853934
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6290,7 +6290,7 @@ MonoBehaviour:
   m_CaptionImage: {fileID: 0}
   m_ItemText: {fileID: 2021457019}
   m_ItemImage: {fileID: 0}
-  m_Value: 5
+  m_Value: 3
   m_Options:
     m_Options:
     - m_Text: TEST
@@ -15728,6 +15728,36 @@ MonoBehaviour:
   miniEarth: {fileID: 21300004, guid: c132b7527a90ed34090eacdbca824bb3, type: 3}
   miniAir: {fileID: 21300010, guid: c132b7527a90ed34090eacdbca824bb3, type: 3}
   miniMuscle: {fileID: 21300008, guid: c132b7527a90ed34090eacdbca824bb3, type: 3}
+  slidingEase:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 2.8715081
+      outSlope: 2.8715081
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.2555388
+      value: 0.39740157
+      inSlope: 0.6829202
+      outSlope: 0.6829202
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.7950378
+      value: 0.6650169
+      inSlope: 1.0120869
+      outSlope: 1.0120869
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 1
+      inSlope: 2.8715122
+      outSlope: 2.8715122
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!1 &2111427543
 GameObject:
   m_ObjectHideFlags: 0

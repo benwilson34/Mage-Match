@@ -118,6 +118,19 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
         //mm.commishTurn = true;
     }
 
+    // eventually should be an event?
+    public void CommishTurnStart() {
+        if (!mm.MyTurn()) { // not totally necessary...
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleCommishTurnStart", PhotonTargets.Others);
+        }
+    }
+
+    [PunRPC]
+    public void HandleCommishTurnStart() {
+        mm.commishTurn = true;
+    }
+
     public void OnCommishTurnDone() {
         if (mm.MyTurn()) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
@@ -127,6 +140,7 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
 
     [PunRPC]
     public void HandleCommishTurnDone() {
+        Debug.Log("TURNMANAGER: CommishTurnDone!");
         mm.commishTurn = false;
     }
 
@@ -145,19 +159,6 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
         } else {
             mm.GetPlayer(id).ChangeHealth(amount, dealt, true);
         }
-    }
-
-    // eventually should be an event?
-    public void CommishTurnStart() {
-        if (!mm.MyTurn()) { // not totally necessary...
-            PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleCommishTurnStart", PhotonTargets.Others);
-        }
-    }
-
-    [PunRPC]
-    public void HandleCommishTurnStart() {
-        mm.commishTurn = true;
     }
 
     public void OnSpellCast(int id, Spell spell) {
