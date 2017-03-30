@@ -122,13 +122,13 @@ public class Player {
 
             TileBehav tb = go.GetComponent<TileBehav>();
             tileElems[i] = tb.tile.element;
+            mm.eventCont.GrabTile(tb.tile.element);
             hand.Add(tb);
 
             mm.eventCont.Draw(id, tb.tile.element, dealt);
             if (!dealt)
                 mm.eventCont.GameAction(true); //?
         }
-        mm.audioCont.PickupSound(mm.GetComponent<AudioSource>());
         AlignHand(.1f, linear);
 
         return tileElems;
