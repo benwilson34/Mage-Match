@@ -111,7 +111,9 @@ public class MageMatch : MonoBehaviour {
         eventCont = new EventController(this);
         eventCont.boardAction += OnBoardAction;
         eventCont.gameAction += OnGameAction;
+
         syncManager.InitEvents(this, eventCont);
+        audioCont.InitEvents();
         effectCont.InitEvents();
         commish.InitEvents();
         uiCont.InitEvents();

@@ -62,6 +62,7 @@ public class UIController : MonoBehaviour {
     public void InitEvents() {
         mm.eventCont.turnBegin += OnTurnBegin;
         mm.eventCont.turnEnd += OnTurnEnd;
+        mm.eventCont.gameAction += OnGameAction;
         mm.eventCont.match += OnMatch;
         mm.eventCont.cascade += OnCascade;
     }
@@ -79,6 +80,10 @@ public class UIController : MonoBehaviour {
 
     public void OnTurnEnd(int id) {
         UpdateEffTexts();
+    }
+
+    public void OnGameAction(int id, bool costsAP) {
+        UpdateEffTexts(); // could be considerable overhead...
     }
 
     public void OnMatch(int id, int[] lens) {

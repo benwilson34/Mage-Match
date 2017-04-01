@@ -55,6 +55,8 @@ public class Player {
 
             if(ThisIsLocal()) // i think?
                 DealTile();
+
+            mm.uiCont.UpdatePlayerInfo(); // not needed once events have priority...?
         }
     }
 
@@ -132,7 +134,7 @@ public class Player {
 
             TileBehav tb = go.GetComponent<TileBehav>();
             tileElems[i] = tb.tile.element;
-            mm.eventCont.GrabTile(tb.tile.element);
+            //mm.eventCont.GrabTile(tb.tile.element);
             hand.Add(tb);
 
             mm.eventCont.Draw(id, tb.tile.element, dealt);

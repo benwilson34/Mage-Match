@@ -54,7 +54,7 @@ public class EffectController {
             fullTag += tag + "-" + tagDict[tag].ToString("D3");
         } else {
             tagDict.Add(tag, 1);
-            fullTag += tag + "001";
+            fullTag += tag + "-001";
         }
         Debug.Log("EFFECTCONT: adding effect with tag " + fullTag);
         return fullTag;
