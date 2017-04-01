@@ -132,7 +132,9 @@ public class InputController : MonoBehaviour {
                             //tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
 
                             dropTile = tb.gameObject;
-                            mm.audioCont.PickupSound(tb.gameObject.GetComponent<AudioSource>());
+                            mm.eventCont.GrabTile(tb.tile.element);
+                            //mm.audioCont.grabSound(tb.gameObject.GetComponent<AudioSource>());
+                            
                         }
                         break;
                     case TileBehav.TileState.Placed:

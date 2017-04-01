@@ -62,7 +62,6 @@ public class EventController {
             commishTurnDone.Invoke();
     }
 
-
     #region GameAction events
     public delegate void GameActionEvent(int id, bool costsAP);
     public event GameActionEvent gameAction;
@@ -132,5 +131,12 @@ public class EventController {
     public void PlayerHealthChange(int id, int amount, bool dealt, bool sent) {
         if (playerHealthChange != null)
             playerHealthChange.Invoke(id, amount, dealt, sent);
+    }
+
+    public delegate void GrabTileEvent(int id, Tile.Element elem);
+    public event GrabTileEvent grabTile;
+    public void GrabTile(Tile.Element elem) {
+        if (grabTile != null)
+            grabTile.Invoke(mm.ActiveP().id, elem);
     }
 }

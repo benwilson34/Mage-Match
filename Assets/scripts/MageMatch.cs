@@ -42,7 +42,7 @@ public class MageMatch : MonoBehaviour {
         timer = gameObject.GetComponent<TurnTimer>();
         effectCont = new EffectController(this); //?
         targeting = new Targeting();
-        audioCont = new AudioController();
+        audioCont = new AudioController(this);
         LoadPrefabs();
         syncManager = GetComponent<SyncManager>();
         animCont = GetComponent<AnimationController>();
@@ -289,7 +289,6 @@ public class MageMatch : MonoBehaviour {
                 if (!menu) { // move to stats?
                     eventCont.GameAction(true);
                 }
-                audioCont.SwapSound();
             }
         }
     }

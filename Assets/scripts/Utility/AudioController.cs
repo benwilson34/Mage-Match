@@ -3,60 +3,222 @@ using System.Collections;
 
 public class AudioController {
 
-	private AudioSource source;
-	private AudioClip[] swap, drop, hand, match;
+    private MageMatch mm;
 
-	public AudioController(){
+    private AudioSource source;
+	private AudioClip[] grab, match, swap_Fire, swap_Water, swap_Earth, swap_Air, swap_Muscle,
+                        drop_Fire, drop_Water, drop_Earth, drop_Air, drop_Muscle;
+
+	public AudioController(MageMatch mm){
 		source = GameObject.Find ("board").GetComponent<AudioSource> ();
+        this.mm = mm;
 
 		AudioListener.volume = .6f;
 
-		swap = new AudioClip[5];
-		swap[0] = (AudioClip)Resources.Load ("sounds/Swap-1");
-		swap[1] = (AudioClip)Resources.Load ("sounds/Swap-2");
-		swap[2] = (AudioClip)Resources.Load ("sounds/Swap-3");
-		swap[3] = (AudioClip)Resources.Load ("sounds/Swap-4");
-		swap[4] = (AudioClip)Resources.Load ("sounds/Swap-5");
-
-		drop = new AudioClip[5];
-		drop[0] = (AudioClip)Resources.Load ("sounds/Drop-2");
-		drop[1] = (AudioClip)Resources.Load ("sounds/Drop-3");
-		drop[2] = (AudioClip)Resources.Load ("sounds/Drop-6");
-		drop[3] = (AudioClip)Resources.Load ("sounds/Drop-8");
-		drop[4] = (AudioClip)Resources.Load ("sounds/Drop-9");
-
-		hand = new AudioClip[5];
-		hand[0] = (AudioClip)Resources.Load ("sounds/Hand-0");
-		hand[1] = (AudioClip)Resources.Load ("sounds/Hand-1");
-		hand[2] = (AudioClip)Resources.Load ("sounds/Hand-3");
-		hand[3] = (AudioClip)Resources.Load ("sounds/Hand-4");
-		hand[4] = (AudioClip)Resources.Load ("sounds/Hand-5");
+		grab = new AudioClip[5];
+		grab[0] = (AudioClip)Resources.Load ("sounds/grab_01");
+		grab[1] = (AudioClip)Resources.Load ("sounds/grab_02");
+		grab[2] = (AudioClip)Resources.Load ("sounds/grab_03");
+		grab[3] = (AudioClip)Resources.Load ("sounds/grab_04");
+		grab[4] = (AudioClip)Resources.Load ("sounds/grab_05");
 
 		match = new AudioClip[5];
-		match[0] = (AudioClip)Resources.Load ("sounds/Match-7-1");
-		match[1] = (AudioClip)Resources.Load ("sounds/Match-7-2");
-		match[2] = (AudioClip)Resources.Load ("sounds/Match-7-3");
-		match[3] = (AudioClip)Resources.Load ("sounds/Match-7-4");
-		match[4] = (AudioClip)Resources.Load ("sounds/Match-7-5");
-	}
+		match[0] = (AudioClip)Resources.Load ("sounds/match_01");
+		match[1] = (AudioClip)Resources.Load ("sounds/match_02");
+		match[2] = (AudioClip)Resources.Load ("sounds/match_03");
+		match[3] = (AudioClip)Resources.Load ("sounds/match_04");
+		match[4] = (AudioClip)Resources.Load ("sounds/match_05");
 
+        //TODO populate with new elemental soundfx ***Make sure to add files to resources folder!***
+        swap_Fire = new AudioClip[3];
+        swap_Fire[0] = (AudioClip)Resources.Load("sounds/swap_fire_01");
+        swap_Fire[1] = (AudioClip)Resources.Load("sounds/swap_fire_02");
+        swap_Fire[2] = (AudioClip)Resources.Load("sounds/swap_fire_03");
+
+        swap_Water = new AudioClip[3];
+        swap_Water[0] = (AudioClip)Resources.Load("sounds/swap_water_01");
+        swap_Water[1] = (AudioClip)Resources.Load("sounds/swap_water_02");
+        swap_Water[2] = (AudioClip)Resources.Load("sounds/swap_water_03");
+
+        swap_Earth = new AudioClip[3];
+        swap_Earth[0] = (AudioClip)Resources.Load("sounds/swap_earth_01");
+        swap_Earth[1] = (AudioClip)Resources.Load("sounds/swap_earth_02");
+        swap_Earth[2] = (AudioClip)Resources.Load("sounds/swap_earth_03");
+
+        swap_Air = new AudioClip[4];
+        swap_Air[0] = (AudioClip)Resources.Load("sounds/air_01");
+        swap_Air[1] = (AudioClip)Resources.Load("sounds/air_02");
+        swap_Air[2] = (AudioClip)Resources.Load("sounds/air_03");
+        swap_Air[3] = (AudioClip)Resources.Load("sounds/air_04");
+
+        swap_Muscle = new AudioClip[3];
+        swap_Muscle[0] = (AudioClip)Resources.Load("sounds/swap_muscle_01");
+        swap_Muscle[1] = (AudioClip)Resources.Load("sounds/swap_muscle_02");
+        swap_Muscle[2] = (AudioClip)Resources.Load("sounds/swap_muscle_03");
+
+        drop_Fire = new AudioClip[3];
+        drop_Fire[0] = (AudioClip)Resources.Load("sounds/drop_fire_01");
+        drop_Fire[1] = (AudioClip)Resources.Load("sounds/drop_fire_02");
+        drop_Fire[2] = (AudioClip)Resources.Load("sounds/drop_fire_03");
+
+        drop_Water = new AudioClip[3];
+        drop_Water[0] = (AudioClip)Resources.Load("sounds/drop_water_01");
+        drop_Water[1] = (AudioClip)Resources.Load("sounds/drop_water_02");
+        drop_Water[2] = (AudioClip)Resources.Load("sounds/drop_water_03");
+
+        drop_Earth = new AudioClip[3];
+        drop_Earth[0] = (AudioClip)Resources.Load("sounds/drop_earth_01");
+        drop_Earth[1] = (AudioClip)Resources.Load("sounds/drop_earth_02");
+        drop_Earth[2] = (AudioClip)Resources.Load("sounds/drop_earth_03");
+
+        drop_Air = new AudioClip[4];
+        drop_Air[0] = (AudioClip)Resources.Load("sounds/air_01");
+        drop_Air[1] = (AudioClip)Resources.Load("sounds/air_02");
+        drop_Air[2] = (AudioClip)Resources.Load("sounds/air_03");
+        drop_Air[3] = (AudioClip)Resources.Load("sounds/air_04");
+
+        drop_Muscle = new AudioClip[3];
+        drop_Muscle[0] = (AudioClip)Resources.Load("sounds/drop_muslce_01");
+        drop_Muscle[1] = (AudioClip)Resources.Load("sounds/drop_muscle_02");
+        drop_Muscle[2] = (AudioClip)Resources.Load("sounds/drop_muscle_03");
+    }
+
+    public void InitEvents(){
+        //mm.eventCont.drop += onDrop;
+        mm.eventCont.swap += onSwap;
+        mm.eventCont.grabTile += onGrab;
+        //mm.eventCont.match += onMatch;
+    }
+
+    /*delete once elemental swap sounds are fully implemented
 	public void SwapSound(){
 		source.clip = swap [Random.Range (0, 5)];
 		source.Play ();
-	}	
+	}*/
 
-	public void DropSound(AudioSource source){
-		source.clip = drop [Random.Range (0, 5)];
+    public void onSwap(int id, int c1, int r1, int c2, int r2)
+    {
+        TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
+        Tile.Element elem = tb.tile.element;
+        AudioClip clip = null;
+        switch (elem)
+        {
+            case Tile.Element.Fire:
+                clip = swap_Fire[Random.Range(0, swap_Fire.Length)];
+                break;
+            case Tile.Element.Water:
+                clip = swap_Water[Random.Range(0, swap_Water.Length)];
+                break;
+            case Tile.Element.Earth:
+                clip = swap_Earth[Random.Range(0, swap_Earth.Length)];
+                break;
+            case Tile.Element.Air:
+                clip = swap_Air[Random.Range(0, swap_Air.Length)];
+                break;
+            case Tile.Element.Muscle:
+                clip = swap_Muscle[Random.Range(0, swap_Muscle.Length)];
+                break;
+        }
+        AudioSource source = tb.GetComponent<AudioSource>();
+
+        source.clip = clip;
+        source.Play();
+    }
+
+    
+    public void DropSound(AudioSource source){
+		source.clip = drop_Earth[Random.Range (0, drop_Earth.Length)]; //This should be its own event?
 		source.Play ();
 	}
+
+    public void onDrop(int id, Tile.Element elem, int col) {
+        AudioClip clip = null;
+        switch (elem) {
+            case Tile.Element.Fire:
+                clip = drop_Fire[Random.Range(0, drop_Fire.Length)];
+                break;
+            case Tile.Element.Water:
+                clip = drop_Water[Random.Range(0, drop_Water.Length)];
+                break;
+            case Tile.Element.Earth:
+                clip = drop_Earth[Random.Range(0, drop_Earth.Length)];
+                break;
+            case Tile.Element.Air:
+                clip = drop_Air[Random.Range(0, drop_Air.Length)];
+                break;
+            case Tile.Element.Muscle:
+                clip = drop_Muscle[Random.Range(0, drop_Muscle.Length)];
+                break;
+        }
+        GameObject go = mm.ActiveP().GetTileFromHand(elem);
+        AudioSource source = go.GetComponent<AudioSource>();
+
+        source.clip = clip;
+        source.Play();
+    }
 	
-	public void PickupSound(AudioSource source){
-		source.clip = hand [Random.Range (0, 5)];
-		source.Play ();
-	}
+     
+
+    public void onGrab(int id, Tile.Element elem) {
+        AudioClip clip = null;
+        switch (elem)
+        {
+            case Tile.Element.Fire:
+                clip = grab[0];
+                break;
+            case Tile.Element.Water:
+                clip = grab[1];
+                break;
+            case Tile.Element.Earth:
+                clip = grab[2];
+                break;
+            case Tile.Element.Air:
+                clip = grab[3];
+                break;
+            case Tile.Element.Muscle:
+                clip = grab[4];
+                break;
+        }
+        GameObject go = mm.GetPlayer(id).GetTileFromHand(elem);
+        AudioSource source = go.GetComponent<AudioSource>();
+
+        source.clip = clip;
+        source.Play();
+    }
 
 	public void BreakSound(){
 		source.clip = match [Random.Range (0, 5)];
 		source.Play ();
 	}
+
+    /*Can't finish until MatchEvent is beefed up a little bit
+    public void onMatch(int id, int[] lens)
+    {
+        AudioClip clip = null;
+        Tile.Element elem = ;
+
+        switch ()
+        {
+            case Tile.Element.Fire:
+                clip = match_Fire [Random.Range (0,match_Fire.Length)]
+                break;
+            case Tile.Element.Water:
+                clip = match_Water[Random.Range(0, match_Water.Length)]
+                break;
+            case Tile.Element.Earth:
+                clip = match_Earth[Random.Range(0, match_Earth.Length)]
+                break;
+            case Tile.Element.Air:
+                clip = match_Air[Random.Range(0, match_Air.Length)]
+                break;
+            case Tile.Element.Muscle:
+                clip = match_Muscle[Random.Range(0, match_Muscle.Length)]
+                break;
+        }
+        GameObject go = mm.ActiveP().GetTileFromHand(elem);
+        AudioSource source = go.GetComponent<AudioSource>();
+
+        source.clip = clip;
+        source.Play();
+    }*/
 }
