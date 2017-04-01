@@ -13,7 +13,7 @@ public class TileBehav : MonoBehaviour {
 	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
 	public bool ableTarget = true; // will eventually need a list of valid spells - maybe a hierarchy? categories?
 
-    private MageMatch mm;
+    protected MageMatch mm;
 	private Enchantment enchantment;
 //	private bool resolved = false;
 	private bool inPos = true;

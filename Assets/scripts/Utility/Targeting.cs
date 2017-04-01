@@ -69,7 +69,7 @@ public class Targeting {
                 return;
         // TODO if targetable
 
-        mm.turnManager.SendTBTarget(tb);
+        mm.syncManager.SendTBTarget(tb);
         if (currentTMode == TargetMode.Tile) {
             Tile t = tb.tile;
             OutlineTarget(t.col, t.row);
@@ -123,7 +123,7 @@ public class Targeting {
         //        return;
         // TODO if targetable
 
-        mm.turnManager.SendCBTarget(cb);
+        mm.syncManager.SendCBTarget(cb);
         if (currentTMode == TargetMode.Cell) {
             OutlineTarget(cb.col, cb.row);
             targetCBs.Add(cb);

@@ -10,7 +10,7 @@ public class Spell {
 	private TileSeq seq;
 	private TileSeq boardSeq;
 
-	public delegate void MySpellEffect();
+	public delegate IEnumerator MySpellEffect();
 	private MySpellEffect effect;
 	
 	public Spell(int index, string name, string seq, int APcost, MySpellEffect effect){
@@ -21,8 +21,12 @@ public class Spell {
 		this.effect = effect;
 	}
 
-	public void Cast(){
-		effect ();
+	public IEnumerator Cast(){
+        Debug.Log("SPELL: Casting...");
+        if(effect == null)
+            Debug.Log("SPELL: Effect is null!");
+
+		return effect ();
 	}
 
 	public Tile.Element GetElementAt(int index){

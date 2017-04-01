@@ -10,7 +10,8 @@ public class UIController : MonoBehaviour {
     public AnimationCurve slidingEase;
 
 	private Text moveText, debugGridText, turnTimerText, slidingText;
-	private MageMatch mm;
+	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
+    private MageMatch mm;
 	private Dropdown DD1, DD2;
     private Transform p1info, p2info, p1load, p2load;
     private GameObject gradient, targetingBG;
@@ -29,6 +30,11 @@ public class UIController : MonoBehaviour {
 
         slidingTextStart = new Vector3(Screen.width, slidingText.rectTransform.position.y);
         slidingText.rectTransform.position = slidingTextStart;
+
+        beginTurnEffText = GameObject.Find("Text_BeginTurnEff").GetComponent<Text>();
+        endTurnEffText = GameObject.Find("Text_EndTurnEff").GetComponent<Text>();
+        matchEffText = GameObject.Find("Text_MatchEff").GetComponent<Text>();
+        swapEffText = GameObject.Find("Text_SwapEff").GetComponent<Text>();
 
         p1info = GameObject.Find("Player1_Info").transform;
         p2info = GameObject.Find("Player2_Info").transform;
@@ -55,6 +61,7 @@ public class UIController : MonoBehaviour {
 
     public void InitEvents() {
         mm.eventCont.turnBegin += OnTurnBegin;
+        mm.eventCont.turnEnd += OnTurnEnd;
         mm.eventCont.match += OnMatch;
         mm.eventCont.cascade += OnCascade;
     }
@@ -67,6 +74,11 @@ public class UIController : MonoBehaviour {
         SetDrawButton(mm.ActiveP(), true);
         FlipGradient(); // ugly
         UpdatePlayerInfo();
+        UpdateEffTexts();
+    }
+
+    public void OnTurnEnd(int id) {
+        UpdateEffTexts();
     }
 
     public void OnMatch(int id, int[] lens) {
@@ -139,7 +151,7 @@ public class UIController : MonoBehaviour {
         RectTransform boxRect = slidingText.rectTransform;
         Vector3 end = new Vector3(-boxRect.rect.width, slidingTextStart.y);
         //Debug.Log("UICONT: _SlidingText: start=" + slidingTextStart.ToString() + ", end=" + end.ToString());
-        Tween t = slidingText.rectTransform.DOMoveX(end.x, 2f).SetEase(slidingEase);
+        Tween t = slidingText.rectTransform.DOMoveX(end.x, 3f).SetEase(slidingEase);
         yield return t.WaitForCompletion();
         slidingText.rectTransform.position = slidingTextStart;
     }
@@ -312,60 +324,82 @@ public class UIController : MonoBehaviour {
     }
 
     // TODO methods for two edit dropdowns
-    public Tile.Element GetClickElement() {
-        Dropdown dd = GameObject.Find("Dropdown_DropColor").GetComponent<Dropdown>();
-        switch (dd.value) {
-            default:
-                return Tile.Element.None;
-            case 1:
-                return Tile.Element.Fire;
-            case 2:
-                return Tile.Element.Water;
-            case 3:
-                return Tile.Element.Earth;
-            case 4:
-                return Tile.Element.Air;
-            case 5:
-                return Tile.Element.Muscle;
-        }
-    }
-
-    public void GetClickEffect(TileBehav tb) {
-        Dropdown dd = GameObject.Find("Dropdown_ClickEffect").GetComponent<Dropdown>();
-        MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
-
-        switch (dd.value) {
-            default: // none
-                break;
-            case 1: // destroy tile
-                mm.RemoveTile(tb.tile, false); // FIXME will probably throw null reference exception
-                break;
-            case 2: // clear enchant
-                tb.ClearEnchantment();
-                break;
-            case 3: // cherrybomb
-                spellfx.Ench_SetCherrybomb(tb);
-                break;
-            case 4: // burning
-                spellfx.Ench_SetBurning(tb);
-                break;
-            case 5: // zombify
-                spellfx.Ench_SetZombify(tb, false);
-                break;
-        }
-    }
-
-    //   public void UpdateCommishMeter(){
-    //	mm.StartAnim(SlideMoodMarker());
+    //public Tile.Element GetClickElement() {
+    //    Dropdown dd = GameObject.Find("Dropdown_DropColor").GetComponent<Dropdown>();
+    //    switch (dd.value) {
+    //        default:
+    //            return Tile.Element.None;
+    //        case 1:
+    //            return Tile.Element.Fire;
+    //        case 2:
+    //            return Tile.Element.Water;
+    //        case 3:
+    //            return Tile.Element.Earth;
+    //        case 4:
+    //            return Tile.Element.Air;
+    //        case 5:
+    //            return Tile.Element.Muscle;
+    //    }
     //}
 
-    //IEnumerator SlideMoodMarker(){
-    //	float slideRatio = (float)(mm.commish.GetMood() + 100) / 200f;
-    //	float meterwidth = moodMeter.rect.width;
-    //	yield return moodMarker.DOAnchorPosX(slideRatio * meterwidth, .4f, false);
+    //public void GetClickEffect(TileBehav tb) {
+    //    Dropdown dd = GameObject.Find("Dropdown_ClickEffect").GetComponent<Dropdown>();
+    //    MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
+
+    //    switch (dd.value) {
+    //        default: // none
+    //            break;
+    //        case 1: // destroy tile
+    //            mm.RemoveTile(tb.tile, false); // FIXME will probably throw null reference exception
+    //            break;
+    //        case 2: // clear enchant
+    //            tb.ClearEnchantment();
+    //            break;
+    //        case 3: // cherrybomb
+    //            spellfx.Ench_SetCherrybomb(mm.ActiveP().id, tb);
+    //            break;
+    //        case 4: // burning
+    //            spellfx.Ench_SetBurning(mm.ActiveP().id, tb);
+    //            break;
+    //        case 5: // zombify
+    //            spellfx.Ench_SetZombify(mm.ActiveP().id, tb, false);
+    //            break;
+    //    }
     //}
 
     public void UpdateTurnTimer(float time) {
         turnTimerText.text = time.ToString("0.0");
-    } 
+    }
+
+    public void UpdateEffTexts() {
+        object[] lists = mm.effectCont.GetLists();
+
+        List<Effect> beginTurnEff = (List<Effect>)lists[0];
+        string bte = "BeginTurnEffs:\n";
+        foreach (Effect e in beginTurnEff) {
+            bte += e.tag;
+        }
+        beginTurnEffText.text = bte;
+
+        List<Effect> endTurnEff = (List<Effect>)lists[1];
+        string ete = "EndTurnEffs:\n";
+        foreach (Effect e in endTurnEff) {
+            ete += e.tag;
+        }
+        endTurnEffText.text = ete;
+
+        List<MatchEffect> matchEff = (List<MatchEffect>)lists[2];
+        string me = "MatchEffs:\n";
+        foreach (MatchEffect e in matchEff) {
+            me += e.tag;
+        }
+        matchEffText.text = me;
+
+        List<SwapEffect> swapEff = (List<SwapEffect>)lists[3];
+        string se = "SwapEffs:\n";
+        foreach (SwapEffect e in swapEff) {
+            se += e.tag;
+        }
+        swapEffText.text = se;
+    }
 }

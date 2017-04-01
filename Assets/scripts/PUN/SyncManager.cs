@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon;
-using System;
-using ExitGames.Client.Photon;
-using System.IO;
 
-public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
+public class SyncManager : PunBehaviour {
 
-    private PunTurnManager turnManager; // not needed?
     private MageMatch mm;
 
     // Use this for initialization
     void Start() {
-        turnManager = gameObject.AddComponent<PunTurnManager>();
-        turnManager.TurnManagerListener = this;
-        turnManager.TurnDuration = 20f; // TODO use TurnTimer instead?
+        //turnManager = gameObject.AddComponent<PunTurnManager>();
+        //turnManager.TurnManagerListener = this;
+        //turnManager.TurnDuration = 20f; // TODO use TurnTimer instead?
     }
 
     // Update is called once per frame
@@ -33,34 +29,6 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
         eventCont.playerHealthChange += OnPlayerHealthChange;
         eventCont.spellCast += OnSpellCast;
     }
-
-    #region PunTurnManager Callbacks
-
-    public void OnPlayerFinished(PhotonPlayer player, int turn, object move) {
-        throw new NotImplementedException();
-    }
-
-    public void OnPlayerMove(PhotonPlayer player, int turn, object move) {
-        //if (!player.IsLocal) {
-        //    // TODO handle action - make class to do it?
-        //    playMaker.HandlePlayerAction((PlayerAction)move);
-        //}
-        throw new NotImplementedException();
-    }
-
-    public void OnTurnBegins(int turn) {
-        throw new NotImplementedException();
-    }
-
-    public void OnTurnCompleted(int turn) {
-        throw new NotImplementedException();
-    }
-
-    public void OnTurnTimeEnds(int turn) {
-        throw new NotImplementedException();
-    }
-
-    #endregion
 
     public void OnDrawLocal(int id, Tile.Element elem, bool dealt) {
         Debug.Log("TURNMANAGER: id=" + id + " myID=" + mm.myID);
@@ -114,8 +82,6 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
     public void HandleCommishDrop(Tile.Element elem, int col) {
         GameObject go = mm.GenerateTile(elem);
         mm.DropTile(col, go, .08f);
-
-        //mm.commishTurn = true;
     }
 
     // eventually should be an event?
@@ -196,4 +162,16 @@ public class MyTurnManager : PunBehaviour, IPunTurnManagerCallbacks {
     public void HandleCBTarget(int col, int row) {
         mm.targeting.OnCBTarget(mm.hexGrid.GetCellBehavAt(col, row));
     }
+
+    //public void SendHotBodyTarget(int col, int row) {
+    //    if (mm.MyTurn()) { // not necessary
+    //        PhotonView photonView = PhotonView.Get(this);
+    //        photonView.RPC("HandleCBTarget", PhotonTargets.Others, cb.col, cb.row);
+    //    }
+    //}
+
+    //[PunRPC]
+    //public void HandleHotBodyTarget(int col, int row) {
+    //    mm.targeting.OnCBTarget(mm.hexGrid.GetCellBehavAt(col, row));
+    //}
 }

@@ -88,7 +88,7 @@ namespace Com.SoupSkull.MageMatch {
 
             if (PhotonNetwork.isMasterClient && PhotonNetwork.room.PlayerCount == 2) {
                 Debug.Log("OnPhotonPlayerConnected isMasterClient " + PhotonNetwork.isMasterClient); // called before OnPhotonPlayerDisconnected
-                PhotonNetwork.LoadLevel("MM Game Screen (Landscape) PHOTON");
+                PhotonNetwork.LoadLevel("Game Screen (Landscape)");
             }
         }
     }

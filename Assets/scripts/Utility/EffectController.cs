@@ -5,35 +5,77 @@ using UnityEngine;
 // TODO events for beginning-of-turn effects and for passive/trigger effects
 public class EffectController {
 
+    private MageMatch mm;
     private List<Effect> beginTurnEffects, endTurnEffects;
+    private List<MatchEffect> matchEffects;
+    private List<SwapEffect> swapEffects;
+    private Dictionary<string, int> tagDict;
+    private int effectsResolving = 0;
 
-    public EffectController() {
+    public EffectController(MageMatch mm) {
+        this.mm = mm;
         beginTurnEffects = new List<Effect>();
         endTurnEffects = new List<Effect>();
+        matchEffects = new List<MatchEffect>();
+        swapEffects = new List<SwapEffect>();
+        tagDict = new Dictionary<string, int>();
     }
 
-    public void InitEvents(EventController eventCont) {
-        eventCont.turnBegin += OnTurnBegin;
-        eventCont.turnEnd += OnTurnEnd;
+    public void InitEvents() {
+        mm.eventCont.turnBegin += OnTurnBegin;
+        mm.eventCont.turnEnd += OnTurnEnd;
+        mm.eventCont.match += OnMatch;
+        mm.eventCont.swap += OnSwap;
     }
 
     #region EventCont calls
     public void OnTurnBegin(int id) {
-        ResolveBeginTurnEffects();
+        mm.StartCoroutine(ResolveBeginTurnEffects());
     }
 
     public void OnTurnEnd(int id) {
-        ResolveEndTurnEffects();
+        mm.StartCoroutine(ResolveEndTurnEffects());
+    }
+
+    public void OnMatch(int id, int[] lens) {
+        mm.StartCoroutine(ResolveMatchEffects(id));
+    }
+
+    public void OnSwap(int id, int c1, int r1, int c2, int r2) {
+        mm.StartCoroutine(ResolveSwapEffects(id, c1, r1, c2, r2));
+        Debug.Log("EFFECTCONT: Just finished resolving swap effects.");
     }
     #endregion
 
-    public void AddBeginTurnEffect(Effect e) {
-        // TODO insert at correct position for priority
-        beginTurnEffects.Add(e);
+    public string GenFullTag(string effType, string tag) {
+        string fullTag = effType + "-";
+        if (tagDict.ContainsKey(tag)) {
+            tagDict[tag]++;
+            fullTag += tag + "-" + tagDict[tag].ToString("D3");
+        } else {
+            tagDict.Add(tag, 1);
+            fullTag += tag + "001";
+        }
+        Debug.Log("EFFECTCONT: adding effect with tag " + fullTag);
+        return fullTag;
     }
 
-    public void AddEndTurnEffect(Effect e) {
+    #region TurnEffects
+    public void AddBeginTurnEffect(Effect e, string tag) {
+        // TODO insert at correct position for priority
+        e.tag = GenFullTag("begt", tag);
+        int i;
+        for (i = 0; i < beginTurnEffects.Count; i++) {
+            Effect listE = beginTurnEffects[i];
+            if (listE.priority < e.priority)
+                break;
+        }
+        beginTurnEffects.Insert(i, e);
+    }
+
+    public void AddEndTurnEffect(Effect e, string tag) {
         // TODO test somehow?
+        e.tag = GenFullTag("endt", tag);
         int i;
         for (i = 0; i < endTurnEffects.Count; i++) {
             Effect listE = endTurnEffects[i];
@@ -45,14 +87,20 @@ public class EffectController {
 
     // TODO not the right way to do this
     public void RemoveEndTurnEffect(Effect e) {
+        // TODO foreach in ETE look for tag.
         endTurnEffects.Remove(e);
     }
 
-    public void ResolveBeginTurnEffects() {
+    public IEnumerator ResolveBeginTurnEffects() {
+        effectsResolving++;
         Effect e;
-        for (int i = 0; i < beginTurnEffects.Count; i++) {
+        for (int i = 0; i < beginTurnEffects.Count; i++) { //foreach
             e = beginTurnEffects[i];
-            if (e.ResolveEffect()) { // if it's the last pass of the effect (turnsLeft == 0)
+            bool remove = e.TurnsRemaining() == 1; // test?
+
+            yield return e.ResolveEffect();
+
+            if (remove) { // if it's the last pass of the effect (turnsLeft == 0)
                 beginTurnEffects.Remove(e);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
@@ -61,13 +109,19 @@ public class EffectController {
                 Debug.Log("MAGEMATCH: Beginning-of-turn effect " + i + " has " + e.TurnsRemaining() + " turns left.");
             }
         }
+        effectsResolving--;
     }
 
-    public void ResolveEndTurnEffects() { // TODO test priority
+    public IEnumerator ResolveEndTurnEffects() {
+        effectsResolving++;
         Effect e;
-        for (int i = 0; i < endTurnEffects.Count; i++) {
+        for (int i = 0; i < endTurnEffects.Count; i++) { // foreach
             e = endTurnEffects[i];
-            if (e.ResolveEffect()) { // if it's the last pass of the effect (turnsLeft == 0)
+            bool remove = e.TurnsRemaining() == 0;
+
+            yield return e.ResolveEffect();
+
+            if (remove) { // if it's the last pass of the effect (turnsLeft == 0)
                 endTurnEffects.Remove(e);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
@@ -76,5 +130,85 @@ public class EffectController {
                 Debug.Log("EFFECTCONTROLLER: End-of-turn effect " + i + " with priority " + e.priority + " has " + e.TurnsRemaining() + " turns left.");
             }
         }
+        effectsResolving--;
     }
+    #endregion
+
+
+    #region MatchEffects
+    public void AddMatchEffect(MatchEffect me, string tag) {
+        me.tag = GenFullTag("matc", tag);
+        matchEffects.Add(me);
+    }
+
+    IEnumerator ResolveMatchEffects(int id) {
+        MatchEffect me;
+        for (int i = 0; i < matchEffects.Count; i++) { // foreach
+            me = matchEffects[i];
+            if (me.playerID == id) {
+                bool remove = me.TurnsRemaining() == 1; // should be count?
+                yield return me.TriggerEffect();
+                if (remove) {
+                    matchEffects.Remove(me); // maybe not best...
+                    i--;
+                }
+            }
+        }
+    }
+
+    public void RemoveMatchEffect(string tag) { // TODO test
+        MatchEffect me = matchEffects[0];
+        for (int i = 0; i < matchEffects.Count; i++, me = matchEffects[i]) {
+            if (me.tag == tag)
+                break;
+        }
+        matchEffects.Remove(me);
+    }
+    #endregion
+
+
+    #region SwapEffects
+    public void AddSwapEffect(SwapEffect se, string tag) {
+        se.tag = GenFullTag("swap", tag);
+        swapEffects.Add(se);
+    }
+
+    public IEnumerator ResolveSwapEffects(int id, int c1, int r1, int c2, int r2) {
+        SwapEffect se;
+        for (int i = 0; i < swapEffects.Count; i++) { // foreach
+            se = swapEffects[i];
+            Debug.Log("EFFECTCONT: Checking swapEff with tag " + se.tag);
+            if (se.playerID == id) {
+                bool remove = se.TurnsRemaining() == 1; // should be count?
+                yield return se.TriggerEffect(c1, r1, c2, r2);
+                if (remove) {
+                    RemoveSwapEffect(se.tag);
+                    i--;
+                }
+            }
+        }
+    }
+
+    public void RemoveSwapEffect(string tag) { // TODO test
+        SwapEffect se = swapEffects[0];
+        for (int i = 0; i < swapEffects.Count; se = swapEffects[i], i++) {
+            if (se.tag == tag)
+                break;
+        }
+        swapEffects.Remove(se);
+    }
+    #endregion
+
+
+    public bool isResolving() { return effectsResolving > 0; }
+
+    public object[] GetLists() {
+        return new object[4] {
+            beginTurnEffects,
+            endTurnEffects,
+            matchEffects,
+            swapEffects
+        };
+    }
+
 }

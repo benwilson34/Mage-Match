@@ -40,18 +40,27 @@ public class Player {
                 break;
         }
 
-        character = CharacterLoader.Load(mm.uiCont.GetLoadoutNum(id));
+        character = Character.Load(mm, id);
         health = character.GetMaxHealth();
     }
 
     public void InitEvents() {
+        mm.eventCont.turnBegin += OnTurnBegin;
         mm.eventCont.match += OnMatch;
+    }
+
+    public void OnTurnBegin(int id) {
+        if (id == this.id) {
+            InitAP();
+
+            if(ThisIsLocal()) // i think?
+                DealTile();
+        }
     }
 
     public void OnMatch(int id, int[] lens) {
         if (id == this.id) {
             foreach (int count in lens) {
-                ResolveMatchEffect();
                 switch (count) {
                     case 3:
                         DealDamage(Random.Range(30, 50), false); // diff 20
@@ -104,6 +113,7 @@ public class Player {
         return DrawTiles(1, elem, false, false);
     }
 
+    // this return type isn't really necessary anymore due to the drawEvent
     public Tile.Element[] DrawTiles(int numTiles, Tile.Element elem, bool dealt, bool linear) {
         Tile.Element[] tileElems = new Tile.Element[numTiles];
         for (int i = 0; i < numTiles && !IsHandFull(); i++) {
@@ -152,6 +162,7 @@ public class Player {
         return i;
     }
 
+    // delete?
     public void FlipHand() {
         foreach (TileBehav tb in hand) {
             tb.FlipTile();
@@ -190,7 +201,7 @@ public class Player {
         if (AP >= spell.APcost) {
             currentSpell = spell;
             mm.eventCont.SpellCast(currentSpell); // here?
-            spell.Cast();
+            mm.StartCoroutine(spell.Cast());
             return true;
         } else
             return false;
@@ -204,20 +215,6 @@ public class Player {
 
     public TileSeq GetCurrentBoardSeq() {
         return currentSpell.GetBoardSeq();
-    }
-
-    public void SetMatchEffect(MatchEffect effect) {
-        // TODO bool for success? able to overwrite?
-        matchEffect = effect;
-    }
-
-    public void ClearMatchEffect() {
-        matchEffect = null;
-    }
-
-    public void ResolveMatchEffect() {
-        if (matchEffect != null && matchEffect.ResolveEffect())
-            matchEffect = null;
     }
 
     public void ChangeBuff_DmgMult(float d) {

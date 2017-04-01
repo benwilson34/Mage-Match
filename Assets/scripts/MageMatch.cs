@@ -24,7 +24,7 @@ public class MageMatch : MonoBehaviour {
     public Stats stats;
     public EventController eventCont;
     public TurnTimer timer;
-    public MyTurnManager turnManager;
+    public SyncManager syncManager;
     public AnimationController animCont;
     // should SpellEffects instance be here?
 
@@ -40,11 +40,11 @@ public class MageMatch : MonoBehaviour {
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
         timer = gameObject.GetComponent<TurnTimer>();
-        effectCont = new EffectController();
+        effectCont = new EffectController(this); //?
         targeting = new Targeting();
         audioCont = new AudioController();
         LoadPrefabs();
-        turnManager = GetComponent<MyTurnManager>();
+        syncManager = GetComponent<SyncManager>();
         animCont = GetComponent<AnimationController>();
         myID = PhotonNetwork.player.ID;
 
@@ -75,16 +75,7 @@ public class MageMatch : MonoBehaviour {
 
         commish = new Commish(this);
 
-        // TODO make its own method
-        eventCont = new EventController(this);
-        eventCont.boardAction += OnBoardAction;
-        eventCont.gameAction += OnGameAction;
-        turnManager.InitEvents(this, eventCont);
-        effectCont.InitEvents(eventCont);
-        commish.InitEvents();
-        uiCont.InitEvents();
-        p1.InitEvents();
-        p2.InitEvents();
+        InitEvents();
 
         for (int i = 0; i < 4; i++)
             LocalP().DealTile();
@@ -116,6 +107,18 @@ public class MageMatch : MonoBehaviour {
         targetPF = Resources.Load("prefabs/outline_target") as GameObject;
     }
 
+    public void InitEvents() {
+        eventCont = new EventController(this);
+        eventCont.boardAction += OnBoardAction;
+        eventCont.gameAction += OnGameAction;
+        syncManager.InitEvents(this, eventCont);
+        effectCont.InitEvents();
+        commish.InitEvents();
+        uiCont.InitEvents();
+        p1.InitEvents();
+        p2.InitEvents();
+    }
+
     #region EventCont calls
     public void OnBoardAction() {
         if (!checking) {
@@ -142,7 +145,10 @@ public class MageMatch : MonoBehaviour {
         Debug.Log("MAGEMATCH: Starting TurnSystem.");
         timer.Pause();
         yield return new WaitUntil(() => !checking);
+
         eventCont.TurnEnd();
+        yield return new WaitUntil(() => !effectCont.isResolving()); //?
+
         BoardChanged(); // why doesn't this happen when resolving turn effects?
         yield return new WaitUntil(() => !checking);
         uiCont.DeactivateAllSpellButtons(activep);
@@ -157,7 +163,7 @@ public class MageMatch : MonoBehaviour {
             Debug.Log("MAGEMATCH: TurnSystem: My turn, about to start the Commish's turn.");
             yield return commish.CTurn(); // place 5 random tiles
         } else {
-            turnManager.CommishTurnStart();
+            syncManager.CommishTurnStart();
             commishTurn = true; //?
             Debug.Log("MAGEMATCH: Turnsystem: Not my turn, but the Commish's turn just started.");
             yield return new WaitUntil(() => !commishTurn);
@@ -166,12 +172,8 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => !checking); // needed anymore?
 
         activep = InactiveP();
-        activep.InitAP();
         eventCont.TurnBegin();
-
-        if (MyTurn()) {
-            activep.DealTile();
-        }
+        yield return new WaitUntil(() => !effectCont.isResolving()); //?
 
         SpellCheck();
         yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
@@ -252,8 +254,6 @@ public class MageMatch : MonoBehaviour {
             return false;
         } else {
             Tile.Element[] tileElem = activep.DrawTiles(1, Tile.Element.None, false, false);
-            //eventCont.Draw(tileElem[0], false);
-            //eventCont.GameAction();
             return true;
         }
     }
@@ -295,7 +295,6 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void CastSpell(int spellNum) { // IEnumerator?
-        Debug.Log("MAGEMATCH: CastSpell called...");
         Player p = activep;
         if (p.CastSpell(spellNum)) {
             commish.ChangeMood(45);
@@ -359,6 +358,8 @@ public class MageMatch : MonoBehaviour {
     public Player LocalP() { return GetPlayer(myID); }
 
     public bool MyTurn() { return activep.id == myID; }
+
+    public bool IsMe(int id) { return id == myID; }
 
     public GameObject GenerateTile(Tile.Element element) {
         return GenerateTile(element, GameObject.Find("tileSpawn").transform.position);
@@ -489,6 +490,7 @@ public class MageMatch : MonoBehaviour {
 
     public bool IsCommishTurn() { return currentState == GameState.CommishTurn; }
 
+    // move to Targeting?
     public bool IsTargetMode() { return currentState == GameState.TargetMode; }
 
     public bool IsBoardChecking() { return checking; }

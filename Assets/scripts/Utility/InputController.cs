@@ -198,7 +198,7 @@ public class InputController : MonoBehaviour {
                 }
             } else {
                 // TODO bool menuSwap
-                uiCont.GetClickEffect(tb);
+                //uiCont.GetClickEffect(tb);
             }
 		}
 	}
@@ -239,14 +239,14 @@ public class InputController : MonoBehaviour {
 	void CBMouseDown(CellBehav cb){
 //		Debug.Log ("OnMouseDown hit on column " + cb.col);
 		if (mm.menu) {
-			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-			Tile.Element element = uiCont.GetClickElement ();
-			if (element != Tile.Element.None) {
-//				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
-				GameObject go = mm.GenerateTile (element);
-				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-				mm.DropTile (cb.col, go, .15f);
-			}
+//			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+//			Tile.Element element = uiCont.GetClickElement ();
+//			if (element != Tile.Element.None) {
+////				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
+//				GameObject go = mm.GenerateTile (element);
+//				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
+//				mm.DropTile (cb.col, go, .15f);
+//			}
 		} else if(targeting.IsTargetMode() && targeting.currentTMode == Targeting.TargetMode.Cell) {
 			targeting.OnCBTarget (cb);
 			//Put target return here!

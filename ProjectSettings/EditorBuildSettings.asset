@@ -5,9 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/scenes/MM Game Screen (Landscape).unity
   - enabled: 1
     path: Assets/scenes/Launcher.unity
   - enabled: 1
-    path: Assets/scenes/MM Game Screen (Landscape) PHOTON.unity
+    path: Assets/scenes/Game Screen (Landscape).unity
