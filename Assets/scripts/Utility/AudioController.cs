@@ -85,84 +85,46 @@ public class AudioController {
 
     public void InitEvents(){
         //mm.eventCont.drop += onDrop;
-        mm.eventCont.swap += onSwap;
-        mm.eventCont.grabTile += onGrab;
+        mm.eventCont.grabTile += OnGrab;
+        mm.eventCont.draw += OnDraw;
+        mm.eventCont.swap += OnSwap;
         //mm.eventCont.match += onMatch;
     }
 
-    /*delete once elemental swap sounds are fully implemented
-	public void SwapSound(){
-		source.clip = swap [Random.Range (0, 5)];
-		source.Play ();
-	}*/
-
-    public void onSwap(int id, int c1, int r1, int c2, int r2)
-    {
-        TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
-        Tile.Element elem = tb.tile.element;
-        AudioClip clip = null;
-        switch (elem)
-        {
-            case Tile.Element.Fire:
-                clip = swap_Fire[Random.Range(0, swap_Fire.Length)];
-                break;
-            case Tile.Element.Water:
-                clip = swap_Water[Random.Range(0, swap_Water.Length)];
-                break;
-            case Tile.Element.Earth:
-                clip = swap_Earth[Random.Range(0, swap_Earth.Length)];
-                break;
-            case Tile.Element.Air:
-                clip = swap_Air[Random.Range(0, swap_Air.Length)];
-                break;
-            case Tile.Element.Muscle:
-                clip = swap_Muscle[Random.Range(0, swap_Muscle.Length)];
-                break;
-        }
-        AudioSource source = tb.GetComponent<AudioSource>();
-
-        source.clip = clip;
+    public void DropSound(AudioSource source) {
+        source.clip = drop_Earth[Random.Range(0, drop_Earth.Length)]; //This should be its own event?
         source.Play();
     }
 
-    
-    public void DropSound(AudioSource source){
-		source.clip = drop_Earth[Random.Range (0, drop_Earth.Length)]; //This should be its own event?
-		source.Play ();
-	}
+    //public void OnDrop(int id, Tile.Element elem, int col) {
+    //    AudioClip clip = null;
+    //    switch (elem) {
+    //        case Tile.Element.Fire:
+    //            clip = drop_Fire[Random.Range(0, drop_Fire.Length)];
+    //            break;
+    //        case Tile.Element.Water:
+    //            clip = drop_Water[Random.Range(0, drop_Water.Length)];
+    //            break;
+    //        case Tile.Element.Earth:
+    //            clip = drop_Earth[Random.Range(0, drop_Earth.Length)];
+    //            break;
+    //        case Tile.Element.Air:
+    //            clip = drop_Air[Random.Range(0, drop_Air.Length)];
+    //            break;
+    //        case Tile.Element.Muscle:
+    //            clip = drop_Muscle[Random.Range(0, drop_Muscle.Length)];
+    //            break;
+    //    }
+    //    GameObject go = mm.ActiveP().GetTileFromHand(elem);
+    //    AudioSource source = go.GetComponent<AudioSource>();
 
-    public void onDrop(int id, Tile.Element elem, int col) {
+    //    source.clip = clip;
+    //    source.Play();
+    //}
+
+    public void OnGrab(int id, Tile.Element elem) {
         AudioClip clip = null;
         switch (elem) {
-            case Tile.Element.Fire:
-                clip = drop_Fire[Random.Range(0, drop_Fire.Length)];
-                break;
-            case Tile.Element.Water:
-                clip = drop_Water[Random.Range(0, drop_Water.Length)];
-                break;
-            case Tile.Element.Earth:
-                clip = drop_Earth[Random.Range(0, drop_Earth.Length)];
-                break;
-            case Tile.Element.Air:
-                clip = drop_Air[Random.Range(0, drop_Air.Length)];
-                break;
-            case Tile.Element.Muscle:
-                clip = drop_Muscle[Random.Range(0, drop_Muscle.Length)];
-                break;
-        }
-        GameObject go = mm.ActiveP().GetTileFromHand(elem);
-        AudioSource source = go.GetComponent<AudioSource>();
-
-        source.clip = clip;
-        source.Play();
-    }
-	
-     
-
-    public void onGrab(int id, Tile.Element elem) {
-        AudioClip clip = null;
-        switch (elem)
-        {
             case Tile.Element.Fire:
                 clip = grab[0];
                 break;
@@ -186,39 +148,72 @@ public class AudioController {
         source.Play();
     }
 
+    public void OnDraw(int id, Tile.Element elem, bool dealt) {
+        OnGrab(id, elem);
+    }
+
+    public void OnSwap(int id, int c1, int r1, int c2, int r2) {
+        TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
+        Tile.Element elem = tb.tile.element;
+        AudioClip clip = null;
+        switch (elem) {
+            case Tile.Element.Fire:
+                clip = swap_Fire[Random.Range(0, swap_Fire.Length)];
+                break;
+            case Tile.Element.Water:
+                clip = swap_Water[Random.Range(0, swap_Water.Length)];
+                break;
+            case Tile.Element.Earth:
+                clip = swap_Earth[Random.Range(0, swap_Earth.Length)];
+                break;
+            case Tile.Element.Air:
+                clip = swap_Air[Random.Range(0, swap_Air.Length)];
+                break;
+            case Tile.Element.Muscle:
+                clip = swap_Muscle[Random.Range(0, swap_Muscle.Length)];
+                break;
+        }
+        AudioSource source = tb.GetComponent<AudioSource>();
+
+        source.clip = clip;
+        source.Play();
+    }
+
 	public void BreakSound(){
 		source.clip = match [Random.Range (0, 5)];
 		source.Play ();
 	}
 
-    /*Can't finish until MatchEvent is beefed up a little bit
-    public void onMatch(int id, int[] lens)
-    {
+    // still need a way of getting an audiosource...
+    public void OnMatch(int id, string[] seqs) {
         AudioClip clip = null;
-        Tile.Element elem = ;
+        Tile.Element elem = Tile.CharToElement(seqs[0][0]); // get the first char of the first seq
 
-        switch ()
-        {
-            case Tile.Element.Fire:
-                clip = match_Fire [Random.Range (0,match_Fire.Length)]
-                break;
-            case Tile.Element.Water:
-                clip = match_Water[Random.Range(0, match_Water.Length)]
-                break;
-            case Tile.Element.Earth:
-                clip = match_Earth[Random.Range(0, match_Earth.Length)]
-                break;
-            case Tile.Element.Air:
-                clip = match_Air[Random.Range(0, match_Air.Length)]
-                break;
-            case Tile.Element.Muscle:
-                clip = match_Muscle[Random.Range(0, match_Muscle.Length)]
-                break;
-        }
+        //switch (elem) {
+        //    case Tile.Element.Fire:
+        //        clip = match_Fire [Random.Range (0,match_Fire.Length)]
+        //        break;
+        //    case Tile.Element.Water:
+        //        clip = match_Water[Random.Range(0, match_Water.Length)]
+        //        break;
+        //    case Tile.Element.Earth:
+        //        clip = match_Earth[Random.Range(0, match_Earth.Length)]
+        //        break;
+        //    case Tile.Element.Air:
+        //        clip = match_Air[Random.Range(0, match_Air.Length)]
+        //        break;
+        //    case Tile.Element.Muscle:
+        //        clip = match_Muscle[Random.Range(0, match_Muscle.Length)]
+        //        break;
+        //}
+
+
+        // TODO this won't work...how to get the tile? maybe there should just be an audio object with a few AudioSources for everything to use?
         GameObject go = mm.ActiveP().GetTileFromHand(elem);
+
         AudioSource source = go.GetComponent<AudioSource>();
 
         source.clip = clip;
         source.Play();
-    }*/
+    }
 }

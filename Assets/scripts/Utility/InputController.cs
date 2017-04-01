@@ -23,7 +23,6 @@ public class InputController : MonoBehaviour {
 	void Start () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
-        //settings = GameObject.Find("ui").GetComponent<Settings>();
         uiCont = mm.uiCont;
     }
 
@@ -45,11 +44,8 @@ public class InputController : MonoBehaviour {
 	TileBehav GetMouseTile(RaycastHit2D[] hits){
 		foreach (RaycastHit2D hit in hits) {
 			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
-			if (tb != null) {
-//				clickTB = tb;
-//				isClickTB = true;
+			if (tb != null)
 				return tb;
-			}
 		}
 		return null;
 	}
@@ -57,11 +53,8 @@ public class InputController : MonoBehaviour {
 	CellBehav GetMouseCell(RaycastHit2D[] hits){
 		foreach (RaycastHit2D hit in hits) {
 			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-			if (cb != null) {
-//				clickTB = tb;
-//				isClickTB = true;
+			if (cb != null)
 				return cb;
-			}
 		}
 		return null;
 	}
@@ -133,7 +126,6 @@ public class InputController : MonoBehaviour {
 
                             dropTile = tb.gameObject;
                             mm.eventCont.GrabTile(tb.tile.element);
-                            //mm.audioCont.grabSound(tb.gameObject.GetComponent<AudioSource>());
                             
                         }
                         break;

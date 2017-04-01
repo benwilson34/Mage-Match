@@ -28,11 +28,15 @@ public class Player {
 
         switch (playerNum) {
             case 1:
-                name = mm.gameSettings.p1name; // TODO handle empty name
+                name = mm.gameSettings.p1name;
+                if (name == "")
+                    name = "player 1";
                 handSlot = GameObject.Find("handslot1").transform;
                 break;
             case 2:
-                name = mm.gameSettings.p2name; // TODO handle empty name
+                name = mm.gameSettings.p2name;
+                if (name == "")
+                    name = "player 2";
                 handSlot = GameObject.Find("handslot2").transform;
                 break;
             default:
@@ -60,10 +64,11 @@ public class Player {
         }
     }
 
-    public void OnMatch(int id, int[] lens) {
+    public void OnMatch(int id, string[] seqs) {
         if (id == this.id) {
-            foreach (int count in lens) {
-                switch (count) {
+            foreach (string seq in seqs) {
+                int len = seq.Length;
+                switch (len) {
                     case 3:
                         DealDamage(Random.Range(30, 50), false); // diff 20
                         break;
@@ -134,7 +139,6 @@ public class Player {
 
             TileBehav tb = go.GetComponent<TileBehav>();
             tileElems[i] = tb.tile.element;
-            //mm.eventCont.GrabTile(tb.tile.element);
             hand.Add(tb);
 
             mm.eventCont.Draw(id, tb.tile.element, dealt);

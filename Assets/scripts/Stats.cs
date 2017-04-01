@@ -99,9 +99,9 @@ public class Stats {
         report.AppendLine("C-drop " + Tile.ElementToChar(elem) + " col" + col);
     }
 
-    public void OnCommishMatch(int[] lens) {
-        commishMatches += lens.Length;
-        report.AppendLine("...Commish made "+lens.Length+" match(es)");
+    public void OnCommishMatch(string[] seqs) {
+        commishMatches += seqs.Length;
+        report.AppendLine("...Commish made "+seqs.Length+" match(es)");
     }
 
     #region GameAction subscriptions
@@ -135,10 +135,11 @@ public class Stats {
     }
     #endregion
 
-    public void OnMatch(int id, int[] lens) {
-        report.AppendLine("...made " + lens.Length + " match(es)");
-        GetPS(id).matches += lens.Length;
-        foreach (int len in lens) {
+    public void OnMatch(int id, string[] seqs) {
+        report.AppendLine("...made " + seqs.Length + " match(es)");
+        GetPS(id).matches += seqs.Length;
+        foreach (string seq in seqs) {
+            int len = seq.Length;
             if (len == 3)
                 GetPS(id).match3s++;
             else if(len == 4)

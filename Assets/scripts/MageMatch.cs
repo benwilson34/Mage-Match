@@ -116,6 +116,9 @@ public class MageMatch : MonoBehaviour {
         eventCont.boardAction += OnBoardAction;
         eventCont.gameAction += OnGameAction;
 
+        if (gameSettings.turnTimerOn)
+            eventCont.timeout += OnTimeout;
+
         syncManager.InitEvents(this, eventCont);
         audioCont.InitEvents();
         effectCont.InitEvents();
@@ -144,6 +147,13 @@ public class MageMatch : MonoBehaviour {
             }
             uiCont.UpdatePlayerInfo();
         }
+    }
+
+    public void OnTimeout(int id) {
+        Player p = GetPlayer(id);
+        Debug.Log("MAGEMATCH:" + p.name + "'s turn just timed out! They had " + p.AP + " AP left.");
+        uiCont.SetDrawButton(activep, false);
+        StartCoroutine(TurnSystem());
     }
     #endregion
 
@@ -244,9 +254,9 @@ public class MageMatch : MonoBehaviour {
         Debug.Log("MAGEMATCH: At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
         if (currentState != GameState.CommishTurn) {
             Debug.Log("MAGEMATCH: Match was made by a player!!");
-            eventCont.Match(GetTileSeqsLens(seqList)); // raise player Match event
+            eventCont.Match(GetTileSeqs(seqList)); // raise player Match event
         } else {
-            eventCont.CommishMatch(GetTileSeqsLens(seqList)); // raise CommishMatch event
+            eventCont.CommishMatch(GetTileSeqs(seqList)); // raise CommishMatch event
         }
         RemoveSeqList(seqList);
     }
@@ -469,14 +479,13 @@ public class MageMatch : MonoBehaviour {
     }
 
     // move to BoardCheck?
-    public int[] GetTileSeqsLens(List<TileSeq> seqs) {
-        int[] lens = new int[seqs.Count];
-        int i = 0;
-        foreach (TileSeq seq in seqs) {
-            lens[i] = seq.GetSeqLength();
-            i++;
+    public string[] GetTileSeqs(List<TileSeq> seqs) {
+        string[] ss = new string[seqs.Count];
+        TileSeq seq = seqs[0];
+        for (int i = 0; i < seqs.Count; seq = seqs[i], i++) {
+            ss[i] = seq.SeqAsString();
         }
-        return lens;
+        return ss;
     }
 
     public void BoardChanged() {

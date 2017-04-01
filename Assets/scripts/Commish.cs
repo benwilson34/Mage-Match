@@ -13,13 +13,14 @@ public class Commish  {
 
     public void InitEvents() {
         mm.eventCont.commishMatch += OnCommishMatch;
-        mm.eventCont.match += OnMatch;
+        //mm.eventCont.match += OnMatch;
     }
 
-    public void OnCommishMatch(int[] lens) {
+    public void OnCommishMatch(string[] seqs) {
         int sum = 0;
         string s = "{";
-        foreach (int i in lens) {
+        foreach (string seq in seqs) {
+            int i = seq.Length;
             sum += i;
             s += i + ",";
         }
@@ -28,9 +29,9 @@ public class Commish  {
         numTiles += sum;
     }
 
-    public void OnMatch(int id, int[] lens) {
-        // TODO mood stuff etc.
-    }
+    //public void OnMatch(int id, int[] lens) {
+    //    // TODO mood stuff etc.
+    //}
 
     public IEnumerator CTurn(){
         //if (activeEffects) {

@@ -37,7 +37,7 @@ public class EffectController {
         mm.StartCoroutine(ResolveEndTurnEffects());
     }
 
-    public void OnMatch(int id, int[] lens) {
+    public void OnMatch(int id, string[] seqs) {
         mm.StartCoroutine(ResolveMatchEffects(id));
     }
 

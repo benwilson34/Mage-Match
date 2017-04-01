@@ -86,8 +86,8 @@ public class UIController : MonoBehaviour {
         UpdateEffTexts(); // could be considerable overhead...
     }
 
-    public void OnMatch(int id, int[] lens) {
-        if (lens.Length > 1)
+    public void OnMatch(int id, string[] seqs) {
+        if (seqs.Length > 1)
             SendSlidingText("Wow, nice combo!");
     }
 

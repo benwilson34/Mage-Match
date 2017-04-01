@@ -47,11 +47,11 @@ public class EventController {
             commishDrop.Invoke(elem, col);
     }
 
-    public delegate void CommishMatchEvent(int[] lens);
+    public delegate void CommishMatchEvent(string[] seqs);
     public event CommishMatchEvent commishMatch;
-    public void CommishMatch(int[] lens) {
+    public void CommishMatch(string[] seqs) {
         if (commishMatch != null) // never will be due to Stats
-            commishMatch.Invoke(lens);
+            commishMatch.Invoke(seqs);
     }
 
     public delegate void CommishTurnDoneEvent();
@@ -103,12 +103,12 @@ public class EventController {
     #endregion
 
 
-    public delegate void MatchEvent(int id, int[] lens);
+    public delegate void MatchEvent(int id, string[] seqs);
     public event MatchEvent match;
-    public void Match(int[] lens) {
+    public void Match(string[] seqs) {
         //Debug.Log("EVENTCONTROLLER: Match event raised, dispatching to " + match.GetInvocationList().Length + " subscribers.");
         if (match != null) // never will be due to Stats
-            match.Invoke(mm.ActiveP().id, lens);
+            match.Invoke(mm.ActiveP().id, seqs);
     }
 
     public delegate void CascadeEvent(int id, int chain);
