@@ -85,11 +85,17 @@ namespace Com.SoupSkull.MageMatch {
 
         public override void OnPhotonPlayerConnected(PhotonPlayer other) {
             Debug.Log("OnPhotonPlayerConnected() " + other.NickName); // not seen if you're the player connecting
-
             if (PhotonNetwork.isMasterClient && PhotonNetwork.room.PlayerCount == 2) {
-                Debug.Log("OnPhotonPlayerConnected isMasterClient " + PhotonNetwork.isMasterClient); // called before OnPhotonPlayerDisconnected
-                PhotonNetwork.LoadLevel("Game Screen (Landscape)");
+                PhotonView view = GameObject.Find("GameSettings").GetComponent<PhotonView>();
+                view.RPC("PutSettings", PhotonTargets.All);
+
+                //Debug.Log("OnPhotonPlayerConnected isMasterClient " + PhotonNetwork.isMasterClient); // called before OnPhotonPlayerDisconnected
+                //PhotonNetwork.LoadLevel("Game Screen (Landscape)");
             }
+        }
+
+        public void LoadGameScreen() {
+            PhotonNetwork.LoadLevel("Game Screen (Landscape)");
         }
     }
 }

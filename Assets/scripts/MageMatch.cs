@@ -14,6 +14,7 @@ public class MageMatch : MonoBehaviour {
     [HideInInspector]
     public bool commishTurn = false; // maybe make getters/setters?
 
+    public GameSettings gameSettings;
     public Commish commish;
     public BoardCheck boardCheck;
     public HexGrid hexGrid;
@@ -36,6 +37,9 @@ public class MageMatch : MonoBehaviour {
 
     void Start() {
         Random.InitState(1337);
+
+        gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
+        Debug.Log("MAGEMATCH: gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
 
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();

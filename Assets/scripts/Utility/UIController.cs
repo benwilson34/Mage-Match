@@ -104,9 +104,9 @@ public class UIController : MonoBehaviour {
         Text nameText = p1info.Find("Text_Name").GetComponent<Text>();
 
         if (p1.id == PhotonNetwork.player.ID)
-            nameText.text = "P1 - ME!";
+            nameText.text = "P1: " + p1.name + " (ME!)";
         else
-            nameText.text = "P1 - " + p1.name;
+            nameText.text = "P1: " + p1.name;
 
         ShowLoadout(p1);
         DeactivateAllSpellButtons(p1);
@@ -114,9 +114,9 @@ public class UIController : MonoBehaviour {
         nameText = p2info.Find("Text_Name").GetComponent<Text>();
 
         if (p2.id == PhotonNetwork.player.ID)
-            nameText.text = "P2 - ME!";
+            nameText.text = "P2: " + p2.name + " (ME!)";
         else
-            nameText.text = "P2 - " + p2.name;
+            nameText.text = "P2: " + p2.name;
 
         ShowLoadout(p2);
         DeactivateAllSpellButtons(p2);

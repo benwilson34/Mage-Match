@@ -28,11 +28,11 @@ public class Player {
 
         switch (playerNum) {
             case 1:
-                name = "Maxsimilous Forza";
+                name = mm.gameSettings.p1name; // TODO handle empty name
                 handSlot = GameObject.Find("handslot1").transform;
                 break;
             case 2:
-                name = "Quincy Shungle";
+                name = mm.gameSettings.p2name; // TODO handle empty name
                 handSlot = GameObject.Find("handslot2").transform;
                 break;
             default:

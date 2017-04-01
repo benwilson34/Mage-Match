@@ -54,4 +54,7 @@ MonoBehaviour:
   - HandleSpellCast
   - HandleTBTarget
   - HandleCBTarget
+  - SetPlayerName
+  - SetTurnTimerToggle
+  - PutSettings
   DisableAutoOpenWizard: 1
