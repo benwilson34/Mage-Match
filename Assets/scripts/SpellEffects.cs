@@ -99,7 +99,7 @@ public class SpellEffects {
         ench.priority = 1;
 		tb.SetEnchantment (ench);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
-		mm.effectCont.AddEndTurnEffect(ench, "bur");
+		mm.effectCont.AddEndTurnEffect(ench, "burn");
 	}
 	IEnumerator Ench_Burning_TEffect(int id, TileBehav tb){
 		mm.GetPlayer(id).DealDamage (3, false);
@@ -118,7 +118,7 @@ public class SpellEffects {
             ench.SkipCurrent();
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
-        mm.effectCont.AddEndTurnEffect(ench, "zom");
+        mm.effectCont.AddEndTurnEffect(ench, "zomb");
     }
     IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
         // TODO filter list before rand
@@ -153,7 +153,7 @@ public class SpellEffects {
         ench.SetTypeTier(Enchantment.EnchType.ZombieTok, 3);
         ench.priority = 6; // TODO 6.1?
         tb.SetEnchantment(ench);
-        mm.effectCont.AddEndTurnEffect(ench, "zmT");
+        mm.effectCont.AddEndTurnEffect(ench, "zomT");
     }
     IEnumerator Ench_ZombieTok_TEffect(int id, TileBehav tb) {
         Ench_Zombify_TEffect(id, tb);
@@ -166,7 +166,7 @@ public class SpellEffects {
         ench.SetTypeTier(Enchantment.EnchType.StoneTok, 3);
         ench.priority = 4;
         tb.SetEnchantment(ench);
-        mm.effectCont.AddEndTurnEffect(ench, "stT");
+        mm.effectCont.AddEndTurnEffect(ench, "stoT");
     }
     IEnumerator Ench_StoneTok_TEffect(int id, TileBehav tb) {
         int c = tb.tile.col, r = tb.tile.row;

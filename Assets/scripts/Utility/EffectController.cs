@@ -182,7 +182,7 @@ public class EffectController {
                 bool remove = se.TurnsRemaining() == 1; // should be count?
                 yield return se.TriggerEffect(c1, r1, c2, r2);
                 if (remove) {
-                    RemoveSwapEffect(se.tag);
+                    RemoveSwapEffect(se.tag); // just removeAt...?
                     i--;
                 }
             }

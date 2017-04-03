@@ -92,7 +92,18 @@ public class AnimationController : MonoBehaviour {
 
 
     public IEnumerator _Burning(TileBehav tb) {
-        
-        yield return null;
+        GameObject fireballPF = (GameObject)Resources.Load("prefabs/anim/fireball"); // field
+        Transform spawn = GameObject.Find("tileSpawn").transform;
+        GameObject fb = Instantiate(fireballPF, spawn);
+
+        Tween t = fb.transform.DOMove(tb.transform.position, 1f);
+        t.SetEase(Ease.InQuad);
+        yield return t.WaitForCompletion();
+
+        t = fb.GetComponent<SpriteRenderer>().DOColor(new Color(1, 0, 0, 0), .05f);
+        yield return t.WaitForCompletion();
+        Destroy(fb);
+        Debug.Log("ANIMCONT: Done animating Burning.");
+        //yield return null; //?
     }
 }

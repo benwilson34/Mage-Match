@@ -312,7 +312,6 @@ public class MageMatch : MonoBehaviour {
                 yield return eventCont.Swap(c1, r1, c2, r2); //?
 
                 if (!menu) { // move to stats?
-                    //Debug.Log(">>>About to send GameAction event...");
                     eventCont.GameAction(true);
                 }
             }

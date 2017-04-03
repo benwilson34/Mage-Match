@@ -105,8 +105,8 @@ public class Enfuego : Character {
         yield return null;
     }
     IEnumerator HotBody_Swap(int id, int c1, int r1, int c2, int r2) {
-        Debug.Log("ENFUEGO: HotBody's swap effect was called! Waiting for 3 seconds...");
-        yield return new WaitForSeconds(3f);
+        Debug.Log("ENFUEGO: HotBody's swap effect was called...selects="+hotBody_selects);
+        //yield return new WaitForSeconds(3f);
 
         TileBehav tbSelect = null;
 
@@ -130,6 +130,7 @@ public class Enfuego : Character {
 
             int rand = Random.Range(0, tbs.Count);
             tbSelect = tbs[rand];
+            hotBody_selects--;
             mm.syncManager.SendHotBodySelect(id, tbSelect.tile.col, tbSelect.tile.row);
         } else {
             mm.syncManager.StartHotBody(id);
@@ -139,8 +140,8 @@ public class Enfuego : Character {
         }
 
         Debug.Log("About to apply burning to the tb at " + tbSelect.PrintCoord());
+        yield return mm.animCont._Burning(tbSelect);
         spellfx.Ench_SetBurning(id, tbSelect);
-        yield return null; // needed?
     }
 
     public void SetHotBodySelect(int col, int row) {
