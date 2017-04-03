@@ -89,4 +89,10 @@ public class AnimationController : MonoBehaviour {
                 yield return tween.WaitForCompletion();
         }
     }
+
+
+    public IEnumerator _Burning(TileBehav tb) {
+        
+        yield return null;
+    }
 }

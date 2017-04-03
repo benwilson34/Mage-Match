@@ -132,4 +132,8 @@ public class TileBehav : MonoBehaviour {
 		return false;
 	}
 
+    public string PrintCoord() {
+        return "(" + tile.col + ", " + tile.row + ")";
+    }
+
 }

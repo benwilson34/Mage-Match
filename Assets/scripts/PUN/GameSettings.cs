@@ -9,6 +9,7 @@ public class GameSettings : PunBehaviour {
     public string p1name, p2name;
     public bool turnTimerOn;
 
+    private bool nameSet = false;
     private Transform control;
     private Com.SoupSkull.MageMatch.Launcher launcher; // hideous class name
 
@@ -34,7 +35,7 @@ public class GameSettings : PunBehaviour {
             Debug.Log("GAMESETTINGS: player 1 here, setting turnTimerOn to " + turnTimerOn);
             photonView.RPC("SetTurnTimerToggle", PhotonTargets.Others, turnTimerOn);
 
-            yield return new WaitUntil(() => p2name != ""); // wait for RPC
+            yield return new WaitUntil(() => nameSet); // wait for RPC
 
             launcher.LoadGameScreen();
         } else {
@@ -44,14 +45,17 @@ public class GameSettings : PunBehaviour {
 
     [PunRPC]
     public void SetPlayerName(int id, string name) {
+        Debug.Log("GAMESETTINGS: Set player" + id + " name to " + name);
         if (id == 1)
             p1name = name;
         else
             p2name = name;
+        nameSet = true;
     }
 
     [PunRPC]
     public void SetTurnTimerToggle(bool b) {
+        Debug.Log("GAMESETTINGS: SetTurnTimer to " + b);
         turnTimerOn = b;
     }
 }

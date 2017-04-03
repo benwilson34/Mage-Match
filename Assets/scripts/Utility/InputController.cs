@@ -27,7 +27,7 @@ public class InputController : MonoBehaviour {
     }
 
 	void Update(){ // polling input...change to events?
-        if (mm.MyTurn()) {
+        if (mm.MyTurn() && !mm.eventCont.handlingEvents) { //?
             if (Input.GetMouseButton(0)) { // if left mouse is down
                 if (targeting.currentTMode == Targeting.TargetMode.Drag) {
                     //				HandleDrag ();

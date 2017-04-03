@@ -6,6 +6,8 @@ public class EventController {
 
     MageMatch mm;
 
+    public bool handlingEvents = false; // worth it?
+
     public EventController(MageMatch mm) {
         this.mm = mm;
     }
@@ -86,11 +88,46 @@ public class EventController {
             drop.Invoke(mm.ActiveP().id, elem, col);
     }
 
-    public delegate void SwapEvent(int id, int c1, int r1, int c2, int r2);
-    public event SwapEvent swap;
-    public void Swap(int c1, int r1, int c2, int r2) {
-        if (swap != null)
-            swap.Invoke(mm.ActiveP().id, c1, r1, c2, r2);
+    public delegate IEnumerator SwapEvent(int id, int c1, int r1, int c2, int r2);
+    struct SwapPack { public SwapEvent swapEvent; public int priority; }
+    private List<SwapPack> swaps;
+    public IEnumerator Swap(int c1, int r1, int c2, int r2) {
+        handlingEvents = true; // worth it?
+        foreach (SwapPack sp in swaps) {
+            Debug.Log("EVENTCONT: going thru swapEvent with priority " + sp.priority);
+            yield return sp.swapEvent(mm.ActiveP().id, c1, r1, c2, r2);
+        }
+        Debug.Log("EVENTCONT: Just finished swap events...");
+        handlingEvents = false; // worth it?
+    }
+
+    // TODO AddEvent(string OR enum, event, priority) etc.
+    public void AddSwapEvent(SwapEvent e, int priority) {
+        SwapPack sp = new SwapPack { swapEvent = e, priority = priority };
+        if (swaps == null) {
+            swaps = new List<SwapPack>();
+            
+            swaps.Add(sp);
+            return;
+        }
+
+        int i;
+        for (i = 0; i < swaps.Count; i++) {
+            SwapPack listS = swaps[i];
+            if (listS.priority < priority)
+                break;
+        }
+        swaps.Insert(i, sp);
+    }
+    public void RemoveSwapEvent(SwapEvent e) {
+        for (int i = 0; i < swaps.Count; i++) {
+            SwapPack sp = swaps[i];
+            if (sp.swapEvent.Equals(e)) {
+                swaps.RemoveAt(i);
+                return;
+            }
+        }
+        Debug.LogError("EVENTCONT: RemoveSwapEvent shouldn't get to this point.");
     }
 
     public delegate void SpellCastEvent(int id, Spell spell);

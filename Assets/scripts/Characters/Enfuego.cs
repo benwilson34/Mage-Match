@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class Enfuego : Character {
 
+    public int hotBody_selects = 0;
+    private int hotBody_col, hotBody_row;
+
     private HexGrid hexGrid; // eventually these will be static again?
     private Targeting targeting; // ''
-    private bool hotBody_active = false;
 
     public Enfuego(MageMatch mm, int id, int loadout) {
         spellfx = new SpellEffects(); //?
@@ -103,37 +105,49 @@ public class Enfuego : Character {
         yield return null;
     }
     IEnumerator HotBody_Swap(int id, int c1, int r1, int c2, int r2) {
-        // TODO check ID???
+        Debug.Log("ENFUEGO: HotBody's swap effect was called! Waiting for 3 seconds...");
+        yield return new WaitForSeconds(3f);
 
-        Debug.Log("ENFUEGO: HotBody's swap effect was called!");
-        yield return null;
+        TileBehav tbSelect = null;
 
-        //if(id == playerID) {
-        //    mm.GetPlayer(id).DealDamage(25, false);
+        if (id == mm.myID) {
+            Debug.Log("ENFUEGO: This effect is mine, player " + playerID + "!");
+            mm.GetPlayer(id).DealDamage(25, false);
 
-        //    // TODO still doesn't function properly...seems to be whiffing at least once
-        //    // maybe it's enchanting part of the match??
-        //    List<TileBehav> tbs = hexGrid.GetPlacedTiles();
-        //    for (int i = 0; i < tbs.Count; i++) {
-        //        TileBehav tb = tbs[i];
-        //        if (tb.HasEnchantment()) {
-        //            tbs.Remove(tb);
-        //            i--;
-        //        }
-        //    }
+            // TODO still doesn't function properly...seems to be whiffing at least once
+            // maybe it's enchanting part of the match??
+            List<TileBehav> tbs = hexGrid.GetPlacedTiles();
+            for (int i = 0; i < tbs.Count; i++) {
+                TileBehav tb = tbs[i];
+                if (tb.HasEnchantment()) {
+                    tbs.Remove(tb);
+                    i--;
+                }
+            }
 
-        //    Debug.Log("ENFUEGO: Waiting to choose the tile to apply Burning to.");
-        //    //yield return new WaitUntil(() => hotBody_active);
-        //    int rand = Random.Range(0, tbs.Count);
-        //    spellfx.Ench_SetBurning(id, tbs[rand]);
-        //    //mm.syncManager
-        //} else {
-        //    // TODO something about waiting for it...
-        //} 
+            Debug.Log("ENFUEGO: Waiting to choose the tile to apply Burning to.");
+            yield return new WaitUntil(() => hotBody_selects > 0);
+
+            int rand = Random.Range(0, tbs.Count);
+            tbSelect = tbs[rand];
+            mm.syncManager.SendHotBodySelect(id, tbSelect.tile.col, tbSelect.tile.row);
+        } else {
+            mm.syncManager.StartHotBody(id);
+
+            yield return new WaitUntil(() => hotBody_selects == 0);
+            tbSelect = hexGrid.GetTileBehavAt(hotBody_col, hotBody_row);
+        }
+
+        Debug.Log("About to apply burning to the tb at " + tbSelect.PrintCoord());
+        spellfx.Ench_SetBurning(id, tbSelect);
+        yield return null; // needed?
     }
-    //void HotBody_Tile(int col, int row) {
-    //    // TODO
-    //}
+
+    public void SetHotBodySelect(int col, int row) {
+        hotBody_col = col;
+        hotBody_row = row;
+        hotBody_selects--;
+    }
 
     public IEnumerator HotAndBothered() {
         Debug.Log("ENFUEGO: HAB called????");

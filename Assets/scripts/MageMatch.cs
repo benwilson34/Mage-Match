@@ -33,7 +33,7 @@ public class MageMatch : MonoBehaviour {
     private GameObject stonePF, emberPF, zombiePF, prereqPF, targetPF; // token prefabs
     private Player p1, p2, activep;
     private bool endGame = false;     // is either player dead?
-    private bool checking = false;
+    private bool checking = false, performingAction = false;
 
     void Start() {
         Random.InitState(1337);
@@ -199,6 +199,7 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator BoardChecking() {
         checking = true; // prevents overcalling/retriggering
+        yield return new WaitUntil(() => !performingAction); //?
         int cascade = 0;
         while (true) {
             yield return new WaitUntil(() => !menu && !IsTargetMode() && !animCont.IsAnimating());
@@ -299,14 +300,25 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void SwapTiles(int c1, int r1, int c2, int r2) {
+        StartCoroutine(_SwapTiles(c1, r1, c2, r2));
+    }
+
+    public IEnumerator _SwapTiles(int c1, int r1, int c2, int r2) {
+        Debug.Log("  ----- SWAPPING -----");
+        performingAction = true;
         if (!IsCommishTurn()) {
             if (hexGrid.Swap(c1, r1, c2, r2)) {
-                eventCont.Swap(c1, r1, c2, r2);
+
+                yield return eventCont.Swap(c1, r1, c2, r2); //?
+
                 if (!menu) { // move to stats?
+                    //Debug.Log(">>>About to send GameAction event...");
                     eventCont.GameAction(true);
                 }
             }
         }
+        performingAction = false;
+        Debug.Log("  ----- END SWAP -----");
     }
 
     public void CastSpell(int spellNum) { // IEnumerator?

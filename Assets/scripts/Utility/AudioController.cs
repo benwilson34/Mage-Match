@@ -87,7 +87,7 @@ public class AudioController {
         //mm.eventCont.drop += onDrop;
         mm.eventCont.grabTile += OnGrab;
         mm.eventCont.draw += OnDraw;
-        mm.eventCont.swap += OnSwap;
+        mm.eventCont.AddSwapEvent(OnSwap, 4);
         //mm.eventCont.match += onMatch;
     }
 
@@ -152,7 +152,7 @@ public class AudioController {
         OnGrab(id, elem);
     }
 
-    public void OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
         TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
         Tile.Element elem = tb.tile.element;
         AudioClip clip = null;
@@ -177,6 +177,7 @@ public class AudioController {
 
         source.clip = clip;
         source.Play();
+        yield return null;
     }
 
 	public void BreakSound(){

@@ -95,6 +95,7 @@ namespace Com.SoupSkull.MageMatch {
         }
 
         public void LoadGameScreen() {
+            Debug.Log("LAUNCHER: Loading...");
             PhotonNetwork.LoadLevel("Game Screen (Landscape)");
         }
     }

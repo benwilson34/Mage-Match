@@ -25,7 +25,7 @@ public class EffectController {
         mm.eventCont.turnBegin += OnTurnBegin;
         mm.eventCont.turnEnd += OnTurnEnd;
         mm.eventCont.match += OnMatch;
-        mm.eventCont.swap += OnSwap;
+        mm.eventCont.AddSwapEvent(OnSwap, 3);
     }
 
     #region EventCont calls
@@ -41,8 +41,8 @@ public class EffectController {
         mm.StartCoroutine(ResolveMatchEffects(id));
     }
 
-    public void OnSwap(int id, int c1, int r1, int c2, int r2) {
-        mm.StartCoroutine(ResolveSwapEffects(id, c1, r1, c2, r2));
+    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+        yield return ResolveSwapEffects(id, c1, r1, c2, r2);
         Debug.Log("EFFECTCONT: Just finished resolving swap effects.");
     }
     #endregion

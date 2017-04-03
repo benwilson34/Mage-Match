@@ -23,7 +23,8 @@ public class SyncManager : PunBehaviour {
         this.mm = mm;
         eventCont.draw += OnDrawLocal;
         eventCont.drop += OnDropLocal;
-        eventCont.swap += OnSwapLocal;
+        //eventCont.swap += OnSwapLocal;
+        eventCont.AddSwapEvent(OnSwapLocal, 5);
         eventCont.commishDrop += OnCommishDrop;
         eventCont.commishTurnDone += OnCommishTurnDone;
         eventCont.playerHealthChange += OnPlayerHealthChange;
@@ -59,11 +60,12 @@ public class SyncManager : PunBehaviour {
         mm.DropTile(col, go);
     }
 
-    public void OnSwapLocal(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwapLocal(int id, int c1, int r1, int c2, int r2) {
         if (id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleSwap", PhotonTargets.Others, id, c1, r1, c2, r2);
         }
+        yield return null;
     }
 
     [PunRPC]
@@ -174,4 +176,29 @@ public class SyncManager : PunBehaviour {
     //public void HandleHotBodyTarget(int col, int row) {
     //    mm.targeting.OnCBTarget(mm.hexGrid.GetCellBehavAt(col, row));
     //}
+
+    public void StartHotBody(int id) {
+        PhotonView photonView = PhotonView.Get(this);
+        photonView.RPC("R_StartHotBody", PhotonTargets.All, id);
+    }
+
+
+    [PunRPC]
+    public void R_StartHotBody(int id) {
+        ((Enfuego)mm.GetPlayer(id).character).hotBody_selects = 1;
+    }
+
+
+    public void SendHotBodySelect(int id, int col, int row) {
+        if (mm.MyTurn()) { //?
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("R_HotBodySelect", PhotonTargets.Others, id, col, row);
+        }
+    }
+
+
+    [PunRPC]
+    public void R_HotBodySelect(int id, int col, int row) {
+        ((Enfuego)mm.GetPlayer(id).character).SetHotBodySelect(col, row);
+    }
 }

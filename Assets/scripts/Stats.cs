@@ -47,7 +47,7 @@ public class Stats {
 
         mm.eventCont.draw += OnDraw;
         mm.eventCont.drop += OnDrop;
-        mm.eventCont.swap += OnSwap;
+        mm.eventCont.AddSwapEvent(OnSwap, 2);
         mm.eventCont.spellCast += OnSpellCast;
 
         mm.eventCont.match += OnMatch;
@@ -121,12 +121,13 @@ public class Stats {
             report.AppendLine("menu Drop col" + col);
     }
 
-    public void OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
         if (!mm.menu) {
             report.AppendLine("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
             GetPS(id).swaps++;
         } else
             report.AppendLine("menu Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
+        yield return null;
     }
 
     public void OnSpellCast(int id, Spell spell) {
