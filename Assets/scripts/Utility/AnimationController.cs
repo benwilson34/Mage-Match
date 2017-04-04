@@ -106,4 +106,15 @@ public class AnimationController : MonoBehaviour {
         Debug.Log("ANIMCONT: Done animating Burning.");
         //yield return null; //?
     }
+
+    public IEnumerator _Zombify_Attack(Transform zomb, Transform bitten) {
+        Vector3 origPos = zomb.position;
+        Tween t = zomb.DOMove(bitten.position, .03f);
+        t.SetEase(Ease.Linear);
+        yield return t.WaitForCompletion();
+
+        t = zomb.DOMove(origPos, .13f);
+        t.SetEase(Ease.Linear);
+        yield return t.WaitForCompletion();
+    }
 }

@@ -130,6 +130,7 @@ public class Gravekeeper : Character {
         mm.effectCont.AddEndTurnEffect(ench, "zomb");
     }
     IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
+        //zombify_select = false; // only use if you're sloppy. 
         TileBehav selectTB = null;
         Debug.Log("GRAVEKEEPER: Zombify at " + tb.PrintCoord() + " starting...");
         if (id == mm.myID) {
@@ -140,23 +141,23 @@ public class Gravekeeper : Character {
                     ctb.GetEnchType() == Enchantment.EnchType.Zombify) { // other conditions where Zombify wouldn't work?
                     tbs.Remove(ctb);
                     i--;
+                    Debug.Log("GRAVEKEEPER: Removing tile at " + ctb.PrintCoord());
                 }
             }
             Debug.Log("GRAVEKEEPER: Zombified tile has " + tbs.Count + " available tiles around it.");
 
             yield return new WaitUntil(() => zombify_select);
+            zombify_select = false;
 
-            if (tbs.Count == 0) {
-                // send failure over network.
-                Debug.Log("GRAVEKEEPER: Zombify has no targets!");
+            if (tbs.Count == 0) { // no targets
+                Debug.Log("GRAVEKEEPER: Zombify at "+tb.PrintCoord()+" has no targets!");
                 mm.syncManager.SendZombifySelect(id, -1, -1);
-                yield break; //?
-                Debug.Log("GRAVEKEEPER: Yield break doesn't work!");
+                yield break;
             }
 
             int rand = Random.Range(0, tbs.Count);
             selectTB = tbs[rand];
-            Debug.Log("SPELL-FX: Zombify trying TB " + selectTB.PrintCoord());
+            Debug.Log("GRAVEKEEPER: Zombify attacking TB at " + selectTB.PrintCoord());
 
             mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);
         } else { // remote
@@ -164,20 +165,18 @@ public class Gravekeeper : Character {
             yield return new WaitUntil(() => !zombify_select);
 
             if (zombify_col == -1) { // if no available selects
-                Debug.Log("GRAVEKEEPER: Zombify has no targets!");
+                Debug.Log("GRAVEKEEPER: Zombify at "+tb.PrintCoord()+" has no targets!");
                 yield break;
             }
             selectTB = mm.hexGrid.GetTileBehavAt(zombify_col, zombify_row);
         }
 
+        yield return mm.animCont._Zombify_Attack(tb.transform, selectTB.transform);
+
         if (selectTB.tile.element == Tile.Element.Muscle) {
-            if (!selectTB.HasEnchantment() ||
-                (selectTB.GetEnchType() != Enchantment.EnchType.Zombify &&
-                selectTB.GetEnchType() != Enchantment.EnchType.ZombieTok)) {
-                mm.RemoveTile(selectTB.tile, true);
-                mm.GetPlayer(id).DealDamage(10, false);
-                mm.GetPlayer(id).ChangeHealth(10);
-            }
+            mm.RemoveTile(selectTB.tile, true);
+            mm.GetPlayer(id).DealDamage(10, false);
+            mm.GetPlayer(id).ChangeHealth(10);
         } else {
             Ench_SetZombify(id, selectTB, true);
         }

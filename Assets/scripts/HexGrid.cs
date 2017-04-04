@@ -196,7 +196,7 @@ public class HexGrid {
 					tbs.Add (tileGrid [col + dc, row + dr]);
 			}
 		}
-        Debug.Log("HEXGRID: " + tbs.Count + " tiles around (" + col + "," + row + ")");
+        //Debug.Log("HEXGRID: " + tbs.Count + " tiles around (" + col + "," + row + ")");
 		return tbs;
 	}
 

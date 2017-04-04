@@ -131,6 +131,7 @@ public class EffectController {
         Effect e;
         for (int i = 0; i < endTurnEffects.Count; i++) { // foreach
             e = endTurnEffects[i];
+            Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsRemaining() + " turns left (including this one).");
             bool remove = e.TurnsRemaining() == 0;
 
             yield return e.ResolveEffect();
@@ -140,9 +141,7 @@ public class EffectController {
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
                 i--;
-            } else {
-                Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsRemaining() + " turns left.");
-            }
+            } 
         }
         effectsResolving--;
     }

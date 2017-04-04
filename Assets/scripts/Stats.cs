@@ -207,6 +207,7 @@ public class Stats {
             sb.AppendLine("Turns timed out," + ps.timeouts).AppendLine("");
         }
 
+        // TODO write num of each spell cast from EffectCont.tagDict
         File.WriteAllText(filePath, sb.ToString());
     }
 
