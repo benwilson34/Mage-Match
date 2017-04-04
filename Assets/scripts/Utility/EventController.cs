@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿//using System; // maybe?
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +11,50 @@ public class EventController {
 
     public EventController(MageMatch mm) {
         this.mm = mm;
+        swaps = new List<EventPack>();
+        turnEnds = new List<EventPack>();
     }
+
+    struct EventPack { public System.Delegate ev; public int priority; }
+
+    List<EventPack> GetEventList(string type) {
+        switch (type) {
+            case "swap":
+                return swaps;
+            case "turnEnd":
+                return turnEnds;
+            default:
+                Debug.LogError("EVENTCONT: Bad type name!!");
+                return null;
+        }
+    }
+
+    // ex. AddEvent("swap", SwapCallbackMethod, 1)
+    public void AddEvent(string type, System.Delegate e, int priority) {
+        List<EventPack> evList = GetEventList(type);
+
+        int i = 0;
+        for (; i < evList.Count; i++) {
+            if (evList[i].priority < priority)
+                break;
+        }
+        evList.Insert(i, new EventPack { ev = e, priority = priority });
+    }
+
+
+    public void RemoveEvent(string type, System.Delegate e) {
+        List<EventPack> evList = GetEventList(type);
+
+        for (int i = 0; i < evList.Count; i++) {
+            if (evList[i].ev.Equals(e)) {
+                evList.RemoveAt(i);
+                return;
+            }
+        }
+        Debug.LogError("EVENTCONT: RemoveSwapEvent shouldn't get to this point.");
+    }
+
+    // -----------------------------------------------------
 
     public delegate void BoardActionEvent();
     public event BoardActionEvent boardAction;
@@ -20,12 +64,20 @@ public class EventController {
             boardAction.Invoke();
     }
 
-    public delegate void TurnEndEvent(int id);
-    public event TurnEndEvent turnEnd;
-    public void TurnEnd() {
-        if (turnEnd != null) // never will be due to Stats
-            turnEnd.Invoke(mm.ActiveP().id);
+    public delegate IEnumerator TurnEndEvent(int id);
+    private List<EventPack> turnEnds;
+    public IEnumerator TurnEnd() {
+        handlingEvents = true; // worth it?
+        foreach (EventPack pack in turnEnds) {
+            yield return ((TurnEndEvent)pack.ev)(mm.ActiveP().id); // OH YEAH
+        }
+        Debug.Log("EVENTCONT: Just finished turnEnd events...");
+        handlingEvents = false; // worth it?
     }
+    public void AddTurnEndEvent(TurnEndEvent ev, int priority) {
+        AddEvent("turnEnd", ev, priority);
+    }
+
 
     public delegate void TurnBeginEvent(int id);
     public event TurnBeginEvent turnBegin;
@@ -89,46 +141,21 @@ public class EventController {
     }
 
     public delegate IEnumerator SwapEvent(int id, int c1, int r1, int c2, int r2);
-    struct SwapPack { public SwapEvent swapEvent; public int priority; }
-    private List<SwapPack> swaps;
+    private List<EventPack> swaps;
     public IEnumerator Swap(int c1, int r1, int c2, int r2) {
         handlingEvents = true; // worth it?
-        foreach (SwapPack sp in swaps) {
-            Debug.Log("EVENTCONT: going thru swapEvent with priority " + sp.priority);
-            yield return sp.swapEvent(mm.ActiveP().id, c1, r1, c2, r2);
+        foreach (EventPack pack in swaps) {
+            Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
+            yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, c1, r1, c2, r2); // OH YEAH
         }
         Debug.Log("EVENTCONT: Just finished swap events...");
         handlingEvents = false; // worth it?
     }
 
-    // TODO AddEvent(string OR enum, event, priority) etc.
-    public void AddSwapEvent(SwapEvent e, int priority) {
-        SwapPack sp = new SwapPack { swapEvent = e, priority = priority };
-        if (swaps == null) {
-            swaps = new List<SwapPack>();
-            
-            swaps.Add(sp);
-            return;
-        }
-
-        int i;
-        for (i = 0; i < swaps.Count; i++) {
-            SwapPack listS = swaps[i];
-            if (listS.priority < priority)
-                break;
-        }
-        swaps.Insert(i, sp);
+    public void AddSwapEvent(SwapEvent se, int priority) {
+        AddEvent("swap", se, priority);
     }
-    public void RemoveSwapEvent(SwapEvent e) {
-        for (int i = 0; i < swaps.Count; i++) {
-            SwapPack sp = swaps[i];
-            if (sp.swapEvent.Equals(e)) {
-                swaps.RemoveAt(i);
-                return;
-            }
-        }
-        Debug.LogError("EVENTCONT: RemoveSwapEvent shouldn't get to this point.");
-    }
+    // TODO similar method to convert for removing (if it's ever needed...)
 
     public delegate void SpellCastEvent(int id, Spell spell);
     public event SpellCastEvent spellCast;

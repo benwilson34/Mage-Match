@@ -23,7 +23,7 @@ public class EffectController {
 
     public void InitEvents() {
         mm.eventCont.turnBegin += OnTurnBegin;
-        mm.eventCont.turnEnd += OnTurnEnd;
+        mm.eventCont.AddTurnEndEvent(OnTurnEnd, 3);
         mm.eventCont.match += OnMatch;
         mm.eventCont.AddSwapEvent(OnSwap, 3);
     }
@@ -33,8 +33,8 @@ public class EffectController {
         mm.StartCoroutine(ResolveBeginTurnEffects());
     }
 
-    public void OnTurnEnd(int id) {
-        mm.StartCoroutine(ResolveEndTurnEffects());
+    public IEnumerator OnTurnEnd(int id) {
+        yield return ResolveEndTurnEffects();
     }
 
     public void OnMatch(int id, string[] seqs) {
@@ -86,9 +86,23 @@ public class EffectController {
     }
 
     // TODO not the right way to do this
-    public void RemoveEndTurnEffect(Effect e) {
-        // TODO foreach in ETE look for tag.
-        endTurnEffects.Remove(e);
+    public void RemoveTurnEffect(Effect e) {
+        List<Effect> list;
+        if (e.tag.Substring(0, 4) == "begt")
+            list = beginTurnEffects;
+        else
+            list = endTurnEffects;
+
+        int i;
+        for (i = 0; i < list.Count; i++) {
+            Effect listE = list[i];
+            if (listE.tag == e.tag) {
+                Debug.Log("EFFECT-CONT: found effect with tag " + e.tag);
+                list.RemoveAt(i); // can be moved up?
+                return;
+            }
+        }
+        Debug.LogError("EFFECT-CONT: Missed the remove!");
     }
 
     public IEnumerator ResolveBeginTurnEffects() {
@@ -127,7 +141,7 @@ public class EffectController {
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
                 i--;
             } else {
-                Debug.Log("EFFECTCONTROLLER: End-of-turn effect " + i + " with priority " + e.priority + " has " + e.TurnsRemaining() + " turns left.");
+                Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsRemaining() + " turns left.");
             }
         }
         effectsResolving--;

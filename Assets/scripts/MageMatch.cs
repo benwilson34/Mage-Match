@@ -36,7 +36,7 @@ public class MageMatch : MonoBehaviour {
     private bool checking = false, performingAction = false;
 
     void Start() {
-        Random.InitState(1337);
+        Random.InitState(1337420);
 
         gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         Debug.Log("MAGEMATCH: gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
@@ -158,12 +158,13 @@ public class MageMatch : MonoBehaviour {
     #endregion
 
     IEnumerator TurnSystem() {
-        Debug.Log("MAGEMATCH: Starting TurnSystem.");
+        yield return new WaitUntil(() => !performingAction); //?
+        Debug.Log("  ----- TURNSYSTEM START -----");
         timer.Pause();
         yield return new WaitUntil(() => !checking);
 
-        eventCont.TurnEnd();
-        yield return new WaitUntil(() => !effectCont.isResolving()); //?
+        yield return eventCont.TurnEnd();
+        //yield return new WaitUntil(() => !effectCont.isResolving()); //?
 
         BoardChanged(); // why doesn't this happen when resolving turn effects?
         yield return new WaitUntil(() => !checking);
@@ -195,6 +196,7 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
         currentState = GameState.PlayerTurn;
         timer.InitTimer();
+        Debug.Log("  ----- TURNSYSTEM END -----");
     }
 
     public IEnumerator BoardChecking() {
@@ -316,8 +318,8 @@ public class MageMatch : MonoBehaviour {
                 }
             }
         }
-        performingAction = false;
         Debug.Log("  ----- END SWAP -----");
+        performingAction = false;
     }
 
     public void CastSpell(int spellNum) { // IEnumerator?
@@ -475,7 +477,7 @@ public class MageMatch : MonoBehaviour {
         TileBehav tb = hexGrid.GetTileBehavAt(col, row);
         if (tb.HasEnchantment()) {
             if (resolveEnchant) {
-                Debug.Log("MAGEMATCH: About to resolve enchant on tile (" + col + ", " + row + ")");
+                Debug.Log("MAGEMATCH: About to resolve enchant on tile " + tb.PrintCoord());
                 tb.ResolveEnchantment();
             }
             tb.ClearEnchantment(); // TODO

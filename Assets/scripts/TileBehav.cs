@@ -94,6 +94,8 @@ public class TileBehav : MonoBehaviour {
     }
 
     public int GetEnchTier() {
+        if (!HasEnchantment())
+            return 0;
         return enchantment.tier;
     }
 
@@ -105,7 +107,8 @@ public class TileBehav : MonoBehaviour {
 	public void ClearEnchantment(){
         //		this.enchantEffect = null;
         // TODO remove Effect from whichever list in MageMatch...
-        mm.effectCont.RemoveEndTurnEffect(enchantment);
+        Debug.Log("TILEBEHAV: About to remove enchantment with tag " + enchantment.tag);
+        mm.effectCont.RemoveTurnEffect(enchantment);
 		enchantment = null;
 		this.GetComponent<SpriteRenderer> ().color = Color.white;
 	}
@@ -126,7 +129,6 @@ public class TileBehav : MonoBehaviour {
 			currentState = TileState.Removed;
 //			this.enchantEffect (this);
 			enchantment.CancelEffect();
-            mm.effectCont.RemoveEndTurnEffect (enchantment); // TODO assumes end-of-turn list
 			return true;
 		}
 		return false;

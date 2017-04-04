@@ -84,8 +84,8 @@ public class Player {
     }
 
     public void DealDamage(int amount, bool sent) {
-        Debug.Log("PLAYER: >>>Dealing " + (-amount) + "dmg to p" + id);
         if (ThisIsLocal() || sent) {
+            Debug.Log("PLAYER: >>>Dealing " + (-amount) + "dmg to p" + id);
             mm.GetOpponent(id).ChangeHealth(-amount, true, sent);
             character.ChangeMeter(amount / 3); // TODO tentative
         }

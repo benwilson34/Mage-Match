@@ -59,4 +59,6 @@ MonoBehaviour:
   - PutSettings
   - R_HotBodySelect
   - R_StartHotBody
+  - R_StartZombify
+  - R_ZombifySelect
   DisableAutoOpenWizard: 1

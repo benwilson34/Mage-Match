@@ -185,6 +185,7 @@ public class HexGrid {
 		return CellExists (col + dc, row + dr);
 	}
 
+    // perimeter; doesn't add center tile
 	public List<TileBehav> GetSmallAreaTiles(int col, int row){
 		List<TileBehav> tbs = new List<TileBehav> ();
 		int dc, dr;
@@ -195,6 +196,7 @@ public class HexGrid {
 					tbs.Add (tileGrid [col + dc, row + dr]);
 			}
 		}
+        Debug.Log("HEXGRID: " + tbs.Count + " tiles around (" + col + "," + row + ")");
 		return tbs;
 	}
 

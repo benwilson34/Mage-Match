@@ -61,7 +61,7 @@ public class UIController : MonoBehaviour {
 
     public void InitEvents() {
         mm.eventCont.turnBegin += OnTurnBegin;
-        mm.eventCont.turnEnd += OnTurnEnd;
+        mm.eventCont.AddTurnEndEvent(OnTurnEnd, 1);
         mm.eventCont.gameAction += OnGameAction;
         mm.eventCont.match += OnMatch;
         mm.eventCont.cascade += OnCascade;
@@ -78,8 +78,9 @@ public class UIController : MonoBehaviour {
         UpdateEffTexts();
     }
 
-    public void OnTurnEnd(int id) {
+    public IEnumerator OnTurnEnd(int id) {
         UpdateEffTexts();
+        yield return null;
     }
 
     public void OnGameAction(int id, bool costsAP) {
@@ -382,28 +383,28 @@ public class UIController : MonoBehaviour {
         List<Effect> beginTurnEff = (List<Effect>)lists[0];
         string bte = "BeginTurnEffs:\n";
         foreach (Effect e in beginTurnEff) {
-            bte += e.tag;
+            bte += e.tag + "\n";
         }
         beginTurnEffText.text = bte;
 
         List<Effect> endTurnEff = (List<Effect>)lists[1];
         string ete = "EndTurnEffs:\n";
         foreach (Effect e in endTurnEff) {
-            ete += e.tag;
+            ete += e.tag + "\n";
         }
         endTurnEffText.text = ete;
 
         List<MatchEffect> matchEff = (List<MatchEffect>)lists[2];
         string me = "MatchEffs:\n";
         foreach (MatchEffect e in matchEff) {
-            me += e.tag;
+            me += e.tag + "\n";
         }
         matchEffText.text = me;
 
         List<SwapEffect> swapEff = (List<SwapEffect>)lists[3];
         string se = "SwapEffs:\n";
         foreach (SwapEffect e in swapEff) {
-            se += e.tag;
+            se += e.tag + "\n";
         }
         swapEffText.text = se;
     }

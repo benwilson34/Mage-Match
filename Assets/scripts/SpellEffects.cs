@@ -71,7 +71,8 @@ public class SpellEffects {
 	}
 
 
-	// -------------------------------- ENCHANTMENTS --------------------------------------
+    // -------------------------------- ENCHANTMENTS --------------------------------------
+
 
 	public void Ench_SetCherrybomb(int id, TileBehav tb){
 		Enchantment ench = new Enchantment (id, null, null, Ench_Cherrybomb_Remove);
@@ -107,57 +108,6 @@ public class SpellEffects {
     }
 	IEnumerator Ench_Burning_End(int id, TileBehav tb){
 		mm.GetPlayer(id).DealDamage (6, false);
-        yield return null; // for now
-    }
-
-    public void Ench_SetZombify(int id, TileBehav tb, bool skip){
-        Enchantment ench = new Enchantment(id, Ench_Zombify_TEffect, null, null);
-        ench.SetTypeTier(Enchantment.EnchType.Zombify, 1);
-        ench.priority = 6;
-        if (skip)
-            ench.SkipCurrent();
-        tb.SetEnchantment(ench);
-        tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
-        mm.effectCont.AddEndTurnEffect(ench, "zomb");
-    }
-    IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
-        // TODO filter list before rand
-        List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-        if (tbs.Count > 0){
-            int tries = 15;
-            TileBehav ctb;
-            for (int i = 0; i < 1 && tries > 0; i++) {
-                int rand = Random.Range(0, tbs.Count);
-                ctb = tbs[rand];
-                if (ctb.tile.element == Tile.Element.Muscle) {
-                    if (!ctb.HasEnchantment() || 
-                        (ctb.GetEnchType() != Enchantment.EnchType.Zombify &&
-                        ctb.GetEnchType() != Enchantment.EnchType.ZombieTok)) {
-                        mm.RemoveTile(ctb.tile, true);
-                        mm.GetPlayer(id).DealDamage(10, false);
-                        mm.GetPlayer(id).ChangeHealth(10);
-                    }
-                } else if (ctb.HasEnchantment()) { // TODO TB - ableEnchant
-                    i--;
-                    tries--;
-                } else {
-                    Ench_SetZombify(id, ctb, true);
-                }
-            }
-        }
-        yield return null; // for now
-    }
-
-    public void Ench_SetZombieTok(int id, TileBehav tb) {
-        Enchantment ench = new Enchantment(id, Ench_ZombieTok_TEffect, null, null);
-        ench.SetTypeTier(Enchantment.EnchType.ZombieTok, 3);
-        ench.priority = 6; // TODO 6.1?
-        tb.SetEnchantment(ench);
-        mm.effectCont.AddEndTurnEffect(ench, "zomT");
-    }
-    IEnumerator Ench_ZombieTok_TEffect(int id, TileBehav tb) {
-        Ench_Zombify_TEffect(id, tb);
-        Ench_Zombify_TEffect(id, tb);
         yield return null; // for now
     }
 

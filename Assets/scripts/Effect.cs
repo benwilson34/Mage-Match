@@ -111,6 +111,7 @@ public class Enchantment : Effect {
         if (skip) {
             skip = false;
             //return false; //?
+            yield break;
         }
         if (turnsLeft != 0) {
             yield return TriggerEffect();

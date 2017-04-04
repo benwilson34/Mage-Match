@@ -40,7 +40,7 @@ public class Stats {
         InitReport();
 
         mm.eventCont.turnBegin += OnTurnBegin;
-        mm.eventCont.turnEnd += OnTurnEnd;
+        mm.eventCont.AddTurnEndEvent(OnTurnEnd, 2);
         mm.eventCont.timeout += OnTimeout;
         mm.eventCont.commishDrop += OnCommishDrop;
         mm.eventCont.commishMatch += OnCommishMatch;
@@ -84,9 +84,10 @@ public class Stats {
         report.Append("\nT" + turns + " - ");
     }
 
-    public void OnTurnEnd(int id) {
+    public IEnumerator OnTurnEnd(int id) {
         report.AppendLine("\nC" + turns + " - ");
         turns++;
+        yield return null;
     }
 
     public void OnTimeout(int id) {

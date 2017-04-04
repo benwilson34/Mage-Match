@@ -96,7 +96,7 @@ public class AnimationController : MonoBehaviour {
         Transform spawn = GameObject.Find("tileSpawn").transform;
         GameObject fb = Instantiate(fireballPF, spawn);
 
-        Tween t = fb.transform.DOMove(tb.transform.position, 1f);
+        Tween t = fb.transform.DOMove(tb.transform.position, 1.2f);
         t.SetEase(Ease.InQuad);
         yield return t.WaitForCompletion();
 

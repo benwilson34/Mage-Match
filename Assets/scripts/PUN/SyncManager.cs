@@ -32,7 +32,7 @@ public class SyncManager : PunBehaviour {
     }
 
     public void OnDrawLocal(int id, Tile.Element elem, bool dealt) {
-        Debug.Log("TURNMANAGER: id=" + id + " myID=" + mm.myID);
+        //Debug.Log("TURNMANAGER: id=" + id + " myID=" + mm.myID);
         if (id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDraw", PhotonTargets.Others, id, elem, dealt);
@@ -177,17 +177,17 @@ public class SyncManager : PunBehaviour {
     //    mm.targeting.OnCBTarget(mm.hexGrid.GetCellBehavAt(col, row));
     //}
 
+    // --------------- spells ------------------
+
     public void StartHotBody(int id) {
         PhotonView photonView = PhotonView.Get(this);
         photonView.RPC("R_StartHotBody", PhotonTargets.All, id);
     }
 
-
     [PunRPC]
     public void R_StartHotBody(int id) {
         ((Enfuego)mm.GetPlayer(id).character).hotBody_selects = 1;
     }
-
 
     public void SendHotBodySelect(int id, int col, int row) {
         if (mm.MyTurn()) { //?
@@ -196,9 +196,30 @@ public class SyncManager : PunBehaviour {
         }
     }
 
-
     [PunRPC]
     public void R_HotBodySelect(int id, int col, int row) {
         ((Enfuego)mm.GetPlayer(id).character).SetHotBodySelect(col, row);
+    }
+
+    public void StartZombify(int id) {
+        PhotonView photonView = PhotonView.Get(this);
+        photonView.RPC("R_StartZombify", PhotonTargets.All, id);
+    }
+
+    [PunRPC]
+    public void R_StartZombify(int id) {
+        ((Gravekeeper)mm.GetPlayer(id).character).zombify_select = true;
+    }
+
+
+    public void SendZombifySelect(int id, int col, int row) {
+        PhotonView photonView = PhotonView.Get(this);
+        photonView.RPC("R_ZombifySelect", PhotonTargets.Others, id, col, row);
+    }
+
+
+    [PunRPC]
+    public void R_ZombifySelect(int id, int col, int row) {
+        ((Gravekeeper)mm.GetPlayer(id).character).SetZombifySelect(col, row);
     }
 }
