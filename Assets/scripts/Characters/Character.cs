@@ -19,6 +19,15 @@ public abstract class Character {
         spellfx = new SpellEffects();
     }
 
+    public virtual void InitEvents() {
+        mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+    }
+
+    public void OnPlayerHealthChange(int id, int amount, bool dealt, bool sent) {
+        if (dealt && id != playerID) // if the other player was dealt dmg
+            ChangeMeter((-amount) / 3);
+    }
+
     public void SetDeckElements(int f, int w, int e, int a, int m) {
         dfire = f;
         dwater = w;
@@ -29,7 +38,7 @@ public abstract class Character {
 
     public void ChangeMeter(int amount) {
         meter += amount;
-        meter = Mathf.Clamp(meter, 0, 100);
+        meter = Mathf.Clamp(meter, 0, meterMax);
     }
 
     public int GetMaxHealth() { return maxHealth; }

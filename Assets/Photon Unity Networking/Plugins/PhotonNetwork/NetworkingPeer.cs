@@ -2186,7 +2186,8 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
     public void OnEvent(EventData photonEvent)
     {
         if (PhotonNetwork.logLevel >= PhotonLogLevel.Informational)
-            Debug.Log(string.Format("OnEvent: {0}", photonEvent.ToString()));
+            if(photonEvent.ToString() != "Event 200.")
+                Debug.Log(string.Format("OnEvent: {0}", photonEvent.ToString()));
 
         int actorNr = -1;
         PhotonPlayer originatingPlayer = null;

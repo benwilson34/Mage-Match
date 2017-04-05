@@ -57,7 +57,7 @@ public class Enfuego : Character {
         yield return null;
     }
     void WHCK_Target(TileBehav tb) {
-        mm.ActiveP().DealDamage(70, false);
+        mm.ActiveP().DealDamage(70);
 
         if (tb.tile.element.Equals(Tile.Element.Fire)) {
             // TODO spread Burning
@@ -112,7 +112,7 @@ public class Enfuego : Character {
 
         if (id == mm.myID) {
             Debug.Log("ENFUEGO: This effect is mine, player " + playerID + "!");
-            mm.GetPlayer(id).DealDamage(25, false);
+            mm.GetPlayer(id).DealDamage(25);
 
             // TODO still doesn't function properly...seems to be whiffing at least once
             // maybe it's enchanting part of the match??

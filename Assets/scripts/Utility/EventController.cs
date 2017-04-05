@@ -145,7 +145,7 @@ public class EventController {
     public IEnumerator Swap(int c1, int r1, int c2, int r2) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in swaps) {
-            Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
+            //Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
             yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, c1, r1, c2, r2); // OH YEAH
         }
         Debug.Log("EVENTCONT: Just finished swap events...");

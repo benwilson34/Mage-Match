@@ -107,14 +107,19 @@ public class AnimationController : MonoBehaviour {
         //yield return null; //?
     }
 
-    public IEnumerator _Zombify_Attack(Transform zomb, Transform bitten) {
-        Vector3 origPos = zomb.position;
-        Tween t = zomb.DOMove(bitten.position, .03f);
-        t.SetEase(Ease.Linear);
-        yield return t.WaitForCompletion();
+    Vector3 zomb_origPos;
 
-        t = zomb.DOMove(origPos, .13f);
-        t.SetEase(Ease.Linear);
+    public IEnumerator _Zombify_Attack(Transform zomb, Transform target) {
+        zomb_origPos = zomb.position;
+        Vector3 bite = Vector3.Lerp(zomb_origPos, target.position, 0.75f);
+        Tween t = zomb.DOMove(bite, .03f);
+        t.SetEase(Ease.InQuad);
+        yield return t.WaitForCompletion();
+    }
+
+    public IEnumerator _Zombify_Back(Transform zomb) {
+        Tween t = zomb.DOMove(zomb_origPos, .13f);
+        t.SetEase(Ease.OutQuad);
         yield return t.WaitForCompletion();
     }
 }

@@ -122,11 +122,7 @@ public class SyncManager : PunBehaviour {
     [PunRPC]
     public void HandlePlayerHealthChange(int id, int amount, bool dealt) {
         Debug.Log("TURNMANAGER: HandlePlayerHealthChange; id=" + id + " amount=" + amount + " dealt=" + dealt);
-        if (dealt) {
-            mm.GetOpponent(id).DealDamage(-amount, true);
-        } else {
-            mm.GetPlayer(id).ChangeHealth(amount, dealt, true);
-        }
+        mm.GetPlayer(id).ChangeHealth(amount, dealt, true);
     }
 
     public void OnSpellCast(int id, Spell spell) {

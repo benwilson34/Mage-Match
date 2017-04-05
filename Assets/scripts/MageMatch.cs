@@ -131,7 +131,6 @@ public class MageMatch : MonoBehaviour {
     #region EventCont calls
     public void OnBoardAction() {
         if (!checking) {
-            Debug.Log("MAGEMATCH: About to check the board.");
             StartCoroutine(BoardChecking());
         }
     }
@@ -159,7 +158,7 @@ public class MageMatch : MonoBehaviour {
 
     IEnumerator TurnSystem() {
         yield return new WaitUntil(() => !performingAction); //?
-        Debug.Log("  ----- TURNSYSTEM START -----");
+        Debug.Log("   ---------- TURNSYSTEM START ----------");
         timer.Pause();
         yield return new WaitUntil(() => !checking);
 
@@ -196,12 +195,14 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
         currentState = GameState.PlayerTurn;
         timer.InitTimer();
-        Debug.Log("  ----- TURNSYSTEM END -----");
+        Debug.Log("   ---------- TURNSYSTEM END ----------");
     }
 
     public IEnumerator BoardChecking() {
         checking = true; // prevents overcalling/retriggering
-        yield return new WaitUntil(() => !performingAction); //?
+        yield return new WaitUntil(() => !performingAction && !effectCont.isResolving()); //?
+        Debug.Log("MAGEMATCH: About to check the board.");
+
         int cascade = 0;
         while (true) {
             yield return new WaitUntil(() => !menu && !IsTargetMode() && !animCont.IsAnimating());
@@ -306,7 +307,7 @@ public class MageMatch : MonoBehaviour {
     }
 
     public IEnumerator _SwapTiles(int c1, int r1, int c2, int r2) {
-        Debug.Log("  ----- SWAPPING -----");
+        Debug.Log("   ---------- SWAP BEGIN ----------");
         performingAction = true;
         if (!IsCommishTurn()) {
             if (hexGrid.Swap(c1, r1, c2, r2)) {
@@ -318,7 +319,7 @@ public class MageMatch : MonoBehaviour {
                 }
             }
         }
-        Debug.Log("  ----- END SWAP -----");
+        Debug.Log("   ---------- SWAP END ----------");
         performingAction = false;
     }
 
@@ -472,9 +473,14 @@ public class MageMatch : MonoBehaviour {
         StartCoroutine(_RemoveTile(col, row, resolveEnchant));
     }
 
-    IEnumerator _RemoveTile(int col, int row, bool resolveEnchant) {
+    public IEnumerator _RemoveTile(int col, int row, bool resolveEnchant) {
         //		Debug.Log ("Removing (" + col + ", " + row + ")");
+        // TODO status bool
         TileBehav tb = hexGrid.GetTileBehavAt(col, row);
+        if (tb == null) {
+            Debug.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
+            yield break;
+        }
         if (tb.HasEnchantment()) {
             if (resolveEnchant) {
                 Debug.Log("MAGEMATCH: About to resolve enchant on tile " + tb.PrintCoord());

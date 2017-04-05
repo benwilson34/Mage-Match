@@ -64,11 +64,11 @@ public class Rocky : Character {
                 Tile t = hexGrid.GetTileAt(col, row);
                 if (!t.element.Equals(Tile.Element.Earth)) {
                     mm.RemoveTile(t, true);
-                    dmg -= 15;
+                    dmg += 15;
                 }
             }
         }
-        mm.GetPlayer(id).DealDamage(-dmg, false); // TODO not negative
+        mm.GetPlayer(id).DealDamage(dmg); 
 
         yield return null; // for now
     }

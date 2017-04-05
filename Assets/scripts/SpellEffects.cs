@@ -17,7 +17,7 @@ public class SpellEffects {
 	// -------------------------------------- SPELLS ------------------------------------------
 
 	public IEnumerator Deal496Dmg(){
-		mm.ActiveP ().DealDamage (496, false);
+		mm.ActiveP().DealDamage(496);
         return null;
 	}
 
@@ -42,7 +42,7 @@ public class SpellEffects {
 			tile = tileList [i].tile;
 			if (tile.element.Equals (tb.tile.element)) {
 				mm.RemoveTile(tile, true);
-				mm.ActiveP ().DealDamage (15, false);
+				mm.ActiveP ().DealDamage (15);
 			}
 		}
 	}
@@ -82,7 +82,7 @@ public class SpellEffects {
 	}
 	IEnumerator Ench_Cherrybomb_Remove(int id, TileBehav tb){
 		Debug.Log ("SPELLEFFECTS: Resolving Cherrybomb at (" + tb.tile.col + ", " + tb.tile.row + ")");
-		mm.GetPlayer(id).DealDamage (200, false);
+		mm.GetPlayer(id).DealDamage (200);
 
 		List<TileBehav> tbs = hexGrid.GetSmallAreaTiles (tb.tile.col, tb.tile.row);
 		foreach(TileBehav ctb in tbs){
@@ -103,11 +103,11 @@ public class SpellEffects {
 		mm.effectCont.AddEndTurnEffect(ench, "burn");
 	}
 	IEnumerator Ench_Burning_TEffect(int id, TileBehav tb){
-		mm.GetPlayer(id).DealDamage (3, false);
+		mm.GetPlayer(id).DealDamage (3);
         yield return null; // for now
     }
 	IEnumerator Ench_Burning_End(int id, TileBehav tb){
-		mm.GetPlayer(id).DealDamage (6, false);
+		mm.GetPlayer(id).DealDamage (6);
         yield return null; // for now
     }
 

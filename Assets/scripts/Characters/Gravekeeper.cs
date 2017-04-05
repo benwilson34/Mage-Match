@@ -66,7 +66,7 @@ public class Gravekeeper : Character {
             }
         }
         Debug.Log("SPELLEFFECTS: Zombie Synergy has counted " + count + " adjacent zombs");
-        mm.ActiveP().DealDamage(count * 4, false);
+        mm.ActiveP().DealDamage(count * 4);
 
         yield return null;
     }
@@ -132,7 +132,7 @@ public class Gravekeeper : Character {
     IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
         //zombify_select = false; // only use if you're sloppy. 
         TileBehav selectTB = null;
-        Debug.Log("GRAVEKEEPER: Zombify at " + tb.PrintCoord() + " starting...");
+        Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " starting -----");
         if (id == mm.myID) {
             List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
             for (int i = 0; i < tbs.Count; i++) {
@@ -141,10 +141,10 @@ public class Gravekeeper : Character {
                     ctb.GetEnchType() == Enchantment.EnchType.Zombify) { // other conditions where Zombify wouldn't work?
                     tbs.Remove(ctb);
                     i--;
-                    Debug.Log("GRAVEKEEPER: Removing tile at " + ctb.PrintCoord());
+                    //Debug.Log("GRAVEKEEPER: Ignoring tile at " + ctb.PrintCoord());
                 }
             }
-            Debug.Log("GRAVEKEEPER: Zombified tile has " + tbs.Count + " available tiles around it.");
+            //Debug.Log("GRAVEKEEPER: Zombified tile has " + tbs.Count + " available tiles around it.");
 
             yield return new WaitUntil(() => zombify_select);
             zombify_select = false;
@@ -171,15 +171,21 @@ public class Gravekeeper : Character {
             selectTB = mm.hexGrid.GetTileBehavAt(zombify_col, zombify_row);
         }
 
-        yield return mm.animCont._Zombify_Attack(tb.transform, selectTB.transform);
+        yield return mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); //anim 1
 
         if (selectTB.tile.element == Tile.Element.Muscle) {
-            mm.RemoveTile(selectTB.tile, true);
-            mm.GetPlayer(id).DealDamage(10, false);
-            mm.GetPlayer(id).ChangeHealth(10);
+            Tile t = selectTB.tile;
+            yield return mm._RemoveTile(t.col, t.row, true); // maybe?
+
+            mm.GetPlayer(id).DealDamage(10);
+            mm.GetPlayer(id).Heal(10);
         } else {
             Ench_SetZombify(id, selectTB, true);
         }
+
+        yield return mm.animCont._Zombify_Back(tb.transform); // anim 2
+
+        Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " done -----");
         yield return null; // needed?
     }
 

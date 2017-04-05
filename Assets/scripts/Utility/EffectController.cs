@@ -132,7 +132,7 @@ public class EffectController {
         for (int i = 0; i < endTurnEffects.Count; i++) { // foreach
             e = endTurnEffects[i];
             Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsRemaining() + " turns left (including this one).");
-            bool remove = e.TurnsRemaining() == 0;
+            bool remove = e.TurnsRemaining() == 0; // 1?
 
             yield return e.ResolveEffect();
 
