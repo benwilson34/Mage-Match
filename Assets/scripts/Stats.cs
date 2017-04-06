@@ -50,7 +50,7 @@ public class Stats {
         mm.eventCont.AddSwapEvent(OnSwap, 2);
         mm.eventCont.spellCast += OnSpellCast;
 
-        mm.eventCont.match += OnMatch;
+        mm.eventCont.AddMatchEvent(OnMatch, 2);
         mm.eventCont.cascade += OnCascade;
         mm.eventCont.tileRemove += OnTileRemove;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
@@ -138,7 +138,7 @@ public class Stats {
     }
     #endregion
 
-    public void OnMatch(int id, string[] seqs) {
+    public IEnumerator OnMatch(int id, string[] seqs) {
         report.AppendLine("...made " + seqs.Length + " match(es)");
         GetPS(id).matches += seqs.Length;
         foreach (string seq in seqs) {
@@ -150,6 +150,7 @@ public class Stats {
             else
                 GetPS(id).match5s++;
         }
+        yield return null;
     }
 
     public void OnCascade(int id, int chain) {
@@ -169,7 +170,7 @@ public class Stats {
         }
     }
 
-    public void OnPlayerHealthChange(int id, int amount, bool dealt, bool sent) {
+    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
         if (dealt) {
             GetPS(GetOpponentID(id)).dmgDealt -= amount;
             report.AppendLine("...p" + GetOpponentID(id) + " dealt " + (-amount) + " dmg...");

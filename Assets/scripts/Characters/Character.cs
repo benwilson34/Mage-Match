@@ -23,8 +23,8 @@ public abstract class Character {
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
     }
 
-    public void OnPlayerHealthChange(int id, int amount, bool dealt, bool sent) {
-        if (dealt && id != playerID) // if the other player was dealt dmg
+    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
+        if (dealt && id != playerID) // if the other player was dealt dmg (not great)
             ChangeMeter((-amount) / 3);
     }
 

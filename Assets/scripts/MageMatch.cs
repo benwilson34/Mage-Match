@@ -33,7 +33,7 @@ public class MageMatch : MonoBehaviour {
     private GameObject stonePF, emberPF, zombiePF, prereqPF, targetPF; // token prefabs
     private Player p1, p2, activep;
     private bool endGame = false;     // is either player dead?
-    private bool checking = false, performingAction = false;
+    private bool checking = false, performingAction = false, resolvingMatch = false;
 
     void Start() {
         Random.InitState(1337420);
@@ -209,7 +209,8 @@ public class MageMatch : MonoBehaviour {
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
             List<TileSeq> seqMatches = boardCheck.MatchCheck();
             if (seqMatches.Count > 0) { // if there's at least one MATCH
-                ResolveMatchEffects(seqMatches);
+                Debug.Log("MAGEMATCH: Resolving matches...");
+                yield return ResolveMatchEffects(seqMatches);
                 cascade++;
             } else {
                 if (currentState == GameState.PlayerTurn) {
@@ -251,15 +252,19 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
-    void ResolveMatchEffects(List<TileSeq> seqList) {
+    IEnumerator ResolveMatchEffects(List<TileSeq> seqList) {
+        resolvingMatch = true;
         Debug.Log("MAGEMATCH: At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
         if (currentState != GameState.CommishTurn) {
             Debug.Log("MAGEMATCH: Match was made by a player!!");
-            eventCont.Match(GetTileSeqs(seqList)); // raise player Match event
+            string[] seqs = GetTileSeqs(seqList);
+            RemoveSeqList(seqList); // hopefully putting this first makes it more responsive?
+            yield return eventCont.Match(seqs); // raise player Match event
         } else {
             eventCont.CommishMatch(GetTileSeqs(seqList)); // raise CommishMatch event
+            RemoveSeqList(seqList);
         }
-        RemoveSeqList(seqList);
+        resolvingMatch = false;
     }
 
 

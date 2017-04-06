@@ -51,7 +51,7 @@ public class Player {
     public void InitEvents() {
         character.InitEvents();
         mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 4);
-        mm.eventCont.match += OnMatch;
+        mm.eventCont.AddMatchEvent(OnMatch, 4);
     }
 
     public IEnumerator OnTurnBegin(int id) {
@@ -64,58 +64,94 @@ public class Player {
         yield return null;
     }
 
-    public void OnMatch(int id, string[] seqs) {
-        if (id == this.id) {
+    public IEnumerator OnMatch(int id, string[] seqs) {
+        if (id == this.id) { // important!!
             foreach (string seq in seqs) {
                 int len = seq.Length;
+                int dmg = 0;
                 switch (len) {
                     case 3:
-                        DealDamage(Random.Range(30, 50)); // diff 20
+                        dmg = Random.Range(30, 50); // diff 20
                         break;
                     case 4:
-                        DealDamage(Random.Range(60, 85)); // diff 25
+                        dmg = Random.Range(60, 85); // diff 25
                         break;
                     case 5:
-                        DealDamage(Random.Range(95, 125)); // diff 30
+                        dmg = Random.Range(95, 125); // diff 30
                         break;
                 }
+
+                //Debug.Log("PLAYER: Player "+id+" about to sync dmg=" + dmg);
+                yield return mm.syncManager.SyncRand(id, dmg);
+                DealDamage(mm.syncManager.rand); // do the actual damage
             }
         }
     }
 
     public void DealDamage(int amount) {
-        mm.GetOpponent(id).ChangeHealth(-amount, true, false);
+        mm.GetOpponent(id).TakeDamage(amount);
+    }
+
+    public void TakeDamage(int amount) {
+        if (amount > 0)
+            ChangeHealth(-amount, true);
+        else
+            Debug.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
     }
 
     public void Heal(int amount) {
-        ChangeHealth(amount, false, false);
+        //ChangeHealth(amount, false, false);
+        ChangeHealth(amount, false);
     }
 
     // not totally sure this syncing stuff is totally necessary...
-    public void ChangeHealth(int amount, bool dealt, bool sent) {
-        if (ThisIsLocal() || sent) { // dealt needed here?
-            string str = "PLAYER: >>>";
-            int newAmount = 0;
-            if (amount < 0) { // damage
-                newAmount = (int)(amount * buff_dmgMult) - buff_dmgExtra;
-                if (dealt)
-                    str += mm.GetOpponent(id).name + " dealt " + (-1 * newAmount) + " damage; ";
-                else
-                    str += name + " took " + (-1 * newAmount) + " damage; ";
-                str += name + "'s health changed from " + health + " to " + (health + newAmount);
-            } else {
-                newAmount = amount;
-                str += name + " healed for " + newAmount + " health; " + name + "'s health changed from " + health + " to " + (health + newAmount);
-            } // healing?
-            Debug.Log(str);
+    //public void ChangeHealth(int amount, bool dealt, bool sent) {
+    //    if (ThisIsLocal() || sent) { // dealt needed here?
+    //        string str = "PLAYER: >>>";
+    //        int newAmount = 0;
+    //        if (amount < 0) { // damage
+    //            newAmount = (int)(amount * buff_dmgMult) - buff_dmgExtra;
+    //            if (dealt)
+    //                str += mm.GetOpponent(id).name + " dealt " + (-1 * newAmount) + " damage; ";
+    //            else
+    //                str += name + " took " + (-1 * newAmount) + " damage; ";
+    //            str += name + "'s health changed from " + health + " to " + (health + newAmount);
+    //        } else {
+    //            newAmount = amount;
+    //            str += name + " healed for " + newAmount + " health; " + name + "'s health changed from " + health + " to " + (health + newAmount);
+    //        } // healing?
+    //        Debug.Log(str);
 
-            health += newAmount;
-            health = Mathf.Clamp(health, 0, character.GetMaxHealth());
-            mm.eventCont.PlayerHealthChange(id, amount, dealt, sent);
+    //        health += newAmount;
+    //        health = Mathf.Clamp(health, 0, character.GetMaxHealth());
+    //        mm.eventCont.PlayerHealthChange(id, amount, dealt, sent);
 
-            if (health == 0)
-                mm.EndTheGame();
-        }
+    //        if (health == 0)
+    //            mm.EndTheGame();
+    //    }
+    //}
+    public void ChangeHealth(int amount, bool dealt) {
+        string str = "PLAYER: >>>";
+        int newAmount = 0;
+        if (amount < 0) { // damage
+            newAmount = (int)(amount * buff_dmgMult) - buff_dmgExtra;
+            if (dealt)
+                str += mm.GetOpponent(id).name + " dealt " + (-1 * newAmount) + " damage; ";
+            else
+                str += name + " took " + (-1 * newAmount) + " damage; ";
+            str += name + "'s health changed from " + health + " to " + (health + newAmount);
+        } else {
+            newAmount = amount;
+            str += name + " healed for " + newAmount + " health; " + name + "'s health changed from " + health + " to " + (health + newAmount);
+        } // healing?
+        Debug.Log(str);
+
+        health += newAmount;
+        health = Mathf.Clamp(health, 0, character.GetMaxHealth());
+        mm.eventCont.PlayerHealthChange(id, amount, dealt);
+
+        if (health == 0)
+            mm.EndTheGame();
     }
 
     public bool DealTile() {

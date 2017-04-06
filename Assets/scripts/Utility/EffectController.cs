@@ -24,7 +24,7 @@ public class EffectController {
     public void InitEvents() {
         mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 3);
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, 3);
-        mm.eventCont.match += OnMatch;
+        mm.eventCont.AddMatchEvent(OnMatch, 3);
         mm.eventCont.AddSwapEvent(OnSwap, 3);
     }
 
@@ -37,8 +37,8 @@ public class EffectController {
         yield return ResolveEndTurnEffects();
     }
 
-    public void OnMatch(int id, string[] seqs) {
-        mm.StartCoroutine(ResolveMatchEffects(id));
+    public IEnumerator OnMatch(int id, string[] seqs) {
+        yield return ResolveMatchEffects(id);
     }
 
     public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {

@@ -14,6 +14,7 @@ public class EventController {
         swap = new List<EventPack>();
         turnBegin = new List<EventPack>();
         turnEnd = new List<EventPack>();
+        match = new List<EventPack>();
     }
 
     struct EventPack { public System.Delegate ev; public int priority; }
@@ -26,6 +27,8 @@ public class EventController {
                 return turnBegin;
             case "turnEnd":
                 return turnEnd;
+            case "match":
+                return match;
             default:
                 Debug.LogError("EVENTCONT: Bad type name!!");
                 return null;
@@ -74,7 +77,7 @@ public class EventController {
         foreach (EventPack pack in turnBegin) {
             yield return ((TurnBeginEvent)pack.ev)(mm.ActiveP().id); // OH YEAH
         }
-        Debug.Log("EVENTCONT: Just finished turnBegin events...");
+        Debug.Log("EVENTCONT: Just finished TURN BEGIN events...");
         handlingEvents = false; // worth it?
     }
     public void AddTurnBeginEvent(TurnBeginEvent ev, int priority) {
@@ -88,7 +91,7 @@ public class EventController {
         foreach (EventPack pack in turnEnd) {
             yield return ((TurnEndEvent)pack.ev)(mm.ActiveP().id); // OH YEAH
         }
-        Debug.Log("EVENTCONT: Just finished turnEnd events...");
+        Debug.Log("EVENTCONT: Just finished TURN END events...");
         handlingEvents = false; // worth it?
     }
     public void AddTurnEndEvent(TurnEndEvent ev, int priority) {
@@ -157,7 +160,7 @@ public class EventController {
             //Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
             yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, c1, r1, c2, r2); // OH YEAH
         }
-        Debug.Log("EVENTCONT: Just finished swap events...");
+        Debug.Log("EVENTCONT: Just finished SWAP events...");
         handlingEvents = false; // worth it?
     }
 
@@ -176,12 +179,19 @@ public class EventController {
     #endregion
 
 
-    public delegate void MatchEvent(int id, string[] seqs);
-    public event MatchEvent match;
-    public void Match(string[] seqs) {
-        //Debug.Log("EVENTCONTROLLER: Match event raised, dispatching to " + match.GetInvocationList().Length + " subscribers.");
-        if (match != null) // never will be due to Stats
-            match.Invoke(mm.ActiveP().id, seqs);
+    public delegate IEnumerator MatchEvent(int id, string[] seqs);
+    private List<EventPack> match;
+    public IEnumerator Match(string[] seqs) {
+        handlingEvents = true; // worth it?
+        foreach (EventPack pack in match) {
+            //Debug.Log("EVENTCONT: Resolving matchEvent with p="+pack.priority);
+            yield return ((MatchEvent)pack.ev)(mm.ActiveP().id, seqs); // OH YEAH
+        }
+        Debug.Log("EVENTCONT: Just finished MATCH events...");
+        handlingEvents = false; // worth it?
+    }
+    public void AddMatchEvent(MatchEvent ev, int priority) {
+        AddEvent("match", ev, priority);
     }
 
     public delegate void CascadeEvent(int id, int chain);
@@ -199,11 +209,11 @@ public class EventController {
     }
 
     // NOTE: id is ALWAYS the receiver
-    public delegate void PlayerHealthChangeEvent(int id, int amount, bool dealt, bool sent);
+    public delegate void PlayerHealthChangeEvent(int id, int amount, bool dealt);
     public event PlayerHealthChangeEvent playerHealthChange;
-    public void PlayerHealthChange(int id, int amount, bool dealt, bool sent) {
+    public void PlayerHealthChange(int id, int amount, bool dealt) {
         if (playerHealthChange != null)
-            playerHealthChange.Invoke(id, amount, dealt, sent);
+            playerHealthChange.Invoke(id, amount, dealt);
     }
 
     public delegate void PlayerMeterChangeEvent(int id, int amount);

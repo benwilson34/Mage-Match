@@ -61,4 +61,5 @@ MonoBehaviour:
   - R_StartHotBody
   - R_StartZombify
   - R_ZombifySelect
+  - HandleSyncRandom
   DisableAutoOpenWizard: 1

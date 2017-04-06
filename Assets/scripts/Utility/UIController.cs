@@ -64,7 +64,7 @@ public class UIController : MonoBehaviour {
         mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 1);
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, 1);
         mm.eventCont.gameAction += OnGameAction;
-        mm.eventCont.match += OnMatch;
+        mm.eventCont.AddMatchEvent(OnMatch, 2);
         mm.eventCont.cascade += OnCascade;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
         mm.eventCont.playerMeterChange += OnPlayerMeterChange;
@@ -95,9 +95,10 @@ public class UIController : MonoBehaviour {
         UpdateEffTexts(); // could be considerable overhead...
     }
 
-    public void OnMatch(int id, string[] seqs) {
+    public IEnumerator OnMatch(int id, string[] seqs) {
         if (seqs.Length > 1)
             SendSlidingText("Wow, nice combo!");
+        yield return null;
     }
 
     public void OnCascade(int id, int chain) {
@@ -105,7 +106,7 @@ public class UIController : MonoBehaviour {
         SendSlidingText("Wow, a cascade of " + chain + " matches!");
     }
 
-    public void OnPlayerHealthChange(int id, int amount, bool dealt, bool sent) {
+    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
         StartCoroutine(UpdateHealthbar(mm.GetPlayer(id)));
     }
 
