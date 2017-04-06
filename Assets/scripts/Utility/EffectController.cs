@@ -22,15 +22,15 @@ public class EffectController {
     }
 
     public void InitEvents() {
-        mm.eventCont.turnBegin += OnTurnBegin;
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 3);
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, 3);
         mm.eventCont.match += OnMatch;
         mm.eventCont.AddSwapEvent(OnSwap, 3);
     }
 
     #region EventCont calls
-    public void OnTurnBegin(int id) {
-        mm.StartCoroutine(ResolveBeginTurnEffects());
+    public IEnumerator OnTurnBegin(int id) {
+        yield return ResolveBeginTurnEffects();
     }
 
     public IEnumerator OnTurnEnd(int id) {

@@ -89,12 +89,13 @@ public class MageMatch : MonoBehaviour {
         activep.InitAP();
         if (MyTurn())
             activep.DealTile();
-        uiCont.UpdatePlayerInfo();
 
         stats = new Stats(p1, p2);
 
         timer.InitTimer();
-        uiCont.Reset(p1, p2);
+        uiCont.Reset();
+
+        // BeginTurnEvent()?
     }
 
     public void LoadPrefabs() {
@@ -144,7 +145,6 @@ public class MageMatch : MonoBehaviour {
                 uiCont.SetDrawButton(activep, false);
                 StartCoroutine(TurnSystem());
             }
-            uiCont.UpdatePlayerInfo();
         }
     }
 
@@ -188,8 +188,7 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => !checking); // needed anymore?
 
         activep = InactiveP();
-        eventCont.TurnBegin();
-        yield return new WaitUntil(() => !effectCont.isResolving()); //?
+        yield return eventCont.TurnBegin();
 
         SpellCheck();
         yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
@@ -221,37 +220,35 @@ public class MageMatch : MonoBehaviour {
                 uiCont.UpdateDebugGrid();
                 break;
             }
-            uiCont.UpdatePlayerInfo(); // try to move out of main loop
         }
         checking = false;
     }
 
-    void SpellCheck() { // TODO clean up
+    void SpellCheck() { 
         Character c = activep.character;
         List<TileSeq> spells = c.GetTileSeqList();
-        spells.AddRange(InactiveP().character.GetTileSeqList()); // probably not needed?
         spells = boardCheck.SpellCheck(spells);
-        if (spells.Count > 0) {
-            List<TileSeq> spellList = c.GetTileSeqList();
-            for (int s = 0; s < spellList.Count; s++) {
-                TileSeq spellSeq = spellList[s];
-                bool spellIsOnBoard = false;
-                for (int i = 0; i < spells.Count; i++) {
-                    TileSeq matchSeq = spells[i];
-                    if (matchSeq.MatchesTileSeq(spellSeq)) {
-                        spellIsOnBoard = true;
-                        c.GetSpell(s).SetBoardSeq(matchSeq);
-                        break;
-                    }
-                }
+        if (spells.Count == 0)
+            return;
 
-                if (spellIsOnBoard)
-                    uiCont.ActivateSpellButton(activep, s);
-                else
-                    uiCont.DeactivateSpellButton(activep, s);
+        List<TileSeq> spellList = c.GetTileSeqList();
+        for (int s = 0; s < spellList.Count; s++) {
+            TileSeq spellSeq = spellList[s];
+            bool spellIsOnBoard = false;
+            for (int i = 0; i < spells.Count; i++) {
+                TileSeq matchSeq = spells[i];
+                if (matchSeq.MatchesTileSeq(spellSeq)) {
+                    spellIsOnBoard = true;
+                    c.GetSpell(s).SetBoardSeq(matchSeq);
+                    break;
+                }
             }
-        } else
-            uiCont.DeactivateAllSpellButtons(activep);
+
+            if (spellIsOnBoard)
+                uiCont.ActivateSpellButton(activep, s);
+            else
+                uiCont.DeactivateSpellButton(activep, s);
+        }
     }
 
     void ResolveMatchEffects(List<TileSeq> seqList) {
@@ -332,8 +329,7 @@ public class MageMatch : MonoBehaviour {
                 RemoveSeq(p.GetCurrentBoardSeq());
                 p.ApplyAPCost();
             }
-            //			UIController.UpdateMoveText (activep.name + " casts " + spell.name + " for " + spell.APcost + " AP!!");
-            uiCont.UpdatePlayerInfo(); // move to BoardChecking handling??
+//			UIController.UpdateMoveText (activep.name + " casts " + spell.name + " for " + spell.APcost + " AP!!");
         } else {
             uiCont.UpdateMoveText("Not enough AP to cast!");
         }

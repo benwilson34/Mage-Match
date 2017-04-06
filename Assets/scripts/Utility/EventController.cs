@@ -11,8 +11,9 @@ public class EventController {
 
     public EventController(MageMatch mm) {
         this.mm = mm;
-        swaps = new List<EventPack>();
-        turnEnds = new List<EventPack>();
+        swap = new List<EventPack>();
+        turnBegin = new List<EventPack>();
+        turnEnd = new List<EventPack>();
     }
 
     struct EventPack { public System.Delegate ev; public int priority; }
@@ -20,9 +21,11 @@ public class EventController {
     List<EventPack> GetEventList(string type) {
         switch (type) {
             case "swap":
-                return swaps;
+                return swap;
+            case "turnBegin":
+                return turnBegin;
             case "turnEnd":
-                return turnEnds;
+                return turnEnd;
             default:
                 Debug.LogError("EVENTCONT: Bad type name!!");
                 return null;
@@ -64,11 +67,25 @@ public class EventController {
             boardAction.Invoke();
     }
 
+    public delegate IEnumerator TurnBeginEvent(int id);
+    private List<EventPack> turnBegin;
+    public IEnumerator TurnBegin() {
+        handlingEvents = true; // worth it?
+        foreach (EventPack pack in turnBegin) {
+            yield return ((TurnBeginEvent)pack.ev)(mm.ActiveP().id); // OH YEAH
+        }
+        Debug.Log("EVENTCONT: Just finished turnBegin events...");
+        handlingEvents = false; // worth it?
+    }
+    public void AddTurnBeginEvent(TurnBeginEvent ev, int priority) {
+        AddEvent("turnBegin", ev, priority);
+    }
+
     public delegate IEnumerator TurnEndEvent(int id);
-    private List<EventPack> turnEnds;
+    private List<EventPack> turnEnd;
     public IEnumerator TurnEnd() {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in turnEnds) {
+        foreach (EventPack pack in turnEnd) {
             yield return ((TurnEndEvent)pack.ev)(mm.ActiveP().id); // OH YEAH
         }
         Debug.Log("EVENTCONT: Just finished turnEnd events...");
@@ -76,14 +93,6 @@ public class EventController {
     }
     public void AddTurnEndEvent(TurnEndEvent ev, int priority) {
         AddEvent("turnEnd", ev, priority);
-    }
-
-
-    public delegate void TurnBeginEvent(int id);
-    public event TurnBeginEvent turnBegin;
-    public void TurnBegin() {
-        if (turnBegin != null) // never will be due to Stats
-            turnBegin.Invoke(mm.ActiveP().id);
     }
 
     public delegate void TimeoutEvent(int id);
@@ -141,10 +150,10 @@ public class EventController {
     }
 
     public delegate IEnumerator SwapEvent(int id, int c1, int r1, int c2, int r2);
-    private List<EventPack> swaps;
+    private List<EventPack> swap;
     public IEnumerator Swap(int c1, int r1, int c2, int r2) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in swaps) {
+        foreach (EventPack pack in swap) {
             //Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
             yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, c1, r1, c2, r2); // OH YEAH
         }

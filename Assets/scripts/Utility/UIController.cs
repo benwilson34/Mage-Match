@@ -61,7 +61,7 @@ public class UIController : MonoBehaviour {
     }
 
     public void InitEvents() {
-        mm.eventCont.turnBegin += OnTurnBegin;
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 1);
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, 1);
         mm.eventCont.gameAction += OnGameAction;
         mm.eventCont.match += OnMatch;
@@ -71,22 +71,27 @@ public class UIController : MonoBehaviour {
     }
 
     #region EventCont calls
-    public void OnTurnBegin(int id) {
+    public IEnumerator OnTurnBegin(int id) {
         if (mm.MyTurn())
             SendSlidingText(mm.ActiveP().name + ", make your move!");
         UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
         SetDrawButton(mm.ActiveP(), true);
         FlipGradient(); // ugly
-        UpdatePlayerInfo();
-        UpdateEffTexts();
-    }
+        UpdateAPText(mm.GetPlayer(id));
 
-    public IEnumerator OnTurnEnd(int id) {
+        ChangePinfoColor(id, new Color(0, 1, 0, .4f));
         UpdateEffTexts();
         yield return null;
     }
 
+    public IEnumerator OnTurnEnd(int id) {
+        UpdateEffTexts();
+        ChangePinfoColor(id, new Color(1, 1, 1, .4f));
+        yield return null;
+    }
+
     public void OnGameAction(int id, bool costsAP) {
+        UpdateAPText(mm.GetPlayer(id));
         UpdateEffTexts(); // could be considerable overhead...
     }
 
@@ -109,48 +114,33 @@ public class UIController : MonoBehaviour {
     }
     #endregion
 
-    public void Reset(Player p1, Player p2) { // could just get players from MM
+    public void Reset() { // could just get players from MM
         UpdateDebugGrid();
         UpdateMoveText("Fight!!");
 
-        // TODO do in a loop
-        Text nameText = p1info.Find("Text_Name").GetComponent<Text>();
+        for (int id = 1; id <= 2; id++) {
+            Player p = mm.GetPlayer(id);
+            Transform pinfo = GetPinfo(id);
 
-        if (p1.id == PhotonNetwork.player.ID)
-            nameText.text = "P1: " + p1.name + " (ME!)";
-        else
-            nameText.text = "P1: " + p1.name;
+            Text nameText = pinfo.Find("Text_Name").GetComponent<Text>();
+            nameText.text = "P"+id+": " + p.name;
+            if (id == mm.myID)
+                nameText.text += " (ME!)";
 
-        ShowLoadout(p1);
-        DeactivateAllSpellButtons(p1);
+            ShowLoadout(p);
+            DeactivateAllSpellButtons(p);
+            UpdateAPText(p);
 
-        Transform healthOutline = GetPinfo(1).Find("Health_Outline");
-        Text healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
-        healthText.text = p1.health + "/" + p1.character.GetMaxHealth();
+            // TODO start health from zero so it animates
+            Text healthT = pinfo.Find("Health_Outline").Find("Text_Health").GetComponent<Text>();
+            healthT.text = p.health + "/" + p.character.GetMaxHealth();
 
-        Transform meterOutline = GetPinfo(1).Find("Meter_Outline");
-        Text meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
-        meterText.text = "0/" + p1.character.meterMax;
-        StartCoroutine(UpdateMeterbar(p1));
+            Text meterT = pinfo.Find("Meter_Outline").Find("Text_Meter").GetComponent<Text>();
+            meterT.text = "0/" + p.character.meterMax;
+            StartCoroutine(UpdateMeterbar(p));
+        }
 
-        nameText = p2info.Find("Text_Name").GetComponent<Text>();
-
-        if (p2.id == PhotonNetwork.player.ID)
-            nameText.text = "P2: " + p2.name + " (ME!)";
-        else
-            nameText.text = "P2: " + p2.name;
-
-        ShowLoadout(p2);
-        DeactivateAllSpellButtons(p2);
-
-        healthOutline = GetPinfo(2).Find("Health_Outline");
-        healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
-        healthText.text = p2.health + "/" + p2.character.GetMaxHealth();
-
-        meterOutline = GetPinfo(2).Find("Meter_Outline");
-        meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
-        meterText.text = "0/" + p2.character.meterMax;
-        StartCoroutine(UpdateMeterbar(p2));
+        ChangePinfoColor(1, new Color(0, 1, 0, .4f));
 
         settingsMenu.SetActive(mm.menu); //?
     }
@@ -199,41 +189,23 @@ public class UIController : MonoBehaviour {
             return p2info;
     }
 
-	public void UpdatePlayerInfo(){
-		UpdatePlayerInfo (mm.ActiveP());
-		UpdatePlayerInfo (mm.InactiveP());
-	}
-    
-    // TODO all these things should be separate & event callbacks
-    public void UpdatePlayerInfo(Player p){
-		Transform pinfo = GetPinfo(p.id);
+    public void ChangePinfoColor(int id, Color c) {
+        GetPinfo(id).GetComponent<Image>().color = c; // idk why
+    }
 
-		if (p.id == mm.ActiveP().id)
-			pinfo.GetComponent<Image> ().color = new Color (0, 1, 0, .4f);
-		else
-			pinfo.GetComponent<Image> ().color = new Color (1, 1, 1, .4f);
-
-		Text APText = pinfo.Find ("Text_AP").GetComponent<Text>();
+    public void UpdateAPText(Player p) {
+        Text APText = GetPinfo(p.id).Find ("Text_AP").GetComponent<Text>();
 		APText.text = "AP left: " + p.AP;
-
-        //StartCoroutine(UpdateHealthbar(p, pinfo.Find("Health_Outline")));
-        //StartCoroutine(UpdateMeterbar(p, pinfo.Find("Meter_Outline")));
-	}
+    }
 
     IEnumerator UpdateHealthbar(Player p) {
         Transform healthOutline = GetPinfo(p.id).Find("Health_Outline");
         RectTransform healthbar = healthOutline.Find("Healthbar").GetComponent<RectTransform>();
         Text healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
-        int maxHealth = p.character.GetMaxHealth();
 
-        // could maybe generalize for both meters?
-        int oldHealth = int.Parse(healthText.text.Split('/')[0]);
-        Tween tHealth = DOTween.To(() => oldHealth, 
-            x => { oldHealth = x; healthText.text = oldHealth + "/" + maxHealth; }, 
-            p.health, .8f)
-            .SetEase(Ease.OutCubic);
-        
-        float slideRatio = (float)p.health / maxHealth;
+        Tween tween = TextNumTween(healthText, p.health, p.character.GetMaxHealth());
+
+        float slideRatio = (float)p.health / p.character.GetMaxHealth();
 
         // health bar coloring; green -> yellow -> red
         float thresh = .6f; // point where health bar is yellow (0.6 = 60% health)
@@ -249,15 +221,18 @@ public class UIController : MonoBehaviour {
         RectTransform meter = meterOutline.Find("Meterbar").GetComponent<RectTransform>();
         Text meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
 
-        int oldMeter = int.Parse(meterText.text.Split('/')[0]);
-        int maxMeter = p.character.meterMax;
-        Tween tHealth = DOTween.To(() => oldMeter,
-            x => { oldMeter = x; meterText.text = oldMeter + "/" + maxMeter; },
-            p.character.meter, .8f)
-            .SetEase(Ease.OutCubic);
+        Tween tween = TextNumTween(meterText, p.character.meter, p.character.meterMax);
 
         float slideRatio = (float) p.character.meter / p.character.meterMax;
         yield return meter.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
+    }
+
+    Tween TextNumTween(Text t, int newValue, int maxValue) {
+        int oldValue = int.Parse(t.text.Split('/')[0]);
+        return DOTween.To(() => oldValue,
+            x => { oldValue = x; t.text = oldValue + "/" + maxValue; },
+            newValue, .8f)
+            .SetEase(Ease.OutCubic);
     }
 
 	public void ShowLoadout(Player player){

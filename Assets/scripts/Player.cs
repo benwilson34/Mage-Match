@@ -50,19 +50,18 @@ public class Player {
 
     public void InitEvents() {
         character.InitEvents();
-        mm.eventCont.turnBegin += OnTurnBegin;
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 4);
         mm.eventCont.match += OnMatch;
     }
 
-    public void OnTurnBegin(int id) {
+    public IEnumerator OnTurnBegin(int id) {
         if (id == this.id) {
             InitAP();
 
             if(ThisIsLocal()) // i think?
                 DealTile();
-
-            mm.uiCont.UpdatePlayerInfo(); // not needed once events have priority...?
         }
+        yield return null;
     }
 
     public void OnMatch(int id, string[] seqs) {
