@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -65,6 +66,8 @@ public class UIController : MonoBehaviour {
         mm.eventCont.gameAction += OnGameAction;
         mm.eventCont.match += OnMatch;
         mm.eventCont.cascade += OnCascade;
+        mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+        mm.eventCont.playerMeterChange += OnPlayerMeterChange;
     }
 
     #region EventCont calls
@@ -96,12 +99,21 @@ public class UIController : MonoBehaviour {
         UpdateMoveText("Wow, a cascade of " + chain + " matches!");
         SendSlidingText("Wow, a cascade of " + chain + " matches!");
     }
+
+    public void OnPlayerHealthChange(int id, int amount, bool dealt, bool sent) {
+        StartCoroutine(UpdateHealthbar(mm.GetPlayer(id)));
+    }
+
+    public void OnPlayerMeterChange(int id, int amount) {
+        StartCoroutine(UpdateMeterbar(mm.GetPlayer(id)));
+    }
     #endregion
 
     public void Reset(Player p1, Player p2) { // could just get players from MM
         UpdateDebugGrid();
         UpdateMoveText("Fight!!");
 
+        // TODO do in a loop
         Text nameText = p1info.Find("Text_Name").GetComponent<Text>();
 
         if (p1.id == PhotonNetwork.player.ID)
@@ -112,6 +124,15 @@ public class UIController : MonoBehaviour {
         ShowLoadout(p1);
         DeactivateAllSpellButtons(p1);
 
+        Transform healthOutline = GetPinfo(1).Find("Health_Outline");
+        Text healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
+        healthText.text = p1.health + "/" + p1.character.GetMaxHealth();
+
+        Transform meterOutline = GetPinfo(1).Find("Meter_Outline");
+        Text meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
+        meterText.text = "0/" + p1.character.meterMax;
+        StartCoroutine(UpdateMeterbar(p1));
+
         nameText = p2info.Find("Text_Name").GetComponent<Text>();
 
         if (p2.id == PhotonNetwork.player.ID)
@@ -121,6 +142,15 @@ public class UIController : MonoBehaviour {
 
         ShowLoadout(p2);
         DeactivateAllSpellButtons(p2);
+
+        healthOutline = GetPinfo(2).Find("Health_Outline");
+        healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
+        healthText.text = p2.health + "/" + p2.character.GetMaxHealth();
+
+        meterOutline = GetPinfo(2).Find("Meter_Outline");
+        meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
+        meterText.text = "0/" + p2.character.meterMax;
+        StartCoroutine(UpdateMeterbar(p2));
 
         settingsMenu.SetActive(mm.menu); //?
     }
@@ -162,17 +192,21 @@ public class UIController : MonoBehaviour {
         slidingText.rectTransform.position = slidingTextStart;
     }
 
+    Transform GetPinfo(int id) {
+        if (id == 1)
+            return p1info;
+        else
+            return p2info;
+    }
+
 	public void UpdatePlayerInfo(){
 		UpdatePlayerInfo (mm.ActiveP());
 		UpdatePlayerInfo (mm.InactiveP());
 	}
-
+    
+    // TODO all these things should be separate & event callbacks
     public void UpdatePlayerInfo(Player p){
-		Transform pinfo;
-		if (p.id == 1)
-            pinfo = p1info;
-		else
-            pinfo = p2info;
+		Transform pinfo = GetPinfo(p.id);
 
 		if (p.id == mm.ActiveP().id)
 			pinfo.GetComponent<Image> ().color = new Color (0, 1, 0, .4f);
@@ -182,16 +216,23 @@ public class UIController : MonoBehaviour {
 		Text APText = pinfo.Find ("Text_AP").GetComponent<Text>();
 		APText.text = "AP left: " + p.AP;
 
-        StartCoroutine(UpdateHealthbar(p, pinfo.Find("Health_Outline")));
-        StartCoroutine(UpdateMeterbar(p, pinfo.Find("Meter_Outline")));
+        //StartCoroutine(UpdateHealthbar(p, pinfo.Find("Health_Outline")));
+        //StartCoroutine(UpdateMeterbar(p, pinfo.Find("Meter_Outline")));
 	}
 
-    IEnumerator UpdateHealthbar(Player p, Transform healthOutline) {
+    IEnumerator UpdateHealthbar(Player p) {
+        Transform healthOutline = GetPinfo(p.id).Find("Health_Outline");
         RectTransform healthbar = healthOutline.Find("Healthbar").GetComponent<RectTransform>();
         Text healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
         int maxHealth = p.character.GetMaxHealth();
 
-        healthText.text = p.health + "/" + maxHealth;
+        // could maybe generalize for both meters?
+        int oldHealth = int.Parse(healthText.text.Split('/')[0]);
+        Tween tHealth = DOTween.To(() => oldHealth, 
+            x => { oldHealth = x; healthText.text = oldHealth + "/" + maxHealth; }, 
+            p.health, .8f)
+            .SetEase(Ease.OutCubic);
+        
         float slideRatio = (float)p.health / maxHealth;
 
         // health bar coloring; green -> yellow -> red
@@ -200,15 +241,23 @@ public class UIController : MonoBehaviour {
         float g = Mathf.Clamp(slideRatio, 0, thresh) / thresh;
         healthbar.GetComponent<Image>().color = new Color(r, g, 0);
 
-        yield return healthbar.DOScaleX(slideRatio, .4f);
+        yield return healthbar.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
     }
 
-    IEnumerator UpdateMeterbar(Player p, Transform meterOutline) { // no args eventually?
+    IEnumerator UpdateMeterbar(Player p) {
+        Transform meterOutline = GetPinfo(p.id).Find("Meter_Outline");
         RectTransform meter = meterOutline.Find("Meterbar").GetComponent<RectTransform>();
         Text meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
-        meterText.text = p.character.meter + "/" + p.character.meterMax;
+
+        int oldMeter = int.Parse(meterText.text.Split('/')[0]);
+        int maxMeter = p.character.meterMax;
+        Tween tHealth = DOTween.To(() => oldMeter,
+            x => { oldMeter = x; meterText.text = oldMeter + "/" + maxMeter; },
+            p.character.meter, .8f)
+            .SetEase(Ease.OutCubic);
+
         float slideRatio = (float) p.character.meter / p.character.meterMax;
-        yield return meter.DOScaleX(slideRatio, .8f);
+        yield return meter.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
     }
 
 	public void ShowLoadout(Player player){

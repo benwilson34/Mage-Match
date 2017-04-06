@@ -38,7 +38,8 @@ public abstract class Character {
 
     public void ChangeMeter(int amount) {
         meter += amount;
-        meter = Mathf.Clamp(meter, 0, meterMax);
+        meter = Mathf.Clamp(meter, 0, meterMax); // TODO clamp amount before event
+        mm.eventCont.PlayerMeterChange(playerID, amount);
     }
 
     public int GetMaxHealth() { return maxHealth; }

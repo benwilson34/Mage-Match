@@ -121,7 +121,7 @@ public class SyncManager : PunBehaviour {
 
     [PunRPC]
     public void HandlePlayerHealthChange(int id, int amount, bool dealt) {
-        Debug.Log("TURNMANAGER: HandlePlayerHealthChange; id=" + id + " amount=" + amount + " dealt=" + dealt);
+        //Debug.Log("TURNMANAGER: HandlePlayerHealthChange; id=" + id + " amount=" + amount + " dealt=" + dealt);
         mm.GetPlayer(id).ChangeHealth(amount, dealt, true);
     }
 

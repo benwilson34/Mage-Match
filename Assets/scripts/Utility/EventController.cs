@@ -197,6 +197,13 @@ public class EventController {
             playerHealthChange.Invoke(id, amount, dealt, sent);
     }
 
+    public delegate void PlayerMeterChangeEvent(int id, int amount);
+    public event PlayerMeterChangeEvent playerMeterChange;
+    public void PlayerMeterChange(int id, int amount) {
+        if (playerMeterChange != null)
+            playerMeterChange.Invoke(id, amount);
+    }
+
     public delegate void GrabTileEvent(int id, Tile.Element elem);
     public event GrabTileEvent grabTile;
     public void GrabTile(Tile.Element elem) {
