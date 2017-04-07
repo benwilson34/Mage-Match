@@ -47,10 +47,19 @@ public class Enfuego : Character {
         spells[0] = new Spell(0, "White-Hot Combo Kick", "MFFM", 1, WhiteHotComboKick);
         spells[1] = new Spell(1, "Hot Body", "FEFM", 1, HotBody);
         spells[2] = new Spell(2, "Hot and Bothered", "FMF", 1, HotAndBothered);
-        spells[3] = new Spell(3, "Pivot", "MEF", 0, Pivot);
+        spells[3] = new Spell(3, "Core: BURN", 1, Burning);
     }
 
     // ----- spells -----
+
+    // sample
+    public IEnumerator Burning() {
+        targeting.WaitForTileTarget(1, Burning_Target);
+        yield return null;
+    }
+    void Burning_Target(TileBehav tb) {
+        spellfx.Ench_SetBurning(mm.ActiveP().id, tb);
+    }
 
     public IEnumerator WhiteHotComboKick() {
         targeting.WaitForTileTarget(3, WHCK_Target);

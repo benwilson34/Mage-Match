@@ -61,7 +61,7 @@ public class EffectController {
     }
 
     #region TurnEffects
-    public void AddBeginTurnEffect(Effect e, string tag) {
+    public string AddBeginTurnEffect(Effect e, string tag) {
         // TODO insert at correct position for priority
         e.tag = GenFullTag("begt", tag);
         int i;
@@ -71,9 +71,10 @@ public class EffectController {
                 break;
         }
         beginTurnEffects.Insert(i, e);
+        return e.tag;
     }
 
-    public void AddEndTurnEffect(Effect e, string tag) {
+    public string AddEndTurnEffect(Effect e, string tag) {
         // TODO test somehow?
         e.tag = GenFullTag("endt", tag);
         int i;
@@ -83,6 +84,7 @@ public class EffectController {
                 break;    
         }
         endTurnEffects.Insert(i, e);
+        return e.tag;
     }
 
     // TODO not the right way to do this
@@ -103,6 +105,30 @@ public class EffectController {
             }
         }
         Debug.LogError("EFFECT-CONT: Missed the remove!");
+    }
+
+    // TODO generalize
+    public Effect GetTurnEffect(string tag) {
+        if (tag == "")
+            return null;
+
+        List<Effect> list;
+        if (tag.Substring(0, 4) == "begt")
+            list = beginTurnEffects;
+        else
+            list = endTurnEffects;
+
+        int i;
+        Effect e;
+        for (i = 0; i < list.Count; i++) {
+            e = list[i];
+            if (e.tag == tag) {
+                Debug.Log("EFFECT-CONT: found effect with tag " + e.tag);
+                return e;
+            }
+        }
+
+        return null;
     }
 
     public IEnumerator ResolveBeginTurnEffects() {

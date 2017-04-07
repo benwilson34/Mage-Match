@@ -46,6 +46,10 @@ public abstract class Character {
 
     public Spell GetSpell(int index) { return spells[index]; }
 
+    public List<Spell> GetSpells() {
+        return new List<Spell>(spells);
+    }
+
     public List<TileSeq> GetTileSeqList() {
         List<TileSeq> outlist = new List<TileSeq>();
         foreach (Spell s in spells)

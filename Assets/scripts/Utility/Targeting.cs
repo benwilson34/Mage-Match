@@ -237,7 +237,7 @@ public class Targeting {
     public void ClearTargets() {
         Player p = mm.ActiveP();
         int prereqs = p.GetCurrentBoardSeq().sequence.Count;
-        for (int i = 0; i < outlines.Count - prereqs;) {
+        for (int i = 0; i < outlines.Count - prereqs;) { // clear just the target outlines
             GameObject go = outlines[prereqs];
             GameObject.Destroy(go);
             outlines.Remove(go);

@@ -186,6 +186,7 @@ public class MageMatch : MonoBehaviour {
         }
 
         yield return new WaitUntil(() => !checking); // needed anymore?
+        Debug.Log("MAGEMATCH: Commish turn done, and the board is at rest.");
 
         activep = InactiveP();
         yield return eventCont.TurnBegin();
@@ -227,28 +228,38 @@ public class MageMatch : MonoBehaviour {
 
     void SpellCheck() { 
         Character c = activep.character;
-        List<TileSeq> spells = c.GetTileSeqList();
-        spells = boardCheck.SpellCheck(spells);
-        if (spells.Count == 0)
-            return;
-
-        List<TileSeq> spellList = c.GetTileSeqList();
-        for (int s = 0; s < spellList.Count; s++) {
-            TileSeq spellSeq = spellList[s];
+        List<TileSeq> spellSeqList = c.GetTileSeqList();
+        List<TileSeq> spellsOnBoard = boardCheck.SpellCheck(spellSeqList);
+        //if (spellsOnBoard.Count == 0)
+        //    return;
+        
+        for (int s = 0; s < spellSeqList.Count; s++) {
+            Spell sp = c.GetSpell(s);
+            //Debug.Log("MAGEMATCH: Checking "+sp.name+"...");
             bool spellIsOnBoard = false;
-            for (int i = 0; i < spells.Count; i++) {
-                TileSeq matchSeq = spells[i];
-                if (matchSeq.MatchesTileSeq(spellSeq)) {
+            if (sp.core) {
+                // TODO check for cooldown
+                if (effectCont.GetTurnEffect(sp.effectTag) == null) {
+                    Debug.Log("MAGEMATCH: " + sp.name + " is core, and there's no effect with tag=" + sp.effectTag);
                     spellIsOnBoard = true;
-                    c.GetSpell(s).SetBoardSeq(matchSeq);
-                    break;
+                } else {
+                    Debug.Log("MAGEMATCH: " + sp.name + " is core, but it's cooling down!");
+                }
+            } else { // could be cleaner.
+                for (int i = 0; i < spellsOnBoard.Count; i++) {
+                    TileSeq matchSeq = spellsOnBoard[i];
+                    if (matchSeq.MatchesTileSeq(sp.GetTileSeq())) {
+                        spellIsOnBoard = true;
+                        c.GetSpell(s).SetBoardSeq(matchSeq);
+                        break;
+                    }
                 }
             }
 
             if (spellIsOnBoard)
                 uiCont.ActivateSpellButton(activep, s);
             else
-                uiCont.DeactivateSpellButton(activep, s);
+                uiCont.DeactivateSpellButton(activep, s); // needed?
         }
     }
 
