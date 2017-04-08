@@ -147,8 +147,8 @@ public class Player {
         Debug.Log(str);
 
         health += newAmount;
-        health = Mathf.Clamp(health, 0, character.GetMaxHealth());
-        mm.eventCont.PlayerHealthChange(id, amount, dealt);
+        health = Mathf.Clamp(health, 0, character.GetMaxHealth()); // clamp amount before event
+        mm.eventCont.PlayerHealthChange(id, amount, dealt); // due to buffs, this should probably get called first...although actually with the syncing fix it shouldn't be a problem? Need to send correct amount thru eventCont e.g. Stats call
 
         if (health == 0)
             mm.EndTheGame();
@@ -240,19 +240,10 @@ public class Player {
 
     public bool ThisIsLocal() { return mm.myID == id; }
 
-    public void InitAP() {
-        AP = 3;
-    }
+    public void InitAP() { AP = 3; }
 
-    public bool CastSpell(int index) { // TODO
-        Spell spell = character.GetSpell(index);
-        if (AP >= spell.APcost) {
-            currentSpell = spell;
-            mm.eventCont.SpellCast(currentSpell); // here?
-            mm.StartCoroutine(spell.Cast());
-            return true;
-        } else
-            return false;
+    public void SetCurrentSpell(int index) {
+        currentSpell = character.GetSpell(index);
     }
 
     public void ApplyAPCost() {

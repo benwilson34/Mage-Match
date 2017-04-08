@@ -62,4 +62,6 @@ MonoBehaviour:
   - R_StartZombify
   - R_ZombifySelect
   - HandleSyncRandom
+  - HandleCancelTargeting
+  - HandleClearTargets
   DisableAutoOpenWizard: 1

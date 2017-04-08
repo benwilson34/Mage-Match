@@ -21,7 +21,7 @@ public class Spell {
         //Debug.Log(">>>>>>>>SPELL: Normal constructor called. core=" + core);
     }
 
-    public Spell(int index, string name, int APcost, MySpellEffect effect) {
+    public Spell(int index, string name, int APcost, MySpellEffect effect) { // core spell
         this.index = index;
 		this.name = name;
 		this.APcost = APcost;
@@ -37,7 +37,7 @@ public class Spell {
             MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
             TurnEffect te = new TurnEffect(2, null, null, null);
             te.priority = 1; //?
-            effectTag = mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 4));
+            effectTag = mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 5) + "-C");
         }
 		return effect ();
 	}

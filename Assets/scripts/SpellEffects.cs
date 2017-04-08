@@ -18,28 +18,30 @@ public class SpellEffects {
 
 	public IEnumerator Deal496Dmg(){
 		mm.ActiveP().DealDamage(496);
-        return null;
+        yield return null;
 	}
 
     public IEnumerator StoneTest() {
-        targeting.WaitForCellTarget(1, StoneTest_Target);
-        return null;
-    }
-    void StoneTest_Target(CellBehav cb) {
+        yield return targeting.WaitForCellTarget(1);
+        if (targeting.WasCanceled())
+            yield break;
+
+        CellBehav cb = targeting.GetTargetCBs()[0];
         GameObject stone;
         stone = mm.GenerateToken("stone");
         stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
         mm.DropTile(cb.col, stone, .08f);
     }
 
-	public void LightningPalm(){
-        targeting.WaitForTileTarget(1, LightningPalm_Target);
-	}
-	void LightningPalm_Target(TileBehav tb){
+	public IEnumerator LightningPalm(){
+        yield return targeting.WaitForTileTarget(1);
+        if (targeting.WasCanceled())
+            yield break;
+
+        TileBehav tb = targeting.GetTargetTBs()[0]; // TODO elem
         List<TileBehav> tileList = hexGrid.GetPlacedTiles ();
-		Tile tile;
 		for (int i = 0; i < tileList.Count; i++) {
-			tile = tileList [i].tile;
+			Tile tile = tileList [i].tile;
 			if (tile.element.Equals (tb.tile.element)) {
 				mm.RemoveTile(tile, true);
 				mm.ActiveP ().DealDamage (15);
@@ -63,10 +65,11 @@ public class SpellEffects {
     }
 
 	public IEnumerator Cherrybomb(){
-        targeting.WaitForTileTarget(1, Cherrybomb_Target);
-        return null;
-	}
-	void Cherrybomb_Target(TileBehav tb){
+        yield return targeting.WaitForTileTarget(1);
+        if (targeting.WasCanceled())
+            yield break;
+
+        TileBehav tb = targeting.GetTargetTBs()[0];
         Ench_SetCherrybomb(mm.ActiveP().id, tb); // right id?
 	}
 

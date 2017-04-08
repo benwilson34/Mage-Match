@@ -32,7 +32,7 @@ public class Enfuego : Character {
         SetDeckElements(50, 0, 0, 20, 30);
 
         spells[0] = new Spell(0, "White-Hot Combo Kick", "MFFM", 1, WhiteHotComboKick);
-        spells[1] = new Spell(1, "Baila!", "FMF", 1, Baila);
+        spells[1] = new Spell(1, "¡Baile!", "FMF", 1, Baile);
         spells[2] = new Spell(2, "Incinerate", "FAFF", 1, Incinerate);
         spells[3] = new Spell(3, "Phoenix Fire", "AFM", 1, PhoenixFire);
     }
@@ -47,54 +47,59 @@ public class Enfuego : Character {
         spells[0] = new Spell(0, "White-Hot Combo Kick", "MFFM", 1, WhiteHotComboKick);
         spells[1] = new Spell(1, "Hot Body", "FEFM", 1, HotBody);
         spells[2] = new Spell(2, "Hot and Bothered", "FMF", 1, HotAndBothered);
-        spells[3] = new Spell(3, "Core: BURN", 1, Burning);
+        spells[3] = new Spell(3, "Fiery Fandango", 1, Burning); // sample for now
     }
 
     // ----- spells -----
 
     // sample
     public IEnumerator Burning() {
-        targeting.WaitForTileTarget(1, Burning_Target);
-        yield return null;
-    }
-    void Burning_Target(TileBehav tb) {
-        spellfx.Ench_SetBurning(mm.ActiveP().id, tb);
+        yield return targeting.WaitForTileTarget(1);
+        if (targeting.WasCanceled())
+            yield break;
+
+        TileBehav tb = targeting.GetTargetTBs()[0];
+        yield return mm.animCont._Burning(tb);
+        spellfx.Ench_SetBurning(playerID, tb);
     }
 
     public IEnumerator WhiteHotComboKick() {
-        targeting.WaitForTileTarget(3, WHCK_Target);
-        yield return null;
-    }
-    void WHCK_Target(TileBehav tb) {
-        mm.ActiveP().DealDamage(70);
+        yield return targeting.WaitForTileTarget(3);
+        if (targeting.WasCanceled())
+            yield break;
 
-        if (tb.tile.element.Equals(Tile.Element.Fire)) {
-            // TODO spread Burning
-            List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-            int burns = Mathf.Min(3, tbs.Count);
-            int tries = 10; // TODO generalize this form of randomization. see Commish spell also.
-            for (int i = 0; i < burns; i++) {
-                int rand = Random.Range(0, tbs.Count);
-                TileBehav ctb = tbs[rand];
-                if (ctb.HasEnchantment()) {
-                    tries--;
-                    i--;
-                } else {
-                    spellfx.Ench_SetBurning(mm.ActiveP().id, ctb); // right ID?
-                    tries = 10;
+        List<TileBehav> tTBs = targeting.GetTargetTBs();
+
+        foreach (TileBehav tb in tTBs) { // maybe for instead?
+            mm.ActiveP().DealDamage(70);
+
+            if (tb.tile.element.Equals(Tile.Element.Fire)) { // spread Burning to 3 nearby
+                List<TileBehav> ctbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+                for (int i = 0; i < ctbs.Count; i++) {
+                    TileBehav ctb = ctbs[i];
+                    if (ctb.HasEnchantment() && ctb.GetEnchTier() > 1) {
+                        ctbs.RemoveAt(i);
+                        i--;
+                    }
                 }
-                if (tries == 0)
-                    break;
-            }
-        } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
-            mm.InactiveP().DiscardRandom(1);
-        }
 
-        mm.RemoveTile(tb.tile, true);
+                int burns = Mathf.Min(3, ctbs.Count);
+                for (int i = 0; i < burns; i++) {
+                    int rand = Random.Range(0, ctbs.Count);
+                    yield return mm.syncManager.SyncRand(playerID, rand);
+                    TileBehav ctb = ctbs[mm.syncManager.rand];
+                    spellfx.Ench_SetBurning(playerID, ctb);
+                }
+            } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
+                mm.InactiveP().DiscardRandom(1);
+            }
+
+            mm.RemoveTile(tb.tile, true);
+        }
     }
 
     // PLACEHOLDER
-    public IEnumerator Baila() {
+    public IEnumerator Baile() {
         targeting.WaitForTileAreaTarget(true, Baila_Target);
         yield return null;
     }
@@ -110,7 +115,7 @@ public class Enfuego : Character {
 
     // TODO
     public IEnumerator HotBody() {
-        mm.effectCont.AddSwapEffect(new SwapEffect(10, 3, HotBody_Swap, null), "hotbd");
+        mm.effectCont.AddSwapEffect(new SwapEffect(3, 3, HotBody_Swap, null), "hotbd");
         yield return null;
     }
     IEnumerator HotBody_Swap(int id, int c1, int r1, int c2, int r2) {
@@ -118,35 +123,37 @@ public class Enfuego : Character {
         //yield return new WaitForSeconds(3f);
 
         TileBehav tbSelect = null;
+        int rand = Random.Range(10, 16);
+        yield return mm.syncManager.SyncRand(id, rand);
+        mm.GetPlayer(id).DealDamage(rand);
 
-        if (id == mm.myID) {
+        // TODO can be done with mm.syncManager.SyncRand()!!!
+        //if (id == mm.myID) {
             Debug.Log("ENFUEGO: This effect is mine, player " + playerID + "!");
-            mm.GetPlayer(id).DealDamage(25);
-
-            // TODO still doesn't function properly...seems to be whiffing at least once
-            // maybe it's enchanting part of the match??
             List<TileBehav> tbs = hexGrid.GetPlacedTiles();
             for (int i = 0; i < tbs.Count; i++) {
                 TileBehav tb = tbs[i];
-                if (tb.HasEnchantment()) {
-                    tbs.Remove(tb);
+                if (tb.HasEnchantment() && tb.GetEnchTier() > 1) {
+                    tbs.RemoveAt(i);
                     i--;
                 }
             }
 
-            Debug.Log("ENFUEGO: Waiting to choose the tile to apply Burning to.");
-            yield return new WaitUntil(() => hotBody_selects > 0);
+            //Debug.Log("ENFUEGO: Waiting to choose the tile to apply Burning to.");
+            //yield return new WaitUntil(() => hotBody_selects > 0);
 
-            int rand = Random.Range(0, tbs.Count);
+            rand = Random.Range(0, tbs.Count);
+            yield return mm.syncManager.SyncRand(id, rand);
             tbSelect = tbs[rand];
-            hotBody_selects--;
-            mm.syncManager.SendHotBodySelect(id, tbSelect.tile.col, tbSelect.tile.row);
-        } else {
-            mm.syncManager.StartHotBody(id);
 
-            yield return new WaitUntil(() => hotBody_selects == 0);
-            tbSelect = hexGrid.GetTileBehavAt(hotBody_col, hotBody_row);
-        }
+        //    hotBody_selects--;
+        //    mm.syncManager.SendHotBodySelect(id, tbSelect.tile.col, tbSelect.tile.row);
+        //} else {
+        //    mm.syncManager.StartHotBody(id);
+
+        //    yield return new WaitUntil(() => hotBody_selects == 0);
+        //    tbSelect = hexGrid.GetTileBehavAt(hotBody_col, hotBody_row);
+        //}
 
         Debug.Log("About to apply burning to the tb at " + tbSelect.PrintCoord());
         yield return mm.animCont._Burning(tbSelect);

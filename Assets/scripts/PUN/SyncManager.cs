@@ -23,11 +23,12 @@ public class SyncManager : PunBehaviour {
         eventCont.commishDrop += OnCommishDrop;
         eventCont.commishTurnDone += OnCommishTurnDone;
         //eventCont.playerHealthChange += OnPlayerHealthChange;
-        eventCont.spellCast += OnSpellCast;
+        //eventCont.spellCast += OnSpellCast;
     }
 
     public int rand = 0;
 
+    // could be made to be a wrapper around Random.Range
     public IEnumerator SyncRand(int id, int value) {
         PhotonView photonView = PhotonView.Get(this);
         if (id == mm.myID) { // send
@@ -131,15 +132,15 @@ public class SyncManager : PunBehaviour {
     //    mm.GetPlayer(id).ChangeHealth(amount, dealt, true);
     //}
 
-    public void OnSpellCast(int id, Spell spell) {
+    public void SendSpellCast(int spellNum) {
         if (mm.MyTurn()) { // not totally necessary...
             PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleSpellCast", PhotonTargets.Others, spell.index);
+            photonView.RPC("HandleSpellCast", PhotonTargets.Others, spellNum);
         }
     }
     [PunRPC]
     public void HandleSpellCast(int spellNum) {
-        mm.CastSpell(spellNum);
+        StartCoroutine(mm.CastSpell(spellNum));
     }
 
     public void SendTBTarget(TileBehav tb) {
@@ -177,41 +178,45 @@ public class SyncManager : PunBehaviour {
 
     // --------------- spells ------------------
 
-    public void StartHotBody(int id) {
-        PhotonView photonView = PhotonView.Get(this);
-        photonView.RPC("R_StartHotBody", PhotonTargets.All, id);
-    }
-    [PunRPC]
-    public void R_StartHotBody(int id) {
-        ((Enfuego)mm.GetPlayer(id).character).hotBody_selects = 1;
-    }
+    //public void StartHotBody(int id) {
+    //    PhotonView photonView = PhotonView.Get(this);
+    //    photonView.RPC("R_StartHotBody", PhotonTargets.All, id);
+    //}
+    //[PunRPC]
+    //public void R_StartHotBody(int id) {
+    //    ((Enfuego)mm.GetPlayer(id).character).hotBody_selects = 1;
+    //}
 
-    public void SendHotBodySelect(int id, int col, int row) {
-        if (mm.MyTurn()) { //?
+    //public void SendHotBodySelect(int id, int col, int row) {
+    //    if (mm.MyTurn()) { //?
+    //        PhotonView photonView = PhotonView.Get(this);
+    //        photonView.RPC("R_HotBodySelect", PhotonTargets.Others, id, col, row);
+    //    }
+    //}
+    //[PunRPC]
+    //public void R_HotBodySelect(int id, int col, int row) {
+    //    ((Enfuego)mm.GetPlayer(id).character).SetHotBodySelect(col, row);
+    //}
+
+    public void SendClearTargets() {
+        if (mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("R_HotBodySelect", PhotonTargets.Others, id, col, row);
+            photonView.RPC("HandleClearTargets", PhotonTargets.Others);
         }
     }
     [PunRPC]
-    public void R_HotBodySelect(int id, int col, int row) {
-        ((Enfuego)mm.GetPlayer(id).character).SetHotBodySelect(col, row);
+    public void HandleClearTargets() {
+        mm.targeting.ClearTargets();
     }
 
-    public void StartZombify(int id) {
-        PhotonView photonView = PhotonView.Get(this);
-        photonView.RPC("R_StartZombify", PhotonTargets.All, id);
+    public void SendCancelTargeting() {
+        if (mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleCancelTargeting", PhotonTargets.Others);
+        }
     }
     [PunRPC]
-    public void R_StartZombify(int id) {
-        ((Gravekeeper)mm.GetPlayer(id).character).zombify_select = true;
-    }
-
-    public void SendZombifySelect(int id, int col, int row) {
-        PhotonView photonView = PhotonView.Get(this);
-        photonView.RPC("R_ZombifySelect", PhotonTargets.Others, id, col, row);
-    }
-    [PunRPC]
-    public void R_ZombifySelect(int id, int col, int row) {
-        ((Gravekeeper)mm.GetPlayer(id).character).SetZombifySelect(col, row);
+    public void HandleCancelTargeting() {
+        mm.targeting.CancelTargeting();
     }
 }

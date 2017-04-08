@@ -15,18 +15,18 @@ public class MageMatch : MonoBehaviour {
     public bool commishTurn = false; // maybe make getters/setters?
 
     public GameSettings gameSettings;
-    public Commish commish;
-    public BoardCheck boardCheck;
-    public HexGrid hexGrid;
-    public UIController uiCont;
-    public EffectController effectCont;
-    public AudioController audioCont;
-    public Targeting targeting;
-    public Stats stats;
-    public EventController eventCont;
-    public TurnTimer timer;
     public SyncManager syncManager;
+    public HexGrid hexGrid;
+    public BoardCheck boardCheck;
+    public Commish commish;
+    public TurnTimer timer;
+    public Targeting targeting;
+    public EffectController effectCont;
+    public EventController eventCont;
+    public AudioController audioCont;
     public AnimationController animCont;
+    public UIController uiCont;
+    public Stats stats;
     // should SpellEffects instance be here?
 
     private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
@@ -34,6 +34,7 @@ public class MageMatch : MonoBehaviour {
     private Player p1, p2, activep;
     private bool endGame = false;     // is either player dead?
     private bool checking = false, performingAction = false, resolvingMatch = false;
+    private int removing = 0;
 
     void Start() {
         Random.InitState(1337420);
@@ -200,7 +201,7 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator BoardChecking() {
         checking = true; // prevents overcalling/retriggering
-        yield return new WaitUntil(() => !performingAction && !effectCont.isResolving()); //?
+        yield return new WaitUntil(() => !performingAction && !effectCont.isResolving() && removing == 0); //?
         Debug.Log("MAGEMATCH: About to check the board.");
 
         int cascade = 0;
@@ -336,12 +337,22 @@ public class MageMatch : MonoBehaviour {
         performingAction = false;
     }
 
-    public void CastSpell(int spellNum) { // IEnumerator?
+    public IEnumerator CastSpell(int spellNum) {
+        Debug.Log("   ---------- CAST SPELL BEGIN ----------");
+        performingAction = true;
+        syncManager.SendSpellCast(spellNum);
+
         Player p = activep;
-        if (p.CastSpell(spellNum)) {
-            commish.ChangeMood(45);
+        Spell spell = p.character.GetSpell(spellNum);
+        if (p.AP >= spell.APcost) {
+            targeting.canceled = false;
             uiCont.DeactivateAllSpellButtons(activep); // ?
-            if (currentState != GameState.TargetMode) { // kinda shitty
+            p.SetCurrentSpell(spellNum);
+
+            yield return spell.Cast();
+
+            if (!targeting.WasCanceled()) {
+                eventCont.SpellCast(spell);
                 RemoveSeq(p.GetCurrentBoardSeq());
                 p.ApplyAPCost();
             }
@@ -349,6 +360,8 @@ public class MageMatch : MonoBehaviour {
         } else {
             uiCont.UpdateMoveText("Not enough AP to cast!");
         }
+        Debug.Log("   ---------- CAST SPELL END ----------");
+        performingAction = false;
     }
 
     #endregion
@@ -464,8 +477,8 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
-    public void RemoveSeq(TileSeq seq) { // TODO messy stuff
-                                         //Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + boardCheck.PrintSeq(seq, true));
+    void RemoveSeq(TileSeq seq) { // TODO messy stuff
+        //Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + boardCheck.PrintSeq(seq, true));
         Tile tile;
         for (int i = 0; i < seq.sequence.Count;) {
             tile = seq.sequence[0];
@@ -477,6 +490,7 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
+    // TODO should be IEnums? Then just start the anim at the end?
     public void RemoveTile(Tile tile, bool resolveEnchant) {
         StartCoroutine(_RemoveTile(tile.col, tile.row, resolveEnchant));
     }
@@ -487,7 +501,8 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator _RemoveTile(int col, int row, bool resolveEnchant) {
         //		Debug.Log ("Removing (" + col + ", " + row + ")");
-        // TODO status bool
+        removing++;
+
         TileBehav tb = hexGrid.GetTileBehavAt(col, row);
         if (tb == null) {
             Debug.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
@@ -501,12 +516,14 @@ public class MageMatch : MonoBehaviour {
             tb.ClearEnchantment(); // TODO
         }
 
-        yield return animCont._RemoveTile(tb);
+        yield return animCont._RemoveTile(tb); // just start it, don't yield?
 
         Destroy(tb.gameObject);
         hexGrid.ClearTileBehavAt(col, row);
         eventCont.TileRemove(tb); //? not needed for checking but idk
         BoardChanged();
+
+        removing--;
     }
 
     // move to BoardCheck?

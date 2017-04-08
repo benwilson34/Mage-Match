@@ -86,10 +86,11 @@ public class Rocky : Character {
     }
 
     public IEnumerator Stalagmite() {
-        targeting.WaitForCellTarget(1, Stalagmite_Target);
-        yield return null;
-    }
-    void Stalagmite_Target(CellBehav cb) {
+        yield return targeting.WaitForCellTarget(1);
+        if (targeting.WasCanceled())
+            yield break;
+
+        CellBehav cb = targeting.GetTargetCBs()[0];
         int col = cb.col;
         int bottomr = hexGrid.BottomOfColumn(col);
         // hardset bottom three cells of column

@@ -39,11 +39,12 @@ public class EffectController {
 
     public IEnumerator OnMatch(int id, string[] seqs) {
         yield return ResolveMatchEffects(id);
+        Debug.Log("EFFECTCONT: Just finished resolving MATCH effects.");
     }
 
     public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
         yield return ResolveSwapEffects(id, c1, r1, c2, r2);
-        Debug.Log("EFFECTCONT: Just finished resolving swap effects.");
+        Debug.Log("EFFECTCONT: Just finished resolving SWAP effects.");
     }
     #endregion
 

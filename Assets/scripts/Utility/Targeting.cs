@@ -6,20 +6,21 @@ public class Targeting {
 
     public enum TargetMode { Tile, TileArea, Cell, CellArea, Drag };
     public TargetMode currentTMode = TargetMode.Tile;
+    public bool canceled = false;
 
     private MageMatch mm;
     private int targets, targetsLeft = 0;
     private List<TileBehav> targetTBs;
     private List<CellBehav> targetCBs;
     private Vector3 lastTCenter;
-    private bool largeAreaMode = false, canceled = false;
+    private bool largeAreaMode = false;
 
     private List<GameObject> outlines;
 
-    public delegate void TBTargetEffect(TileBehav tb);
+    //public delegate void TBTargetEffect(TileBehav tb);
     public delegate void TBMultiTargetEffect(List<TileBehav> tbs);
     public delegate void CBTargetEffect(CellBehav cb);
-    private TBTargetEffect TBtargetEffect;
+    //private TBTargetEffect TBtargetEffect;
     private TBMultiTargetEffect TBmultiTargetEffect;
     private CBTargetEffect CBtargetEffect;
 
@@ -38,15 +39,14 @@ public class Targeting {
         //	currentTMode = TargetMode.Tile;
     }
 
-    public void WaitForTileTarget(int count, TBTargetEffect targetEffect) {
+    public IEnumerator WaitForTileTarget(int count) {
         // TODO handle fewer tiles on board than count
         currentTMode = TargetMode.Tile;
         targets = targetsLeft = count;
         targetTBs = new List<TileBehav>();
-        TBtargetEffect = targetEffect;
         Debug.Log("TARGETING: targets = " + targetsLeft);
 
-        mm.StartCoroutine(TargetingScreen());
+        yield return TargetingScreen();
     }
 
     public void WaitForTileAreaTarget(bool largeArea, TBMultiTargetEffect targetEffect) {
@@ -98,14 +98,14 @@ public class Targeting {
     }
 
     // TODO
-    public void WaitForCellTarget(int count, CBTargetEffect targetEffect) {
+    public IEnumerator WaitForCellTarget(int count) {
         currentTMode = TargetMode.Cell;
         targets = targetsLeft = count;
         targetCBs = new List<CellBehav>();
-        CBtargetEffect = targetEffect;
+        //CBtargetEffect = targetEffect;
         //Debug.Log ("targets = " + targetsLeft);
 
-        mm.StartCoroutine(TargetingScreen());
+        yield return TargetingScreen();
     }
 
     // TODO
@@ -176,12 +176,12 @@ public class Targeting {
         yield return new WaitUntil(() => targetsLeft == 0);
         Debug.Log("TARGETING: no more targets.");
 
-        if (!canceled) {
-            mm.RemoveSeq(seq);
-            HandleTargets();
-            mm.BoardChanged();
-            p.ApplyAPCost();
-        }
+        //if (!canceled) { // shouldn't be here anymore
+        //    mm.RemoveSeq(seq);
+        //    //HandleTargets();
+        //    mm.BoardChanged();
+        //    p.ApplyAPCost();
+        //}
 
         foreach (GameObject go in outlines) {
             GameObject.Destroy(go);
@@ -196,27 +196,31 @@ public class Targeting {
         mm.currentState = MageMatch.GameState.PlayerTurn;
     }
 
-    void HandleTargets() {
-        switch (currentTMode) {
-            case TargetMode.Tile:
-                foreach (TileBehav tb in targetTBs)
-                    TBtargetEffect(tb);
-                break;
-            case TargetMode.TileArea:
-                Debug.Log("TARGETING: Handling TileArea effect...");
-                TBmultiTargetEffect(targetTBs);
-                break;
-            case TargetMode.Cell:
-                foreach (CellBehav cb in targetCBs) {
-                    CBtargetEffect(cb);
-                }
-                break;
-            case TargetMode.CellArea:
-                break;
-            case TargetMode.Drag:
-                break;
-        }
-    }
+    public List<TileBehav> GetTargetTBs() { return targetTBs; }
+
+    public List<CellBehav> GetTargetCBs() { return targetCBs; }
+
+    //void HandleTargets() {
+    //    switch (currentTMode) {
+    //        case TargetMode.Tile:
+    //            foreach (TileBehav tb in targetTBs)
+    //                TBtargetEffect(tb);
+    //            break;
+    //        case TargetMode.TileArea:
+    //            Debug.Log("TARGETING: Handling TileArea effect...");
+    //            TBmultiTargetEffect(targetTBs);
+    //            break;
+    //        case TargetMode.Cell:
+    //            foreach (CellBehav cb in targetCBs) {
+    //                CBtargetEffect(cb);
+    //            }
+    //            break;
+    //        case TargetMode.CellArea:
+    //            break;
+    //        case TargetMode.Drag:
+    //            break;
+    //    }
+    //}
 
     void OutlinePrereq(TileSeq seq) {
         outlines = new List<GameObject>(); // move to Init?
@@ -235,6 +239,8 @@ public class Targeting {
     }
 
     public void ClearTargets() {
+        mm.syncManager.SendClearTargets();
+
         Player p = mm.ActiveP();
         int prereqs = p.GetCurrentBoardSeq().sequence.Count;
         for (int i = 0; i < outlines.Count - prereqs;) { // clear just the target outlines
@@ -256,7 +262,11 @@ public class Targeting {
     }
 
     public void CancelTargeting() {
+        mm.syncManager.SendCancelTargeting();
+
         canceled = true;
         targetsLeft = 0;
     }
+
+    public bool WasCanceled() { return canceled; }
 }

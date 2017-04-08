@@ -28,7 +28,7 @@ public class Gravekeeper : Character {
 
         SetDeckElements(0, 20, 40, 0, 40);
 
-        spells[0] = new Spell(0, "Target Zombie", "EM", 1, RaiseZombie);
+        spells[0] = new Spell(0, "Target Zombie", "EM", 1, ZombifySpell);
         spells[1] = new Spell(1, "Zombie Synergy", "MEE", 1, ZombieSynergy);
         spells[2] = new Spell(2, "Human Resources", "MEME", 1, HumanResources);
         spells[3] = new Spell(3, "Company Luncheon", "EMWM", 1, CompanyLuncheon);
@@ -40,7 +40,7 @@ public class Gravekeeper : Character {
 
         SetDeckElements(25, 0, 35, 0, 40);
 
-        spells[0] = new Spell(0, "Raise Zombie", "EMME", 1, RaiseZombie);
+        spells[0] = new Spell(0, "Raise Zombie", "EMME", 1, ZombifySpell);
         spells[1] = new Spell(1, "R.S.V.Z.", "MEM", 1, spellfx.Deal496Dmg); //
         spells[2] = new Spell(2, "The Oogie Boogie", "MFE", 1, spellfx.Deal496Dmg); //
         spells[3] = new Spell(3, "Bottle Rocket Mishap", "EMFM", 1, spellfx.Deal496Dmg); //
@@ -103,21 +103,24 @@ public class Gravekeeper : Character {
             tb.TriggerEnchantment();
     }
 
-    public IEnumerator RaiseZombie() {
-        targeting.WaitForTileTarget(1, RaiseZombie_Target);
-        yield return null;
-    }
-    void RaiseZombie_Target(TileBehav tb) {
-        //GameObject zomb = mm.GenerateToken("zombie");
-        //zomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform); // move to MM.PutTile
-        //mm.hexGrid.RaiseTileBehavIntoColumn(zomb.GetComponent<TileBehav>(), cb.col);
+    public IEnumerator ZombifySpell() {
+        yield return targeting.WaitForTileTarget(1);
+        if (targeting.WasCanceled())
+            yield break;
+        TileBehav tb = targeting.GetTargetTBs()[0];
         Ench_SetZombify(playerID, tb, false);
     }
+    //void RaiseZombie_Target(TileBehav tb) {
+    //    //GameObject zomb = mm.GenerateToken("zombie");
+    //    //zomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform); // move to MM.PutTile
+    //    //mm.hexGrid.RaiseTileBehavIntoColumn(zomb.GetComponent<TileBehav>(), cb.col);
+    //    Ench_SetZombify(playerID, tb, false);
+    //}
 
     // ----- enchant -----
 
-    private int zombify_col, zombify_row;
-    public bool zombify_select;
+    //private int zombify_col, zombify_row;
+    //public bool zombify_select;
 
     public void Ench_SetZombify(int id, TileBehav tb, bool skip) {
         Enchantment ench = new Enchantment(id, Ench_Zombify_TEffect, null, null);
@@ -131,45 +134,38 @@ public class Gravekeeper : Character {
     }
     IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
         //zombify_select = false; // only use if you're sloppy. 
-        TileBehav selectTB = null;
+        if (tb == null)
+            Debug.LogError("GRAVEKEEPER: >>>>>Zombify called with a null tile!! Maybe it was removed?");
         Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " starting -----");
-        if (id == mm.myID) {
-            List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-            for (int i = 0; i < tbs.Count; i++) {
-                TileBehav ctb = tbs[i];
-                if (ctb.GetEnchTier() > 1 || 
-                    ctb.GetEnchType() == Enchantment.EnchType.Zombify) { // other conditions where Zombify wouldn't work?
-                    tbs.Remove(ctb);
-                    i--;
-                    //Debug.Log("GRAVEKEEPER: Ignoring tile at " + ctb.PrintCoord());
-                }
+
+        List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+        Debug.Log("GRAVEKEEPER: Tile has " + tbs.Count + " tiles around it.");
+        for (int i = 0; i < tbs.Count; i++) {
+            TileBehav ctb = tbs[i];
+            if (//ctb.GetEnchTier() > 1 || TODO??????
+                ctb.GetEnchType() == Enchantment.EnchType.Zombify) { // other conditions where Zombify wouldn't work?
+                tbs.RemoveAt(i);
+                i--;
+                Debug.Log("GRAVEKEEPER: Ignoring tile at " + ctb.PrintCoord());
             }
-            //Debug.Log("GRAVEKEEPER: Zombified tile has " + tbs.Count + " available tiles around it.");
-
-            yield return new WaitUntil(() => zombify_select);
-            zombify_select = false;
-
-            if (tbs.Count == 0) { // no targets
-                Debug.Log("GRAVEKEEPER: Zombify at "+tb.PrintCoord()+" has no targets!");
-                mm.syncManager.SendZombifySelect(id, -1, -1);
-                yield break;
-            }
-
-            int rand = Random.Range(0, tbs.Count);
-            selectTB = tbs[rand];
-            Debug.Log("GRAVEKEEPER: Zombify attacking TB at " + selectTB.PrintCoord());
-
-            mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);
-        } else { // remote
-            mm.syncManager.StartZombify(id);
-            yield return new WaitUntil(() => !zombify_select);
-
-            if (zombify_col == -1) { // if no available selects
-                Debug.Log("GRAVEKEEPER: Zombify at "+tb.PrintCoord()+" has no targets!");
-                yield break;
-            }
-            selectTB = mm.hexGrid.GetTileBehavAt(zombify_col, zombify_row);
         }
+        Debug.Log("GRAVEKEEPER: Tile now has " + tbs.Count + " available tiles around it.");
+
+        //yield return new WaitUntil(() => zombify_select);
+        //zombify_select = false;
+
+        if (tbs.Count == 0) { // no targets
+            Debug.Log("GRAVEKEEPER: Zombify at "+tb.PrintCoord()+" has no targets!");
+            //mm.syncManager.SendZombifySelect(id, -1, -1);
+            yield break;
+        }
+
+        int rand = Random.Range(0, tbs.Count);
+        yield return mm.syncManager.SyncRand(playerID, rand);
+        TileBehav selectTB = tbs[mm.syncManager.rand];
+        Debug.Log("GRAVEKEEPER: Zombify attacking TB at " + selectTB.PrintCoord());
+
+        //mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);
 
         yield return mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); //anim 1
 
@@ -189,11 +185,11 @@ public class Gravekeeper : Character {
         yield return null; // needed?
     }
 
-    public void SetZombifySelect(int col, int row) {
-        zombify_col = col;
-        zombify_row = row;
-        zombify_select = false;
-    }
+    //public void SetZombifySelect(int col, int row) {
+    //    zombify_col = col;
+    //    zombify_row = row;
+    //    zombify_select = false;
+    //}
 
     //public void Ench_SetZombieTok(int id, TileBehav tb) {
     //    Enchantment ench = new Enchantment(id, Ench_ZombieTok_TEffect, null, null);

@@ -12,7 +12,7 @@ public class ButtonController : MonoBehaviour {
 
 	public void OnSpellButtonClick(){
 		spellNum = int.Parse (gameObject.name.Substring (12)); // kinda shitty but it works
-		mm.CastSpell (spellNum);
+		StartCoroutine(mm.CastSpell (spellNum));
 	}
 
     public void OnSpellCancelButtonClick() {
