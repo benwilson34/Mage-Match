@@ -29,7 +29,7 @@ public class SyncManager : PunBehaviour {
     public int rand = 0;
 
     // could be made to be a wrapper around Random.Range
-    public IEnumerator SyncRand(int id, int value) {
+    public IEnumerator SyncRand(int id, int value, string debugName = "") {
         PhotonView photonView = PhotonView.Get(this);
         if (id == mm.myID) { // send
             yield return new WaitUntil(() => rand == -1);
@@ -38,7 +38,7 @@ public class SyncManager : PunBehaviour {
             photonView.RPC("HandleSyncRandom", PhotonTargets.All, -1);
             yield return new WaitUntil(() => rand != -1);
         }
-        Debug.Log("SYNCMANAGER: Just synced a random=" + rand);
+        Debug.Log("SYNCMANAGER: Just synced a random, "+debugName+"=" + rand);
     }
     [PunRPC]
     public void HandleSyncRandom(int value) {

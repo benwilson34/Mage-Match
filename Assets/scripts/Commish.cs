@@ -56,6 +56,7 @@ public class Commish  {
         bool finalSuccess = false;
 		GameObject go = mm.GenerateTile (GetTileElement());
 
+        // TODO better randomization & sync rand instead of this complicated syncing
 		for (int i = 0; i < numTiles && tries > 0; i++) {
 			if (tries == 20 && i != 0) {
 				yield return new WaitForSeconds (.15f);

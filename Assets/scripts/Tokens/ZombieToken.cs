@@ -9,7 +9,7 @@ public class ZombieToken : TileBehav {
         tile = new Tile(initElement);
         currentState = TileState.Placed; //?
 
-        SpellEffects spellfx = new SpellEffects();
+        //SpellEffects spellfx = new SpellEffects();
         //spellfx.Ench_SetZombieTok(mm.ActiveP().id, this); // not sure about the activep here...
     }
 }

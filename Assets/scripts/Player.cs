@@ -18,7 +18,8 @@ public class Player {
     private MatchEffect matchEffect;
 
     private float buff_dmgMult = 1;
-    private int buff_dmgExtra;
+    private int buff_dmgBonus;
+    private int debuff_dmgExtra;
 
     public Player(int playerNum) {
         AP = 0;
@@ -82,25 +83,26 @@ public class Player {
                 }
 
                 //Debug.Log("PLAYER: Player "+id+" about to sync dmg=" + dmg);
-                yield return mm.syncManager.SyncRand(id, dmg);
+                yield return mm.syncManager.SyncRand(id, dmg, "dmg");
                 DealDamage(mm.syncManager.rand); // do the actual damage
             }
         }
     }
 
     public void DealDamage(int amount) {
-        mm.GetOpponent(id).TakeDamage(amount);
+        int buffAmount = (int)(amount*buff_dmgMult) + buff_dmgBonus;
+        mm.GetOpponent(id).TakeDamage(buffAmount);
     }
 
     public void TakeDamage(int amount) {
-        if (amount > 0)
-            ChangeHealth(-amount, true);
-        else
+        if (amount > 0) {
+            int debuffAmount = amount + debuff_dmgExtra;
+            ChangeHealth(-debuffAmount, true);
+        } else
             Debug.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
     }
 
     public void Heal(int amount) {
-        //ChangeHealth(amount, false, false);
         ChangeHealth(amount, false);
     }
 
@@ -131,24 +133,21 @@ public class Player {
     //    }
     //}
     public void ChangeHealth(int amount, bool dealt) {
-        string str = "PLAYER: >>>";
-        int newAmount = 0;
+        string str = "PLAYER: >>>>>";
         if (amount < 0) { // damage
-            newAmount = (int)(amount * buff_dmgMult) - buff_dmgExtra;
             if (dealt)
-                str += mm.GetOpponent(id).name + " dealt " + (-1 * newAmount) + " damage; ";
+                str += mm.GetOpponent(id).name + " dealt " + (-1 * amount) + " damage; ";
             else
-                str += name + " took " + (-1 * newAmount) + " damage; ";
-            str += name + "'s health changed from " + health + " to " + (health + newAmount);
-        } else {
-            newAmount = amount;
-            str += name + " healed for " + newAmount + " health; " + name + "'s health changed from " + health + " to " + (health + newAmount);
-        } // healing?
+                str += name + " took " + (-1 * amount) + " damage; ";
+        } else { // healing
+            str += name + " healed for " + amount + " health; ";
+        }
+        str += name + "'s health changed from " + health + " to " + (health + amount);
         Debug.Log(str);
 
-        health += newAmount;
+        health += amount;
         health = Mathf.Clamp(health, 0, character.GetMaxHealth()); // clamp amount before event
-        mm.eventCont.PlayerHealthChange(id, amount, dealt); // due to buffs, this should probably get called first...although actually with the syncing fix it shouldn't be a problem? Need to send correct amount thru eventCont e.g. Stats call
+        mm.eventCont.PlayerHealthChange(id, amount, dealt);
 
         if (health == 0)
             mm.EndTheGame();
@@ -261,8 +260,13 @@ public class Player {
         buff_dmgMult = d;
     }
 
-    public void ChangeBuff_DmgExtra(int amount) {
+    public void ChangeBuff_DmgBonus(int amount) {
         Debug.Log("PLAYER: " + name + " had dmg bonus buff changed to +" + amount);
-        buff_dmgExtra = amount;
+        buff_dmgBonus = amount;
+    }
+
+    public void ChangeDebuff_DmgExtra(int amount) {
+        Debug.Log("PLAYER: " + name + " had dmg extra debuff changed to +" + amount);
+        debuff_dmgExtra = amount;
     }
 }

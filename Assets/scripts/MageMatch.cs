@@ -27,7 +27,7 @@ public class MageMatch : MonoBehaviour {
     public AnimationController animCont;
     public UIController uiCont;
     public Stats stats;
-    // should SpellEffects instance be here?
+    public SpellEffects spellfx;
 
     private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
     private GameObject stonePF, emberPF, zombiePF, prereqPF, targetPF; // token prefabs
@@ -71,6 +71,7 @@ public class MageMatch : MonoBehaviour {
 
         hexGrid = new HexGrid();
         boardCheck = new BoardCheck(hexGrid);
+        spellfx = new SpellEffects(this);
 
         endGame = false;
 
@@ -96,7 +97,7 @@ public class MageMatch : MonoBehaviour {
         timer.InitTimer();
         uiCont.Reset();
 
-        // BeginTurnEvent()?
+        // TODO init some stuff that would otherwise be BeginTurnEvent()
     }
 
     public void LoadPrefabs() {
@@ -158,7 +159,7 @@ public class MageMatch : MonoBehaviour {
     #endregion
 
     IEnumerator TurnSystem() {
-        yield return new WaitUntil(() => !performingAction); //?
+        yield return new WaitUntil(() => !performingAction && removing == 0); //?
         Debug.Log("   ---------- TURNSYSTEM START ----------");
         timer.Pause();
         yield return new WaitUntil(() => !checking);
@@ -206,7 +207,7 @@ public class MageMatch : MonoBehaviour {
 
         int cascade = 0;
         while (true) {
-            yield return new WaitUntil(() => !menu && !IsTargetMode() && !animCont.IsAnimating());
+            yield return new WaitUntil(() => !menu && !IsTargetMode() && !animCont.IsAnimating() && removing == 0); //?
             hexGrid.CheckGrav(); // TODO! move into v(that)v?
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
             List<TileSeq> seqMatches = boardCheck.MatchCheck();

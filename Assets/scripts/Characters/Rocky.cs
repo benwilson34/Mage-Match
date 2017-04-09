@@ -9,11 +9,11 @@ public class Rocky : Character {
     private Targeting targeting;
 
     public Rocky(MageMatch mm, int id, int loadout) {
-        this.mm = mm;
         playerID = id;
+        this.mm = mm;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
-        spellfx = new SpellEffects();
+        spellfx = mm.spellfx;
         characterName = "Rocky";
         spells = new Spell[4];
 

@@ -61,7 +61,7 @@ public class TurnEffect : Effect {
 
 public class Enchantment : Effect {
 
-    public delegate IEnumerator MyTileEffect(int id, TileBehav tb); // TODO IEnumerator
+    public delegate IEnumerator MyTileEffect(int id, TileBehav tb);
 
     public enum EnchType { None, Cherrybomb, Burning, Zombify, ZombieTok, StoneTok }
     public EnchType type = EnchType.None; // private?
@@ -69,7 +69,28 @@ public class Enchantment : Effect {
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
+    private SpellEffects spellfx;
     private bool skip = false;
+
+    //public Enchantment(int id, EnchType type) {
+    //    spellfx = mm.spellfx;
+    //    this.type = type;
+    //    switch (type) {
+    //        case EnchType.Burning:
+    //            tier = 1;
+    //            break;
+    //        case EnchType.Zombify:
+    //            tier = 1;
+    //            new Enchantment(id, spellfx.Ench_Zombify_TEffect, null, null);
+    //            break;
+    //        case EnchType.Cherrybomb:
+    //            tier = 2;
+    //            break;
+    //        case EnchType.StoneTok:
+    //            tier = 3; //?
+    //            break;
+    //    }
+    //}
 
     public Enchantment(int id, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
@@ -80,13 +101,8 @@ public class Enchantment : Effect {
         this.cancelEffect = cancelEffect;
     }
 
-    public Enchantment(int id, int turns, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = mm.ActiveP().id;
+    public Enchantment(int id, int turns, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) :this(id, turnEffect, endEffect, cancelEffect) {
         turnsLeft = turns;
-        this.turnEffect = turnEffect;
-        this.endEffect = endEffect;
-        this.cancelEffect = cancelEffect;
     }
 
     public void SetAsEnchantment(TileBehav tb) {

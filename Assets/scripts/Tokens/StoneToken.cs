@@ -9,7 +9,6 @@ public class StoneToken : TileBehav {
         tile = new Tile(initElement);
         currentState = TileState.Placed; //?
 
-        SpellEffects spellfx = new SpellEffects();
-        spellfx.Ench_SetStoneTok(this);
+        mm.spellfx.Ench_SetStoneTok(this);
     }
 }

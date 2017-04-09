@@ -11,19 +11,21 @@ public class Spell {
 
 	private TileSeq seq;
 	private TileSeq boardSeq;
+    private int cooldown;
 
 	public delegate IEnumerator MySpellEffect();
 	private MySpellEffect effect;
 	
-	public Spell(int index, string name, string seq, int APcost, MySpellEffect effect) : this(index, name, APcost, effect){
+	public Spell(int index, string name, string seq, int APcost, MySpellEffect effect) : this(index, name, 0, APcost, effect){
         this.seq = new TileSeq (seq);
         core = false;
         //Debug.Log(">>>>>>>>SPELL: Normal constructor called. core=" + core);
     }
 
-    public Spell(int index, string name, int APcost, MySpellEffect effect) { // core spell
+    public Spell(int index, string name, int cooldown, int APcost, MySpellEffect effect) { // core spell
         this.index = index;
 		this.name = name;
+        this.cooldown = cooldown;
 		this.APcost = APcost;
 		this.effect = effect;
         this.seq = new TileSeq(); // empty seq...be wary of errors...
@@ -35,7 +37,7 @@ public class Spell {
 	public IEnumerator Cast(){
         if (core) {
             MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
-            TurnEffect te = new TurnEffect(2, null, null, null);
+            TurnEffect te = new TurnEffect(cooldown, null, null, null);
             te.priority = 1; //?
             effectTag = mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 5) + "-C");
         }

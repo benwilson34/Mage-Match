@@ -2,14 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// TODO rename to EnchantEffects
 public class SpellEffects {
 
 	private MageMatch mm;
     private Targeting targeting;
     private HexGrid hexGrid;
 
-	public SpellEffects(){
-		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+	public SpellEffects(MageMatch mm){
+        this.mm = mm;
         targeting = mm.targeting;
         hexGrid = mm.hexGrid;
 	}
@@ -49,21 +50,6 @@ public class SpellEffects {
 		}
 	}
 
-	public void CaughtYouMirin(){
-		mm.ActiveP().ChangeBuff_DmgMult (.5f); // 50% damage multiplier
-        TurnEffect t = new TurnEffect(4, CaughtYouMirin_Turn, CaughtYouMirin_End, null);
-        t.priority = 3;
-        mm.effectCont.AddEndTurnEffect(t, "cym");
-	}
-	IEnumerator CaughtYouMirin_Turn(int id){ // technically this isn't needed
-		mm.GetPlayer(id).ChangeBuff_DmgMult (.5f); // 50% damage multiplier
-        yield return null; // for now
-	}
-	IEnumerator CaughtYouMirin_End(int id){
-		mm.GetPlayer(id).ChangeBuff_DmgMult (1f); // reset back to 100% dmg
-        yield return null; // for now
-    }
-
 	public IEnumerator Cherrybomb(){
         yield return targeting.WaitForTileTarget(1);
         if (targeting.WasCanceled())
@@ -84,7 +70,7 @@ public class SpellEffects {
 		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
 	}
 	IEnumerator Ench_Cherrybomb_Remove(int id, TileBehav tb){
-		Debug.Log ("SPELLEFFECTS: Resolving Cherrybomb at (" + tb.tile.col + ", " + tb.tile.row + ")");
+        Debug.Log("SPELLEFFECTS: Resolving Cherrybomb at " + tb.PrintCoord());
 		mm.GetPlayer(id).DealDamage (200);
 
 		List<TileBehav> tbs = hexGrid.GetSmallAreaTiles (tb.tile.col, tb.tile.row);
@@ -133,4 +119,65 @@ public class SpellEffects {
         yield return null; // for now
     }
 
+    public void Ench_SetZombify(int id, TileBehav tb, bool skip) {
+        Enchantment ench = new Enchantment(id, Ench_Zombify_TEffect, null, null);
+        ench.SetTypeTier(Enchantment.EnchType.Zombify, 1);
+        ench.priority = 6;
+        if (skip)
+            ench.SkipCurrent();
+        tb.SetEnchantment(ench);
+        tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
+        mm.effectCont.AddEndTurnEffect(ench, "zomb");
+    }
+    IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
+        //zombify_select = false; // only use if you're sloppy. 
+        if (tb == null)
+            Debug.LogError("GRAVEKEEPER: >>>>>Zombify called with a null tile!! Maybe it was removed?");
+        Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " starting -----");
+
+        List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+        Debug.Log("GRAVEKEEPER: Tile has " + tbs.Count + " tiles around it.");
+        for (int i = 0; i < tbs.Count; i++) {
+            TileBehav ctb = tbs[i];
+            if (!ctb.CanSetEnch(Enchantment.EnchType.Zombify)) { // other conditions where Zombify wouldn't work?
+                tbs.RemoveAt(i);
+                i--;
+                Debug.Log("GRAVEKEEPER: Ignoring tile at " + ctb.PrintCoord());
+            }
+        }
+        Debug.Log("GRAVEKEEPER: Tile now has " + tbs.Count + " available tiles around it.");
+
+        //yield return new WaitUntil(() => zombify_select);
+        //zombify_select = false;
+
+        if (tbs.Count == 0) { // no targets
+            Debug.Log("GRAVEKEEPER: Zombify at "+tb.PrintCoord()+" has no targets!");
+            //mm.syncManager.SendZombifySelect(id, -1, -1);
+            yield break;
+        }
+
+        int rand = Random.Range(0, tbs.Count);
+        yield return mm.syncManager.SyncRand(id, rand);
+        TileBehav selectTB = tbs[mm.syncManager.rand];
+        Debug.Log("GRAVEKEEPER: Zombify attacking TB at " + selectTB.PrintCoord());
+
+        //mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);
+
+        yield return mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); //anim 1
+
+        if (selectTB.tile.element == Tile.Element.Muscle) {
+            Tile t = selectTB.tile;
+            yield return mm._RemoveTile(t.col, t.row, true); // maybe?
+
+            mm.GetPlayer(id).DealDamage(10);
+            mm.GetPlayer(id).Heal(10);
+        } else {
+            Ench_SetZombify(id, selectTB, true);
+        }
+
+        yield return mm.animCont._Zombify_Back(tb.transform); // anim 2
+
+        Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " done -----");
+        yield return null; // needed?
+    }
 }

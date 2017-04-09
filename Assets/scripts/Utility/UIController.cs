@@ -18,7 +18,7 @@ public class UIController : MonoBehaviour {
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
-    private SpellEffects spellfx;
+    //private SpellEffects spellfx;
     private Vector3 slidingTextStart;
 
     public void Init(){ // Awake()?
@@ -57,7 +57,7 @@ public class UIController : MonoBehaviour {
 
         turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
 
-        spellfx = new SpellEffects();
+        //spellfx = new SpellEffects();
     }
 
     public void InitEvents() {
@@ -208,6 +208,7 @@ public class UIController : MonoBehaviour {
 
         float slideRatio = (float)p.health / p.character.GetMaxHealth();
 
+        // TODO I have a feeling I can just Lerp this? lol
         // health bar coloring; green -> yellow -> red
         float thresh = .6f; // point where health bar is yellow (0.6 = 60% health)
         float r = (((Mathf.Clamp(slideRatio, thresh, 1) - thresh) / (1 - thresh)) * -1 + 1);

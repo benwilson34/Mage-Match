@@ -81,7 +81,28 @@ public class TileBehav : MonoBehaviour {
 	public bool IsInPosition(){
 		return inPos;
 	}
-	
+
+    public bool CanSetEnch(Enchantment.EnchType type) {
+        if (type == GetEnchType()) {
+            Debug.Log("TILEBEHAV: Tile has same enchant: " + type.ToString());
+            return false;
+        }
+
+        switch (type) {
+            case Enchantment.EnchType.Burning:
+            case Enchantment.EnchType.Zombify:
+                return 1 >= GetEnchTier();
+            case Enchantment.EnchType.Cherrybomb:
+                return 2 >= GetEnchTier();
+            case Enchantment.EnchType.StoneTok:
+                return 3 >= GetEnchTier(); //?
+
+            default:
+                Debug.LogError("TileBehav: Bad ench type in CanSetEnch!");
+                return false;
+        }
+    }
+
 	public bool HasEnchantment(){ // just use GetEnchType?
 		return enchantment != null;
 	}

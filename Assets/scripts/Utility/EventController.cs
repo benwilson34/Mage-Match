@@ -36,7 +36,7 @@ public class EventController {
     }
 
     // ex. AddEvent("swap", SwapCallbackMethod, 1)
-    public void AddEvent(string type, System.Delegate e, int priority) {
+    void AddEvent(string type, System.Delegate e, int priority) {
         List<EventPack> evList = GetEventList(type);
 
         int i = 0;
@@ -48,7 +48,7 @@ public class EventController {
     }
 
 
-    public void RemoveEvent(string type, System.Delegate e) {
+    void RemoveEvent(string type, System.Delegate e) {
         List<EventPack> evList = GetEventList(type);
 
         for (int i = 0; i < evList.Count; i++) {
@@ -192,6 +192,9 @@ public class EventController {
     }
     public void AddMatchEvent(MatchEvent ev, int priority) {
         AddEvent("match", ev, priority);
+    }
+    public void RemoveMatchEvent(MatchEvent ev) {
+        RemoveEvent("match", ev);
     }
 
     public delegate void CascadeEvent(int id, int chain);

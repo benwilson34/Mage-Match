@@ -15,9 +15,7 @@ public abstract class Character {
     protected MageMatch mm;
     protected int playerID;
 
-    public Character() { //?
-        spellfx = new SpellEffects();
-    }
+    public Character() {} //?
 
     public virtual void InitEvents() {
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
@@ -96,7 +94,7 @@ public abstract class Character {
 
 public class CharTest : Character {
     public CharTest() {
-        spellfx = new SpellEffects();
+        spellfx = mm.spellfx;
         spells = new Spell[4];
 
         characterName = "Sample";

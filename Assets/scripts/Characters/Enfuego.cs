@@ -4,16 +4,13 @@ using UnityEngine;
 
 public class Enfuego : Character {
 
-    public int hotBody_selects = 0;
-    private int hotBody_col, hotBody_row;
-
     private HexGrid hexGrid; // eventually these will be static again?
     private Targeting targeting; // ''
 
     public Enfuego(MageMatch mm, int id, int loadout) {
-        spellfx = new SpellEffects(); //?
-        this.mm = mm;
         playerID = id;
+        this.mm = mm;
+        spellfx = mm.spellfx;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
         characterName = "Enfuego";
@@ -32,9 +29,9 @@ public class Enfuego : Character {
         SetDeckElements(50, 0, 0, 20, 30);
 
         spells[0] = new Spell(0, "White-Hot Combo Kick", "MFFM", 1, WhiteHotComboKick);
-        spells[1] = new Spell(1, "¡Baile!", "FMF", 1, Baile);
-        spells[2] = new Spell(2, "Incinerate", "FAFF", 1, Incinerate);
-        spells[3] = new Spell(3, "Phoenix Fire", "AFM", 1, PhoenixFire);
+        spells[1] = new Spell(1, "¡Baile!", "FM", 1, Baile);
+        spells[2] = new Spell(2, "Incinerate", "FAF", 1, Incinerate);
+        spells[3] = new Spell(3, "Fiery Fandango", 3, 1, FieryFandango);
     }
 
     // FOCUS
@@ -45,9 +42,9 @@ public class Enfuego : Character {
         SetDeckElements(50, 0, 15, 0, 35);
 
         spells[0] = new Spell(0, "White-Hot Combo Kick", "MFFM", 1, WhiteHotComboKick);
-        spells[1] = new Spell(1, "Hot Body", "FEFM", 1, HotBody);
-        spells[2] = new Spell(2, "Hot and Bothered", "FMF", 1, HotAndBothered);
-        spells[3] = new Spell(3, "Fiery Fandango", 1, Burning); // sample for now
+        spells[1] = new Spell(1, "Hot Body", "MEF", 1, HotBody);
+        spells[2] = new Spell(2, "Backburner", "MF", 1, Backburner);
+        spells[3] = new Spell(3, "Fiery Fandango", 3, 1, FieryFandango);
     }
 
     // ----- spells -----
@@ -61,6 +58,18 @@ public class Enfuego : Character {
         TileBehav tb = targeting.GetTargetTBs()[0];
         yield return mm.animCont._Burning(tb);
         spellfx.Ench_SetBurning(playerID, tb);
+    }
+
+    public IEnumerator FieryFandango() {
+        mm.GetPlayer(playerID).ChangeDebuff_DmgExtra(15);
+        mm.GetOpponent(playerID).ChangeDebuff_DmgExtra(15);
+        TurnEffect te = new TurnEffect(2, null, FF_TEnd, null);
+        yield return null;
+    }
+    IEnumerator FF_TEnd(int id) {
+        mm.GetPlayer(id).ChangeDebuff_DmgExtra(0);
+        mm.GetOpponent(id).ChangeDebuff_DmgExtra(0);
+        yield return null;
     }
 
     public IEnumerator WhiteHotComboKick() {
@@ -77,7 +86,7 @@ public class Enfuego : Character {
                 List<TileBehav> ctbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 for (int i = 0; i < ctbs.Count; i++) {
                     TileBehav ctb = ctbs[i];
-                    if (ctb.HasEnchantment() && ctb.GetEnchTier() > 1) {
+                    if (!ctb.CanSetEnch(Enchantment.EnchType.Burning)) {
                         ctbs.RemoveAt(i);
                         i--;
                     }
@@ -85,9 +94,11 @@ public class Enfuego : Character {
 
                 int burns = Mathf.Min(3, ctbs.Count);
                 for (int i = 0; i < burns; i++) {
+                    Debug.Log("ENFUEGO: WHCK count=" + burns);
                     int rand = Random.Range(0, ctbs.Count);
                     yield return mm.syncManager.SyncRand(playerID, rand);
                     TileBehav ctb = ctbs[mm.syncManager.rand];
+                    Debug.Log("ENFUEGO: Setting Burning to " + ctb.PrintCoord());
                     spellfx.Ench_SetBurning(playerID, ctb);
                 }
             } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
@@ -113,92 +124,85 @@ public class Enfuego : Character {
         yield return null;
     }
 
+    public IEnumerator Backburner() {
+        yield return mm.syncManager.SyncRand(playerID, Random.Range(15, 26), "dmg");
+        mm.GetPlayer(playerID).DealDamage(mm.syncManager.rand);
+
+        mm.eventCont.AddMatchEvent(Backburner_Match, 4);
+        TurnEffect te = new TurnEffect(1, null, Backburner_TEnd, null);
+        yield return null;
+    }
+    IEnumerator Backburner_TEnd(int id) {
+        mm.eventCont.RemoveMatchEvent(Backburner_Match);
+        yield return null;
+    }
+    IEnumerator Backburner_Match(int id, string[] seqs) {
+        mm.GetPlayer(id).AP++;
+        yield return null;
+    }
+
     // TODO
     public IEnumerator HotBody() {
         mm.effectCont.AddSwapEffect(new SwapEffect(3, 3, HotBody_Swap, null), "hotbd");
         yield return null;
     }
     IEnumerator HotBody_Swap(int id, int c1, int r1, int c2, int r2) {
-        Debug.Log("ENFUEGO: HotBody's swap effect was called...selects="+hotBody_selects);
-        //yield return new WaitForSeconds(3f);
-
-        TileBehav tbSelect = null;
-        int rand = Random.Range(10, 16);
+        int rand = Random.Range(10, 16); // 10-15 dmg
         yield return mm.syncManager.SyncRand(id, rand);
-        mm.GetPlayer(id).DealDamage(rand);
+        mm.GetPlayer(id).DealDamage(mm.syncManager.rand);
 
-        // TODO can be done with mm.syncManager.SyncRand()!!!
-        //if (id == mm.myID) {
-            Debug.Log("ENFUEGO: This effect is mine, player " + playerID + "!");
-            List<TileBehav> tbs = hexGrid.GetPlacedTiles();
-            for (int i = 0; i < tbs.Count; i++) {
-                TileBehav tb = tbs[i];
-                if (tb.HasEnchantment() && tb.GetEnchTier() > 1) {
-                    tbs.RemoveAt(i);
-                    i--;
-                }
+        List<TileBehav> tbs = hexGrid.GetPlacedTiles();
+        for (int i = 0; i < tbs.Count; i++) {
+            TileBehav tb = tbs[i];
+            if (!tb.CanSetEnch(Enchantment.EnchType.Burning)) {
+                Debug.Log("ENFUEGO: Removing " + tb.PrintCoord());
+                tbs.RemoveAt(i);
+                i--;
             }
+        }
 
-            //Debug.Log("ENFUEGO: Waiting to choose the tile to apply Burning to.");
-            //yield return new WaitUntil(() => hotBody_selects > 0);
+        rand = Random.Range(0, tbs.Count);
+        yield return mm.syncManager.SyncRand(id, rand);
+        TileBehav tbSelect = tbs[mm.syncManager.rand];
 
-            rand = Random.Range(0, tbs.Count);
-            yield return mm.syncManager.SyncRand(id, rand);
-            tbSelect = tbs[rand];
-
-        //    hotBody_selects--;
-        //    mm.syncManager.SendHotBodySelect(id, tbSelect.tile.col, tbSelect.tile.row);
-        //} else {
-        //    mm.syncManager.StartHotBody(id);
-
-        //    yield return new WaitUntil(() => hotBody_selects == 0);
-        //    tbSelect = hexGrid.GetTileBehavAt(hotBody_col, hotBody_row);
-        //}
-
-        Debug.Log("About to apply burning to the tb at " + tbSelect.PrintCoord());
+        Debug.Log("ENFUEGO: About to apply burning to the tb at " + tbSelect.PrintCoord());
         yield return mm.animCont._Burning(tbSelect);
         spellfx.Ench_SetBurning(id, tbSelect);
     }
 
-    public void SetHotBodySelect(int col, int row) {
-        hotBody_col = col;
-        hotBody_row = row;
-        hotBody_selects--;
-    }
+    //public IEnumerator HotAndBothered() {
+    //    Debug.Log("ENFUEGO: HAB called????");
+    //    mm.InactiveP().ChangeBuff_DmgBonus(15);
+    //    TurnEffect t = new TurnEffect(5, HAB_Turn, HAB_End, null);
+    //    t.priority = 3;
+    //    mm.effectCont.AddEndTurnEffect(t, "handb");
+    //    yield return null;
+    //}
+    //IEnumerator HAB_Turn(int id) {
+    //    mm.InactiveP().ChangeBuff_DmgBonus(15); // technically not needed
+    //    yield return null;
+    //}
+    //IEnumerator HAB_End(int id) {
+    //    mm.InactiveP().ChangeBuff_DmgBonus(0); // reset
+    //    yield return null;
+    //}
 
-    public IEnumerator HotAndBothered() {
-        Debug.Log("ENFUEGO: HAB called????");
-        mm.InactiveP().ChangeBuff_DmgExtra(15);
-        TurnEffect t = new TurnEffect(5, HAB_Turn, HAB_End, null);
-        t.priority = 3;
-        mm.effectCont.AddEndTurnEffect(t, "handb");
-        yield return null;
-    }
-    IEnumerator HAB_Turn(int id) {
-        mm.InactiveP().ChangeBuff_DmgExtra(15); // technically not needed
-        yield return null;
-    }
-    IEnumerator HAB_End(int id) {
-        mm.InactiveP().ChangeBuff_DmgExtra(0); // reset
-        yield return null;
-    }
+    //public IEnumerator Pivot() {
+    //    TurnEffect t = new TurnEffect(1, null, Pivot_End, null);
+    //    t.priority = 3;
+    //    mm.effectCont.AddEndTurnEffect(t, "pivot");
 
-    public IEnumerator Pivot() {
-        TurnEffect t = new TurnEffect(1, null, Pivot_End, null);
-        t.priority = 3;
-        mm.effectCont.AddEndTurnEffect(t, "pivot");
-
-        mm.effectCont.AddMatchEffect(new MatchEffect(1, 1, Pivot_Match, null), "pivot");
-        yield return null;
-    }
-    IEnumerator Pivot_End(int id) {
-        //mm.ActiveP().ClearMatchEffect();
-        yield return null;
-    }
-    IEnumerator Pivot_Match(int id) {
-        mm.ActiveP().AP++;
-        yield return null;
-    }
+    //    mm.effectCont.AddMatchEffect(new MatchEffect(1, 1, Pivot_Match, null), "pivot");
+    //    yield return null;
+    //}
+    //IEnumerator Pivot_End(int id) {
+    //    //mm.ActiveP().ClearMatchEffect();
+    //    yield return null;
+    //}
+    //IEnumerator Pivot_Match(int id) {
+    //    mm.ActiveP().AP++;
+    //    yield return null;
+    //}
 
     public IEnumerator Incinerate() {
         // TODO drag targeting

@@ -8,11 +8,11 @@ public class Gravekeeper : Character {
     private Targeting targeting; // ''
 
     public Gravekeeper(MageMatch mm, int id, int loadout) {
-        this.mm = mm;
         playerID = id;
+        this.mm = mm;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
-        spellfx = new SpellEffects();
+        spellfx = mm.spellfx;
         spells = new Spell[4];
         characterName = "The Gravekeeper";
         if (loadout == 1)
@@ -31,7 +31,7 @@ public class Gravekeeper : Character {
         spells[0] = new Spell(0, "Target Zombie", "EM", 1, ZombifySpell);
         spells[1] = new Spell(1, "Zombie Synergy", "MEE", 1, ZombieSynergy);
         spells[2] = new Spell(2, "Human Resources", "MEME", 1, HumanResources);
-        spells[3] = new Spell(3, "Company Luncheon", "EMWM", 1, CompanyLuncheon);
+        spells[3] = new Spell(3, "Gather the Ghouls~", 3, 1, GatherTheGhouls);
     }
 
     void GravekeeperB() { // The Gravekeeper B - Party in the Back
@@ -48,18 +48,17 @@ public class Gravekeeper : Character {
 
     // ----- spells -----
 
+    // TODO Undead Union
     public IEnumerator ZombieSynergy() {
         int count = 0;
         List<TileBehav> tbs = hexGrid.GetPlacedTiles();
         foreach (TileBehav tb in tbs) {
-            if (tb.HasEnchantment() &&
-                (tb.GetEnchType() == Enchantment.EnchType.Zombify ||
-                tb.GetEnchType() == Enchantment.EnchType.ZombieTok)) {
+            if (tb.GetEnchType() == Enchantment.EnchType.Zombify ||
+                tb.GetEnchType() == Enchantment.EnchType.ZombieTok) {
                 List<TileBehav> adjTBs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 foreach (TileBehav adjTB in adjTBs) {
-                    if (adjTB.HasEnchantment() &&
-                        (adjTB.GetEnchType() == Enchantment.EnchType.Zombify ||
-                        adjTB.GetEnchType() == Enchantment.EnchType.ZombieTok)) {
+                    if (adjTB.GetEnchType() == Enchantment.EnchType.Zombify ||
+                        adjTB.GetEnchType() == Enchantment.EnchType.ZombieTok) {
                         count++;
                     }
                 }
@@ -80,7 +79,7 @@ public class Gravekeeper : Character {
             if (tb.tile.element == Tile.Element.Muscle) {
                 if (tb.GetEnchType() != Enchantment.EnchType.Zombify &&
                     tb.GetEnchType() != Enchantment.EnchType.ZombieTok)
-                    Ench_SetZombify(playerID, tb, false);
+                    spellfx.Ench_SetZombify(playerID, tb, false);
             }
         }
     }
@@ -103,13 +102,36 @@ public class Gravekeeper : Character {
             tb.TriggerEnchantment();
     }
 
+    // sample
     public IEnumerator ZombifySpell() {
         yield return targeting.WaitForTileTarget(1);
         if (targeting.WasCanceled())
             yield break;
         TileBehav tb = targeting.GetTargetTBs()[0];
-        Ench_SetZombify(playerID, tb, false);
+        spellfx.Ench_SetZombify(playerID, tb, false);
     }
+
+    public IEnumerator GatherTheGhouls() {
+        List<TileBehav> tbs =  hexGrid.GetPlacedTiles();
+        for (int i = 0; i < tbs.Count; i++) {
+            TileBehav ctb = tbs[i];
+            if (!ctb.CanSetEnch(Enchantment.EnchType.Zombify)) {
+                tbs.RemoveAt(i);
+                i--;
+            }
+        }
+
+        yield return mm.syncManager.SyncRand(playerID, Random.Range(1, 4));
+        int count = mm.syncManager.rand;
+
+        for (int i = 0; i < count; i++) {
+            yield return mm.syncManager.SyncRand(playerID, Random.Range(1, tbs.Count));
+            int rand = mm.syncManager.rand;
+            spellfx.Ench_SetZombify(playerID, tbs[rand], false);
+            tbs.RemoveAt(rand);
+        }
+    }
+
     //void RaiseZombie_Target(TileBehav tb) {
     //    //GameObject zomb = mm.GenerateToken("zombie");
     //    //zomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform); // move to MM.PutTile
@@ -122,68 +144,6 @@ public class Gravekeeper : Character {
     //private int zombify_col, zombify_row;
     //public bool zombify_select;
 
-    public void Ench_SetZombify(int id, TileBehav tb, bool skip) {
-        Enchantment ench = new Enchantment(id, Ench_Zombify_TEffect, null, null);
-        ench.SetTypeTier(Enchantment.EnchType.Zombify, 1);
-        ench.priority = 6;
-        if (skip)
-            ench.SkipCurrent();
-        tb.SetEnchantment(ench);
-        tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
-        mm.effectCont.AddEndTurnEffect(ench, "zomb");
-    }
-    IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
-        //zombify_select = false; // only use if you're sloppy. 
-        if (tb == null)
-            Debug.LogError("GRAVEKEEPER: >>>>>Zombify called with a null tile!! Maybe it was removed?");
-        Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " starting -----");
-
-        List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-        Debug.Log("GRAVEKEEPER: Tile has " + tbs.Count + " tiles around it.");
-        for (int i = 0; i < tbs.Count; i++) {
-            TileBehav ctb = tbs[i];
-            if (//ctb.GetEnchTier() > 1 || TODO??????
-                ctb.GetEnchType() == Enchantment.EnchType.Zombify) { // other conditions where Zombify wouldn't work?
-                tbs.RemoveAt(i);
-                i--;
-                Debug.Log("GRAVEKEEPER: Ignoring tile at " + ctb.PrintCoord());
-            }
-        }
-        Debug.Log("GRAVEKEEPER: Tile now has " + tbs.Count + " available tiles around it.");
-
-        //yield return new WaitUntil(() => zombify_select);
-        //zombify_select = false;
-
-        if (tbs.Count == 0) { // no targets
-            Debug.Log("GRAVEKEEPER: Zombify at "+tb.PrintCoord()+" has no targets!");
-            //mm.syncManager.SendZombifySelect(id, -1, -1);
-            yield break;
-        }
-
-        int rand = Random.Range(0, tbs.Count);
-        yield return mm.syncManager.SyncRand(playerID, rand);
-        TileBehav selectTB = tbs[mm.syncManager.rand];
-        Debug.Log("GRAVEKEEPER: Zombify attacking TB at " + selectTB.PrintCoord());
-
-        //mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);
-
-        yield return mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); //anim 1
-
-        if (selectTB.tile.element == Tile.Element.Muscle) {
-            Tile t = selectTB.tile;
-            yield return mm._RemoveTile(t.col, t.row, true); // maybe?
-
-            mm.GetPlayer(id).DealDamage(10);
-            mm.GetPlayer(id).Heal(10);
-        } else {
-            Ench_SetZombify(id, selectTB, true);
-        }
-
-        yield return mm.animCont._Zombify_Back(tb.transform); // anim 2
-
-        Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " done -----");
-        yield return null; // needed?
-    }
 
     //public void SetZombifySelect(int col, int row) {
     //    zombify_col = col;
