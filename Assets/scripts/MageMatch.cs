@@ -117,7 +117,11 @@ public class MageMatch : MonoBehaviour {
     public void InitEvents() {
         eventCont = new EventController(this);
         eventCont.boardAction += OnBoardAction;
+        eventCont.AddDropEvent(OnDrop, 1); // checking
+        eventCont.AddSwapEvent(OnSwap, 1); // checking
         eventCont.gameAction += OnGameAction;
+        eventCont.AddTurnBeginEvent(OnTurnBegin, 1); // checking
+        eventCont.AddTurnEndEvent(OnTurnEnd, 1); // checking
 
         if (gameSettings.turnTimerOn)
             eventCont.timeout += OnTimeout;
@@ -138,6 +142,19 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
+    public IEnumerator OnDrop(int id, Tile.Element elem, int col) {
+        if (currentState == GameState.PlayerTurn) {
+            yield return BoardChecking();
+            eventCont.GameAction(true);
+        }
+        yield return null;
+    }
+
+    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+        yield return BoardChecking();
+        eventCont.GameAction(true);
+    }
+
     public void OnGameAction(int id, bool costsAP) { // eventually just pass in int for cost?
         if (currentState != GameState.CommishTurn) { //?
             //Debug.Log("MAGEMATCH: OnGameAction called!");
@@ -150,6 +167,14 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
+    public IEnumerator OnTurnBegin(int id) {
+        yield return BoardChecking();
+    }
+
+    public IEnumerator OnTurnEnd(int id) {
+        yield return BoardChecking();
+    }
+
     public void OnTimeout(int id) {
         Player p = GetPlayer(id);
         Debug.Log("MAGEMATCH:" + p.name + "'s turn just timed out! They had " + p.AP + " AP left.");
@@ -160,14 +185,14 @@ public class MageMatch : MonoBehaviour {
 
     IEnumerator TurnSystem() {
         yield return new WaitUntil(() => !performingAction && removing == 0); //?
-        Debug.Log("   ---------- TURNSYSTEM START ----------");
         timer.Pause();
         yield return new WaitUntil(() => !checking);
+        Debug.Log("   ---------- TURNSYSTEM START ----------");
 
         yield return eventCont.TurnEnd();
         //yield return new WaitUntil(() => !effectCont.isResolving()); //?
 
-        BoardChanged(); // why doesn't this happen when resolving turn effects?
+        //BoardChanged(); // why doesn't this happen when resolving turn effects?
         yield return new WaitUntil(() => !checking);
         uiCont.DeactivateAllSpellButtons(activep);
         uiCont.SetDrawButton(activep, false);
@@ -175,17 +200,20 @@ public class MageMatch : MonoBehaviour {
         currentState = GameState.CommishTurn;
 
         //Debug.Log("MAGEMATCH: TurnSystem: About to check for MyTurn...currentState="+currentState.ToString());
-        if (MyTurn()) {
-            //Debug.Log("MAGEMATCH: Turnsystem: My turn; waiting for the go-ahead from the other player.");
-            yield return new WaitUntil(() => commishTurn);
-            Debug.Log("MAGEMATCH: TurnSystem: My turn, about to start the Commish's turn.");
-            yield return commish.CTurn(); // place 5 random tiles
-        } else {
-            syncManager.CommishTurnStart();
-            commishTurn = true; //?
-            Debug.Log("MAGEMATCH: Turnsystem: Not my turn, but the Commish's turn just started.");
-            yield return new WaitUntil(() => !commishTurn);
-        }
+
+        //if (MyTurn()) {
+        //    //Debug.Log("MAGEMATCH: Turnsystem: My turn; waiting for the go-ahead from the other player.");
+        //    yield return new WaitUntil(() => commishTurn);
+        //    Debug.Log("MAGEMATCH: TurnSystem: My turn, about to start the Commish's turn.");
+        //    yield return commish.CTurn(); // place 5 random tiles
+        //} else {
+        //    syncManager.CommishTurnStart();
+        //    commishTurn = true; //?
+        //    Debug.Log("MAGEMATCH: Turnsystem: Not my turn, but the Commish's turn just started.");
+        //    yield return new WaitUntil(() => !commishTurn);
+        //}
+
+        yield return commish.CTurn();
 
         yield return new WaitUntil(() => !checking); // needed anymore?
         Debug.Log("MAGEMATCH: Commish turn done, and the board is at rest.");
@@ -193,7 +221,7 @@ public class MageMatch : MonoBehaviour {
         activep = InactiveP();
         yield return eventCont.TurnBegin();
 
-        SpellCheck();
+        SpellCheck(); // I don't like this call here
         yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
         currentState = GameState.PlayerTurn;
         timer.InitTimer();
@@ -202,18 +230,18 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator BoardChecking() {
         checking = true; // prevents overcalling/retriggering
-        yield return new WaitUntil(() => !performingAction && !effectCont.isResolving() && removing == 0); //?
+        yield return new WaitUntil(() => removing == 0); //?
         Debug.Log("MAGEMATCH: About to check the board.");
 
         int cascade = 0;
         while (true) {
-            yield return new WaitUntil(() => !menu && !IsTargetMode() && !animCont.IsAnimating() && removing == 0); //?
-            hexGrid.CheckGrav(); // TODO! move into v(that)v?
+            yield return new WaitUntil(() => !animCont.IsAnimating() && removing == 0); //?
+            hexGrid.CheckGrav(); // TODO make IEnum
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
             List<TileSeq> seqMatches = boardCheck.MatchCheck();
             if (seqMatches.Count > 0) { // if there's at least one MATCH
                 Debug.Log("MAGEMATCH: Resolving matches...");
-                yield return ResolveMatchEffects(seqMatches);
+                yield return ResolveMatches(seqMatches);
                 cascade++;
             } else {
                 if (currentState == GameState.PlayerTurn) {
@@ -225,6 +253,7 @@ public class MageMatch : MonoBehaviour {
                 break;
             }
         }
+        Debug.Log("MAGEMATCH: Done checking.");
         checking = false;
     }
 
@@ -242,7 +271,7 @@ public class MageMatch : MonoBehaviour {
             if (sp.core) {
                 // TODO check for cooldown
                 if (effectCont.GetTurnEffect(sp.effectTag) == null) {
-                    Debug.Log("MAGEMATCH: " + sp.name + " is core, and there's no effect with tag=" + sp.effectTag);
+                    //Debug.Log("MAGEMATCH: " + sp.name + " is core, and there's no effect with tag=" + sp.effectTag);
                     spellIsOnBoard = true;
                 } else {
                     Debug.Log("MAGEMATCH: " + sp.name + " is core, but it's cooling down!");
@@ -265,7 +294,7 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
-    IEnumerator ResolveMatchEffects(List<TileSeq> seqList) {
+    IEnumerator ResolveMatches(List<TileSeq> seqList) {
         resolvingMatch = true;
         Debug.Log("MAGEMATCH: At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
         if (currentState != GameState.CommishTurn) {
@@ -296,25 +325,36 @@ public class MageMatch : MonoBehaviour {
     public bool DropTile(int col, GameObject go) {
         if (DropTile(col, go, .08f)) {
             activep.hand.Remove(go.GetComponent<TileBehav>()); // remove from hand
-            eventCont.GameAction(true); // could get moved into case below...
+            //eventCont.GameAction(true); // could get moved into case below...
             return true;
         } else
             return false;
     }
 
+    // TODO separate methods for player and Commish
     public bool DropTile(int col, GameObject go, float dur) {
         int row = boardCheck.CheckColumn(col); // check that column isn't full
         if (row >= 0) { // if the col is not full
-            TileBehav currentTileBehav = go.GetComponent<TileBehav>();
-            currentTileBehav.SetPlaced();
-            currentTileBehav.ChangePos(hexGrid.TopOfColumn(col) + 1, col, row, dur); // move to appropriate spot in column
-            if (currentState == GameState.PlayerTurn) //kinda hacky
-                eventCont.Drop(currentTileBehav.tile.element, col); // etc...
-            else if (currentState == GameState.CommishTurn)
-                eventCont.CommishDrop(currentTileBehav.tile.element, col);
+            StartCoroutine(Drop(col, go));
             return true;
         }
         return false;
+    }
+
+    public IEnumerator Drop(int col, GameObject go) {
+        Debug.Log("   ---------- DROP BEGIN ----------");
+        performingAction = true; //?
+        TileBehav tb = go.GetComponent<TileBehav>();
+        tb.SetPlaced();
+        tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
+        if (currentState == GameState.PlayerTurn) //kinda hacky
+            yield return eventCont.Drop(tb.tile.element, col); // etc...
+        else if (currentState == GameState.CommishTurn)
+            eventCont.CommishDrop(tb.tile.element, col);
+
+        Debug.Log("   ---------- DROP END ----------");
+        performingAction = false;
+        yield return null;
     }
 
     public void SwapTiles(int c1, int r1, int c2, int r2) {
@@ -324,14 +364,9 @@ public class MageMatch : MonoBehaviour {
     public IEnumerator _SwapTiles(int c1, int r1, int c2, int r2) {
         Debug.Log("   ---------- SWAP BEGIN ----------");
         performingAction = true;
-        if (!IsCommishTurn()) {
-            if (hexGrid.Swap(c1, r1, c2, r2)) {
-
-                yield return eventCont.Swap(c1, r1, c2, r2); //?
-
-                if (!menu) { // move to stats?
-                    eventCont.GameAction(true);
-                }
+        if (!IsCommishTurn()) { // eventually, when InputCont gets some love
+            if (hexGrid.Swap(c1, r1, c2, r2)) { // I feel like this check should be in InputCont
+                yield return eventCont.Swap(c1, r1, c2, r2); 
             }
         }
         Debug.Log("   ---------- SWAP END ----------");
@@ -356,6 +391,7 @@ public class MageMatch : MonoBehaviour {
                 eventCont.SpellCast(spell);
                 RemoveSeq(p.GetCurrentBoardSeq());
                 p.ApplyAPCost();
+                yield return BoardChecking(); //?
             }
 //			UIController.UpdateMoveText (activep.name + " casts " + spell.name + " for " + spell.APcost + " AP!!");
         } else {

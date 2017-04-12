@@ -31,10 +31,12 @@ public class EffectController {
     #region EventCont calls
     public IEnumerator OnTurnBegin(int id) {
         yield return ResolveBeginTurnEffects();
+        Debug.Log("EFFECTCONT: Just finished resolving TURN BEGIN effects.");
     }
 
     public IEnumerator OnTurnEnd(int id) {
         yield return ResolveEndTurnEffects();
+        Debug.Log("EFFECTCONT: Just finished resolving TURN END effects.");
     }
 
     public IEnumerator OnMatch(int id, string[] seqs) {
@@ -137,17 +139,14 @@ public class EffectController {
         Effect e;
         for (int i = 0; i < beginTurnEffects.Count; i++) { //foreach
             e = beginTurnEffects[i];
-            bool remove = e.TurnsRemaining() == 1; // test?
+            Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsLeft() + " turns left (including this one).");
+            yield return e.Turn();
 
-            yield return e.ResolveEffect();
-
-            if (remove) { // if it's the last pass of the effect (turnsLeft == 0)
-                beginTurnEffects.Remove(e);
+            if (e.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
+                beginTurnEffects.RemoveAt(i);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
                 i--;
-            } else {
-                Debug.Log("MAGEMATCH: Beginning-of-turn effect " + i + " has " + e.TurnsRemaining() + " turns left.");
             }
         }
         effectsResolving--;
@@ -158,18 +157,43 @@ public class EffectController {
         Effect e;
         for (int i = 0; i < endTurnEffects.Count; i++) { // foreach
             e = endTurnEffects[i];
-            Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsRemaining() + " turns left (including this one).");
-            bool remove = e.TurnsRemaining() == 0; // 1?
+            Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsLeft() + " turns left (including this one).");
+            yield return e.Turn();
 
-            yield return e.ResolveEffect();
-
-            if (remove) { // if it's the last pass of the effect (turnsLeft == 0)
-                endTurnEffects.Remove(e);
+            if (e.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
+                Debug.Log("EFFECTCONT: Removing " + e.tag + "...");
+                endTurnEffects.RemoveAt(i);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
                 i--;
             } 
         }
+
+
+        // TODO generalize somehow?
+        for (int i = 0; i < matchEffects.Count; i++) { // foreach
+            MatchEffect me = matchEffects[i];
+            Debug.Log("EFFECTCONTROLLER: " + me.tag + " (p" + me.priority + ") has " + me.TurnsLeft() + " turns left (including this one).");
+            yield return me.Turn();
+
+            if (me.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
+                Debug.Log("EFFECTCONT: Removing " + me.tag + "...");
+                matchEffects.RemoveAt(i);
+                i--;
+            }
+        }
+        for (int i = 0; i < swapEffects.Count; i++) { // foreach
+            SwapEffect se = swapEffects[i];
+            Debug.Log("EFFECTCONTROLLER: " + se.tag + " (p" + se.priority + ") has " + se.TurnsLeft() + " turns left (including this one).");
+            yield return se.Turn();
+
+            if (se.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
+                Debug.Log("EFFECTCONT: Removing " + se.tag + "...");
+                swapEffects.RemoveAt(i);
+                i--;
+            }
+        }
+
         effectsResolving--;
     }
     #endregion
@@ -186,24 +210,25 @@ public class EffectController {
         for (int i = 0; i < matchEffects.Count; i++) { // foreach
             me = matchEffects[i];
             if (me.playerID == id) {
-                bool remove = me.TurnsRemaining() == 1; // should be count?
                 yield return me.TriggerEffect();
-                if (remove) {
-                    matchEffects.Remove(me); // maybe not best...
+
+                if (me.NeedRemove()) {
+                    Debug.Log("EFFECTCONT: Removing " + me.tag + "...");
+                    matchEffects.RemoveAt(i);
                     i--;
                 }
             }
         }
     }
 
-    public void RemoveMatchEffect(string tag) { // TODO test
-        MatchEffect me = matchEffects[0];
-        for (int i = 0; i < matchEffects.Count; i++, me = matchEffects[i]) {
-            if (me.tag == tag)
-                break;
-        }
-        matchEffects.Remove(me);
-    }
+    //public void RemoveMatchEffect(string tag) { // TODO test
+    //    MatchEffect me = matchEffects[0];
+    //    for (int i = 0; i < matchEffects.Count; i++, me = matchEffects[i]) {
+    //        if (me.tag == tag)
+    //            break;
+    //    }
+    //    matchEffects.Remove(me);
+    //}
     #endregion
 
 
@@ -217,26 +242,28 @@ public class EffectController {
         SwapEffect se;
         for (int i = 0; i < swapEffects.Count; i++) { // foreach
             se = swapEffects[i];
-            Debug.Log("EFFECTCONT: Checking swapEff with tag " + se.tag);
             if (se.playerID == id) {
-                bool remove = se.TurnsRemaining() == 1; // should be count?
+                Debug.Log("EFFECTCONT: Checking swapEff with tag " + se.tag + "; count=" + se.countLeft);
+
                 yield return se.TriggerEffect(c1, r1, c2, r2);
-                if (remove) {
-                    RemoveSwapEffect(se.tag); // just removeAt...?
+
+                if (se.NeedRemove()) {
+                    Debug.Log("EFFECTCONT: Removing " + se.tag + "...");
+                    swapEffects.RemoveAt(i);
                     i--;
                 }
             }
         }
     }
 
-    public void RemoveSwapEffect(string tag) { // TODO test
-        SwapEffect se = swapEffects[0];
-        for (int i = 0; i < swapEffects.Count; se = swapEffects[i], i++) {
-            if (se.tag == tag)
-                break;
-        }
-        swapEffects.Remove(se);
-    }
+    //public void RemoveSwapEffect(string tag) { // TODO test
+    //    SwapEffect se = swapEffects[0];
+    //    for (int i = 0; i < swapEffects.Count; se = swapEffects[i], i++) {
+    //        if (se.tag == tag)
+    //            break;
+    //    }
+    //    swapEffects.Remove(se);
+    //}
     #endregion
 
 

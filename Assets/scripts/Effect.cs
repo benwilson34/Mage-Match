@@ -12,11 +12,12 @@ public abstract class Effect {
     public int priority; // protected eventually?
     public string tag;
 
-    public abstract IEnumerator TriggerEffect();
-    public abstract IEnumerator ResolveEffect();
-    public abstract IEnumerator EndEffect();
+    public virtual IEnumerator TriggerEffect() { yield return null; }
+    public virtual IEnumerator Turn() { yield return null; }
+    public virtual IEnumerator EndEffect() { yield return null; }
     public virtual void CancelEffect() { } // IEnumerator??
-    public int TurnsRemaining() { return turnsLeft; }
+    public int TurnsLeft() { return turnsLeft; }
+    public virtual bool NeedRemove() { return turnsLeft == 0; }
     //public void SetPriority(int p) { priority = p; }
 }
 
@@ -24,7 +25,7 @@ public class TurnEffect : Effect {
 
     private MyEffect turnEffect, endEffect, cancelEffect;
 
-    // TODO add infinite Constructor
+    // TODO add infinite Constructor...or just pass in a negative for turns?
     public TurnEffect(int turns, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = mm.ActiveP().id;
@@ -34,7 +35,7 @@ public class TurnEffect : Effect {
         this.cancelEffect = cancelEffect;
     }
 
-    public override IEnumerator ResolveEffect() {
+    public override IEnumerator Turn() {
         turnsLeft--;
         if (turnsLeft != 0) {
             yield return TriggerEffect();
@@ -122,7 +123,7 @@ public class Enchantment : Effect {
         skip = true;
     }
 
-    public override IEnumerator ResolveEffect() {
+    public override IEnumerator Turn() {
         turnsLeft--;
         if (skip) {
             skip = false;
@@ -158,37 +159,29 @@ public class Enchantment : Effect {
 
 public class MatchEffect : Effect {
 
-    private MyEffect matchEffect, endEffect;
-    private int count = 0; // -1?
+    // own delegate? if more params are needed
+    private MyEffect matchEffect, endEffect; // needs endEffect?
+    public int countLeft = 0; // -1?
 
     public MatchEffect(int turns, int count, MyEffect matchEffect, MyEffect endEffect) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = mm.ActiveP().id;
-        turnsLeft = turns; // maybe this field should just get renamed to count?
-        this.count = count;
+        playerID = mm.ActiveP().id; // is this ok? pass in?
+        turnsLeft = turns;
+        this.countLeft = count;
         this.matchEffect = matchEffect;
         this.endEffect = endEffect;
     }
 
     public override IEnumerator TriggerEffect() {
-        throw new NotImplementedException(); // hmmm...
-    }
-
-    public IEnumerator TriggerEffect(int id, int[] lens) {
         if (matchEffect != null)
             yield return matchEffect(playerID);
         yield return null;
     }
 
-    public override IEnumerator ResolveEffect() {
-        TriggerEffect();
+    public override IEnumerator Turn() {
         turnsLeft--;
-        if (turnsLeft != 0) {
-            //return false;
-            yield return null; //?
-        } else {
-            yield return EndEffect();
-            //return true;
+        if (turnsLeft == 0) {
+            yield return EndEffect(); //???
         }
     }
 
@@ -196,41 +189,50 @@ public class MatchEffect : Effect {
         if (endEffect != null)
             yield return endEffect(playerID);
     }
+
+    public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
 }
 
 public class SwapEffect : Effect {
 
     public delegate IEnumerator MySwapEffect(int id, int c1, int r1, int c2, int r2);
     private MySwapEffect swapEffect, endEffect;
-    private int count = 0; // -1?
+    public int countLeft = -1;
 
     public SwapEffect(int turns, int count, MySwapEffect swapEffect, MySwapEffect endEffect) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = mm.ActiveP().id;
         turnsLeft = turns;
-        this.count = count;
+        this.countLeft = count;
         this.swapEffect = swapEffect;
         this.endEffect = endEffect;
     }
 
     public override IEnumerator TriggerEffect() {
-        throw new NotImplementedException(); // hmmm...
+        throw new NotImplementedException(); // hmmm...should be virtual in Effect?
     }
 
     public IEnumerator TriggerEffect(int c1, int r1, int c2, int r2) {
-        if (swapEffect != null) {
+        if (swapEffect != null) { // would it ever be? maybe if like, your third swap does something
             Debug.Log("SWAPEFFECT: about to trigger swapEffect!");
             yield return swapEffect(mm.ActiveP().id, c1, r1, c2, r2);
-            count--;
+            countLeft--;
         }
         yield return null;
     }
 
-    public override IEnumerator ResolveEffect() { //?
-        throw new NotImplementedException(); 
+    public override IEnumerator Turn() { //?
+        turnsLeft--;
+        if (turnsLeft == 0) {
+            yield return EndEffect(); //???
+        }
     }
 
-    public override IEnumerator EndEffect() { //?
-        throw new NotImplementedException();
+    public IEnumerator EndEffect(int c1, int r1, int c2, int r2) { //?
+        if (endEffect != null)
+            yield return endEffect(mm.ActiveP().id, c1, r1, c2, r2);
+        yield return null;
     }
+
+    public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
 }

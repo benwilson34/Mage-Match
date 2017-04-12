@@ -64,4 +64,5 @@ MonoBehaviour:
   - HandleSyncRandom
   - HandleCancelTargeting
   - HandleClearTargets
+  - HandleSyncRands
   DisableAutoOpenWizard: 1

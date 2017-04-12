@@ -128,17 +128,14 @@ public class Enfuego : Character {
         yield return mm.syncManager.SyncRand(playerID, Random.Range(15, 26), "dmg");
         mm.GetPlayer(playerID).DealDamage(mm.syncManager.rand);
 
-        mm.eventCont.AddMatchEvent(Backburner_Match, 4);
-        TurnEffect te = new TurnEffect(1, null, Backburner_TEnd, null);
+        mm.effectCont.AddMatchEffect(new MatchEffect(1, 1, Backburner_Match, null), "backb");
         yield return null;
     }
-    IEnumerator Backburner_TEnd(int id) {
-        mm.eventCont.RemoveMatchEvent(Backburner_Match);
-        yield return null;
-    }
-    IEnumerator Backburner_Match(int id, string[] seqs) {
+    IEnumerator Backburner_Match(int id) {
+        Debug.Log("ENFUEGO: Rewarding player " + id + " with 1 AP.");
         mm.GetPlayer(id).AP++;
         yield return null;
+
     }
 
     // TODO

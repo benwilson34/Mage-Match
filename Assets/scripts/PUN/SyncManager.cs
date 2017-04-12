@@ -9,6 +9,7 @@ public class SyncManager : PunBehaviour {
 
     // Use this for initialization
     void Start() {
+        rands = new Queue<int>();
     }
 
     // Update is called once per frame
@@ -18,17 +19,17 @@ public class SyncManager : PunBehaviour {
     public void InitEvents(MageMatch mm, EventController eventCont) {
         this.mm = mm;
         eventCont.draw += OnDrawLocal;
-        eventCont.drop += OnDropLocal;
+        eventCont.AddDropEvent(OnDropLocal, 5);
         eventCont.AddSwapEvent(OnSwapLocal, 5);
-        eventCont.commishDrop += OnCommishDrop;
-        eventCont.commishTurnDone += OnCommishTurnDone;
+        //eventCont.commishDrop += OnCommishDrop;
+        //eventCont.commishTurnDone += OnCommishTurnDone;
         //eventCont.playerHealthChange += OnPlayerHealthChange;
         //eventCont.spellCast += OnSpellCast;
     }
 
     public int rand = 0;
 
-    // could be made to be a wrapper around Random.Range
+    // TODO more responsive!!!
     public IEnumerator SyncRand(int id, int value, string debugName = "") {
         PhotonView photonView = PhotonView.Get(this);
         if (id == mm.myID) { // send
@@ -45,6 +46,37 @@ public class SyncManager : PunBehaviour {
         rand = value;
     }
 
+
+    private Queue<int> rands;
+    private bool affectingQueue = false; // will I need this?
+
+    public IEnumerator SyncRands(int id, int[] values) {
+        PhotonView photonView = PhotonView.Get(this);
+        if (id == mm.myID) { // send/enqueue
+            photonView.RPC("HandleSyncRands", PhotonTargets.All, values);
+        } else {             // wait for rands in queue
+            Debug.Log("SYNCMANAGER: Wating for " + values.Length + " values...");
+            yield return new WaitUntil(() => rands.Count >= values.Length); // will the amount always be the same??
+        }
+        yield return null;
+    }
+    [PunRPC]
+    public void HandleSyncRands(int[] values) {
+        for (int i = 0; i < values.Length; i++) {
+            Debug.Log("SYNCMANAGER: Just synced random["+i+"]=" + values[i]);
+            rands.Enqueue(values[i]);
+        }
+    }
+
+    public int[] GetRands(int count) {
+        int[] r = new int[count];
+        for (int i = 0; i < count; i++) {
+            r[i] = rands.Dequeue();
+            Debug.Log("SYNCMANAGER: Just read random["+i+"]=" + r[i]);
+        }
+        return r;
+    }
+
     public void OnDrawLocal(int id, Tile.Element elem, bool dealt) {
         //Debug.Log("TURNMANAGER: id=" + id + " myID=" + mm.myID);
         if (id == mm.myID) { // if local, send to remote
@@ -57,11 +89,12 @@ public class SyncManager : PunBehaviour {
         mm.GetPlayer(id).DrawTiles(1, elem, dealt, false);
     }
 
-    public void OnDropLocal(int id, Tile.Element elem, int col) {
+    public IEnumerator OnDropLocal(int id, Tile.Element elem, int col) {
         if (id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDrop", PhotonTargets.Others, id, elem, col);
         }
+        yield return null;
     }
     [PunRPC]
     public void HandleDrop(int id, Tile.Element elem, int col) {

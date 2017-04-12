@@ -15,6 +15,7 @@ public class EventController {
         turnBegin = new List<EventPack>();
         turnEnd = new List<EventPack>();
         match = new List<EventPack>();
+        drop = new List<EventPack>();
     }
 
     struct EventPack { public System.Delegate ev; public int priority; }
@@ -29,6 +30,8 @@ public class EventController {
                 return turnEnd;
             case "match":
                 return match;
+            case "drop":
+                return drop;
             default:
                 Debug.LogError("EVENTCONT: Bad type name!!");
                 return null;
@@ -145,11 +148,19 @@ public class EventController {
             draw.Invoke(id, elem, dealt);
     }
 
-    public delegate void DropEvent(int id, Tile.Element elem, int col);
-    public event DropEvent drop;
-    public void Drop(Tile.Element elem, int col) {
-        if (drop != null)
-            drop.Invoke(mm.ActiveP().id, elem, col);
+    public delegate IEnumerator DropEvent(int id, Tile.Element elem, int col);
+    private List<EventPack> drop;
+    public IEnumerator Drop(Tile.Element elem, int col) {
+        handlingEvents = true; // worth it?
+        foreach (EventPack pack in drop) {
+            //Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
+            yield return ((DropEvent)pack.ev)(mm.ActiveP().id, elem, col); // OH YEAH
+        }
+        Debug.Log("EVENTCONT: Just finished DROP events...");
+        handlingEvents = false; // worth it?
+    }
+    public void AddDropEvent(DropEvent se, int priority) {
+        AddEvent("drop", se, priority);
     }
 
     public delegate IEnumerator SwapEvent(int id, int c1, int r1, int c2, int r2);
@@ -163,7 +174,6 @@ public class EventController {
         Debug.Log("EVENTCONT: Just finished SWAP events...");
         handlingEvents = false; // worth it?
     }
-
     public void AddSwapEvent(SwapEvent se, int priority) {
         AddEvent("swap", se, priority);
     }

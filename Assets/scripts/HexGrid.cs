@@ -45,12 +45,12 @@ public class HexGrid {
 
     public void SetTileBehavAt(TileBehav tb, int col, int row){
 		tileGrid [col, row] = tb;
-		mm.BoardChanged ();
+		//mm.BoardChanged ();
 	}
 
 	public void ClearTileBehavAt(int col, int row){
 		tileGrid [col, row] = null;
-		mm.BoardChanged ();
+		//mm.BoardChanged ();
 	}
 
 	public TileBehav GetTileBehavAt(int col, int row){
@@ -126,7 +126,7 @@ public class HexGrid {
 			GetTileBehavAt(c2, r2).ChangePos (c2, r2);
 			SetTileBehavAt (temp, c1, r1);
 			GetTileBehavAt(c1, r1).ChangePos (c1, r1);
-			mm.BoardChanged ();
+			//mm.BoardChanged ();
 			CheckGrav ();
 			return true;
 		}

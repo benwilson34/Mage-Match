@@ -46,7 +46,7 @@ public class Stats {
         mm.eventCont.commishMatch += OnCommishMatch;
 
         mm.eventCont.draw += OnDraw;
-        mm.eventCont.drop += OnDrop;
+        mm.eventCont.AddDropEvent(OnDrop, 2);
         mm.eventCont.AddSwapEvent(OnSwap, 2);
         mm.eventCont.spellCast += OnSpellCast;
 
@@ -115,12 +115,13 @@ public class Stats {
         GetPS(id).draws++;
     }
 
-    public void OnDrop(int id, Tile.Element elem, int col) {
+    public IEnumerator OnDrop(int id, Tile.Element elem, int col) {
         if (!mm.menu) {
             report.AppendLine("Drop " + Tile.ElementToChar(elem) + " col" + col);
             GetPS(id).drops++;
         } else
             report.AppendLine("menu Drop col" + col);
+        yield return null;
     }
 
     public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {

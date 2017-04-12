@@ -48,15 +48,10 @@ public class BoardCheck {
 
 	public float[] EmptyCheck(){
 		float[] ratios = new float[7];
-		int[] counts = new int[7];
-		int total = HexGrid.numCells - hexGrid.GetPlacedTiles ().Count;
+        int[] counts = EmptyCount();
+        int total = counts[7];
 		for (int i = 0; i < HexGrid.numCols; i++) {
-			if (CheckColumn (i) >= 0)
-				counts [i] = hexGrid.TopOfColumn (i) - CheckColumn (i) + 1;
-			else
-				counts [i] = 0;
-//			Debug.Log("counts[" + i + "] = " + counts[i]);
-			ratios [i] = (float)counts [i] / (float)total;
+			ratios [i] = (float)counts [i] / total;
 //			Debug.Log("     ratios[" + i + "] = " + ratios[i] + ": " + counts[i] + "/" + total);
 		}
 
@@ -66,6 +61,21 @@ public class BoardCheck {
 			Debug.Log ("EmptyCheck: totalf = " + totalf);
 		return ratios;
 	}
+
+    // note: the 8th element is the total empty cells...
+    public int[] EmptyCount() {
+        int[] counts = new int[8];
+        counts[7] = HexGrid.numCells - hexGrid.GetPlacedTiles ().Count;
+        for (int i = 0; i < HexGrid.numCols; i++) {
+            if (CheckColumn(i) >= 0)
+                counts[i] = hexGrid.TopOfColumn(i) - CheckColumn(i) + 1;
+            else
+                counts[i] = 0;
+            Debug.Log("HEXGRID: counts[" + i + "] = " + counts[i]);
+        }
+        Debug.Log("HEXGRID: counts total = " + counts[7]);
+        return counts;
+    }
 
 	public List<TileSeq> MatchCheck(){
 		return CheckBoard (matchSeqList, true);
