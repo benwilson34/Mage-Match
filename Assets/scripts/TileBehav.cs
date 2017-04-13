@@ -126,18 +126,21 @@ public class TileBehav : MonoBehaviour {
     }
 
 	public void ClearEnchantment(){
-        //		this.enchantEffect = null;
-        // TODO remove Effect from whichever list in MageMatch...
-        Debug.Log("TILEBEHAV: About to remove enchantment with tag " + enchantment.tag);
-        mm.effectCont.RemoveTurnEffect(enchantment);
-		enchantment = null;
-		this.GetComponent<SpriteRenderer> ().color = Color.white;
+        Debug.Log("TILEBEHAV: About to remove enchantment...");
+        if (HasEnchantment()) {
+            Debug.Log("TILEBEHAV: About to remove enchantment with tag " + enchantment.tag);
+            mm.effectCont.RemoveTurnEffect(enchantment);
+            enchantment = null;
+            this.GetComponent<SpriteRenderer>().color = Color.white;
+        }
 	}
 
 	public bool SetEnchantment(Enchantment ench){
-		if (HasEnchantment() && ench.tier <= enchantment.tier) {
-			return false; // if ench tier is not greater than current enchantment
+		if (ench.tier < GetEnchTier()) {
+			return false;
 		}
+        Debug.Log("TILEBEHAV: About to set ench with tag="+ench.tag);
+        ClearEnchantment(); //?
 		ench.SetAsEnchantment(this);
 		enchantment = ench; 
 		return true;

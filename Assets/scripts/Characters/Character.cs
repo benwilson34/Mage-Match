@@ -6,7 +6,7 @@ public abstract class Character {
 
     public string characterName;
     public string loadoutName;
-    public int meter, meterMax = 100; // protected?
+    public int meter = 0, meterMax = 100; // protected?
 
     protected int maxHealth;
     protected SpellEffects spellfx;
@@ -15,10 +15,17 @@ public abstract class Character {
     protected MageMatch mm;
     protected int playerID;
 
-    public Character() {} //?
+    public Character(MageMatch mm) {
+        this.mm = mm;
+    } //?
 
     public virtual void InitEvents() {
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+    }
+
+    public void InitSpells() {
+        foreach (Spell sp in spells)
+            sp.Init(mm);
     }
 
     public void OnPlayerHealthChange(int id, int amount, bool dealt) {
@@ -72,7 +79,7 @@ public abstract class Character {
     public static Character Load(MageMatch mm, int id) {
         switch (mm.uiCont.GetLoadoutNum(id)) {
             case 0:
-                return new CharTest();
+                return new CharTest(mm);
             case 1:
                 return new Enfuego(mm, id, 1);
             case 2:
@@ -93,7 +100,7 @@ public abstract class Character {
 }
 
 public class CharTest : Character {
-    public CharTest() {
+    public CharTest(MageMatch mm) : base(mm) {
         spellfx = mm.spellfx;
         spells = new Spell[4];
 
@@ -107,5 +114,6 @@ public class CharTest : Character {
         spells[1] = new Spell(1, "Massive damage", "FFA", 1, spellfx.Deal496Dmg);
         spells[2] = new Spell(2, "Stone Test", "FAF", 1, spellfx.StoneTest);
         spells[3] = new Spell(3, "Massive damage", "AFA", 1, spellfx.Deal496Dmg);
+        InitSpells();
     }
 }

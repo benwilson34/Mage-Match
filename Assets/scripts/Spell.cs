@@ -6,42 +6,34 @@ public class Spell {
 	public string name;
 	public int APcost;
     public int index;
-    public bool core;
-    public string effectTag = "";
 
-	private TileSeq seq;
-	private TileSeq boardSeq;
-    private int cooldown;
+    protected MageMatch mm;
+	protected TileSeq seq;
+	protected TileSeq boardSeq;
 
 	public delegate IEnumerator MySpellEffect();
-	private MySpellEffect effect;
+	protected MySpellEffect effect;
 	
-	public Spell(int index, string name, string seq, int APcost, MySpellEffect effect) : this(index, name, 0, APcost, effect){
+	public Spell(int index, string name, string seq, int APcost, MySpellEffect effect) 
+        : this(index, name, APcost, effect) {
         this.seq = new TileSeq (seq);
-        core = false;
-        //Debug.Log(">>>>>>>>SPELL: Normal constructor called. core=" + core);
+        //this.boardSeq = new TileSeq(); // empty seq...be wary of errors...
     }
 
-    public Spell(int index, string name, int cooldown, int APcost, MySpellEffect effect) { // core spell
+    public Spell(int index, string name, int APcost, MySpellEffect effect) {
+        //MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
         this.index = index;
-		this.name = name;
-        this.cooldown = cooldown;
-		this.APcost = APcost;
-		this.effect = effect;
-        this.seq = new TileSeq(); // empty seq...be wary of errors...
-        this.boardSeq = new TileSeq(); // empty seq...be wary of errors...
-        core = true;
-        //Debug.Log(">>>>>>>>SPELL: Core constructor called. core="+core);
+        this.name = name;
+        this.APcost = APcost;
+        this.effect = effect;
     }
 
-	public IEnumerator Cast(){
-        if (core) {
-            MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
-            TurnEffect te = new TurnEffect(cooldown, null, null, null);
-            te.priority = 1; //?
-            effectTag = mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 5) + "-C");
-        }
-		return effect ();
+    public void Init(MageMatch mm) {
+        this.mm = mm;
+    }
+
+    public virtual IEnumerator Cast(){
+		return effect (); //yield??
 	}
 
 	public Tile.Element GetElementAt(int index){
@@ -60,4 +52,51 @@ public class Spell {
 		return boardSeq;
 	}
 
+}
+
+
+
+public class CoreSpell : Spell {
+
+    public string effectTag = "";
+
+    private int cooldown;
+
+    public CoreSpell(int index, string name, int cooldown, int APcost, MySpellEffect effect) : base(index, name, APcost, effect) { // core spell
+        this.cooldown = cooldown;
+        this.seq = new TileSeq(); // empty seq...be wary of errors...
+        this.boardSeq = new TileSeq(); // empty seq...be wary of errors...
+        //if(mm == null)
+        //    Debug.Log(">>>>>>>>SPELL: Core constructor called, but MM is null!");
+    }
+
+    public override IEnumerator Cast() {
+        TurnEffect te = new TurnEffect(cooldown, null, null, null);
+        te.priority = 1; //?
+        effectTag = mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 5) + "-C");
+
+        return effect(); // yield??
+    }
+
+    // TODO maybe override boardSeq stuff since it's not needed?
+
+    public bool IsReadyToCast() {
+        return mm.effectCont.GetTurnEffect(effectTag) == null;
+    }
+}
+
+
+
+public class SignatureSpell : Spell {
+
+    public int meterCost;
+
+    public SignatureSpell(int index, string name, string seq, int APcost, int meterCost, MySpellEffect effect) : base(index, name, seq, APcost, effect) {
+        this.meterCost = meterCost;
+    }
+
+    public bool IsReadyToCast() {
+        Debug.Log("SIGSPELL: Checking " + mm.ActiveP().name + "'s sig spell.");
+        return mm.ActiveP().character.meter >= meterCost;
+    }
 }

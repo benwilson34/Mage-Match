@@ -7,9 +7,9 @@ public class Gravekeeper : Character {
     private HexGrid hexGrid; // eventually these will be static again?
     private Targeting targeting; // ''
 
-    public Gravekeeper(MageMatch mm, int id, int loadout) {
+    public Gravekeeper(MageMatch mm, int id, int loadout) : base(mm) {
         playerID = id;
-        this.mm = mm;
+        //this.mm = mm; //?
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
         spellfx = mm.spellfx;
@@ -19,6 +19,7 @@ public class Gravekeeper : Character {
             GravekeeperA();
         else
             GravekeeperB();
+        InitSpells();
     }
 
     // FOCUS
@@ -28,12 +29,13 @@ public class Gravekeeper : Character {
 
         SetDeckElements(0, 20, 40, 0, 40);
 
-        spells[0] = new Spell(0, "Target Zombie", "EM", 1, ZombifySpell);
+        spells[0] = new SignatureSpell(0, "Target Zombie", "EM", 1, 20, ZombifySpell);
         spells[1] = new Spell(1, "Zombie Synergy", "MEE", 1, ZombieSynergy);
         spells[2] = new Spell(2, "Human Resources", "MEME", 1, HumanResources);
-        spells[3] = new Spell(3, "Gather the Ghouls~", 3, 1, GatherTheGhouls);
+        spells[3] = new CoreSpell(3, "Gather the Ghouls~", 3, 1, GatherTheGhouls);
     }
 
+    // Needs work, ignore for now
     void GravekeeperB() { // The Gravekeeper B - Party in the Back
         loadoutName = "Party in the Back";
         maxHealth = 1050;
@@ -121,12 +123,12 @@ public class Gravekeeper : Character {
             }
         }
 
-        yield return mm.syncManager.SyncRand(playerID, Random.Range(1, 4));
-        int count = mm.syncManager.rand;
+        int count = Mathf.Min(tbs.Count, 3);
 
         for (int i = 0; i < count; i++) {
-            yield return mm.syncManager.SyncRand(playerID, Random.Range(1, tbs.Count));
-            int rand = mm.syncManager.rand;
+            // TODO sync array, not in loop...maybe
+            yield return mm.syncManager.SyncRand(playerID, Random.Range(0, tbs.Count));
+            int rand = mm.syncManager.GetRand();
             spellfx.Ench_SetZombify(playerID, tbs[rand], false);
             tbs.RemoveAt(rand);
         }

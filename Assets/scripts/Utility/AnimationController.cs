@@ -107,6 +107,21 @@ public class AnimationController : MonoBehaviour {
         //yield return null; //?
     }
 
+    public IEnumerator _Burning_Turn(Player p, TileBehav tb) {
+        GameObject fireballPF = (GameObject)Resources.Load("prefabs/anim/fireball"); // field
+        GameObject fb = Instantiate(fireballPF, tb.transform);
+
+        Vector3 dmgSpot = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(p.id).position);
+        Tween t = fb.transform.DOMove(dmgSpot, .4f);
+        t.SetEase(Ease.InQuart);
+        yield return t.WaitForCompletion();
+
+        //t = fb.GetComponent<SpriteRenderer>().DOColor(new Color(1, 0, 0, 0), .05f);
+        //yield return t.WaitForCompletion();
+        Destroy(fb);
+        Debug.Log("ANIMCONT: Done animating Burning_Turn.");
+    }
+
     Vector3 zomb_origPos;
 
     public IEnumerator _Zombify_Attack(Transform zomb, Transform target) {

@@ -92,8 +92,9 @@ public class SpellEffects {
 		mm.effectCont.AddEndTurnEffect(ench, "burn");
 	}
 	IEnumerator Ench_Burning_TEffect(int id, TileBehav tb){
+        yield return mm.animCont._Burning_Turn(mm.GetOpponent(id), tb);
 		mm.GetPlayer(id).DealDamage (3);
-        yield return null; // for now
+        //yield return null; // for now
     }
 	IEnumerator Ench_Burning_End(int id, TileBehav tb){
 		mm.GetPlayer(id).DealDamage (6);
@@ -158,7 +159,7 @@ public class SpellEffects {
 
         int rand = Random.Range(0, tbs.Count);
         yield return mm.syncManager.SyncRand(id, rand);
-        TileBehav selectTB = tbs[mm.syncManager.rand];
+        TileBehav selectTB = tbs[mm.syncManager.GetRand()];
         Debug.Log("GRAVEKEEPER: Zombify attacking TB at " + selectTB.PrintCoord());
 
         //mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);

@@ -7,9 +7,9 @@ public class Enfuego : Character {
     private HexGrid hexGrid; // eventually these will be static again?
     private Targeting targeting; // ''
 
-    public Enfuego(MageMatch mm, int id, int loadout) {
+    public Enfuego(MageMatch mm, int id, int loadout) : base(mm) {
         playerID = id;
-        this.mm = mm;
+        //this.mm = mm; //?
         spellfx = mm.spellfx;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
@@ -20,6 +20,7 @@ public class Enfuego : Character {
             EnfuegoA();
         else
             EnfuegoB();
+        InitSpells();
     }
 
     void EnfuegoA() { // Enfuego A - Supah Hot Fire
@@ -28,10 +29,10 @@ public class Enfuego : Character {
 
         SetDeckElements(50, 0, 0, 20, 30);
 
-        spells[0] = new Spell(0, "White-Hot Combo Kick", "MFFM", 1, WhiteHotComboKick);
+        spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
         spells[1] = new Spell(1, "¡Baile!", "FM", 1, Baile);
         spells[2] = new Spell(2, "Incinerate", "FAF", 1, Incinerate);
-        spells[3] = new Spell(3, "Fiery Fandango", 3, 1, FieryFandango);
+        spells[3] = new CoreSpell(3, "Fiery Fandango", 3, 1, FieryFandango);
     }
 
     // FOCUS
@@ -41,10 +42,10 @@ public class Enfuego : Character {
 
         SetDeckElements(50, 0, 15, 0, 35);
 
-        spells[0] = new Spell(0, "White-Hot Combo Kick", "MFFM", 1, WhiteHotComboKick);
+        spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
         spells[1] = new Spell(1, "Hot Body", "MEF", 1, HotBody);
         spells[2] = new Spell(2, "Backburner", "MF", 1, Backburner);
-        spells[3] = new Spell(3, "Fiery Fandango", 3, 1, FieryFandango);
+        spells[3] = new CoreSpell(3, "Fiery Fandango", 3, 1, FieryFandango);
     }
 
     // ----- spells -----
@@ -97,7 +98,7 @@ public class Enfuego : Character {
                     Debug.Log("ENFUEGO: WHCK count=" + burns);
                     int rand = Random.Range(0, ctbs.Count);
                     yield return mm.syncManager.SyncRand(playerID, rand);
-                    TileBehav ctb = ctbs[mm.syncManager.rand];
+                    TileBehav ctb = ctbs[mm.syncManager.GetRand()];
                     Debug.Log("ENFUEGO: Setting Burning to " + ctb.PrintCoord());
                     spellfx.Ench_SetBurning(playerID, ctb);
                 }
@@ -125,8 +126,9 @@ public class Enfuego : Character {
     }
 
     public IEnumerator Backburner() {
-        yield return mm.syncManager.SyncRand(playerID, Random.Range(15, 26), "dmg");
-        mm.GetPlayer(playerID).DealDamage(mm.syncManager.rand);
+        yield return mm.syncManager.SyncRand(playerID, Random.Range(15, 26));
+        int dmg = mm.syncManager.GetRand();
+        mm.GetPlayer(playerID).DealDamage(dmg);
 
         mm.effectCont.AddMatchEffect(new MatchEffect(1, 1, Backburner_Match, null), "backb");
         yield return null;
@@ -146,7 +148,7 @@ public class Enfuego : Character {
     IEnumerator HotBody_Swap(int id, int c1, int r1, int c2, int r2) {
         int rand = Random.Range(10, 16); // 10-15 dmg
         yield return mm.syncManager.SyncRand(id, rand);
-        mm.GetPlayer(id).DealDamage(mm.syncManager.rand);
+        mm.GetPlayer(id).DealDamage(mm.syncManager.GetRand());
 
         List<TileBehav> tbs = hexGrid.GetPlacedTiles();
         for (int i = 0; i < tbs.Count; i++) {
@@ -160,7 +162,7 @@ public class Enfuego : Character {
 
         rand = Random.Range(0, tbs.Count);
         yield return mm.syncManager.SyncRand(id, rand);
-        TileBehav tbSelect = tbs[mm.syncManager.rand];
+        TileBehav tbSelect = tbs[mm.syncManager.GetRand()];
 
         Debug.Log("ENFUEGO: About to apply burning to the tb at " + tbSelect.PrintCoord());
         yield return mm.animCont._Burning(tbSelect);

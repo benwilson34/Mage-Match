@@ -79,7 +79,8 @@ public class UIController : MonoBehaviour {
         FlipGradient(); // ugly
         UpdateAPText(mm.GetPlayer(id));
 
-        ChangePinfoColor(id, new Color(0, 1, 0, .4f));
+        //ChangePinfoColor(id, new Color(0, 1, 0, .4f));
+        PinfoColorTween(id, CorrectPinfoColor(id));
         UpdateEffTexts();
         yield return null;
     }
@@ -108,6 +109,7 @@ public class UIController : MonoBehaviour {
 
     public void OnPlayerHealthChange(int id, int amount, bool dealt) {
         StartCoroutine(UpdateHealthbar(mm.GetPlayer(id)));
+        StartCoroutine(DamageAnim(mm.GetPlayer(id), amount));
     }
 
     public void OnPlayerMeterChange(int id, int amount) {
@@ -183,28 +185,35 @@ public class UIController : MonoBehaviour {
         slidingText.rectTransform.position = slidingTextStart;
     }
 
-    Transform GetPinfo(int id) {
+    public Transform GetPinfo(int id) {
         if (id == 1)
             return p1info;
         else
             return p2info;
     }
 
-    public void ChangePinfoColor(int id, Color c) {
+    void ChangePinfoColor(int id, Color c) {
         GetPinfo(id).GetComponent<Image>().color = c; // idk why
     }
 
-    public void UpdateAPText(Player p) {
+    Tween PinfoColorTween(int id, Color newColor) {
+        Transform pinfo = GetPinfo(id);
+        return pinfo.GetComponent<Image>().DOColor(newColor, 0.25f)
+            .SetEase(Ease.InOutQuad).SetLoops(5, LoopType.Yoyo);
+    } 
+
+    void UpdateAPText(Player p) {
         Text APText = GetPinfo(p.id).Find ("Text_AP").GetComponent<Text>();
 		APText.text = "AP left: " + p.AP;
     }
 
     IEnumerator UpdateHealthbar(Player p) {
-        Transform healthOutline = GetPinfo(p.id).Find("Health_Outline");
+        Transform pinfo = GetPinfo(p.id);
+        Transform healthOutline = pinfo.Find("Health_Outline");
         RectTransform healthbar = healthOutline.Find("Healthbar").GetComponent<RectTransform>();
         Text healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
 
-        Tween tween = TextNumTween(healthText, p.health, p.character.GetMaxHealth());
+        Tween textTween = TextNumTween(healthText, p.health, p.character.GetMaxHealth());
 
         float slideRatio = (float)p.health / p.character.GetMaxHealth();
 
@@ -229,6 +238,24 @@ public class UIController : MonoBehaviour {
         yield return meter.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
     }
 
+    IEnumerator DamageAnim(Player p, int amount) {
+        if (amount < 0) { // damage
+            Image pinfoImg = GetPinfo(p.id).GetComponent<Image>();
+            pinfoImg.color = new Color(1, 0, 0, 0.4f); // red
+            Color pColor = CorrectPinfoColor(p.id);
+            yield return new WaitForSeconds(.2f);
+            Tween pinfoTween = pinfoImg.DOColor(pColor, .3f).SetEase(Ease.OutQuad);
+            yield return null;
+        }
+    }
+
+    Color CorrectPinfoColor(int id) {
+        if (id == mm.ActiveP().id && mm.currentState != MageMatch.GameState.CommishTurn) {
+            return new Color(0, 1, 0, 0.4f);
+        } else
+            return new Color(1, 1, 1, 0.4f);
+    }
+
     Tween TextNumTween(Text t, int newValue, int maxValue) {
         int oldValue = int.Parse(t.text.Split('/')[0]);
         return DOTween.To(() => oldValue,
@@ -237,7 +264,7 @@ public class UIController : MonoBehaviour {
             .SetEase(Ease.OutCubic);
     }
 
-	public void ShowLoadout(Player player){
+	void ShowLoadout(Player player){
 		Transform pload;
         if (player.id == 1)
             pload = p1load;
@@ -285,7 +312,7 @@ public class UIController : MonoBehaviour {
 		}
 	}
 
-    public void FlipGradient() {
+    void FlipGradient() {
         //		Vector3 scale = go.transform.localScale;
         //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
         gradient.transform.Rotate(0, 0, 180);

@@ -83,8 +83,8 @@ public class Player {
                 }
 
                 //Debug.Log("PLAYER: Player "+id+" about to sync dmg=" + dmg);
-                yield return mm.syncManager.SyncRand(id, dmg, "dmg");
-                DealDamage(mm.syncManager.rand); // do the actual damage
+                yield return mm.syncManager.SyncRand(id, dmg);
+                DealDamage(mm.syncManager.GetRand()); // do the actual damage
             }
         }
     }
@@ -245,9 +245,14 @@ public class Player {
         currentSpell = character.GetSpell(index);
     }
 
-    public void ApplyAPCost() {
+    public void ApplySpellCosts() {
         Debug.Log("PLAYER: Applying AP cost...which is " + currentSpell.APcost);
         AP -= currentSpell.APcost;
+        if (currentSpell is SignatureSpell) {
+            int meter = ((SignatureSpell)currentSpell).meterCost;
+            Debug.Log("PLAYER: Applying meter cost...which is " + meter);
+            character.ChangeMeter(-meter);
+        }
         mm.eventCont.GameAction(false);
     }
 

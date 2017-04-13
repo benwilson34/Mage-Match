@@ -90,7 +90,6 @@ public class EffectController {
         return e.tag;
     }
 
-    // TODO not the right way to do this
     public void RemoveTurnEffect(Effect e) {
         List<Effect> list;
         if (e.tag.Substring(0, 4) == "begt")
@@ -107,7 +106,7 @@ public class EffectController {
                 return;
             }
         }
-        Debug.LogError("EFFECT-CONT: Missed the remove!");
+        Debug.LogError("EFFECT-CONT: Missed the remove! tag="+ e.tag);
     }
 
     // TODO generalize

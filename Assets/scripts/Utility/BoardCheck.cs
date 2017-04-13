@@ -71,9 +71,9 @@ public class BoardCheck {
                 counts[i] = hexGrid.TopOfColumn(i) - CheckColumn(i) + 1;
             else
                 counts[i] = 0;
-            Debug.Log("HEXGRID: counts[" + i + "] = " + counts[i]);
+            //Debug.Log("HEXGRID: counts[" + i + "] = " + counts[i]);
         }
-        Debug.Log("HEXGRID: counts total = " + counts[7]);
+        //Debug.Log("HEXGRID: counts total = " + counts[7]);
         return counts;
     }
 

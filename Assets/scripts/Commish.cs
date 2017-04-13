@@ -50,37 +50,6 @@ public class Commish  {
 	}
 
 	IEnumerator PlaceTiles(){
-		//int tries = 20;
-		//float[] counts = mm.boardCheck.EmptyCheck ();
-        //int[] counts = mm.boardCheck.EmptyCount();
-
-        //bool finalSuccess = false;
-		//GameObject go = mm.GenerateTile (GetTileElement());
-
-        // TODO better randomization & sync rand instead of this complicated syncing
-        //for (int i = 0; i < numTiles && tries > 0; i++) {
-        //	if (tries == 20 && i != 0) {
-        //		yield return new WaitForSeconds (.15f);
-        //		go = mm.GenerateTile (GetTileElement ());
-        //	}
-
-        //	int col = GetSemiRandomCol (ratios);
-        //	if (!mm.DropTile (col, go, .15f)) { // if col is full
-        //		i--;
-        //		tries--;
-        //	} else {
-        //		go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-        //		tries = 20;
-        //              if (i == numTiles - 1)
-        //                  finalSuccess = true;
-        //          }
-
-        //          if (finalSuccess) {
-        //              yield return new WaitUntil(() => !mm.IsBoardChecking());
-        //              finalSuccess = false;
-        //          }
-        //}
-
         Debug.Log ("COMMISH: Starting turn...");
 
         int prevCount = 0;
@@ -90,11 +59,11 @@ public class Commish  {
             if (cols.Count == 0) {
                 cols = GetRandomCols(numTiles - prevCount); // can be i?
                 yield return mm.syncManager.SyncRands(mm.ActiveP().id, cols.ToArray());
-                cols = new Queue<int>( mm.syncManager.GetRands(numTiles - prevCount) );
+                cols = new Queue<int>( mm.syncManager.GetRands(cols.Count) );
 
-                int[] rands = GetRandomInts(numTiles - prevCount);
+                int[] rands = GetRandomInts(cols.Count);
                 yield return mm.syncManager.SyncRands(mm.ActiveP().id, rands);
-                elems = GetRandomElems( mm.syncManager.GetRands(numTiles - prevCount) );
+                elems = GetRandomElems( mm.syncManager.GetRands(rands.Length) );
                 prevCount = numTiles;
             }
             if (cols.Peek() == -1) {
@@ -120,12 +89,6 @@ public class Commish  {
             }
         }
 
-  //      if (tries == 0) {
-  //          Debug.Log ("COMMISH: The board is full. The Commissioner ends his turn early.");
-		//	GameObject.Destroy (go);
-		//}
-
-        // TODO timing???
 	    Debug.Log ("COMMISH: CommishTurnDone.");
         mm.eventCont.CommishTurnDone();
 	}

@@ -8,7 +8,7 @@ public class Rocky : Character {
     private HexGrid hexGrid;
     private Targeting targeting;
 
-    public Rocky(MageMatch mm, int id, int loadout) {
+    public Rocky(MageMatch mm, int id, int loadout) : base(mm) {
         playerID = id;
         this.mm = mm;
         hexGrid = mm.hexGrid;
@@ -21,6 +21,7 @@ public class Rocky : Character {
             RockyA();
         else
             RockyB();
+        InitSpells();
     }
 
     // TODO
