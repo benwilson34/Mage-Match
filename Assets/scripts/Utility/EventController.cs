@@ -238,8 +238,8 @@ public class EventController {
 
     public delegate void GrabTileEvent(int id, Tile.Element elem);
     public event GrabTileEvent grabTile;
-    public void GrabTile(Tile.Element elem) {
+    public void GrabTile(int id, Tile.Element elem) {
         if (grabTile != null)
-            grabTile.Invoke(mm.ActiveP().id, elem);
+            grabTile.Invoke(id, elem);
     }
 }

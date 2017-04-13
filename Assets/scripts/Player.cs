@@ -249,9 +249,9 @@ public class Player {
         Debug.Log("PLAYER: Applying AP cost...which is " + currentSpell.APcost);
         AP -= currentSpell.APcost;
         if (currentSpell is SignatureSpell) {
-            int meter = ((SignatureSpell)currentSpell).meterCost;
-            Debug.Log("PLAYER: Applying meter cost...which is " + meter);
-            character.ChangeMeter(-meter);
+            int meterCost = ((SignatureSpell)currentSpell).meterCost;
+            Debug.Log("PLAYER: Applying meter cost...which is " + meterCost);
+            character.ChangeMeter(-meterCost);
         }
         mm.eventCont.GameAction(false);
     }
@@ -260,6 +260,7 @@ public class Player {
         return currentSpell.GetBoardSeq();
     }
 
+    // buff/debuff stuff could be a switch if it's too unwieldy
     public void ChangeBuff_DmgMult(float d) {
         Debug.Log("PLAYER: " + name + " had dmg multiply buff changed to " + d);
         buff_dmgMult = d;

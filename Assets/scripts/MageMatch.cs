@@ -392,6 +392,8 @@ public class MageMatch : MonoBehaviour {
         performingAction = false;
     }
 
+    public bool IsPerformingAction() { return performingAction; }
+
     #endregion
 
 

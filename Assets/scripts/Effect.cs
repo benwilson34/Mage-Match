@@ -21,6 +21,8 @@ public abstract class Effect {
     //public void SetPriority(int p) { priority = p; }
 }
 
+
+
 public class TurnEffect : Effect {
 
     private MyEffect turnEffect, endEffect, cancelEffect;
@@ -59,6 +61,8 @@ public class TurnEffect : Effect {
             cancelEffect(playerID);
     }
 }
+
+
 
 public class Enchantment : Effect {
 
@@ -157,13 +161,15 @@ public class Enchantment : Effect {
 
 }
 
+
+
 public class MatchEffect : Effect {
 
     // own delegate? if more params are needed
     private MyEffect matchEffect, endEffect; // needs endEffect?
-    public int countLeft = 0; // -1?
+    public int countLeft = -1;
 
-    public MatchEffect(int turns, int count, MyEffect matchEffect, MyEffect endEffect) {
+    public MatchEffect(int turns, MyEffect matchEffect, MyEffect endEffect, int count = -1) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = mm.ActiveP().id; // is this ok? pass in?
         turnsLeft = turns;
@@ -173,8 +179,10 @@ public class MatchEffect : Effect {
     }
 
     public override IEnumerator TriggerEffect() {
-        if (matchEffect != null)
+        if (matchEffect != null) {
             yield return matchEffect(playerID);
+            countLeft--;
+        }
         yield return null;
     }
 
@@ -193,13 +201,15 @@ public class MatchEffect : Effect {
     public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
 }
 
+
+
 public class SwapEffect : Effect {
 
     public delegate IEnumerator MySwapEffect(int id, int c1, int r1, int c2, int r2);
     private MySwapEffect swapEffect, endEffect;
     public int countLeft = -1;
 
-    public SwapEffect(int turns, int count, MySwapEffect swapEffect, MySwapEffect endEffect) {
+    public SwapEffect(int turns, MySwapEffect swapEffect, MySwapEffect endEffect, int count = -1) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = mm.ActiveP().id;
         turnsLeft = turns;

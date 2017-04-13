@@ -62,6 +62,7 @@ public class SpellEffects {
 
     // -------------------------------- ENCHANTMENTS --------------------------------------
 
+    // TODO IEnum types for animation
 
 	public void Ench_SetCherrybomb(int id, TileBehav tb){
 		Enchantment ench = new Enchantment (id, null, null, Ench_Cherrybomb_Remove);

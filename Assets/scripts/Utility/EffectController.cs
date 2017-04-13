@@ -266,7 +266,7 @@ public class EffectController {
     #endregion
 
 
-    public bool isResolving() { return effectsResolving > 0; }
+    public bool IsResolving() { return effectsResolving > 0; }
 
     public object[] GetLists() {
         return new object[4] {

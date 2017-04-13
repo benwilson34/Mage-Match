@@ -26,42 +26,22 @@ public class InputController : MonoBehaviour {
         uiCont = mm.uiCont;
     }
 
-	void Update(){ // polling input...change to events?
-        if (mm.MyTurn() && !mm.eventCont.handlingEvents) { //?
-            if (Input.GetMouseButton(0)) { // if left mouse is down
-                if (targeting.currentTMode == Targeting.TargetMode.Drag) {
-                    //				HandleDrag ();
-                } else
-                    HandleMouse();
-                nowClick = true; // move up?
-            } else if (Input.GetMouseButtonUp(0)) { // if left mouse was JUST released
-                nowClick = false;
+	void Update(){ // polling input...change to events if too much overhead
+        if (Input.GetMouseButton(0)) { // if left mouse is down
+            if (targeting.currentTMode == Targeting.TargetMode.Drag) {
+                //				HandleDrag ();
+            } else
                 HandleMouse();
-            }
+            nowClick = true; // move up?
+        } else if (Input.GetMouseButtonUp(0)) { // if left mouse was JUST released
+            nowClick = false;
+            HandleMouse();
         }
-	}
-
-	TileBehav GetMouseTile(RaycastHit2D[] hits){
-		foreach (RaycastHit2D hit in hits) {
-			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
-			if (tb != null)
-				return tb;
-		}
-		return null;
-	}
-
-	CellBehav GetMouseCell(RaycastHit2D[] hits){
-		foreach (RaycastHit2D hit in hits) {
-			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
-			if (cb != null)
-				return cb;
-		}
-		return null;
 	}
 
 	void HandleMouse(){
 		if (!lastClick) { // first frame of click i.e. MouseDown
-			if (!GetClick ()) {
+			if (!GetClick ()) { // TODO don't need to do this every frame!!!!!!! except Drag targeting...
 //				nowClick = false;
 				return;
 			}
@@ -75,7 +55,7 @@ public class InputController : MonoBehaviour {
 			}
 			lastClick = true;
 		} else if (lastClick && nowClick) { // MouseDrag
-			if (isClickTB) {
+			if (isClickTB) { 
 				TBMouseDrag(clickTB);
 			} else {
 //				CBMouseDrag(clickCB);
@@ -112,8 +92,28 @@ public class InputController : MonoBehaviour {
 		return false;
 	}
 
-	void TBMouseDown(TileBehav tb){
-		if (!mm.IsEnded () && !mm.IsCommishTurn()) { // if the game isn't done
+	TileBehav GetMouseTile(RaycastHit2D[] hits){
+		foreach (RaycastHit2D hit in hits) {
+			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
+			if (tb != null)
+				return tb;
+		}
+		return null;
+	}
+
+	CellBehav GetMouseCell(RaycastHit2D[] hits){
+		foreach (RaycastHit2D hit in hits) {
+			CellBehav cb = hit.collider.GetComponent<CellBehav> ();
+			if (cb != null)
+				return cb;
+		}
+		return null;
+	}
+
+    // ------------------------------- TB & CB handling -------------------------------
+
+    void TBMouseDown(TileBehav tb){
+		if (!mm.IsEnded ()) { // if the game isn't done
 			//if (!mm.menu) { // if the menu isn't open
                 switch (tb.currentState) {
                     case TileBehav.TileState.Hand:
@@ -121,14 +121,12 @@ public class InputController : MonoBehaviour {
                             dropping = true;
                             parentT = tb.transform.parent;
                             tb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
-                            // TODO
-                            //tb.gameObject.layer = LayerMask.NameToLayer ("Ignore Raycast");
 
                             dropTile = tb.gameObject;
-                            mm.eventCont.GrabTile(tb.tile.element);
-                            
+                            mm.eventCont.GrabTile(mm.myID, tb.tile.element);
                         }
                         break;
+
                     case TileBehav.TileState.Placed:
 //					    Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
                         if (targeting.IsTargetMode()
@@ -143,6 +141,7 @@ public class InputController : MonoBehaviour {
                             dragged = true;
                         }
                         break;
+
                 }
 			//} else { // menu mode
                 //uiCont.GetClickEffect(tb); //?
@@ -152,7 +151,7 @@ public class InputController : MonoBehaviour {
 
 	void TBMouseDrag(TileBehav tb){
 //		Debug.Log ("TBMouseDrag called.");
-		if (!mm.IsEnded () && !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
+		if (!mm.IsEnded () && !targeting.IsTargetMode()) {
 			switch (tb.currentState) {
 			    case TileBehav.TileState.Hand:
                     if (!mm.menu && dropping) {
@@ -162,29 +161,27 @@ public class InputController : MonoBehaviour {
                     }
 				    break;
 			    case TileBehav.TileState.Placed:
-				    SwapCheck (tb);
+                    if (!ActionNotAllowed())
+				        SwapCheck (tb);
 				    break;
 			}
 		}
 	}
 
 	void TBMouseUp(TileBehav tb){
-//		Debug.Log ("TBMouseUp called.");
-		if (!mm.IsEnded () && !mm.IsCommishTurn() && !targeting.IsTargetMode()) {
-            if (!mm.menu) {
+        if (!mm.IsEnded () && !targeting.IsTargetMode()) {
+            if (!mm.menu) { //?
                 switch (tb.currentState) {
                     case TileBehav.TileState.Hand:
-                        if (dropping) {
+                        if (dropping) { // will always be if it's in the hand?
                             Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                             RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
+                            CellBehav cb = GetMouseCell(hits); // get cell underneath
 
-                            CellBehav cb = GetMouseCell(hits);
-                            if (cb != null) {
-                                mm.DropTile(cb.col, dropTile);
-                            } else {
+                            if (ActionNotAllowed() || cb == null || !mm.DropTile(cb.col, dropTile)) {
                                 tb.transform.SetParent(parentT);
                                 parentT = null;
-                                mm.ActiveP().AlignHand(.12f, false);
+                                mm.GetPlayer(mm.myID).AlignHand(.12f, false);
                             }
                             dropping = false;
                         }
@@ -229,6 +226,10 @@ public class InputController : MonoBehaviour {
 			}
 		}
 	}
+
+    bool ActionNotAllowed() {
+        return !mm.MyTurn() || mm.IsCommishTurn() || mm.IsPerformingAction(); // add IsEnded?
+    }
 
 	void CBMouseDown(CellBehav cb){
 //		Debug.Log ("OnMouseDown hit on column " + cb.col);
