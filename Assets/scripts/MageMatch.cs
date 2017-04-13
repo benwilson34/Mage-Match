@@ -33,8 +33,7 @@ public class MageMatch : MonoBehaviour {
     private GameObject stonePF, emberPF, zombiePF, prereqPF, targetPF; // token prefabs
     private Player p1, p2, activep;
     private bool endGame = false;     // is either player dead?
-    private bool checking = false, performingAction = false, resolvingMatch = false;
-    private int removing = 0;
+    private int checking = 0, removing = 0, actionsPerforming = 0, matchesResolving = 0;
 
     void Start() {
         Random.InitState(1337420);
@@ -137,7 +136,7 @@ public class MageMatch : MonoBehaviour {
 
     #region EventCont calls
     public void OnBoardAction() {
-        if (!checking) {
+        if (checking == 0) { //?
             StartCoroutine(BoardChecking());
         }
     }
@@ -184,15 +183,15 @@ public class MageMatch : MonoBehaviour {
     #endregion
 
     IEnumerator TurnSystem() {
-        yield return new WaitUntil(() => !performingAction && removing == 0); //?
+        yield return new WaitUntil(() => actionsPerforming == 0 && removing == 0); //?
         timer.Pause();
-        yield return new WaitUntil(() => !checking);
+        yield return new WaitUntil(() => checking == 0); //?
         Debug.Log("   ---------- TURNSYSTEM START ----------");
 
         yield return eventCont.TurnEnd();
 
         //BoardChanged(); // why doesn't this happen when resolving turn effects?
-        yield return new WaitUntil(() => !checking); // waiting should be part of event above...
+        //yield return new WaitUntil(() => checking == 0); // waiting should be part of event above...
         uiCont.DeactivateAllSpellButtons(activep);
         uiCont.SetDrawButton(activep, false);
 
@@ -213,7 +212,7 @@ public class MageMatch : MonoBehaviour {
     }
 
     public IEnumerator BoardChecking() {
-        checking = true; // prevents overcalling/retriggering
+        checking++; // prevents overcalling/retriggering
         yield return new WaitUntil(() => removing == 0); //?
         Debug.Log("MAGEMATCH: About to check the board.");
 
@@ -238,7 +237,7 @@ public class MageMatch : MonoBehaviour {
             }
         }
         Debug.Log("MAGEMATCH: Done checking.");
-        checking = false;
+        checking--;
     }
 
     void SpellCheck() { 
@@ -282,7 +281,7 @@ public class MageMatch : MonoBehaviour {
     }
 
     IEnumerator ResolveMatches(List<TileSeq> seqList) {
-        resolvingMatch = true;
+        matchesResolving++;
         Debug.Log("   ---------- MATCH BEGIN ----------");
         Debug.Log("MAGEMATCH: At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
         if (currentState != GameState.CommishTurn) {
@@ -297,7 +296,7 @@ public class MageMatch : MonoBehaviour {
 
         yield return BoardChecking();
         Debug.Log("   ---------- MATCH END ----------");
-        resolvingMatch = false;
+        matchesResolving--;
     }
 
 
@@ -334,7 +333,7 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator Drop(int col, GameObject go) {
         Debug.Log("   ---------- DROP BEGIN ----------");
-        performingAction = true; //?
+        actionsPerforming++;
         TileBehav tb = go.GetComponent<TileBehav>();
         tb.SetPlaced();
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
@@ -344,7 +343,7 @@ public class MageMatch : MonoBehaviour {
             eventCont.CommishDrop(tb.tile.element, col);
 
         Debug.Log("   ---------- DROP END ----------");
-        performingAction = false;
+        actionsPerforming--;
         yield return null;
     }
 
@@ -354,19 +353,19 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator _SwapTiles(int c1, int r1, int c2, int r2) {
         Debug.Log("   ---------- SWAP BEGIN ----------");
-        performingAction = true;
+        actionsPerforming++;
         if (!IsCommishTurn()) { // eventually, when InputCont gets some love
             if (hexGrid.Swap(c1, r1, c2, r2)) { // I feel like this check should be in InputCont
                 yield return eventCont.Swap(c1, r1, c2, r2); 
             }
         }
         Debug.Log("   ---------- SWAP END ----------");
-        performingAction = false;
+        actionsPerforming--;
     }
 
     public IEnumerator CastSpell(int spellNum) {
         Debug.Log("   ---------- CAST SPELL BEGIN ----------");
-        performingAction = true;
+        actionsPerforming++;
         syncManager.SendSpellCast(spellNum);
 
         Player p = activep;
@@ -389,10 +388,10 @@ public class MageMatch : MonoBehaviour {
             uiCont.UpdateMoveText("Not enough AP to cast!");
         }
         Debug.Log("   ---------- CAST SPELL END ----------");
-        performingAction = false;
+        actionsPerforming--;
     }
 
-    public bool IsPerformingAction() { return performingAction; }
+    public bool IsPerformingAction() { return actionsPerforming > 0; }
 
     #endregion
 
@@ -584,7 +583,4 @@ public class MageMatch : MonoBehaviour {
 
     // move to Targeting?
     public bool IsTargetMode() { return currentState == GameState.TargetMode; }
-
-    public bool IsBoardChecking() { return checking; }
-
 }

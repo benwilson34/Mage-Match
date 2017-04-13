@@ -199,7 +199,7 @@ public class UIController : MonoBehaviour {
     Tween PinfoColorTween(int id, Color newColor) {
         Transform pinfo = GetPinfo(id);
         return pinfo.GetComponent<Image>().DOColor(newColor, 0.25f)
-            .SetEase(Ease.InOutQuad).SetLoops(5, LoopType.Yoyo);
+            .SetEase(Ease.InOutQuad).SetLoops(7, LoopType.Yoyo);
     } 
 
     void UpdateAPText(Player p) {
