@@ -196,30 +196,22 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => actionsPerforming == 0 && removing == 0); //?
         yield return new WaitUntil(() => checking == 0); //?
         Debug.Log("   ---------- TURNSYSTEM START ----------");
-
         yield return eventCont.TurnEnd();
 
-        //BoardChanged(); // why doesn't this happen when resolving turn effects?
-        //yield return new WaitUntil(() => checking == 0); // waiting should be part of event above...
         uiCont.DeactivateAllSpellButtons(activep);
         uiCont.SetDrawButton(activep, false);
 
         currentState = GameState.CommishTurn;
         yield return commish.CTurn();
 
-        //yield return new WaitUntil(() => !checking); // needed anymore?
-        Debug.Log("MAGEMATCH: Commish turn done, and the board is at rest.");
-
         currentState = GameState.PlayerTurn;
         activep = InactiveP();
         yield return eventCont.TurnBegin();
         SpellCheck();
-
-        //yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
         timer.InitTimer();
 
-        switchingTurn = false;
         Debug.Log("   ---------- TURNSYSTEM END ----------");
+        switchingTurn = false;
     }
 
     public IEnumerator BoardChecking() {
@@ -388,7 +380,7 @@ public class MageMatch : MonoBehaviour {
 
             yield return spell.Cast();
 
-            if (!targeting.WasCanceled()) {
+            if (!targeting.WasCanceled()) { // should be an event callback?
                 eventCont.SpellCast(spell);
                 RemoveSeq(p.GetCurrentBoardSeq());
                 p.ApplySpellCosts();
@@ -586,12 +578,10 @@ public class MageMatch : MonoBehaviour {
         uiCont.DeactivateAllSpellButtons(p1);
         uiCont.DeactivateAllSpellButtons(p2);
         eventCont.boardAction -= OnBoardAction; //?
+        timer.Pause();
     }
 
     public bool IsEnded() { return endGame; }
 
     public bool IsCommishTurn() { return currentState == GameState.CommishTurn; }
-
-    // move to Targeting?
-    public bool IsTargetMode() { return currentState == GameState.TargetMode; }
 }
