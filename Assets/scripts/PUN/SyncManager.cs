@@ -116,6 +116,19 @@ public class SyncManager : PunBehaviour {
         StartCoroutine(mm.CastSpell(spellNum));
     }
 
+    public void TurnTimeout() {
+        if (mm.MyTurn()) { // not totally necessary...
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleTimeout", PhotonTargets.All);
+        }
+    }
+    [PunRPC]
+    public void HandleTimeout() {
+        mm.TurnTimeout();
+    }
+
+    // --------------- Targeting ----------------
+
     public void SendTBTarget(TileBehav tb) {
         if (mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);

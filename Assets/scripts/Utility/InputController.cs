@@ -228,7 +228,8 @@ public class InputController : MonoBehaviour {
 	}
 
     bool ActionNotAllowed() {
-        return !mm.MyTurn() || mm.IsCommishTurn() || mm.IsPerformingAction(); // add IsEnded?
+        return !mm.MyTurn() || mm.switchingTurn || 
+            mm.IsCommishTurn() || mm.IsPerformingAction(); // add IsEnded?
     }
 
 	void CBMouseDown(CellBehav cb){

@@ -12,7 +12,7 @@ public class MageMatch : MonoBehaviour {
     [HideInInspector]
     public int myID;
     [HideInInspector]
-    public bool commishTurn = false; // maybe make getters/setters?
+    public bool switchingTurn = false;
 
     public GameSettings gameSettings;
     public SyncManager syncManager;
@@ -32,7 +32,7 @@ public class MageMatch : MonoBehaviour {
     private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
     private GameObject stonePF, emberPF, zombiePF, prereqPF, targetPF; // token prefabs
     private Player p1, p2, activep;
-    private bool endGame = false;     // is either player dead?
+    private bool endGame = false;
     private int checking = 0, removing = 0, actionsPerforming = 0, matchesResolving = 0;
 
     void Start() {
@@ -175,16 +175,25 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void OnTimeout(int id) {
-        Player p = GetPlayer(id);
-        Debug.Log("MAGEMATCH:" + p.name + "'s turn just timed out! They had " + p.AP + " AP left.");
-        uiCont.SetDrawButton(activep, false);
-        StartCoroutine(TurnSystem());
+        syncManager.TurnTimeout();
     }
     #endregion
 
+    public void TurnTimeout() {
+        Player p = GetPlayer(activep.id);
+        Debug.Log("MAGEMATCH: " + p.name + "'s turn just timed out! They had " + p.AP + " AP left.");
+        uiCont.SetDrawButton(activep, false);
+        StartCoroutine(TurnSystem());
+    }
+
     IEnumerator TurnSystem() {
-        yield return new WaitUntil(() => actionsPerforming == 0 && removing == 0); //?
+        if (switchingTurn)
+            yield break;
+
+        switchingTurn = true;
         timer.Pause();
+
+        yield return new WaitUntil(() => actionsPerforming == 0 && removing == 0); //?
         yield return new WaitUntil(() => checking == 0); //?
         Debug.Log("   ---------- TURNSYSTEM START ----------");
 
@@ -208,6 +217,8 @@ public class MageMatch : MonoBehaviour {
 
         //yield return new WaitUntil(() => !checking); // fixes Commish match dmg bug...for now...
         timer.InitTimer();
+
+        switchingTurn = false;
         Debug.Log("   ---------- TURNSYSTEM END ----------");
     }
 
