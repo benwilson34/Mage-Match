@@ -131,6 +131,7 @@ public class EventController {
             commishTurnDone.Invoke();
     }
 
+
     #region GameAction events
     public delegate void GameActionEvent(int id, bool costsAP);
     public event GameActionEvent gameAction;
@@ -148,13 +149,13 @@ public class EventController {
             draw.Invoke(id, elem, dealt);
     }
 
-    public delegate IEnumerator DropEvent(int id, Tile.Element elem, int col);
+    public delegate IEnumerator DropEvent(int id, bool playerAction, Tile.Element elem, int col);
     private List<EventPack> drop;
-    public IEnumerator Drop(Tile.Element elem, int col) {
+    public IEnumerator Drop(Tile.Element elem, int col, bool playerAction) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in drop) {
             //Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
-            yield return ((DropEvent)pack.ev)(mm.ActiveP().id, elem, col); // OH YEAH
+            yield return ((DropEvent)pack.ev)(mm.ActiveP().id, playerAction, elem, col); // OHYEAH
         }
         Debug.Log("EVENTCONT: Just finished DROP events...");
         handlingEvents = false; // worth it?

@@ -11822,7 +11822,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.042509366, y: 0.53826666}
   m_AnchorMax: {x: 0.46132845, y: 0.66520023}
-  m_AnchoredPosition: {x: -0.50001, y: 0.40000153}
+  m_AnchoredPosition: {x: -0.5000076, y: 0.40000153}
   m_SizeDelta: {x: 0, y: -1.0999985}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1816010916
@@ -12425,14 +12425,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  menu: 0
   myID: 0
-  commishTurn: 0
+  switchingTurn: 0
   gameSettings: {fileID: 0}
-  uiCont: {fileID: 0}
-  timer: {fileID: 0}
   syncManager: {fileID: 0}
+  timer: {fileID: 0}
   animCont: {fileID: 0}
+  uiCont: {fileID: 0}
 --- !u!82 &1888761541
 AudioSource:
   m_ObjectHideFlags: 0

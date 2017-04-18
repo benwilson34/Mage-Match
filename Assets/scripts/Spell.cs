@@ -71,8 +71,7 @@ public class CoreSpell : Spell {
     }
 
     public override IEnumerator Cast() {
-        TurnEffect te = new TurnEffect(cooldown, null, null, null);
-        te.priority = 1; //?
+        TurnEffect te = new TurnEffect(cooldown, Effect.Type.Cooldown, null, null);
         effectTag = mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 5) + "-C");
 
         return effect(); // yield??

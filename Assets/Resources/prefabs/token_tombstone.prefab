@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114701202904039058}
   - component: {fileID: 82572084489798454}
   m_Layer: 0
-  m_Name: token_zombie
+  m_Name: token_tombstone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,6 +54,7 @@ CircleCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_UsedByEffector: 0
+  m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
@@ -149,12 +150,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 2
-  initElement: 5
+  initElement: 0
   flipSprite: {fileID: 0}
-  ableSwap: 1
-  ableMatch: 1
+  ableSwap: 0
+  ableMatch: 0
   ableGrav: 1
-  ableDestroy: 1
+  ableDestroy: 0
   ableTarget: 0
 --- !u!212 &212801604113870568
 SpriteRenderer:
@@ -186,8 +187,13 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -234225181
+  m_SortingLayer: -1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300006, guid: 074427b4d75136d458efa0d5600fc5ee, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 36ea4dfad2559f943a35dc40e432785e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0

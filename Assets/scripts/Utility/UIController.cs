@@ -20,6 +20,7 @@ public class UIController : MonoBehaviour {
     private GameObject settingsMenu; // ?
     //private SpellEffects spellfx;
     private Vector3 slidingTextStart;
+    private bool menu = false;
 
     public void Init(){ // Awake()?
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -145,7 +146,7 @@ public class UIController : MonoBehaviour {
 
         ChangePinfoColor(1, new Color(0, 1, 0, .4f));
 
-        settingsMenu.SetActive(mm.menu); //?
+        settingsMenu.SetActive(menu); //?
     }
 
     public void UpdateDebugGrid(){
@@ -154,7 +155,7 @@ public class UIController : MonoBehaviour {
 			grid += r + " ";
 			for (int c = 0; c < HexGrid.numCols; c++) {
 				if (r <= mm.hexGrid.TopOfColumn (c) && r >= mm.hexGrid.BottomOfColumn (c)) {
-					if (mm.hexGrid.IsSlotFilled (c, r))
+					if (mm.hexGrid.IsCellFilled (c, r))
 						grid += "[" + mm.hexGrid.GetTileAt (c, r).ThisElementToChar() + "]";
 					else
 						grid += "[ ]";
@@ -213,7 +214,7 @@ public class UIController : MonoBehaviour {
         RectTransform healthbar = healthOutline.Find("Healthbar").GetComponent<RectTransform>();
         Text healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
 
-        Tween textTween = TextNumTween(healthText, p.health, p.character.GetMaxHealth());
+        TextNumTween(healthText, p.health, p.character.GetMaxHealth());
 
         float slideRatio = (float)p.health / p.character.GetMaxHealth();
 
@@ -232,7 +233,7 @@ public class UIController : MonoBehaviour {
         RectTransform meter = meterOutline.Find("Meterbar").GetComponent<RectTransform>();
         Text meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
 
-        Tween tween = TextNumTween(meterText, p.character.meter, p.character.meterMax);
+        TextNumTween(meterText, p.character.meter, p.character.meterMax);
 
         float slideRatio = (float) p.character.meter / p.character.meterMax;
         yield return meter.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
@@ -244,8 +245,7 @@ public class UIController : MonoBehaviour {
             pinfoImg.color = new Color(1, 0, 0, 0.4f); // red
             Color pColor = CorrectPinfoColor(p.id);
             yield return new WaitForSeconds(.2f);
-            Tween pinfoTween = pinfoImg.DOColor(pColor, .3f).SetEase(Ease.OutQuad);
-            yield return null;
+            pinfoImg.DOColor(pColor, .3f).SetEase(Ease.OutQuad);
         }
     }
 
@@ -372,15 +372,17 @@ public class UIController : MonoBehaviour {
 	}
 
     public void ToggleMenu() {
-        mm.menu = !mm.menu;
+        menu = !menu;
         Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
-        if (mm.menu) {
+        if (menu) {
             menuButtonText.text = "Close Menu";
         } else {
             menuButtonText.text = "Menu";
         }
-        settingsMenu.SetActive(mm.menu);
+        settingsMenu.SetActive(menu);
     }
+
+    public bool IsMenu() { return menu; }
 
     // TODO methods for two edit dropdowns
     //public Tile.Element GetClickElement() {

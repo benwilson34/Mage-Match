@@ -15,7 +15,6 @@ public class TileBehav : MonoBehaviour {
 
     protected MageMatch mm;
 	private Enchantment enchantment;
-//	private bool resolved = false;
 	private bool inPos = true;
 
 	void Awake(){
@@ -55,7 +54,6 @@ public class TileBehav : MonoBehaviour {
 		tile.SetPos(col, row);
         mm.hexGrid.HardSetTileBehavAt (this, col, row);
 		transform.position = mm.hexGrid.GridCoordToPos (col, row);
-		mm.BoardChanged ();
 	}
 
 	public void SetPlaced(){
@@ -63,16 +61,16 @@ public class TileBehav : MonoBehaviour {
 	}
 
     // delete?
-	public void FlipTile(){
-		SpriteRenderer rend = gameObject.GetComponent<SpriteRenderer> ();
-		Sprite temp = rend.sprite;
-		rend.sprite = flipSprite;
-		flipSprite = temp;
-		if (currentState == TileState.Hand)
-			currentState = TileState.Flipped;
-		else if (currentState == TileState.Flipped)
-			currentState = TileState.Hand;
-	}
+	//public void FlipTile(){
+	//	SpriteRenderer rend = gameObject.GetComponent<SpriteRenderer> ();
+	//	Sprite temp = rend.sprite;
+	//	rend.sprite = flipSprite;
+	//	flipSprite = temp;
+	//	if (currentState == TileState.Hand)
+	//		currentState = TileState.Flipped;
+	//	else if (currentState == TileState.Flipped)
+	//		currentState = TileState.Hand;
+	//}
 
 	public void SetOutOfPosition(){
 		inPos = false;
@@ -88,19 +86,21 @@ public class TileBehav : MonoBehaviour {
             return false;
         }
 
-        switch (type) {
-            case Enchantment.EnchType.Burning:
-            case Enchantment.EnchType.Zombify:
-                return 1 >= GetEnchTier();
-            case Enchantment.EnchType.Cherrybomb:
-                return 2 >= GetEnchTier();
-            case Enchantment.EnchType.StoneTok:
-                return 3 >= GetEnchTier(); //?
+        return (int)type >= GetEnchTier() && ableTarget;
 
-            default:
-                Debug.LogError("TileBehav: Bad ench type in CanSetEnch!");
-                return false;
-        }
+        //switch (type) {
+        //    case Enchantment.EnchType.Burning:
+        //    case Enchantment.EnchType.Zombify:
+        //        return 1 >= GetEnchTier();
+        //    case Enchantment.EnchType.Cherrybomb:
+        //        return 2 >= GetEnchTier();
+        //    case Enchantment.EnchType.StoneTok:
+        //        return 3 >= GetEnchTier(); //?
+
+        //    default:
+        //        Debug.LogError("TileBehav: Bad ench type in CanSetEnch!");
+        //        return false;
+        //}
     }
 
 	public bool HasEnchantment(){ // just use GetEnchType?
@@ -109,15 +109,15 @@ public class TileBehav : MonoBehaviour {
 
     public Enchantment.EnchType GetEnchType() {
         if (enchantment != null)
-            return enchantment.type;
+            return enchantment.enchType;
         else
             return Enchantment.EnchType.None;
     }
 
-    public int GetEnchTier() {
+    int GetEnchTier() {
         if (!HasEnchantment())
             return 0;
-        return enchantment.tier;
+        return (int)enchantment.enchType;
     }
 
     public void TriggerEnchantment() {
@@ -136,7 +136,8 @@ public class TileBehav : MonoBehaviour {
 	}
 
 	public bool SetEnchantment(Enchantment ench){
-		if (ench.tier < GetEnchTier()) {
+		if (!CanSetEnch(ench.enchType)) {
+            Debug.LogError("TILEBEHAV: Can't set ench at "+PrintCoord()+"! enchType="+ench.enchType);
 			return false;
 		}
         Debug.Log("TILEBEHAV: About to set ench with tag="+ench.tag);

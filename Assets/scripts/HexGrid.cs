@@ -18,39 +18,41 @@ public class HexGrid {
     }
 
     public void HardSetTileBehavAt(TileBehav tb, int col, int row){
-		if (IsSlotFilled (col, row))
+		if (IsCellFilled (col, row))
             tileGrid[col, row] = null;
         SetTileBehavAt (tb, col, row);
 	}
 
     public void RaiseTileBehavIntoColumn(TileBehav tb, int col) {
+        RaiseTileBehavIntoCell(tb, col, BottomOfColumn(col));
+    }
+
+    public void RaiseTileBehavIntoCell(TileBehav tb, int col, int row) {
         //TODO test
+        tb.SetPlaced(); //?
+        tb.transform.SetParent(GameObject.Find("tilesOnBoard").transform); //?
+
         int top = TopOfColumn(col);
-        int bot = BottomOfColumn(col);
-        for (int r = top; r >= bot; r--) {
-            if (IsSlotFilled(col, r)) {
+        for (int r = top; r >= row; r--) {
+            if (IsCellFilled(col, r)) {
                 if (r == top) {
-                    // TODO handle top of column getting pushed out
+                    // handle top of column getting pushed out
                     mm.RemoveTile(col, r, false);
                     continue;
                 }
-                //tileGrid[col, r + 1] = tileGrid[col, r];
                 tileGrid[col, r].ChangePos(col, r + 1);
                 tileGrid[col, r] = null;
             }
         }
-        //tileGrid[col, bot] = tb;
-        tb.ChangePos(col, bot);
+        tb.ChangePos(col, row);
     }
 
     public void SetTileBehavAt(TileBehav tb, int col, int row){
 		tileGrid [col, row] = tb;
-		//mm.BoardChanged ();
 	}
 
 	public void ClearTileBehavAt(int col, int row){
 		tileGrid [col, row] = null;
-		//mm.BoardChanged ();
 	}
 
 	public TileBehav GetTileBehavAt(int col, int row){
@@ -70,14 +72,14 @@ public class HexGrid {
 
 	public int BottomOfColumn(int col){ // 0, 0, 0, 0, 1, 2, 3
 		if (col >= 0 && col <= 6)
-			return (int)Mathf.Max (0, col - 3);
+			return Mathf.Max (0, col - 3);
 		else
 			return -1;
 	}
 
 	public int TopOfColumn(int col){    // 3, 4, 5, 6, 6, 6, 6
 		if (col >= 0 && col <= 6)
-			return (int)Mathf.Min (col + 3, 6);
+			return Mathf.Min (col + 3, 6);
 		else
 			return -1;
 	}
@@ -87,14 +89,14 @@ public class HexGrid {
 //		return TopOfColumn (col) - BottomOfColumn (col) + 1;
 //	}
 
-	public bool IsSlotFilled(int col, int row){
+	public bool IsCellFilled(int col, int row){
 		return tileGrid [col, row] != null;
 	}
 
 	public bool IsGridAtRest(){ // better with a List of placed tiles
 		for (int c = 0; c < numCols; c++) {
 			for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) {
-				if (IsSlotFilled(c, r)) {
+				if (IsCellFilled(c, r)) {
 					if (!tileGrid [c, r].IsInPosition())
 						return false;
 				} else
@@ -118,7 +120,7 @@ public class HexGrid {
 
 	public bool Swap(int c1, int r1, int c2, int r2){
 //		Debug.Log("Swapping (" + c1 + ", " + r1 + ") to (" + c2 + ", " + r2 + ")");
-		if (IsSlotFilled(c2, r2)) { // if there's something in the slot
+		if (IsCellFilled(c2, r2)) { // if there's something in the slot
 			if (!tileGrid [c1, r1].ableSwap || !tileGrid [c2, r2].ableSwap)
 				return false;
 			TileBehav temp = GetTileBehavAt(c2, r2);
@@ -138,7 +140,7 @@ public class HexGrid {
 		List<TileBehav> returnList = new List<TileBehav> ();
 		for(int c = 0; c < numCols; c++){ // for each col
 			for(int r = BottomOfColumn(c); r <= TopOfColumn(c); r++){ // for each row
-				if (IsSlotFilled(c, r)) { // if there's a tile there
+				if (IsCellFilled(c, r)) { // if there's a tile there
 					returnList.Add(GetTileBehavAt(c, r));
 				} else
 					break; // breaks just inner loop
@@ -192,7 +194,7 @@ public class HexGrid {
 		for (int dir = 0; dir < 6; dir++) {
 			GetOffset (dir, out dc, out dr);
 			if (CellExists (col + dc, row + dr)) {
-				if (IsSlotFilled (col + dc, row + dr))
+				if (IsCellFilled (col + dc, row + dr))
 					tbs.Add (tileGrid [col + dc, row + dr]);
 			}
 		}
@@ -209,14 +211,14 @@ public class HexGrid {
 			dr *= 2;
 			
 			if (CellExists(col + dc, row + dr))
-			if (IsSlotFilled (col + dc, row + dr))
+			if (IsCellFilled (col + dc, row + dr))
 				tbs.Add (tileGrid [col + dc, row + dr]);
 			
 			if (HasAdjacentCell (col + dc, row + dr, (dir + 2) % 6)) {
 				int dc2, dr2;
 				GetOffset ((dir + 2) % 6, out dc2, out dr2);
 				//				Debug.Log ("Dir = " + dir + ", new dir = " + ((dir+2)%6) + ", dc2 = " + dc2 + ", dr2 = " + dr2);
-				if (IsSlotFilled (col + dc + dc2, row + dr + dr2))
+				if (IsCellFilled (col + dc + dc2, row + dr + dr2))
 					tbs.Add (tileGrid [col + dc + dc2, row + dr + dr2]);
 			}
 		}

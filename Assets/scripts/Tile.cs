@@ -44,20 +44,7 @@ public class Tile {
 	}
 
 	public char ThisElementToChar(){
-		switch (this.element) {
-		case Element.Fire:
-			return 'F';
-		case Element.Water:
-			return 'W';
-		case Element.Earth:
-			return 'E';
-		case Element.Air:
-			return 'A';
-		case Element.Muscle:
-			return 'M';
-		default:
-			return '\0';
-		}
+        return ElementToChar(element);
 	}
 
 	public static Element CharToElement(char c){

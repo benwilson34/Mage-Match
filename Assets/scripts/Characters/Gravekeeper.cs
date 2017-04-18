@@ -29,10 +29,10 @@ public class Gravekeeper : Character {
 
         SetDeckElements(0, 20, 40, 0, 40);
 
-        spells[0] = new SignatureSpell(0, "Target Zombie", "EM", 1, 20, ZombifySpell);
+        spells[0] = new SignatureSpell(0, "Tombstone", "EM", 1, 20, Tombstone);
         spells[1] = new Spell(1, "Zombie Synergy", "MEE", 1, ZombieSynergy);
         spells[2] = new Spell(2, "Human Resources", "MEME", 1, HumanResources);
-        spells[3] = new CoreSpell(3, "Gather the Ghouls~", 3, 1, GatherTheGhouls);
+        spells[3] = new CoreSpell(3, "Gather the Ghouls", 3, 1, GatherTheGhouls);
     }
 
     // Needs work, ignore for now
@@ -141,29 +141,29 @@ public class Gravekeeper : Character {
     //    Ench_SetZombify(playerID, tb, false);
     //}
 
-    // ----- enchant -----
+    public IEnumerator Tombstone() {
+        yield return mm.syncManager.SyncRand(playerID, Random.Range(95, 126));
+        mm.GetPlayer(playerID).DealDamage(mm.syncManager.GetRand());
 
-    //private int zombify_col, zombify_row;
-    //public bool zombify_select;
+        yield return targeting.WaitForCellTarget(1);
+        if (targeting.WasCanceled())
+            yield break;
 
+        CellBehav cb = targeting.GetTargetCBs()[0];
+        int col = cb.col;
+        GameObject tomb = mm.GenerateToken("tombstone");
+        tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
 
-    //public void SetZombifySelect(int col, int row) {
-    //    zombify_col = col;
-    //    zombify_row = row;
-    //    zombify_select = false;
-    //}
+        ZombieToken ttb = tomb.GetComponent<ZombieToken>();
+        mm.effectCont.AddEndTurnEffect(new TurnEffect(5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
 
-    //public void Ench_SetZombieTok(int id, TileBehav tb) {
-    //    Enchantment ench = new Enchantment(id, Ench_ZombieTok_TEffect, null, null);
-    //    ench.SetTypeTier(Enchantment.EnchType.ZombieTok, 3);
-    //    ench.priority = 6; // TODO 6.1?
-    //    tb.SetEnchantment(ench);
-    //    mm.effectCont.AddEndTurnEffect(ench, "zomT");
-    //}
-    //IEnumerator Ench_ZombieTok_TEffect(int id, TileBehav tb) {
-    //    Debug.Log("SPELL-FX: About to resolve ZombTok's effect!");
-    //    yield return Ench_Zombify_TEffect(id, tb);
-    //    yield return Ench_Zombify_TEffect(id, tb);
-    //    //yield return null; // ?
-    //}
+        // destroy tiles under token
+        for (int row = hexGrid.BottomOfColumn(col); row < hexGrid.TopOfColumn(col); row++)
+            if (hexGrid.IsCellFilled(col, row))
+                mm.RemoveTile(col, row, false);
+            else
+                break; // TODO handle floating tiles
+
+        mm.DropTile(col, tomb);
+    }
 }

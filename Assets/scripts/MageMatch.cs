@@ -8,8 +8,6 @@ public class MageMatch : MonoBehaviour {
     public enum GameState { PlayerTurn, TargetMode, CommishTurn };
     public GameState currentState;
     [HideInInspector]
-    public bool menu = false; // is the settings menu open? ->move to UICont
-    [HideInInspector]
     public int myID;
     [HideInInspector]
     public bool switchingTurn = false;
@@ -30,13 +28,14 @@ public class MageMatch : MonoBehaviour {
     public SpellEffects spellfx;
 
     private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
-    private GameObject stonePF, emberPF, zombiePF, prereqPF, targetPF; // token prefabs
+    private GameObject stonePF, emberPF, tombstonePF, prereqPF, targetPF; // token prefabs
     private Player p1, p2, activep;
     private bool endGame = false;
     private int checking = 0, removing = 0, actionsPerforming = 0, matchesResolving = 0;
+    private int cascade = 0; // should this be how this is handled?
 
     void Start() {
-        Random.InitState(1337420);
+        //Random.InitState(1337420);
 
         gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         Debug.Log("MAGEMATCH: gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
@@ -108,7 +107,7 @@ public class MageMatch : MonoBehaviour {
 
         stonePF = Resources.Load("prefabs/token_stone") as GameObject;
         emberPF = Resources.Load("prefabs/token_ember") as GameObject;
-        zombiePF = Resources.Load("prefabs/token_zombie") as GameObject;
+        tombstonePF = Resources.Load("prefabs/token_tombstone") as GameObject;
         prereqPF = Resources.Load("prefabs/outline_prereq") as GameObject;
         targetPF = Resources.Load("prefabs/outline_target") as GameObject;
     }
@@ -141,11 +140,10 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
-    public IEnumerator OnDrop(int id, Tile.Element elem, int col) {
-        if (currentState == GameState.PlayerTurn) {
-            yield return BoardChecking();
+    public IEnumerator OnDrop(int id, bool playerAction, Tile.Element elem, int col) {
+        yield return BoardChecking(); // should go below? if done in a spell, should there be a similar event to this one OnSpellCast that checks the board once the spell resolves?
+        if(playerAction)
             eventCont.GameAction(true);
-        }
         yield return null;
     }
 
@@ -198,7 +196,7 @@ public class MageMatch : MonoBehaviour {
         Debug.Log("   ---------- TURNSYSTEM START ----------");
         yield return eventCont.TurnEnd();
 
-        uiCont.DeactivateAllSpellButtons(activep);
+        uiCont.DeactivateAllSpellButtons(activep); //? These should be part of any boardaction...
         uiCont.SetDrawButton(activep, false);
 
         currentState = GameState.CommishTurn;
@@ -219,7 +217,7 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => removing == 0); //?
         Debug.Log("MAGEMATCH: About to check the board.");
 
-        int cascade = 0;
+        cascade = 0;
         while (true) {
             yield return new WaitUntil(() => !animCont.IsAnimating() && removing == 0); //?
             hexGrid.CheckGrav(); // TODO make IEnum
@@ -231,8 +229,10 @@ public class MageMatch : MonoBehaviour {
                 cascade++;
             } else {
                 if (currentState == GameState.PlayerTurn) {
-                    if (cascade > 1)
+                    if (cascade > 1) {
                         eventCont.Cascade(cascade);
+                        cascade = 0;
+                    }
                     SpellCheck();
                 }
                 uiCont.UpdateDebugGrid();
@@ -310,39 +310,40 @@ public class MageMatch : MonoBehaviour {
             uiCont.UpdateMoveText("Your hand is full!");
             return false;
         } else {
-            Tile.Element[] tileElem = activep.DrawTiles(1, Tile.Element.None, false, false);
+            activep.DrawTiles(1, Tile.Element.None, false, false);
             return true;
         }
     }
 
-    public bool DropTile(int col, GameObject go) {
-        if (DropTile(col, go, .08f)) {
-            activep.hand.Remove(go.GetComponent<TileBehav>()); // remove from hand
-            //eventCont.GameAction(true); // could get moved into case below...
-            return true;
-        } else
-            return false;
-    }
-
-    // TODO separate methods for player and Commish
-    public bool DropTile(int col, GameObject go, float dur) {
+    public bool PlayerDropTile(int col, GameObject go) {
         int row = boardCheck.CheckColumn(col); // check that column isn't full
-        if (row >= 0) { // if the col is not full
-            StartCoroutine(Drop(col, go));
+        if (row >= 0) {
+            activep.hand.Remove(go.GetComponent<TileBehav>()); // remove from hand
+            StartCoroutine(_Drop(col, go, true));
             return true;
         }
         return false;
     }
 
-    public IEnumerator Drop(int col, GameObject go) {
+    // TODO separate methods for player and Commish
+    public bool DropTile(int col, GameObject go) {
+        int row = boardCheck.CheckColumn(col); // check that column isn't full
+        if (row >= 0) { // if the col is not full
+            StartCoroutine(_Drop(col, go, false));
+            return true;
+        }
+        return false;
+    }
+
+    IEnumerator _Drop(int col, GameObject go, bool playerAction) {
         Debug.Log("   ---------- DROP BEGIN ----------");
         actionsPerforming++;
         TileBehav tb = go.GetComponent<TileBehav>();
         tb.SetPlaced();
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
-        if (currentState == GameState.PlayerTurn) //kinda hacky
-            yield return eventCont.Drop(tb.tile.element, col); // etc...
-        else if (currentState == GameState.CommishTurn)
+        if (currentState == GameState.PlayerTurn) { //kinda hacky
+            yield return eventCont.Drop(tb.tile.element, col, playerAction);
+        } else if (currentState == GameState.CommishTurn)
             eventCont.CommishDrop(tb.tile.element, col);
 
         Debug.Log("   ---------- DROP END ----------");
@@ -357,10 +358,8 @@ public class MageMatch : MonoBehaviour {
     public IEnumerator _SwapTiles(int c1, int r1, int c2, int r2) {
         Debug.Log("   ---------- SWAP BEGIN ----------");
         actionsPerforming++;
-        if (!IsCommishTurn()) { // eventually, when InputCont gets some love
-            if (hexGrid.Swap(c1, r1, c2, r2)) { // I feel like this check should be in InputCont
-                yield return eventCont.Swap(c1, r1, c2, r2); 
-            }
+        if (hexGrid.Swap(c1, r1, c2, r2)) { // I feel like this check should be in InputCont
+            yield return eventCont.Swap(c1, r1, c2, r2); 
         }
         Debug.Log("   ---------- SWAP END ----------");
         actionsPerforming--;
@@ -402,7 +401,7 @@ public class MageMatch : MonoBehaviour {
     // TODO
     public void PutTile(GameObject go, int col, int row) {
         TileBehav currentTileBehav = go.GetComponent<TileBehav>();
-        if (hexGrid.IsSlotFilled(col, row))
+        if (hexGrid.IsCellFilled(col, row))
             Destroy(hexGrid.GetTileBehavAt(col, row).gameObject);
         currentTileBehav.SetPlaced();
         currentTileBehav.HardSetPos(col, row);
@@ -485,8 +484,8 @@ public class MageMatch : MonoBehaviour {
             case "ember":
                 go = Instantiate(emberPF);
                 break;
-            case "zombie":
-                go = Instantiate(zombiePF);
+            case "tombstone":
+                go = Instantiate(tombstonePF);
                 break;
             case "prereq":
                 go = Instantiate(prereqPF);
@@ -514,7 +513,7 @@ public class MageMatch : MonoBehaviour {
         Tile tile;
         for (int i = 0; i < seq.sequence.Count;) {
             tile = seq.sequence[0];
-            if (hexGrid.IsSlotFilled(tile.col, tile.row))
+            if (hexGrid.IsCellFilled(tile.col, tile.row))
                 RemoveTile(tile, true);
             else
                 Debug.Log("RemoveSeq(): The tile at (" + tile.col + ", " + tile.row + ") is already gone.");
@@ -537,7 +536,11 @@ public class MageMatch : MonoBehaviour {
 
         TileBehav tb = hexGrid.GetTileBehavAt(col, row);
         if (tb == null) {
-            Debug.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
+            if(!tb.ableDestroy) // maybe not error
+                Debug.LogError("MAGEMATCH: RemoveTile tried to destory an indestructable tile!");
+            else
+                Debug.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
+            removing--;
             yield break;
         }
         if (tb.HasEnchantment()) {
@@ -547,13 +550,11 @@ public class MageMatch : MonoBehaviour {
             }
             tb.ClearEnchantment(); // TODO
         }
+        hexGrid.ClearTileBehavAt(col, row); // move up?
 
         yield return animCont._RemoveTile(tb); // just start it, don't yield?
-
         Destroy(tb.gameObject);
-        hexGrid.ClearTileBehavAt(col, row); // move up?
         eventCont.TileRemove(tb); //? not needed for checking but idk
-        //BoardChanged();
 
         removing--;
     }

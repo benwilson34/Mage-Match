@@ -31,7 +31,7 @@ public class Rocky : Character {
 
         SetDeckElements(5, 0, 45, 30, 20);
 
-        spells[0] = new Spell(0, "Magnitude 10", "EEMEE", 1, Magnitude10);
+        spells[0] = new Spell(0, "NOTHING", "EEMEE", 1, Sinkhole); //
         spells[1] = new Spell(1, "Sinkhole", "EAAE", 1, spellfx.Deal496Dmg); //
         spells[2] = new Spell(2, "Boulder Barrage", "MMEE", 1, spellfx.Deal496Dmg); //
         spells[3] = new Spell(3, "Stalagmite", "AEE", 1, Stalagmite);
@@ -44,42 +44,42 @@ public class Rocky : Character {
 
         SetDeckElements(0, 25, 40, 10, 25);
 
-        spells[0] = new Spell(0, "Magnitude 10", "EEMEE", 1, Magnitude10);
+        spells[0] = new Spell(0, "NOTHING", "EEMEE", 1, Sinkhole); //
         spells[1] = new Spell(1, "Living Flesh Armor", "EWWE", 1, spellfx.Deal496Dmg); //
         spells[2] = new Spell(2, "Figure-Four Leglock", "MEEM", 1, spellfx.Deal496Dmg); //
         spells[3] = new Spell(3, "Stalagmite", "AEE", 1, Stalagmite);
     }
 
 
-    public IEnumerator Magnitude10() {
-        TurnEffect t = new TurnEffect(3, Magnitude10_Turn, Magnitude10_End, null);
-        t.priority = 4;
-        mm.effectCont.AddEndTurnEffect(t, "mag");
+    //public IEnumerator Magnitude10() {
+    //    TurnEffect t = new TurnEffect(3, Magnitude10_Turn, Magnitude10_End, null);
+    //    t.priority = 4;
+    //    mm.effectCont.AddEndTurnEffect(t, "mag");
+    //    yield return null;
+    //}
+    //IEnumerator Magnitude10_Turn(int id) {
+    //    int dmg = 0;
+    //    for (int col = 0; col < 7; col++) {
+    //        int row = hexGrid.BottomOfColumn(col);
+    //        if (hexGrid.IsCellFilled(col, row)) {
+    //            Tile t = hexGrid.GetTileAt(col, row);
+    //            if (!t.element.Equals(Tile.Element.Earth)) {
+    //                mm.RemoveTile(t, true);
+    //                dmg += 15;
+    //            }
+    //        }
+    //    }
+    //    mm.GetPlayer(id).DealDamage(dmg); 
+
+    //    yield return null; // for now
+    //}
+    //IEnumerator Magnitude10_End(int id) {
+    //    Magnitude10_Turn(id);
+    //    yield return null; // for now
+    //}
+
+    public IEnumerator Sinkhole() {
         yield return null;
-    }
-    IEnumerator Magnitude10_Turn(int id) {
-        int dmg = 0;
-        for (int col = 0; col < 7; col++) {
-            int row = hexGrid.BottomOfColumn(col);
-            if (hexGrid.IsSlotFilled(col, row)) {
-                Tile t = hexGrid.GetTileAt(col, row);
-                if (!t.element.Equals(Tile.Element.Earth)) {
-                    mm.RemoveTile(t, true);
-                    dmg += 15;
-                }
-            }
-        }
-        mm.GetPlayer(id).DealDamage(dmg); 
-
-        yield return null; // for now
-    }
-    IEnumerator Magnitude10_End(int id) {
-        Magnitude10_Turn(id);
-        yield return null; // for now
-    }
-
-    public void Sinkhole() {
-
     }
 
     public void BoulderBarrage() {

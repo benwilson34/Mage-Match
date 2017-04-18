@@ -37,11 +37,11 @@ public class BoardCheck {
 
 	public int CheckColumn(int c){
 		int r = hexGrid.TopOfColumn(c);
-		if (hexGrid.IsSlotFilled (c, r))
+		if (hexGrid.IsCellFilled (c, r))
 			return -1;
 		
 		int min = hexGrid.BottomOfColumn (c);
-		while (r > min && !hexGrid.IsSlotFilled(c, r - 1))
+		while (r > min && !hexGrid.IsCellFilled(c, r - 1))
 			r--;
 		return r;
 	}
@@ -92,7 +92,7 @@ public class BoardCheck {
 		List<TileSeq> returnList = new List<TileSeq>(); // list of all matching seqs to be returned
 		for(int c = 0; c < HexGrid.numCols; c++){ // for each col
 			for(int r = hexGrid.BottomOfColumn(c); r <= hexGrid.TopOfColumn(c); r++){ // for each row
-				if (hexGrid.IsSlotFilled(c, r)) { // if there's a tile there
+				if (hexGrid.IsCellFilled(c, r)) { // if there's a tile there
 					shortList = new List<TileSeq>(list); // copies???? just same reference?????
 					for(int i = 0; i < shortList.Count; i++){ // for each TileSeq in seqList
 						TileSeq seq = shortList [i];
@@ -159,7 +159,7 @@ public class BoardCheck {
 						Debug.Log ("Checking tiles[" + (c + dc) + ", " + (r + dr) + "] for seq: " + PrintSeq (checkSeq, false));
 
 					if (!skipCurrentSeq && 
-						hexGrid.IsSlotFilled(c + dc, r + dr) && // if there's something there...
+						hexGrid.IsCellFilled(c + dc, r + dr) && // if there's something there...
 						hexGrid.GetTileBehavAt(c + dc, r + dr).ableMatch && // and it can be matched...
 						hexGrid.GetTileAt(c + dc, r + dr).element.Equals(checkSeq.GetElementAt (seqIndex))) { // ...and the next tile matches the next in the seq
 						outSeq.sequence.Add (hexGrid.GetTileAt(c + dc, r + dr));

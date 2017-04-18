@@ -50,8 +50,7 @@ public class Commish  {
 	}
 
 	IEnumerator PlaceTiles(){
-        Debug.Log ("COMMISH: Starting turn...");
-
+        Debug.Log("   ---------- COMMISH TURN BEGIN ----------");
         int prevCount = 0;
         Queue<int> cols = new Queue<int>();
         Queue<Tile.Element> elems = new Queue<Tile.Element>();
@@ -77,7 +76,7 @@ public class Commish  {
             GameObject go = mm.GenerateTile(elems.Dequeue());
             Debug.Log ("COMMISH: Dropping into col " + cols.Peek());
 
-            if (mm.DropTile(cols.Dequeue(), go, .15f)) {
+            if (mm.DropTile(cols.Dequeue(), go)) {
                 go.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
             } else {
                 Debug.LogError("COMMISH: Tried to drop into a full column!");
@@ -89,7 +88,7 @@ public class Commish  {
             }
         }
 
-	    Debug.Log ("COMMISH: CommishTurnDone.");
+        Debug.Log("   ---------- COMMISH TURN END ----------");
         mm.eventCont.CommishTurnDone();
 	}
 

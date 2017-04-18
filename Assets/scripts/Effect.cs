@@ -5,11 +5,13 @@ using System;
 public abstract class Effect {
 
     public delegate IEnumerator MyEffect(int id); // move to TurnEffect?
+    // rename to EffType?
+    public enum Type { None = 0, Cooldown, Damage, Healing, Buff, Destruct, Subtract, Add, Enchant, Movement }
 
     protected MageMatch mm;
     protected int turnsLeft; // maybe this field should just get renamed to count?
     public int playerID;
-    public int priority; // protected eventually?
+    public Type type; // protected eventually?
     public string tag;
 
     public virtual IEnumerator TriggerEffect() { yield return null; }
@@ -28,10 +30,11 @@ public class TurnEffect : Effect {
     private MyEffect turnEffect, endEffect, cancelEffect;
 
     // TODO add infinite Constructor...or just pass in a negative for turns?
-    public TurnEffect(int turns, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect) {
+    public TurnEffect(int turns, Type t, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect = null) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = mm.ActiveP().id;
         turnsLeft = turns;
+        this.type = t;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
         this.cancelEffect = cancelEffect;
@@ -68,46 +71,28 @@ public class Enchantment : Effect {
 
     public delegate IEnumerator MyTileEffect(int id, TileBehav tb);
 
-    public enum EnchType { None, Cherrybomb, Burning, Zombify, ZombieTok, StoneTok }
-    public EnchType type = EnchType.None; // private?
-    public int tier;
+    public enum EnchType { None = 0, Burning = 1, Zombify = 1, Cherrybomb = 2, ZombieTok = 3, StoneTok = 3 }
+    public EnchType enchType; // private?
+    //public int tier;
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
     private SpellEffects spellfx;
     private bool skip = false;
 
-    //public Enchantment(int id, EnchType type) {
-    //    spellfx = mm.spellfx;
-    //    this.type = type;
-    //    switch (type) {
-    //        case EnchType.Burning:
-    //            tier = 1;
-    //            break;
-    //        case EnchType.Zombify:
-    //            tier = 1;
-    //            new Enchantment(id, spellfx.Ench_Zombify_TEffect, null, null);
-    //            break;
-    //        case EnchType.Cherrybomb:
-    //            tier = 2;
-    //            break;
-    //        case EnchType.StoneTok:
-    //            tier = 3; //?
-    //            break;
-    //    }
-    //}
+    public Enchantment(int id, int turns, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
+        turnsLeft = turns;
+    }
 
-    public Enchantment(int id, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) {
+    public Enchantment(int id, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id; // NO!!!
         turnsLeft = -1;
+        this.enchType = enchType;
+        this.type = type;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
         this.cancelEffect = cancelEffect;
-    }
-
-    public Enchantment(int id, int turns, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect) :this(id, turnEffect, endEffect, cancelEffect) {
-        turnsLeft = turns;
     }
 
     public void SetAsEnchantment(TileBehav tb) {
@@ -118,10 +103,10 @@ public class Enchantment : Effect {
         return enchantee;
     }
 
-    public void SetTypeTier(EnchType type, int tier) {
-        this.type = type;
-        this.tier = tier;
-    }
+    //public void SetTypeTier(EnchType type, int tier) {
+    //    this.enchType = type;
+    //    this.tier = tier;
+    //}
 
     public void SkipCurrent() {
         skip = true;

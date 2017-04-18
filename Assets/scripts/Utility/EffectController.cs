@@ -10,7 +10,10 @@ public class EffectController {
     private List<MatchEffect> matchEffects;
     private List<SwapEffect> swapEffects;
     private Dictionary<string, int> tagDict;
-    private int effectsResolving = 0;
+    private int effectsResolving = 0, beginTurnRes = 0, endTurnRes = 0; // TODO match+swap effs
+
+    private int c = 0;
+    private Effect.Type currentType = Effect.Type.None;
 
     public EffectController(MageMatch mm) {
         this.mm = mm;
@@ -70,10 +73,12 @@ public class EffectController {
         int i;
         for (i = 0; i < beginTurnEffects.Count; i++) {
             Effect listE = beginTurnEffects[i];
-            if (listE.priority < e.priority)
+            if ((int)listE.type < (int)e.type)
                 break;
         }
         beginTurnEffects.Insert(i, e);
+        if ((int)e.type > (int)currentType && beginTurnRes > 0)
+            c++; // correct list if this effect is getting put in the front
         return e.tag;
     }
 
@@ -83,10 +88,12 @@ public class EffectController {
         int i;
         for (i = 0; i < endTurnEffects.Count; i++) {
             Effect listE = endTurnEffects[i];
-            if (listE.priority < e.priority)
+            if ((int)listE.type < (int)e.type)
                 break;    
         }
         endTurnEffects.Insert(i, e);
+        if ((int)e.type > (int)currentType && endTurnRes > 0)
+            c++; // correct list if this effect is getting put in the front
         return e.tag;
     }
 
@@ -135,44 +142,49 @@ public class EffectController {
 
     public IEnumerator ResolveBeginTurnEffects() {
         effectsResolving++;
-        Effect e;
-        for (int i = 0; i < beginTurnEffects.Count; i++) { //foreach
-            e = beginTurnEffects[i];
-            Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsLeft() + " turns left (including this one).");
+        beginTurnRes++;
+        for (c = 0; c < beginTurnEffects.Count; c++) { //foreach
+            Effect e = beginTurnEffects[c];
+            Effect.Type t = currentType = e.type;
+            Debug.Log("EFFECTCONT: " + e.tag + " (type " + t + ", p" + (int)t + ") has " + e.TurnsLeft() + " turns left (including this one).");
             yield return e.Turn();
 
             if (e.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
-                beginTurnEffects.RemoveAt(i);
+                Debug.Log("EFFECTCONT: Removing " + e.tag + "...");
+                beginTurnEffects.RemoveAt(c);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
-                i--;
+                c--;
             }
         }
+        beginTurnRes--;
         effectsResolving--;
     }
 
     public IEnumerator ResolveEndTurnEffects() {
         effectsResolving++;
+        endTurnRes++;
         Effect e;
-        for (int i = 0; i < endTurnEffects.Count; i++) { // foreach
-            e = endTurnEffects[i];
-            Debug.Log("EFFECTCONTROLLER: " + e.tag + " (p" + e.priority + ") has " + e.TurnsLeft() + " turns left (including this one).");
+        for (c = 0; c < endTurnEffects.Count; c++) { // foreach
+            e = endTurnEffects[c];
+            Effect.Type t = currentType = e.type;
+            Debug.Log("EFFECTCONT: " + e.tag + " (type " + t + ", p" + (int)t + ") has " + e.TurnsLeft() + " turns left (including this one).");
             yield return e.Turn();
 
             if (e.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
                 Debug.Log("EFFECTCONT: Removing " + e.tag + "...");
-                endTurnEffects.RemoveAt(i);
+                endTurnEffects.RemoveAt(c);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
-                i--;
+                c--;
             } 
         }
-
 
         // TODO generalize somehow?
         for (int i = 0; i < matchEffects.Count; i++) { // foreach
             MatchEffect me = matchEffects[i];
-            Debug.Log("EFFECTCONTROLLER: " + me.tag + " (p" + me.priority + ") has " + me.TurnsLeft() + " turns left (including this one).");
+            Effect.Type t = me.type;
+            Debug.Log("EFFECTCONT: " + me.tag + " (type " + t + ", p" + (int)t + ") has " + me.TurnsLeft() + " turns left (including this one).");
             yield return me.Turn();
 
             if (me.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
@@ -183,7 +195,8 @@ public class EffectController {
         }
         for (int i = 0; i < swapEffects.Count; i++) { // foreach
             SwapEffect se = swapEffects[i];
-            Debug.Log("EFFECTCONTROLLER: " + se.tag + " (p" + se.priority + ") has " + se.TurnsLeft() + " turns left (including this one).");
+            Effect.Type t = se.type;
+            Debug.Log("EFFECTCONT: " + se.tag + " (type " + t + ", p" + (int)t + ") has " + se.TurnsLeft() + " turns left (including this one).");
             yield return se.Turn();
 
             if (se.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
@@ -193,6 +206,7 @@ public class EffectController {
             }
         }
 
+        endTurnRes--;
         effectsResolving--;
     }
     #endregion

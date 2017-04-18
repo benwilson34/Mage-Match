@@ -153,17 +153,17 @@ public class Player {
             mm.EndTheGame();
     }
 
-    public bool DealTile() {
-        return DrawTiles(1, Tile.Element.None, true, false) != null;
+    // bool again?
+    public void DealTile() {
+        DrawTiles(1, Tile.Element.None, true, false);
     }
 
-    public Tile.Element[] DrawTiles(Tile.Element elem) {
-        return DrawTiles(1, elem, false, false);
+    public void DrawTiles(Tile.Element elem) {
+        DrawTiles(1, elem, false, false);
     }
 
     // this return type isn't really necessary anymore due to the drawEvent
-    public Tile.Element[] DrawTiles(int numTiles, Tile.Element elem, bool dealt, bool linear) {
-        Tile.Element[] tileElems = new Tile.Element[numTiles];
+    public void DrawTiles(int numTiles, Tile.Element elem, bool dealt, bool linear) {
         for (int i = 0; i < numTiles && !IsHandFull(); i++) {
             GameObject go;
             if (elem == Tile.Element.None)
@@ -179,7 +179,6 @@ public class Player {
             go.transform.SetParent(handSlot, false);
 
             TileBehav tb = go.GetComponent<TileBehav>();
-            tileElems[i] = tb.tile.element;
             hand.Add(tb);
 
             mm.eventCont.Draw(id, tb.tile.element, dealt);
@@ -187,8 +186,6 @@ public class Player {
                 mm.eventCont.GameAction(true); //?
         }
         AlignHand(.1f, linear);
-
-        return tileElems;
     }
 
     public void AlignHand(float duration, bool linear) {
@@ -210,11 +207,11 @@ public class Player {
     }
 
     // delete?
-    public void FlipHand() {
-        foreach (TileBehav tb in hand) {
-            tb.FlipTile();
-        }
-    }
+    //public void FlipHand() {
+    //    foreach (TileBehav tb in hand) {
+    //        tb.FlipTile();
+    //    }
+    //}
 
     public void EmptyHand() {
         while (hand.Count > 0) {

@@ -31,7 +31,7 @@ public class SpellEffects {
         GameObject stone;
         stone = mm.GenerateToken("stone");
         stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
-        mm.DropTile(cb.col, stone, .08f);
+        mm.DropTile(cb.col, stone);
     }
 
 	public IEnumerator LightningPalm(){
@@ -65,8 +65,7 @@ public class SpellEffects {
     // TODO IEnum types for animation
 
 	public void Ench_SetCherrybomb(int id, TileBehav tb){
-		Enchantment ench = new Enchantment (id, null, null, Ench_Cherrybomb_Remove);
-        ench.SetTypeTier(Enchantment.EnchType.Cherrybomb, 2);
+		Enchantment ench = new Enchantment (id, Enchantment.EnchType.Cherrybomb, Effect.Type.Destruct, null, null, Ench_Cherrybomb_Remove);
 		tb.SetEnchantment (ench);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
 	}
@@ -85,9 +84,7 @@ public class SpellEffects {
 	public void Ench_SetBurning(int id, TileBehav tb){
         // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
         //		Debug.Log("SPELLEFFECTS: Setting burning...");
-        Enchantment ench = new Enchantment(id, 5, Ench_Burning_TEffect, Ench_Burning_End, null);
-        ench.SetTypeTier(Enchantment.EnchType.Burning, 1);
-        ench.priority = 1;
+        Enchantment ench = new Enchantment(id, 5, Enchantment.EnchType.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
 		tb.SetEnchantment (ench);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
 		mm.effectCont.AddEndTurnEffect(ench, "burn");
@@ -103,15 +100,13 @@ public class SpellEffects {
     }
 
     public void Ench_SetStoneTok(TileBehav tb) {
-        Enchantment ench = new Enchantment(5, Ench_StoneTok_TEffect, Ench_StoneTok_End, null);
-        ench.SetTypeTier(Enchantment.EnchType.StoneTok, 3);
-        ench.priority = 4;
+        Enchantment ench = new Enchantment(5, Enchantment.EnchType.StoneTok, Effect.Type.Destruct, Ench_StoneTok_TEffect, Ench_StoneTok_End, null);
         tb.SetEnchantment(ench);
         mm.effectCont.AddEndTurnEffect(ench, "stoT");
     }
     IEnumerator Ench_StoneTok_TEffect(int id, TileBehav tb) {
         int c = tb.tile.col, r = tb.tile.row;
-        if (hexGrid.CellExists(c, r - 1) && hexGrid.IsSlotFilled(c, r - 1)) {
+        if (hexGrid.CellExists(c, r - 1) && hexGrid.IsCellFilled(c, r - 1)) {
             mm.RemoveTile(c, r - 1, false);
         }
         yield return null; // for now
@@ -122,9 +117,7 @@ public class SpellEffects {
     }
 
     public void Ench_SetZombify(int id, TileBehav tb, bool skip) {
-        Enchantment ench = new Enchantment(id, Ench_Zombify_TEffect, null, null);
-        ench.SetTypeTier(Enchantment.EnchType.Zombify, 1);
-        ench.priority = 6;
+        Enchantment ench = new Enchantment(id, Enchantment.EnchType.Zombify, Effect.Type.Enchant, Ench_Zombify_TEffect, null);
         if (skip)
             ench.SkipCurrent();
         tb.SetEnchantment(ench);

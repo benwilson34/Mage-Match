@@ -101,7 +101,7 @@ public class Enfuego : Character {
     public IEnumerator FieryFandango() {
         mm.GetPlayer(playerID).ChangeDebuff_DmgExtra(15);
         mm.GetOpponent(playerID).ChangeDebuff_DmgExtra(15);
-        TurnEffect te = new TurnEffect(2, null, FF_TEnd, null);
+        mm.effectCont.AddEndTurnEffect(new TurnEffect(2, Effect.Type.Buff, null, FF_TEnd), "fiery");
         yield return null;
     }
     IEnumerator FF_TEnd(int id) {

@@ -28,7 +28,7 @@ public class TurnTimer : MonoBehaviour {
     }
 
     void DecreaseTimeRemaining() {
-        if (!pause && !mm.menu && !mm.targeting.IsTargetMode()) {
+        if (!pause && !mm.targeting.IsTargetMode()) {
             timeRemaining -= .1f;
             if (timeRemaining < .01f) {
                 Pause();

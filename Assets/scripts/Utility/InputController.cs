@@ -7,7 +7,6 @@ public class InputController : MonoBehaviour {
 
 	private MageMatch mm;
     private Targeting targeting;
-    private UIController uiCont;
     private GameObject dropTile;
     private bool dropping = false;
 
@@ -23,7 +22,6 @@ public class InputController : MonoBehaviour {
 	void Start () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
-        uiCont = mm.uiCont;
     }
 
 	void Update(){ // polling input...change to events if too much overhead
@@ -110,6 +108,8 @@ public class InputController : MonoBehaviour {
 		return null;
 	}
 
+    bool MenuOpen() { return mm.uiCont.IsMenu(); }
+
     // ------------------------------- TB & CB handling -------------------------------
 
     void TBMouseDown(TileBehav tb){
@@ -117,7 +117,7 @@ public class InputController : MonoBehaviour {
 			//if (!mm.menu) { // if the menu isn't open
                 switch (tb.currentState) {
                     case TileBehav.TileState.Hand:
-                        if (!targeting.IsTargetMode() && !mm.menu && mm.LocalP().IsTileMine(tb)) {
+                        if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsTileMine(tb)) {
                             dropping = true;
                             parentT = tb.transform.parent;
                             tb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
@@ -154,7 +154,7 @@ public class InputController : MonoBehaviour {
 		if (!mm.IsEnded () && !targeting.IsTargetMode()) {
 			switch (tb.currentState) {
 			    case TileBehav.TileState.Hand:
-                    if (!mm.menu && dropping) {
+                    if (!MenuOpen() && dropping) {
                         Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                         cursor.z = 0;
                         tb.transform.position = cursor;
@@ -170,7 +170,7 @@ public class InputController : MonoBehaviour {
 
 	void TBMouseUp(TileBehav tb){
         if (!mm.IsEnded () && !targeting.IsTargetMode()) {
-            if (!mm.menu) { //?
+            if (!MenuOpen()) { //?
                 switch (tb.currentState) {
                     case TileBehav.TileState.Hand:
                         if (dropping) { // will always be if it's in the hand?
@@ -178,7 +178,7 @@ public class InputController : MonoBehaviour {
                             RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
 
-                            if (ActionNotAllowed() || cb == null || !mm.DropTile(cb.col, dropTile)) {
+                            if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropTile)) {
                                 tb.transform.SetParent(parentT);
                                 parentT = null;
                                 mm.GetPlayer(mm.myID).AlignHand(.12f, false);
@@ -234,7 +234,7 @@ public class InputController : MonoBehaviour {
 
 	void CBMouseDown(CellBehav cb){
 //		Debug.Log ("OnMouseDown hit on column " + cb.col);
-		if (mm.menu) {
+		if (MenuOpen()) {
 //			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
 //			Tile.Element element = uiCont.GetClickElement ();
 //			if (element != Tile.Element.None) {

@@ -28,7 +28,7 @@ public class SyncManager : PunBehaviour {
     }
 
     private Queue<int> rands;
-    private bool affectingQueue = false; // will I need this?
+    //private bool affectingQueue = false; // will I need this?
 
     public IEnumerator SyncRand(int id, int value) {
         yield return SyncRands(id, new int[] { value });
@@ -77,8 +77,8 @@ public class SyncManager : PunBehaviour {
         mm.GetPlayer(id).DrawTiles(1, elem, dealt, false);
     }
 
-    public IEnumerator OnDropLocal(int id, Tile.Element elem, int col) {
-        if (id == mm.myID) { // if local, send to remote
+    public IEnumerator OnDropLocal(int id, bool playerAction, Tile.Element elem, int col) {
+        if (playerAction && id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDrop", PhotonTargets.Others, id, elem, col);
         }
@@ -86,11 +86,8 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleDrop(int id, Tile.Element elem, int col) {
-        if (mm.currentState == MageMatch.GameState.CommishTurn) { // TODO hacky - change event
-            return;
-        }
         GameObject go = mm.ActiveP().GetTileFromHand(elem);
-        mm.DropTile(col, go);
+        mm.PlayerDropTile(col, go);
     }
 
     public IEnumerator OnSwapLocal(int id, int c1, int r1, int c2, int r2) {
