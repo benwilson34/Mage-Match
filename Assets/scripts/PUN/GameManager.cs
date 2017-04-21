@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 namespace Com.SoupSkull.MageMatch {
     public class GameManager : Photon.PunBehaviour {
 

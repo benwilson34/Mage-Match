@@ -50,10 +50,10 @@ public class AnimationController : MonoBehaviour {
         animating--;
     }
 
-    IEnumerator _Grav(Transform trans, int col, int row) {
+    IEnumerator _Grav(Transform t, int col, int row) {
         Vector2 newPos = mm.hexGrid.GridCoordToPos(col, row);
-        float height = trans.position.y - newPos.y;
-        Tween tween = trans.DOMove(newPos, .08f * height, false);
+        float height = t.position.y - newPos.y;
+        Tween tween = t.DOMove(newPos, .08f * height, false);
         //tween.SetEase (Ease.InQuad);
         tween.SetEase(gravEase);
 
@@ -136,5 +136,15 @@ public class AnimationController : MonoBehaviour {
         Tween t = zomb.DOMove(zomb_origPos, .13f);
         t.SetEase(Ease.OutQuad);
         yield return t.WaitForCompletion();
+    }
+
+    public IEnumerator _UpwardInsert(TileBehav tb) {
+        // TODO handle bottom of column
+        Transform t = tb.transform;
+        t.position = mm.hexGrid.GridCoordToPos(tb.tile.col, tb.tile.row - 1); //safe for bottom?
+        t.localScale = new Vector3(.2f, .2f);
+
+        t.DOMoveY(mm.hexGrid.GridRowToPos(tb.tile.col, tb.tile.row), .3f);
+        yield return t.DOScale(1f, .3f);
     }
 }

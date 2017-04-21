@@ -39,7 +39,7 @@ public class Tile {
 		case Element.Muscle:
 			return 'M';
 		default:
-			return '\0';
+			return '*';
 		}
 	}
 

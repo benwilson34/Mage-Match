@@ -103,11 +103,6 @@ public class Enchantment : Effect {
         return enchantee;
     }
 
-    //public void SetTypeTier(EnchType type, int tier) {
-    //    this.enchType = type;
-    //    this.tier = tier;
-    //}
-
     public void SkipCurrent() {
         skip = true;
     }
@@ -130,6 +125,9 @@ public class Enchantment : Effect {
 
     // TODO test
     public override IEnumerator TriggerEffect() {
+
+        // SOMETHING HERE????
+
         if(turnEffect != null)
             yield return turnEffect(playerID, enchantee);
     }

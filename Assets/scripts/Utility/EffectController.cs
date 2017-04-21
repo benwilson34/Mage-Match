@@ -141,7 +141,6 @@ public class EffectController {
     }
 
     public IEnumerator ResolveBeginTurnEffects() {
-        effectsResolving++;
         beginTurnRes++;
         for (c = 0; c < beginTurnEffects.Count; c++) { //foreach
             Effect e = beginTurnEffects[c];
@@ -158,11 +157,9 @@ public class EffectController {
             }
         }
         beginTurnRes--;
-        effectsResolving--;
     }
 
     public IEnumerator ResolveEndTurnEffects() {
-        effectsResolving++;
         endTurnRes++;
         Effect e;
         for (c = 0; c < endTurnEffects.Count; c++) { // foreach
@@ -207,7 +204,6 @@ public class EffectController {
         }
 
         endTurnRes--;
-        effectsResolving--;
     }
     #endregion
 
@@ -280,7 +276,7 @@ public class EffectController {
     #endregion
 
 
-    public bool IsResolving() { return effectsResolving > 0; }
+    public bool IsResolving() { return effectsResolving + beginTurnRes + endTurnRes > 0; }
 
     public object[] GetLists() {
         return new object[4] {

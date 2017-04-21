@@ -112,10 +112,9 @@ public class Enfuego : Character {
 
     // PLACEHOLDER
     public IEnumerator Baile() {
-        targeting.WaitForTileAreaTarget(true, Baila_Target);
-        yield return null;
-    }
-    void Baila_Target(List<TileBehav> tbs) {
+        yield return targeting.WaitForTileAreaTarget(true);
+
+        List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs)
             spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
     }
@@ -125,7 +124,7 @@ public class Enfuego : Character {
         int burnCount = mm.InactiveP().hand.Count * 2;
         Debug.Log("SPELLFX: Incinerate burnCount = " + burnCount);
         mm.InactiveP().DiscardRandom(2);
-        targeting.WaitForDragTarget(burnCount, Incinerate_Target);
+        //targeting.WaitForDragTarget(burnCount, Incinerate_Target);
         yield return null;
     }
     void Incinerate_Target(List<TileBehav> tbs) {

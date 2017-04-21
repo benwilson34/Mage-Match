@@ -408,12 +408,12 @@ public class MageMatch : MonoBehaviour {
         BoardChanged();
     }
 
-    public void Transmute(int col, int row, Tile.Element element) {
-        Destroy(hexGrid.GetTileBehavAt(col, row).gameObject);
-        hexGrid.ClearTileBehavAt(col, row);
-        TileBehav tb = GenerateTile(element).GetComponent<TileBehav>();
-        tb.ChangePos(col, row);
-    }
+    //public void Transmute(int col, int row, Tile.Element element) {
+    //    Destroy(hexGrid.GetTileBehavAt(col, row).gameObject);
+    //    hexGrid.ClearTileBehavAt(col, row);
+    //    TileBehav tb = GenerateTile(element).GetComponent<TileBehav>();
+    //    tb.ChangePos(col, row);
+    //}
 
     public Player ActiveP() {
         return activep;

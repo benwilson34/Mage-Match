@@ -44,7 +44,8 @@ public class HexGrid {
                 tileGrid[col, r] = null;
             }
         }
-        tb.ChangePos(col, row);
+        mm.StartCoroutine(tb._ChangePos(row, col, row, .15f, "raise")); //startRow param not needed here
+        //tb.ChangePos(col, row);
     }
 
     public void SetTileBehavAt(TileBehav tb, int col, int row){

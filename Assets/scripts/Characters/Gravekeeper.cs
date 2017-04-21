@@ -29,9 +29,9 @@ public class Gravekeeper : Character {
 
         SetDeckElements(0, 20, 40, 0, 40);
 
-        spells[0] = new SignatureSpell(0, "Tombstone", "EM", 1, 20, Tombstone);
-        spells[1] = new Spell(1, "Zombie Synergy", "MEE", 1, ZombieSynergy);
-        spells[2] = new Spell(2, "Human Resources", "MEME", 1, HumanResources);
+        spells[0] = new SignatureSpell(0, "Tombstone", "EMME", 1, 20, Tombstone);
+        spells[1] = new Spell(1, "Human Resources", "MEW", 1, HumanResources);
+        spells[2] = new Spell(2, "Undead Union [EMPTY]", "EMM", 1, UndeadUnion);
         spells[3] = new CoreSpell(3, "Gather the Ghouls", 3, 1, GatherTheGhouls);
     }
 
@@ -50,61 +50,65 @@ public class Gravekeeper : Character {
 
     // ----- spells -----
 
-    // TODO Undead Union
-    public IEnumerator ZombieSynergy() {
-        int count = 0;
-        List<TileBehav> tbs = hexGrid.GetPlacedTiles();
+    public IEnumerator HumanResources() {
+        yield return targeting.WaitForTileAreaTarget(false);
+
+        List<TileBehav> tbs = targeting.GetTargetTBs();
+        //foreach (TileBehav tb in tbs) {
+        for(int i = 0; i < tbs.Count; i++) { // foreach
+            TileBehav tb = tbs[i];
+            if (tb.tile.element == Tile.Element.Muscle) {
+                if (tb.CanSetEnch(Enchantment.EnchType.Zombify))
+                    spellfx.Ench_SetZombify(playerID, tb, false);
+            }
+        }
+
         foreach (TileBehav tb in tbs) {
-            if (tb.GetEnchType() == Enchantment.EnchType.Zombify ||
-                tb.GetEnchType() == Enchantment.EnchType.ZombieTok) {
+            if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
+                Debug.Log("GRAVEKEEPER: Triggering zomb at " + tb.PrintCoord());
+                tb.TriggerEnchantment();
+            }
+        }
+    }
+
+    public IEnumerator UndeadUnion() {
+        //DealAdjZombDmg(tbs);
+        yield return null;
+    }
+    void DealAdjZombDmg(List<TileBehav> tbs) {
+        int count = 0;
+        foreach (TileBehav tb in tbs) {
+            if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
                 List<TileBehav> adjTBs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 foreach (TileBehav adjTB in adjTBs) {
-                    if (adjTB.GetEnchType() == Enchantment.EnchType.Zombify ||
-                        adjTB.GetEnchType() == Enchantment.EnchType.ZombieTok) {
+                    if (adjTB.GetEnchType() == Enchantment.EnchType.Zombify) {
                         count++;
                     }
                 }
             }
         }
-        Debug.Log("SPELLEFFECTS: Zombie Synergy has counted " + count + " adjacent zombs");
+        Debug.Log("GRAVEKEEPER: DealAdjZombDmg has counted " + count + " adjacent zombs");
         mm.ActiveP().DealDamage(count * 4);
-
-        yield return null;
     }
 
-    public IEnumerator HumanResources() {
-        targeting.WaitForTileAreaTarget(false, HumanResources_Target);
-        yield return null;
-    }
-    void HumanResources_Target(List<TileBehav> tbs) {
-        foreach (TileBehav tb in tbs) {
-            if (tb.tile.element == Tile.Element.Muscle) {
-                if (tb.GetEnchType() != Enchantment.EnchType.Zombify &&
-                    tb.GetEnchType() != Enchantment.EnchType.ZombieTok)
-                    spellfx.Ench_SetZombify(playerID, tb, false);
-            }
-        }
-    }
+    //public IEnumerator CompanyLuncheon() {
+    //    targeting.WaitForTileAreaTarget(false, CompanyLuncheon_Target);
+    //    yield return null;
+    //}
+    //void CompanyLuncheon_Target(List<TileBehav> tbs) {
+    //    for (int i = 0; i < tbs.Count; i++) {
+    //        TileBehav tb = tbs[i];
+    //        if (!tb.HasEnchantment() ||
+    //            tb.GetEnchType() != Enchantment.EnchType.Zombify ||
+    //            tb.GetEnchType() != Enchantment.EnchType.ZombieTok) {
+    //            tbs.Remove(tb);
+    //            i--;
+    //        }
+    //    }
+    //    foreach (TileBehav tb in tbs)
+    //        tb.TriggerEnchantment();
+    //}
 
-    public IEnumerator CompanyLuncheon() {
-        targeting.WaitForTileAreaTarget(false, CompanyLuncheon_Target);
-        yield return null;
-    }
-    void CompanyLuncheon_Target(List<TileBehav> tbs) {
-        for (int i = 0; i < tbs.Count; i++) {
-            TileBehav tb = tbs[i];
-            if (!tb.HasEnchantment() ||
-                tb.GetEnchType() != Enchantment.EnchType.Zombify ||
-                tb.GetEnchType() != Enchantment.EnchType.ZombieTok) {
-                tbs.Remove(tb);
-                i--;
-            }
-        }
-        foreach (TileBehav tb in tbs)
-            tb.TriggerEnchantment();
-    }
-
-    // sample
     public IEnumerator ZombifySpell() {
         yield return targeting.WaitForTileTarget(1);
         if (targeting.WasCanceled())

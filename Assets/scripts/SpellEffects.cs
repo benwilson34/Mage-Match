@@ -120,9 +120,11 @@ public class SpellEffects {
         Enchantment ench = new Enchantment(id, Enchantment.EnchType.Zombify, Effect.Type.Enchant, Ench_Zombify_TEffect, null);
         if (skip)
             ench.SkipCurrent();
+
+        mm.effectCont.AddEndTurnEffect(ench, "zomb");
+
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
-        mm.effectCont.AddEndTurnEffect(ench, "zomb");
     }
     IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
         //zombify_select = false; // only use if you're sloppy. 

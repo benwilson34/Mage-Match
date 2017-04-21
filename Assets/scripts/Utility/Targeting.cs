@@ -18,10 +18,10 @@ public class Targeting {
     private List<GameObject> outlines;
 
     //public delegate void TBTargetEffect(TileBehav tb);
-    public delegate void TBMultiTargetEffect(List<TileBehav> tbs);
+    //public delegate void TBMultiTargetEffect(List<TileBehav> tbs);
     public delegate void CBTargetEffect(CellBehav cb);
     //private TBTargetEffect TBtargetEffect;
-    private TBMultiTargetEffect TBmultiTargetEffect;
+    //private TBMultiTargetEffect TBmultiTargetEffect;
     private CBTargetEffect CBtargetEffect;
 
     public Targeting() {
@@ -49,15 +49,14 @@ public class Targeting {
         yield return TargetingScreen();
     }
 
-    public void WaitForTileAreaTarget(bool largeArea, TBMultiTargetEffect targetEffect) {
+    public IEnumerator WaitForTileAreaTarget(bool largeArea) {
         currentTMode = TargetMode.TileArea;
         targets = targetsLeft = 1;
         targetTBs = new List<TileBehav>();
         largeAreaMode = largeArea;
-        TBmultiTargetEffect = targetEffect;
         Debug.Log("TARGETING: Waiting for TileArea target. Targets = " + targetsLeft);
 
-        mm.StartCoroutine(TargetingScreen());
+        yield return TargetingScreen();
     }
 
     public void OnTBTarget(TileBehav tb) {
@@ -150,18 +149,17 @@ public class Targeting {
         }
     }
 
-    // TODO
-    public void WaitForDragTarget(int count, TBMultiTargetEffect targetEffect) {
-        // TODO
-        currentTMode = TargetMode.Drag;
-        targetsLeft = count;
-        TBmultiTargetEffect = targetEffect;
-    }
+    //public void WaitForDragTarget(int count, TBMultiTargetEffect targetEffect) {
+    //    // TODO
+    //    currentTMode = TargetMode.Drag;
+    //    targetsLeft = count;
+    //    TBmultiTargetEffect = targetEffect;
+    //}
 
-    public void OnDragTarget(List<TileBehav> tbs) { // should just pass each TB that gets painted?
-                                                    // TODO
-        TBmultiTargetEffect(tbs);
-    }
+    //public void OnDragTarget(List<TileBehav> tbs) { // should just pass each TB that gets painted?
+    //    // TODO
+    //    TBmultiTargetEffect(tbs);
+    //}
 
     IEnumerator TargetingScreen() {
         canceled = false;
@@ -172,9 +170,12 @@ public class Targeting {
         mm.uiCont.ToggleTargetingUI();
         TileSeq seq = p.GetCurrentBoardSeq();
         OutlinePrereq(seq);
-        // TODO implement cast and cancel mechanics???
+
         yield return new WaitUntil(() => targetsLeft == 0);
         Debug.Log("TARGETING: no more targets.");
+
+        mm.uiCont.UpdateMoveText("Here are your targets!");
+        yield return new WaitForSeconds(1f);
 
         //if (!canceled) { // shouldn't be here anymore
         //    mm.RemoveSeq(seq);

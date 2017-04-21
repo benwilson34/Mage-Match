@@ -29,7 +29,6 @@ public class ZombieToken : TileBehav {
     }
 
     public IEnumerator Tombstone_TEnd(int id) {
-        Destroy(this.gameObject);
-        yield return null;
+        yield return mm._RemoveTile(tile.col, tile.row, false); // remove itself
     }
 }

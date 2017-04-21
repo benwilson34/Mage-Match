@@ -28,25 +28,29 @@ public class TileBehav : MonoBehaviour {
     }
 
 	public void ChangePos(int col, int row){
-		ChangePos(row, col, row);
+		ChangePos(row, col, row, .15f);
 	}
 
-	public void ChangePos(int startrow, int col, int row){
-		ChangePos(startrow, col, row, .15f);
+    // startrow needed??
+	public void ChangePos(int startRow, int col, int row, float duration){
+		StartCoroutine(_ChangePos(startRow, col, row, duration, "x"));
 	}
 
-	public void ChangePos(int startrow, int col, int row, float duration){
-//		Debug.Log ("ChangePos: pos set to = (" + pos [0] + ", " + pos [1] + ")");
+	public IEnumerator _ChangePos(int startRow, int col, int row, float duration, string anim){
 		tile.SetPos(col, row);
 		mm.hexGrid.SetTileBehavAt (this, col, row);
 		inPos = false;
-		StartCoroutine(ChangePos_Anim(col, startrow, duration));
-	}
 
-	IEnumerator ChangePos_Anim(int col, int row, float duration){
-        yield return mm.animCont._MoveTile(this, row, duration);
+        switch (anim) { // not great, but simple...
+            case "raise":
+                yield return mm.animCont._UpwardInsert(this);
+                break;
+            default:
+                yield return mm.animCont._MoveTile(this, startRow, duration);
+                break;
+        }
 
-		mm.audioCont.DropSound (GetComponent<AudioSource>());
+		mm.audioCont.DropSound(GetComponent<AudioSource>());
 		inPos = true;
 	}
 
@@ -87,20 +91,6 @@ public class TileBehav : MonoBehaviour {
         }
 
         return (int)type >= GetEnchTier() && ableTarget;
-
-        //switch (type) {
-        //    case Enchantment.EnchType.Burning:
-        //    case Enchantment.EnchType.Zombify:
-        //        return 1 >= GetEnchTier();
-        //    case Enchantment.EnchType.Cherrybomb:
-        //        return 2 >= GetEnchTier();
-        //    case Enchantment.EnchType.StoneTok:
-        //        return 3 >= GetEnchTier(); //?
-
-        //    default:
-        //        Debug.LogError("TileBehav: Bad ench type in CanSetEnch!");
-        //        return false;
-        //}
     }
 
 	public bool HasEnchantment(){ // just use GetEnchType?
@@ -108,21 +98,22 @@ public class TileBehav : MonoBehaviour {
 	}
 
     public Enchantment.EnchType GetEnchType() {
-        if (enchantment != null)
+        if (HasEnchantment())
             return enchantment.enchType;
         else
             return Enchantment.EnchType.None;
     }
 
     int GetEnchTier() {
-        if (!HasEnchantment())
+        if (HasEnchantment())
+            return (int)enchantment.enchType;
+        else
             return 0;
-        return (int)enchantment.enchType;
     }
 
-    public void TriggerEnchantment() {
+    public IEnumerator TriggerEnchantment() {
         Debug.Log("TILEBEHAV: Triggering enchantment at " + tile.col + ", " + tile.row);
-        enchantment.TriggerEffect();
+        yield return enchantment.TriggerEffect();
     }
 
 	public void ClearEnchantment(){
@@ -140,8 +131,10 @@ public class TileBehav : MonoBehaviour {
             Debug.LogError("TILEBEHAV: Can't set ench at "+PrintCoord()+"! enchType="+ench.enchType);
 			return false;
 		}
+        if(HasEnchantment())
+            ClearEnchantment(); //?
+
         Debug.Log("TILEBEHAV: About to set ench with tag="+ench.tag);
-        ClearEnchantment(); //?
 		ench.SetAsEnchantment(this);
 		enchantment = ench; 
 		return true;
