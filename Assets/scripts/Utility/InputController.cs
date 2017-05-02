@@ -207,22 +207,22 @@ public class InputController : MonoBehaviour {
 			dragged = false; // TODO move into cases below for continuous dragging
 			if (angle < 60) {         // NE
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 1))
-					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
 			} else if (angle < 120) { // N
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 0))
-					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
 			} else if (angle < 180) { // NW
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 5))
-					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
 			} else if (angle < 240) { // SW
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 4))
-					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
 			} else if (angle < 300) { // S
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 3))
-					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
 			} else {                  // SE
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 2))
-					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
 			}
 		}
 	}

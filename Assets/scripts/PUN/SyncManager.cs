@@ -65,16 +65,16 @@ public class SyncManager : PunBehaviour {
         return r;
     }
 
-    public void OnDrawLocal(int id, Tile.Element elem, bool dealt) {
+    public void OnDrawLocal(int id, bool playerAction, bool dealt, Tile.Element elem) {
         //Debug.Log("TURNMANAGER: id=" + id + " myID=" + mm.myID);
-        if (id == mm.myID) { // if local, send to remote
+        if ((playerAction || dealt) && id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleDraw", PhotonTargets.Others, id, elem, dealt);
+            photonView.RPC("HandleDraw", PhotonTargets.Others, id, playerAction, dealt, elem);
         }
     }
     [PunRPC]
-    public void HandleDraw(int id, Tile.Element elem, bool dealt) {
-        mm.GetPlayer(id).DrawTiles(1, elem, dealt, false);
+    public void HandleDraw(int id, bool playerAction, bool dealt, Tile.Element elem) {
+        mm.GetPlayer(id).DrawTiles(1, elem, playerAction, dealt, false);
     }
 
     public IEnumerator OnDropLocal(int id, bool playerAction, Tile.Element elem, int col) {
@@ -90,8 +90,8 @@ public class SyncManager : PunBehaviour {
         mm.PlayerDropTile(col, go);
     }
 
-    public IEnumerator OnSwapLocal(int id, int c1, int r1, int c2, int r2) {
-        if (id == mm.myID) { // if local, send to remote
+    public IEnumerator OnSwapLocal(int id, bool playerAction, int c1, int r1, int c2, int r2) {
+        if (playerAction && id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleSwap", PhotonTargets.Others, id, c1, r1, c2, r2);
         }
@@ -99,7 +99,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleSwap(int id, int c1, int r1, int c2, int r2) {
-        mm.SwapTiles(c1, r1, c2, r2);
+        mm.PlayerSwapTiles(c1, r1, c2, r2);
     }
 
     public void SendSpellCast(int spellNum) {

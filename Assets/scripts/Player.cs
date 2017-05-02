@@ -106,32 +106,6 @@ public class Player {
         ChangeHealth(amount, false);
     }
 
-    // not totally sure this syncing stuff is totally necessary...
-    //public void ChangeHealth(int amount, bool dealt, bool sent) {
-    //    if (ThisIsLocal() || sent) { // dealt needed here?
-    //        string str = "PLAYER: >>>";
-    //        int newAmount = 0;
-    //        if (amount < 0) { // damage
-    //            newAmount = (int)(amount * buff_dmgMult) - buff_dmgExtra;
-    //            if (dealt)
-    //                str += mm.GetOpponent(id).name + " dealt " + (-1 * newAmount) + " damage; ";
-    //            else
-    //                str += name + " took " + (-1 * newAmount) + " damage; ";
-    //            str += name + "'s health changed from " + health + " to " + (health + newAmount);
-    //        } else {
-    //            newAmount = amount;
-    //            str += name + " healed for " + newAmount + " health; " + name + "'s health changed from " + health + " to " + (health + newAmount);
-    //        } // healing?
-    //        Debug.Log(str);
-
-    //        health += newAmount;
-    //        health = Mathf.Clamp(health, 0, character.GetMaxHealth());
-    //        mm.eventCont.PlayerHealthChange(id, amount, dealt, sent);
-
-    //        if (health == 0)
-    //            mm.EndTheGame();
-    //    }
-    //}
     public void ChangeHealth(int amount, bool dealt) {
         string str = "PLAYER: >>>>>";
         if (amount < 0) { // damage
@@ -155,15 +129,14 @@ public class Player {
 
     // bool again?
     public void DealTile() {
-        DrawTiles(1, Tile.Element.None, true, false);
+        DrawTiles(1, Tile.Element.None, false, true, false);
     }
 
     public void DrawTiles(Tile.Element elem) {
-        DrawTiles(1, elem, false, false);
+        DrawTiles(1, elem, true, false, false);
     }
 
-    // this return type isn't really necessary anymore due to the drawEvent
-    public void DrawTiles(int numTiles, Tile.Element elem, bool dealt, bool linear) {
+    public void DrawTiles(int numTiles, Tile.Element elem, bool playerAction, bool dealt, bool linear) {
         for (int i = 0; i < numTiles && !IsHandFull(); i++) {
             GameObject go;
             if (elem == Tile.Element.None)
@@ -181,8 +154,8 @@ public class Player {
             TileBehav tb = go.GetComponent<TileBehav>();
             hand.Add(tb);
 
-            mm.eventCont.Draw(id, tb.tile.element, dealt);
-            if (!dealt)
+            mm.eventCont.Draw(id, playerAction, dealt, tb.tile.element);
+            if (playerAction)
                 mm.eventCont.GameAction(true); //?
         }
         AlignHand(.1f, linear);

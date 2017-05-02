@@ -26,7 +26,7 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void OnDrawButtonClick() {
-        mm.DrawTile();
+        mm.PlayerDrawTile();
     }
 
     public void OnFileButtonClick() {

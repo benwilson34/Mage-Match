@@ -148,11 +148,11 @@ public class AudioController {
         source.Play();
     }
 
-    public void OnDraw(int id, Tile.Element elem, bool dealt) {
+    public void OnDraw(int id, bool playerAction, bool dealt, Tile.Element elem) {
         OnGrab(id, elem);
     }
 
-    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
         Tile.Element elem = tb.tile.element;
         AudioClip clip = null;

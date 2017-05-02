@@ -141,17 +141,18 @@ public class EventController {
             gameAction.Invoke(mm.ActiveP().id, costsAP);
     }
 
-    public delegate void DrawEvent(int id, Tile.Element elem, bool dealt);
+    // TODO IEnum instead
+    public delegate void DrawEvent(int id, bool playerAction, bool dealt, Tile.Element elem);
     public event DrawEvent draw;
-    public void Draw(int id, Tile.Element elem, bool dealt) {
+    public void Draw(int id, bool playerAction, bool dealt, Tile.Element elem) {
         //Debug.Log("EVENTCONTROLLER: Draw called.");
         if (draw != null)
-            draw.Invoke(id, elem, dealt);
+            draw.Invoke(id, playerAction, dealt, elem);
     }
 
     public delegate IEnumerator DropEvent(int id, bool playerAction, Tile.Element elem, int col);
     private List<EventPack> drop;
-    public IEnumerator Drop(Tile.Element elem, int col, bool playerAction) {
+    public IEnumerator Drop(bool playerAction, Tile.Element elem, int col) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in drop) {
             //Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
@@ -164,13 +165,13 @@ public class EventController {
         AddEvent("drop", se, priority);
     }
 
-    public delegate IEnumerator SwapEvent(int id, int c1, int r1, int c2, int r2);
+    public delegate IEnumerator SwapEvent(int id, bool playerAction, int c1, int r1, int c2, int r2);
     private List<EventPack> swap;
-    public IEnumerator Swap(int c1, int r1, int c2, int r2) {
+    public IEnumerator Swap(bool playerAction, int c1, int r1, int c2, int r2) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in swap) {
             //Debug.Log("EVENTCONT: going thru swap event with priority " + pack.priority);
-            yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, c1, r1, c2, r2); // OH YEAH
+            yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, playerAction, c1, r1, c2, r2); // OH YEAH
         }
         Debug.Log("EVENTCONT: Just finished SWAP events...");
         handlingEvents = false; // worth it?

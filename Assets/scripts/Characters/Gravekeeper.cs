@@ -58,15 +58,20 @@ public class Gravekeeper : Character {
         for(int i = 0; i < tbs.Count; i++) { // foreach
             TileBehav tb = tbs[i];
             if (tb.tile.element == Tile.Element.Muscle) {
-                if (tb.CanSetEnch(Enchantment.EnchType.Zombify))
+                if (tb.CanSetEnch(Enchantment.EnchType.Zombify)) {
                     spellfx.Ench_SetZombify(playerID, tb, false);
+                    continue;
+                }
             }
+            tbs.RemoveAt(i);
+            i--;
         }
 
+        Debug.Log("GRAVEKEEPER: HumanResources trigger count=" + tbs.Count);
         foreach (TileBehav tb in tbs) {
             if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
                 Debug.Log("GRAVEKEEPER: Triggering zomb at " + tb.PrintCoord());
-                tb.TriggerEnchantment();
+                yield return tb.TriggerEnchantment();
             }
         }
     }

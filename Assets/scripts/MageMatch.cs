@@ -147,9 +147,10 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
-    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         yield return BoardChecking();
-        eventCont.GameAction(true);
+        if(playerAction)
+            eventCont.GameAction(true);
     }
 
     public void OnGameAction(int id, bool costsAP) { // eventually just pass in int for cost?
@@ -305,44 +306,55 @@ public class MageMatch : MonoBehaviour {
 
     #region ----- Game Actions -----
 
-    public bool DrawTile() {
-        if (activep.IsHandFull()) {
-            uiCont.UpdateMoveText("Your hand is full!");
-            return false;
+    public void PlayerDrawTile() {
+        StartCoroutine(_Draw(activep.id, true));
+    }
+    
+    // for spells and such
+    // needed? just call mm.GetPlayer(id).DrawTiles()?
+    public void DrawTile() {
+        StartCoroutine(_Draw(activep.id, false));
+    }
+
+    public IEnumerator _Draw(int id, bool playerAction) {
+        Debug.Log("   ---------- DRAW BEGIN ----------");
+        Player p = GetPlayer(id);
+        if (p.IsHandFull()) {
+            Debug.Log("MAGEMATCH: Player " + id + "'s hand is full.");
         } else {
-            activep.DrawTiles(1, Tile.Element.None, false, false);
-            return true;
+            p.DrawTiles(1, Tile.Element.None, true, false, false);
         }
+        Debug.Log("   ---------- DRAW END ----------");
+        yield return null;
     }
 
     public bool PlayerDropTile(int col, GameObject go) {
         int row = boardCheck.CheckColumn(col); // check that column isn't full
         if (row >= 0) {
             activep.hand.Remove(go.GetComponent<TileBehav>()); // remove from hand
-            StartCoroutine(_Drop(col, go, true));
+            StartCoroutine(_Drop(true, col, go));
             return true;
         }
         return false;
     }
 
-    // TODO separate methods for player and Commish
     public bool DropTile(int col, GameObject go) {
         int row = boardCheck.CheckColumn(col); // check that column isn't full
         if (row >= 0) { // if the col is not full
-            StartCoroutine(_Drop(col, go, false));
+            StartCoroutine(_Drop(false, col, go));
             return true;
         }
         return false;
     }
 
-    IEnumerator _Drop(int col, GameObject go, bool playerAction) {
+    IEnumerator _Drop(bool playerAction, int col, GameObject go) {
         Debug.Log("   ---------- DROP BEGIN ----------");
         actionsPerforming++;
         TileBehav tb = go.GetComponent<TileBehav>();
         tb.SetPlaced();
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
         if (currentState == GameState.PlayerTurn) { //kinda hacky
-            yield return eventCont.Drop(tb.tile.element, col, playerAction);
+            yield return eventCont.Drop(playerAction, tb.tile.element, col);
         } else if (currentState == GameState.CommishTurn)
             eventCont.CommishDrop(tb.tile.element, col);
 
@@ -351,15 +363,20 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
-    public void SwapTiles(int c1, int r1, int c2, int r2) {
-        StartCoroutine(_SwapTiles(c1, r1, c2, r2));
+    public void PlayerSwapTiles(int c1, int r1, int c2, int r2) {
+        StartCoroutine(_SwapTiles(true, c1, r1, c2, r2));
     }
 
-    public IEnumerator _SwapTiles(int c1, int r1, int c2, int r2) {
+    // for spells and such
+    public void SwapTiles(int c1, int r1, int c2, int r2) {
+        StartCoroutine(_SwapTiles(false, c1, r1, c2, r2));
+    }
+
+    public IEnumerator _SwapTiles( bool playerAction, int c1, int r1, int c2, int r2) {
         Debug.Log("   ---------- SWAP BEGIN ----------");
         actionsPerforming++;
         if (hexGrid.Swap(c1, r1, c2, r2)) { // I feel like this check should be in InputCont
-            yield return eventCont.Swap(c1, r1, c2, r2); 
+            yield return eventCont.Swap(playerAction, c1, r1, c2, r2); 
         }
         Debug.Log("   ---------- SWAP END ----------");
         actionsPerforming--;

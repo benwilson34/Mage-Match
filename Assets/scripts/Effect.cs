@@ -9,7 +9,7 @@ public abstract class Effect {
     public enum Type { None = 0, Cooldown, Damage, Healing, Buff, Destruct, Subtract, Add, Enchant, Movement }
 
     protected MageMatch mm;
-    protected int turnsLeft; // maybe this field should just get renamed to count?
+    protected int turnsLeft;
     public int playerID;
     public Type type; // protected eventually?
     public string tag;
@@ -73,7 +73,6 @@ public class Enchantment : Effect {
 
     public enum EnchType { None = 0, Burning = 1, Zombify = 1, Cherrybomb = 2, ZombieTok = 3, StoneTok = 3 }
     public EnchType enchType; // private?
-    //public int tier;
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;

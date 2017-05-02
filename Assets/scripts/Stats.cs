@@ -107,7 +107,8 @@ public class Stats {
     }
 
     #region GameAction subscriptions
-    public void OnDraw(int id, Tile.Element elem, bool dealt) {
+    // TODO for all, different report lines for playerAction or not...
+    public void OnDraw(int id, bool playerAction, bool dealt, Tile.Element elem) {
         if(dealt)
             report.AppendLine("Deal p"+id+" " + Tile.ElementToChar(elem));
         else
@@ -124,10 +125,11 @@ public class Stats {
         yield return null;
     }
 
-    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         if (!mm.uiCont.IsMenu()) { //?
             report.AppendLine("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
-            GetPS(id).swaps++;
+            if(playerAction)
+                GetPS(id).swaps++;
         } else
             report.AppendLine("menu Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
         yield return null;
