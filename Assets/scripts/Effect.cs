@@ -94,7 +94,7 @@ public class Enchantment : Effect {
         this.cancelEffect = cancelEffect;
     }
 
-    public void SetAsEnchantment(TileBehav tb) {
+    public void SetEnchantee(TileBehav tb) {
         enchantee = tb;
     }
 

@@ -14,7 +14,7 @@ public class UIController : MonoBehaviour {
 	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
     private MageMatch mm;
 	private Dropdown DD1, DD2;
-    private Transform p1info, p2info, p1load, p2load;
+    private Transform leftPinfo, rightPinfo, leftPload, rightPload;
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
@@ -38,10 +38,10 @@ public class UIController : MonoBehaviour {
         matchEffText = GameObject.Find("Text_MatchEff").GetComponent<Text>();
         swapEffText = GameObject.Find("Text_SwapEff").GetComponent<Text>();
 
-        p1info = GameObject.Find("Player1_Info").transform;
-        p2info = GameObject.Find("Player2_Info").transform;
-        p1load = GameObject.Find("Player1_Loadout").transform;
-        p2load = GameObject.Find("Player2_Loadout").transform;
+        leftPinfo = GameObject.Find("LeftPlayer_Info").transform;
+        rightPinfo = GameObject.Find("RightPlayer_Info").transform;
+        leftPload = GameObject.Find("LeftPlayer_Loadout").transform;
+        rightPload = GameObject.Find("RightPlayer_Loadout").transform;
 
         DD1 = GameObject.Find ("Dropdown_p1").GetComponent<Dropdown> ();
 		DD2 = GameObject.Find ("Dropdown_p2").GetComponent<Dropdown> ();
@@ -187,10 +187,31 @@ public class UIController : MonoBehaviour {
     }
 
     public Transform GetPinfo(int id) {
-        if (id == 1)
-            return p1info;
-        else
-            return p2info;
+        if (mm.gameSettings.localPlayerOnLeft) {
+            if (id == mm.myID)
+                return leftPinfo;
+            else
+                return rightPinfo;
+        } else {
+            if (id == 1)
+                return leftPinfo;
+            else
+                return rightPinfo;
+        }
+    }
+
+    public Transform GetPload(int id) {
+        if (mm.gameSettings.localPlayerOnLeft) {
+            if (id == mm.myID)
+                return leftPload;
+            else
+                return rightPload;
+        } else {
+            if (id == 1)
+                return leftPload;
+            else
+                return rightPload;
+        }
     }
 
     void ChangePinfoColor(int id, Color c) {
@@ -265,11 +286,8 @@ public class UIController : MonoBehaviour {
     }
 
 	void ShowLoadout(Player player){
-		Transform pload;
-        if (player.id == 1)
-            pload = p1load;
-        else
-            pload = p2load;
+		Transform pload = GetPload(player.id); // i hope?
+
 		Text loadoutText = pload.Find ("Text_LoadoutName").GetComponent<Text>();
 		loadoutText.text = player.character.characterName + " - " + player.character.loadoutName;
 
@@ -330,19 +348,11 @@ public class UIController : MonoBehaviour {
     public void SetDrawButton(Player p, bool interactable) {
         if (interactable && !p.ThisIsLocal()) // if not the localp, no draw button
             return;
-        if (p.id == 1)
-            p1info.Find("Button_Draw").GetComponent<Button>().interactable = interactable;
-        else
-            p2info.Find("Button_Draw").GetComponent<Button>().interactable = interactable;
+        GetPinfo(p.id).Find("Button_Draw").GetComponent<Button>().interactable = interactable;
     }
 
     Button GetButton(Player player, int index){
-		Transform pload;
-        if (player.id == 1)
-            pload = p1load;
-        else
-            pload = p2load;
-		return pload.Find ("Button_Spell" + index).GetComponent<Button>();
+		return GetPload(player.id).Find ("Button_Spell" + index).GetComponent<Button>();
 	}
 
 	public void ActivateSpellButton(Player player, int index){

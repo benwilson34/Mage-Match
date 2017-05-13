@@ -26,19 +26,20 @@ public class Player {
         hand = new List<TileBehav>();
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         id = playerNum;
+        SetHandSlot();
 
         switch (playerNum) {
             case 1:
                 name = mm.gameSettings.p1name;
                 if (name == "")
                     name = "player 1";
-                handSlot = GameObject.Find("handslot1").transform;
+                //handSlot = GameObject.Find("handslot1").transform;
                 break;
             case 2:
                 name = mm.gameSettings.p2name;
                 if (name == "")
                     name = "player 2";
-                handSlot = GameObject.Find("handslot2").transform;
+                //handSlot = GameObject.Find("handslot2").transform;
                 break;
             default:
                 Debug.LogError("PLAYER: Tried to instantiate player with id not 1 or 2!");
@@ -47,6 +48,20 @@ public class Player {
 
         character = Character.Load(mm, id);
         health = character.GetMaxHealth();
+    }
+
+    void SetHandSlot() {
+        if (mm.gameSettings.localPlayerOnLeft) {
+            if (id == mm.myID)
+                handSlot = GameObject.Find("handslot1").transform;
+            else
+                handSlot = GameObject.Find("handslot2").transform;
+        } else {
+            if (id == 1)
+                handSlot = GameObject.Find("handslot1").transform;
+            else
+                handSlot = GameObject.Find("handslot2").transform;
+        }
     }
 
     public void InitEvents() {
@@ -144,10 +159,11 @@ public class Player {
             else
                 go = mm.GenerateTile(elem);
 
-            if (id == 1)
-                go.transform.position = new Vector3(-5, 2);
-            else if (id == 2)
-                go.transform.position = new Vector3(5, 2);
+            go.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
+            //if (id == 1)
+            //    go.transform.position = new Vector3(-5, 2);
+            //else if (id == 2)
+            //    go.transform.position = new Vector3(5, 2);
 
             go.transform.SetParent(handSlot, false);
 
@@ -162,6 +178,8 @@ public class Player {
     }
 
     public void AlignHand(float duration, bool linear) {
+        if (mm.gameSettings.hideOpponentHand && !ThisIsLocal())
+            return;
         mm.animCont.PlayAnim(mm.animCont._AlignHand(this, duration, linear));
     }
 

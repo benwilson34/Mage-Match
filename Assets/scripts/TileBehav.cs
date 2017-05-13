@@ -135,7 +135,7 @@ public class TileBehav : MonoBehaviour {
             ClearEnchantment(); //?
 
         Debug.Log("TILEBEHAV: About to set ench with tag="+ench.tag);
-		ench.SetAsEnchantment(this);
+		ench.SetEnchantee(this);
 		enchantment = ench; 
 		return true;
 	}

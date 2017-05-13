@@ -38,7 +38,7 @@ public class MageMatch : MonoBehaviour {
         //Random.InitState(1337420);
 
         gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
-        Debug.Log("MAGEMATCH: gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
+        Debug.Log("MAGEMATCH: gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn + ",localLeft=" + gameSettings.localPlayerOnLeft + ",hideOppHand=" + gameSettings.hideOpponentHand);
 
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
@@ -131,6 +131,8 @@ public class MageMatch : MonoBehaviour {
         uiCont.InitEvents();
         p1.InitEvents();
         p2.InitEvents();
+
+        animCont.Init(this);
     }
 
     #region EventCont calls
@@ -318,6 +320,7 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator _Draw(int id, bool playerAction) {
         Debug.Log("   ---------- DRAW BEGIN ----------");
+        actionsPerforming++;
         Player p = GetPlayer(id);
         if (p.IsHandFull()) {
             Debug.Log("MAGEMATCH: Player " + id + "'s hand is full.");
@@ -325,6 +328,7 @@ public class MageMatch : MonoBehaviour {
             p.DrawTiles(1, Tile.Element.None, true, false, false);
         }
         Debug.Log("   ---------- DRAW END ----------");
+        actionsPerforming--;
         yield return null;
     }
 
@@ -552,14 +556,18 @@ public class MageMatch : MonoBehaviour {
         removing++;
 
         TileBehav tb = hexGrid.GetTileBehavAt(col, row);
+
         if (tb == null) {
-            if(!tb.ableDestroy) // maybe not error
-                Debug.LogError("MAGEMATCH: RemoveTile tried to destory an indestructable tile!");
-            else
-                Debug.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
+            Debug.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
             removing--;
             yield break;
         }
+        if (!tb.ableDestroy) {
+            Debug.LogWarning("MAGEMATCH: RemoveTile tried to remove an indestructable tile!");
+            removing--;
+            yield break;
+        }
+
         if (tb.HasEnchantment()) {
             if (resolveEnchant) {
                 Debug.Log("MAGEMATCH: About to resolve enchant on tile " + tb.PrintCoord());

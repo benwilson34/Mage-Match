@@ -7,7 +7,7 @@ using Photon;
 public class GameSettings : PunBehaviour {
 
     public string p1name, p2name;
-    public bool turnTimerOn;
+    public bool turnTimerOn, localPlayerOnLeft, hideOpponentHand;
 
     private bool nameSet = false;
     private Transform control;
@@ -32,9 +32,12 @@ public class GameSettings : PunBehaviour {
         if (id == 1) {
             p1name = name;
             turnTimerOn = control.Find("Toggle_TurnTimer").GetComponent<Toggle>().isOn;
-            Debug.Log("GAMESETTINGS: player 1 here, setting turnTimerOn to " + turnTimerOn);
-            photonView.RPC("SetTurnTimerToggle", PhotonTargets.Others, turnTimerOn);
+            localPlayerOnLeft = control.Find("Toggle_PlayerOnLeft").GetComponent<Toggle>().isOn;
+            hideOpponentHand = control.Find("Toggle_HideOpponentHand").GetComponent<Toggle>().isOn;
+            //Debug.Log("GAMESETTINGS: player 1 here, setting turnTimerOn to " + turnTimerOn);
+            photonView.RPC("SetToggles", PhotonTargets.Others, turnTimerOn, localPlayerOnLeft, hideOpponentHand);
 
+            // warn that the toggle RPC might outrun this "callback"...
             yield return new WaitUntil(() => nameSet); // wait for RPC
 
             launcher.LoadGameScreen();
@@ -54,8 +57,10 @@ public class GameSettings : PunBehaviour {
     }
 
     [PunRPC]
-    public void SetTurnTimerToggle(bool b) {
-        Debug.Log("GAMESETTINGS: SetTurnTimer to " + b);
-        turnTimerOn = b;
+    public void SetToggles(bool turnTimerOn, bool localPlayerOnLeft, bool hideOpponentHand) {
+        //Debug.Log("GAMESETTINGS: SetTurnTimer to " + b);
+        this.turnTimerOn = turnTimerOn;
+        this.localPlayerOnLeft = localPlayerOnLeft;
+        this.hideOpponentHand = hideOpponentHand;
     }
 }

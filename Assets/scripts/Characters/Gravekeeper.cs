@@ -31,7 +31,7 @@ public class Gravekeeper : Character {
 
         spells[0] = new SignatureSpell(0, "Tombstone", "EMME", 1, 20, Tombstone);
         spells[1] = new Spell(1, "Human Resources", "MEW", 1, HumanResources);
-        spells[2] = new Spell(2, "Undead Union [EMPTY]", "EMM", 1, UndeadUnion);
+        spells[2] = new Spell(2, "Undead Union", "EMM", 1, UndeadUnion);
         spells[3] = new CoreSpell(3, "Gather the Ghouls", 3, 1, GatherTheGhouls);
     }
 
@@ -77,9 +77,40 @@ public class Gravekeeper : Character {
     }
 
     public IEnumerator UndeadUnion() {
-        //DealAdjZombDmg(tbs);
+        yield return targeting.WaitForTileAreaTarget(false);
+
+        List<TileBehav> tbs = targeting.GetTargetTBs();
+        List<TileBehav> indestructTbs = new List<TileBehav>(tbs);
+        for (int i = 0; i < tbs.Count; i++) { // filter zombs
+            TileBehav tb = tbs[i];
+            if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
+                if (!tb.ableDestroy)
+                    indestructTbs.RemoveAt(i);
+            } else {
+                tbs.RemoveAt(i);
+                indestructTbs.RemoveAt(i);
+                i--;
+            }
+        }
+        Debug.Log("GRAVEKEEPER: Undead Union target has " + tbs.Count + " zombs in area");
+
+        foreach (TileBehav tb in indestructTbs) {
+            tb.ableDestroy = false;
+            Enchantment e = new Enchantment(playerID, 2, Enchantment.EnchType.None, Effect.Type.Enchant, null, UndeadUnion_TEnd); // dunno about these settings
+            e.SetEnchantee(tb);
+            mm.effectCont.AddEndTurnEffect(e, "union"); 
+        }
+
+        DealAdjZombDmg(tbs);
+
         yield return null;
     }
+    IEnumerator UndeadUnion_TEnd(int id, TileBehav tb) {
+        Debug.Log("GRAVEKEEPER: >>>>>>>>>>>> UndeadUnion at " + tb.PrintCoord() + " is done!");
+        tb.ableDestroy = true;
+        yield return null;
+    }
+
     void DealAdjZombDmg(List<TileBehav> tbs) {
         int count = 0;
         foreach (TileBehav tb in tbs) {
@@ -93,7 +124,8 @@ public class Gravekeeper : Character {
             }
         }
         Debug.Log("GRAVEKEEPER: DealAdjZombDmg has counted " + count + " adjacent zombs");
-        mm.ActiveP().DealDamage(count * 4);
+        if(count > 0)
+            mm.ActiveP().DealDamage(count * 5);
     }
 
     //public IEnumerator CompanyLuncheon() {

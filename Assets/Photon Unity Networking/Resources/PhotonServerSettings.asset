@@ -66,4 +66,5 @@ MonoBehaviour:
   - HandleClearTargets
   - HandleSyncRands
   - HandleTimeout
+  - SetToggles
   DisableAutoOpenWizard: 1

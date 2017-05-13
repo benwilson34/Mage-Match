@@ -75,7 +75,7 @@ public class SpellEffects {
 
 		List<TileBehav> tbs = hexGrid.GetSmallAreaTiles (tb.tile.col, tb.tile.row);
 		foreach(TileBehav ctb in tbs){
-			if (ctb.ableDestroy)
+			//if (ctb.ableDestroy) // shouldn't have to check here...
 				mm.RemoveTile (ctb.tile.col, ctb.tile.row, true);
 		}
         yield return null; // for now

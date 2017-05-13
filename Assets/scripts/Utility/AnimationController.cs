@@ -10,13 +10,17 @@ public class AnimationController : MonoBehaviour {
     private MageMatch mm;
     private int animating;
 
-	// Use this for initialization
-	void Start () {
-        mm = GetComponent<MageMatch>();
-	}
-	
-	// Update is called once per frame
-	//void Update () {}
+    // Use this for initialization
+    void Start() {
+        //mm = GetComponent<MageMatch>();
+    }
+
+    public void Init(MageMatch mm) {
+        this.mm = mm;
+    }
+
+    // Update is called once per frame
+    //void Update () {}
 
     public void PlayAnim(IEnumerator anim) {
         StartCoroutine(anim);
@@ -68,25 +72,43 @@ public class AnimationController : MonoBehaviour {
         for (int i = 0; i < p.hand.Count; i++) {
             tb = p.hand[i];
             //			Debug.Log ("AlignHand hand[" + i + "] = " + tb.transform.name + ", position is (" + handSlot.position.x + ", " + handSlot.position.y + ")");
-            if (p.id == 1) {
-                if (i < 2)
-                    tilePos = new Vector3(handPos.x - i - .5f, handPos.y + HexGrid.horiz);
-                else if (i < 5)
-                    tilePos = new Vector3(handPos.x - (i-2), handPos.y);
-                else
-                    tilePos = new Vector3(handPos.x - (i-5) - .5f, handPos.y - HexGrid.horiz);
-            } else {
-                if (i < 2)
-                    tilePos = new Vector3(handPos.x + i + .5f, handPos.y + HexGrid.horiz);
-                else if (i < 5)
-                    tilePos = new Vector3(handPos.x + (i-2), handPos.y);
-                else
-                    tilePos = new Vector3(handPos.x + (i-5) + .5f, handPos.y - HexGrid.horiz);
-            }
+            tilePos = GetHandPos(p.id, handPos, i);
 
             tween = tb.transform.DOMove(tilePos, dur, false);
             if (linear || i == p.hand.Count - 1)
                 yield return tween.WaitForCompletion();
+        }
+    }
+
+    Vector3 GetHandPos(int id, Vector3 handPos, int i) {
+        // should really be outside of method...
+        bool isOnLeft;
+        if (mm.gameSettings.localPlayerOnLeft) {
+            if (id == mm.myID)
+                isOnLeft = true;
+            else
+                isOnLeft = false;
+        } else {
+            if (id == 1)
+                isOnLeft = true;
+            else
+                isOnLeft = false;
+        }
+
+        if (isOnLeft) {
+            if (i < 2)
+                return new Vector3(handPos.x - i - .5f, handPos.y + HexGrid.horiz);
+            else if (i < 5)
+                return new Vector3(handPos.x - (i - 2), handPos.y);
+            else
+                return new Vector3(handPos.x - (i - 5) - .5f, handPos.y - HexGrid.horiz);
+        } else {
+            if (i < 2)
+                return new Vector3(handPos.x + i + .5f, handPos.y + HexGrid.horiz);
+            else if (i < 5)
+                return new Vector3(handPos.x + (i - 2), handPos.y);
+            else
+                return new Vector3(handPos.x + (i - 5) + .5f, handPos.y - HexGrid.horiz);
         }
     }
 
