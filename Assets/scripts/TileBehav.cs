@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class TileBehav : MonoBehaviour {
 
@@ -15,10 +16,12 @@ public class TileBehav : MonoBehaviour {
 
     protected MageMatch mm;
 	private Enchantment enchantment;
+    private List<TileEffect> tileEffects;
 	private bool inPos = true;
 
 	void Awake(){
         mm = GameObject.Find("board").GetComponent<MageMatch>();
+        tileEffects = new List<TileEffect>(); // move to Init?
         Init();
 	}
 
@@ -151,6 +154,16 @@ public class TileBehav : MonoBehaviour {
 		}
 		return false;
 	}
+
+    public void AddTileEffect(TileEffect te) { tileEffects.Add(te); }
+
+    public void RemoveTileEffect(TileEffect te) { tileEffects.Remove(te); }
+
+    public void ClearTileEffects() {
+        foreach (TileEffect te in tileEffects) {
+            mm.effectCont.RemoveTurnEffect(te);
+        }
+    }
 
     public string PrintCoord() {
         return "(" + tile.col + ", " + tile.row + ")";

@@ -574,6 +574,7 @@ public class MageMatch : MonoBehaviour {
                 tb.ResolveEnchantment();
             }
             tb.ClearEnchantment(); // TODO
+            tb.ClearTileEffects(); //?
         }
         hexGrid.ClearTileBehavAt(col, row); // move up?
 

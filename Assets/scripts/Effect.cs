@@ -66,28 +66,23 @@ public class TurnEffect : Effect {
 }
 
 
-
-public class Enchantment : Effect {
+public class TileEffect : Effect {
 
     public delegate IEnumerator MyTileEffect(int id, TileBehav tb);
-
-    public enum EnchType { None = 0, Burning = 1, Zombify = 1, Cherrybomb = 2, ZombieTok = 3, StoneTok = 3 }
-    public EnchType enchType; // private?
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
     private SpellEffects spellfx;
     private bool skip = false;
 
-    public Enchantment(int id, int turns, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
+    public TileEffect(int id, int turns, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) : this(id, type, turnEffect, endEffect, cancelEffect) {
         turnsLeft = turns;
     }
 
-    public Enchantment(int id, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) {
+    public TileEffect(int id, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id; // NO!!!
         turnsLeft = -1;
-        this.enchType = enchType;
         this.type = type;
         this.turnEffect = turnEffect;
         this.endEffect = endEffect;
@@ -122,12 +117,8 @@ public class Enchantment : Effect {
         }
     }
 
-    // TODO test
     public override IEnumerator TriggerEffect() {
-
-        // SOMETHING HERE????
-
-        if(turnEffect != null)
+        if (turnEffect != null)
             yield return turnEffect(playerID, enchantee);
     }
 
@@ -139,6 +130,30 @@ public class Enchantment : Effect {
     public override void CancelEffect() {
         if (cancelEffect != null)
             cancelEffect(playerID, enchantee);
+    }
+
+}
+
+
+public class Enchantment : TileEffect {
+
+    public enum EnchType { None = 0, Burning = 1, Zombify = 1, Cherrybomb = 2, ZombieTok = 3, StoneTok = 3 }
+    public EnchType enchType; // private?
+
+    private MyTileEffect turnEffect, endEffect, cancelEffect;
+    private TileBehav enchantee;
+    private SpellEffects spellfx;
+    private bool skip = false;
+
+    public Enchantment(int id, int turns, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
+        turnsLeft = turns;
+    }
+
+    public Enchantment(int id, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :base(id, type, turnEffect, endEffect) {
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = id; // NO!!!
+        turnsLeft = -1;
+        this.enchType = enchType;
     }
 
 }

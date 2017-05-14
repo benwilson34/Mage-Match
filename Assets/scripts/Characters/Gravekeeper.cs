@@ -96,7 +96,8 @@ public class Gravekeeper : Character {
 
         foreach (TileBehav tb in indestructTbs) {
             tb.ableDestroy = false;
-            Enchantment e = new Enchantment(playerID, 2, Enchantment.EnchType.None, Effect.Type.Enchant, null, UndeadUnion_TEnd); // dunno about these settings
+            TileEffect e = new TileEffect(playerID, 2, Effect.Type.Enchant, null, UndeadUnion_TEnd); // dunno about these settings
+            tb.AddTileEffect(e);
             e.SetEnchantee(tb);
             mm.effectCont.AddEndTurnEffect(e, "union"); 
         }

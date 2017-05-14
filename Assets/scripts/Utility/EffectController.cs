@@ -173,6 +173,10 @@ public class EffectController {
                 endTurnEffects.RemoveAt(c);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment();
+                else if (e is TileEffect) {
+                    TileEffect te = (TileEffect)e;
+                    te.GetEnchantee().RemoveTileEffect(te);
+                }
                 c--;
             } 
         }
