@@ -76,9 +76,7 @@ public class Commish  {
             GameObject go = mm.GenerateTile(elems.Dequeue());
             Debug.Log ("COMMISH: Dropping into col " + cols.Peek());
 
-            if (mm.DropTile(cols.Dequeue(), go)) {
-                go.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
-            } else {
+            if (!mm.DropTile(cols.Dequeue(), go)) {
                 Debug.LogError("COMMISH: Tried to drop into a full column!");
                 break;
             }

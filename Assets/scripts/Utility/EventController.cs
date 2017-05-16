@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class EventController {
 
-    MageMatch mm;
-
+    public enum Type { None = 0, LastStep, GameAction, Stats, EventEffects, Player, Audio, Network, FirstStep }
     public bool handlingEvents = false; // worth it?
+
+    private MageMatch mm;
 
     public EventController(MageMatch mm) {
         this.mm = mm;
@@ -18,7 +19,7 @@ public class EventController {
         drop = new List<EventPack>();
     }
 
-    struct EventPack { public System.Delegate ev; public int priority; }
+    struct EventPack { public System.Delegate ev; public Type type; }
 
     List<EventPack> GetEventList(string type) {
         switch (type) {
@@ -39,15 +40,15 @@ public class EventController {
     }
 
     // ex. AddEvent("swap", SwapCallbackMethod, 1)
-    void AddEvent(string type, System.Delegate e, int priority) {
+    void AddEvent(string type, System.Delegate e, Type t) {
         List<EventPack> evList = GetEventList(type);
 
         int i = 0;
         for (; i < evList.Count; i++) {
-            if (evList[i].priority < priority)
+            if ((int)evList[i].type < (int)t)
                 break;
         }
-        evList.Insert(i, new EventPack { ev = e, priority = priority });
+        evList.Insert(i, new EventPack { ev = e, type = t });
     }
 
 
@@ -83,8 +84,8 @@ public class EventController {
         Debug.Log("EVENTCONT: Just finished TURN BEGIN events...");
         handlingEvents = false; // worth it?
     }
-    public void AddTurnBeginEvent(TurnBeginEvent ev, int priority) {
-        AddEvent("turnBegin", ev, priority);
+    public void AddTurnBeginEvent(TurnBeginEvent ev, Type type) {
+        AddEvent("turnBegin", ev, type);
     }
 
     public delegate IEnumerator TurnEndEvent(int id);
@@ -97,8 +98,8 @@ public class EventController {
         Debug.Log("EVENTCONT: Just finished TURN END events...");
         handlingEvents = false; // worth it?
     }
-    public void AddTurnEndEvent(TurnEndEvent ev, int priority) {
-        AddEvent("turnEnd", ev, priority);
+    public void AddTurnEndEvent(TurnEndEvent ev, Type type) {
+        AddEvent("turnEnd", ev, type);
     }
 
     public delegate void TimeoutEvent(int id);
@@ -161,8 +162,8 @@ public class EventController {
         Debug.Log("EVENTCONT: Just finished DROP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddDropEvent(DropEvent se, int priority) {
-        AddEvent("drop", se, priority);
+    public void AddDropEvent(DropEvent se, Type type) {
+        AddEvent("drop", se, type);
     }
 
     public delegate IEnumerator SwapEvent(int id, bool playerAction, int c1, int r1, int c2, int r2);
@@ -176,8 +177,8 @@ public class EventController {
         Debug.Log("EVENTCONT: Just finished SWAP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddSwapEvent(SwapEvent se, int priority) {
-        AddEvent("swap", se, priority);
+    public void AddSwapEvent(SwapEvent se, Type type) {
+        AddEvent("swap", se, type);
     }
     // TODO similar method to convert for removing (if it's ever needed...)
 
@@ -202,8 +203,8 @@ public class EventController {
         Debug.Log("EVENTCONT: Just finished MATCH events...");
         handlingEvents = false; // worth it?
     }
-    public void AddMatchEvent(MatchEvent ev, int priority) {
-        AddEvent("match", ev, priority);
+    public void AddMatchEvent(MatchEvent ev, Type type) {
+        AddEvent("match", ev, type);
     }
     public void RemoveMatchEvent(MatchEvent ev) {
         RemoveEvent("match", ev);

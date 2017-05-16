@@ -25,10 +25,10 @@ public class EffectController {
     }
 
     public void InitEvents() {
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 3);
-        mm.eventCont.AddTurnEndEvent(OnTurnEnd, 3);
-        mm.eventCont.AddMatchEvent(OnMatch, 3);
-        mm.eventCont.AddSwapEvent(OnSwap, 3);
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.EventEffects);
+        mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.EventEffects);
+        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.EventEffects);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.EventEffects);
     }
 
     #region EventCont calls

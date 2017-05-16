@@ -66,8 +66,8 @@ public class Player {
 
     public void InitEvents() {
         character.InitEvents();
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 4);
-        mm.eventCont.AddMatchEvent(OnMatch, 4);
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Player);
+        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Player);
     }
 
     public IEnumerator OnTurnBegin(int id) {

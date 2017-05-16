@@ -62,10 +62,10 @@ public class UIController : MonoBehaviour {
     }
 
     public void InitEvents() {
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 1);
-        mm.eventCont.AddTurnEndEvent(OnTurnEnd, 1);
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
+        mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
         mm.eventCont.gameAction += OnGameAction;
-        mm.eventCont.AddMatchEvent(OnMatch, 2);
+        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
         mm.eventCont.cascade += OnCascade;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
         mm.eventCont.playerMeterChange += OnPlayerMeterChange;

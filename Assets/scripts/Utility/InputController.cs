@@ -11,7 +11,7 @@ public class InputController : MonoBehaviour {
     private bool dropping = false;
 
 	private Vector3 dragClick;
-	private Transform parentT;
+	//private Transform parentT;
 	private bool dragged = false;
 
 	private bool lastClick = false, nowClick = false;
@@ -119,8 +119,7 @@ public class InputController : MonoBehaviour {
                     case TileBehav.TileState.Hand:
                         if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsTileMine(tb)) {
                             dropping = true;
-                            parentT = tb.transform.parent;
-                            tb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
+                            //parentT = tb.transform.parent;
 
                             dropTile = tb.gameObject;
                             mm.eventCont.GrabTile(mm.myID, tb.tile.element);
@@ -179,8 +178,8 @@ public class InputController : MonoBehaviour {
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
 
                             if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropTile)) {
-                                tb.transform.SetParent(parentT);
-                                parentT = null;
+                                //tb.transform.SetParent(parentT);
+                                //parentT = null;
                                 mm.GetPlayer(mm.myID).AlignHand(.12f, false);
                             }
                             dropping = false;

@@ -39,18 +39,18 @@ public class Stats {
 
         InitReport();
 
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 2);
-        mm.eventCont.AddTurnEndEvent(OnTurnEnd, 2);
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Stats);
+        mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
         mm.eventCont.timeout += OnTimeout;
         mm.eventCont.commishDrop += OnCommishDrop;
         mm.eventCont.commishMatch += OnCommishMatch;
 
         mm.eventCont.draw += OnDraw;
-        mm.eventCont.AddDropEvent(OnDrop, 2);
-        mm.eventCont.AddSwapEvent(OnSwap, 2);
+        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats);
         mm.eventCont.spellCast += OnSpellCast;
 
-        mm.eventCont.AddMatchEvent(OnMatch, 2);
+        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
         mm.eventCont.cascade += OnCascade;
         mm.eventCont.tileRemove += OnTileRemove;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;

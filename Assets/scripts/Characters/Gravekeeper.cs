@@ -52,6 +52,8 @@ public class Gravekeeper : Character {
 
     public IEnumerator HumanResources() {
         yield return targeting.WaitForTileAreaTarget(false);
+        if (targeting.WasCanceled())
+            yield break;
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         //foreach (TileBehav tb in tbs) {
@@ -78,6 +80,8 @@ public class Gravekeeper : Character {
 
     public IEnumerator UndeadUnion() {
         yield return targeting.WaitForTileAreaTarget(false);
+        if (targeting.WasCanceled())
+            yield break;
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         List<TileBehav> indestructTbs = new List<TileBehav>(tbs);

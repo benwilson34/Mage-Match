@@ -108,7 +108,10 @@ public class Targeting {
     }
 
     // TODO
-    public void WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) { }
+    public IEnumerator WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) {
+        currentTMode = TargetMode.CellArea;
+        yield return null;
+    }
 
     public void OnCBTarget(CellBehav cb) {
         //DecTargets ();
@@ -200,28 +203,6 @@ public class Targeting {
     public List<TileBehav> GetTargetTBs() { return targetTBs; }
 
     public List<CellBehav> GetTargetCBs() { return targetCBs; }
-
-    //void HandleTargets() {
-    //    switch (currentTMode) {
-    //        case TargetMode.Tile:
-    //            foreach (TileBehav tb in targetTBs)
-    //                TBtargetEffect(tb);
-    //            break;
-    //        case TargetMode.TileArea:
-    //            Debug.Log("TARGETING: Handling TileArea effect...");
-    //            TBmultiTargetEffect(targetTBs);
-    //            break;
-    //        case TargetMode.Cell:
-    //            foreach (CellBehav cb in targetCBs) {
-    //                CBtargetEffect(cb);
-    //            }
-    //            break;
-    //        case TargetMode.CellArea:
-    //            break;
-    //        case TargetMode.Drag:
-    //            break;
-    //    }
-    //}
 
     void OutlinePrereq(TileSeq seq) {
         outlines = new List<GameObject>(); // move to Init?

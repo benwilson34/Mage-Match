@@ -30,6 +30,7 @@ public class MageMatch : MonoBehaviour {
     private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
     private GameObject stonePF, emberPF, tombstonePF, prereqPF, targetPF; // token prefabs
     private Player p1, p2, activep;
+    private Transform tilesOnBoard;
     private bool endGame = false;
     private int checking = 0, removing = 0, actionsPerforming = 0, matchesResolving = 0;
     private int cascade = 0; // should this be how this is handled?
@@ -37,6 +38,7 @@ public class MageMatch : MonoBehaviour {
     void Start() {
         //Random.InitState(1337420);
 
+        tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
         gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         Debug.Log("MAGEMATCH: gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn + ",localLeft=" + gameSettings.localPlayerOnLeft + ",hideOppHand=" + gameSettings.hideOpponentHand);
 
@@ -115,11 +117,11 @@ public class MageMatch : MonoBehaviour {
     public void InitEvents() {
         eventCont = new EventController(this);
         eventCont.boardAction += OnBoardAction;
-        eventCont.AddDropEvent(OnDrop, 1); // checking
-        eventCont.AddSwapEvent(OnSwap, 1); // checking
+        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction); // checking
+        eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction); // checking
         eventCont.gameAction += OnGameAction;
-        eventCont.AddTurnBeginEvent(OnTurnBegin, 1); // checking
-        eventCont.AddTurnEndEvent(OnTurnEnd, 1); // checking
+        eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.GameAction); // checking
+        eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.GameAction); // checking
 
         if (gameSettings.turnTimerOn)
             eventCont.timeout += OnTimeout;
@@ -354,6 +356,7 @@ public class MageMatch : MonoBehaviour {
     IEnumerator _Drop(bool playerAction, int col, GameObject go) {
         Debug.Log("   ---------- DROP BEGIN ----------");
         actionsPerforming++;
+        go.transform.SetParent(tilesOnBoard);
         TileBehav tb = go.GetComponent<TileBehav>();
         tb.SetPlaced();
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);

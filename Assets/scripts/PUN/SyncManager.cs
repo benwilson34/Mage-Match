@@ -19,8 +19,8 @@ public class SyncManager : PunBehaviour {
     public void InitEvents(MageMatch mm, EventController eventCont) {
         this.mm = mm;
         eventCont.draw += OnDrawLocal;
-        eventCont.AddDropEvent(OnDropLocal, 5);
-        eventCont.AddSwapEvent(OnSwapLocal, 5);
+        eventCont.AddDropEvent(OnDropLocal, EventController.Type.Network);
+        eventCont.AddSwapEvent(OnSwapLocal, EventController.Type.Network);
         //eventCont.commishDrop += OnCommishDrop;
         //eventCont.commishTurnDone += OnCommishTurnDone;
         //eventCont.playerHealthChange += OnPlayerHealthChange;

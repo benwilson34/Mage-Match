@@ -87,7 +87,7 @@ public class AudioController {
         //mm.eventCont.drop += onDrop;
         mm.eventCont.grabTile += OnGrab;
         mm.eventCont.draw += OnDraw;
-        mm.eventCont.AddSwapEvent(OnSwap, 4);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Audio);
         //mm.eventCont.match += onMatch;
     }
 
