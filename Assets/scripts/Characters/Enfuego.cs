@@ -43,7 +43,7 @@ public class Enfuego : Character {
 
         spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
         spells[1] = new Spell(1, "Hot Body", "MEF", 1, HotBody);
-        spells[2] = new Spell(2, "Backburner", "MF", 1, Backburner);
+        spells[2] = new Spell(2, "INCINERATE", "MF", 1, Incinerate); // change back to Backburner
         spells[3] = new CoreSpell(3, "Fiery Fandango", 3, 1, FieryFandango);
     }
 
@@ -90,7 +90,7 @@ public class Enfuego : Character {
                     spellfx.Ench_SetBurning(playerID, ctb);
                 }
             } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
-                mm.InactiveP().DiscardRandom(1);
+                yield return mm.InactiveP().DiscardRandom(1);
             }
 
             mm.RemoveTile(tb.tile, true);
@@ -123,13 +123,18 @@ public class Enfuego : Character {
         // TODO drag targeting
         int burnCount = mm.InactiveP().hand.Count * 2;
         Debug.Log("SPELLFX: Incinerate burnCount = " + burnCount);
-        mm.InactiveP().DiscardRandom(2);
-        //targeting.WaitForDragTarget(burnCount, Incinerate_Target);
-        yield return null;
-    }
-    void Incinerate_Target(List<TileBehav> tbs) {
-        foreach (TileBehav tb in tbs)
+        // should happen after targeting? if they cancel, the player has still discarded
+        yield return mm.InactiveP().DiscardRandom(2); 
+
+        yield return targeting.WaitForDragTarget(burnCount);
+        if (targeting.WasCanceled())
+            yield return null;
+
+        List<TileBehav> tbs = targeting.GetTargetTBs();
+        foreach (TileBehav tb in tbs) {
             spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
+            yield return new WaitForSeconds(.2f);
+        }
     }
 
     public IEnumerator Backburner() {

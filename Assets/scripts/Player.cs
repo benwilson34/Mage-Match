@@ -183,18 +183,15 @@ public class Player {
         mm.animCont.PlayAnim(mm.animCont._AlignHand(this, duration, linear));
     }
 
-    public int DiscardRandom(int count) {
+    public IEnumerator DiscardRandom(int count) {
         int tilesInHand = hand.Count;
-        int i;
-        for (i = 0; i < count; i++) {
-            if (tilesInHand > 0) {
-                int rand = Random.Range(0, tilesInHand);
-                GameObject go = hand[rand].gameObject;
-                hand.RemoveAt(rand);
-                GameObject.Destroy(go);
-            }
+        for (int i = 0; i < count && hand.Count > 0; i++) {
+            yield return mm.syncManager.SyncRand(id, Random.Range(0, hand.Count));
+            int rand = mm.syncManager.GetRand();
+            GameObject go = hand[rand].gameObject;
+            hand.RemoveAt(rand);
+            GameObject.Destroy(go);
         }
-        return i;
     }
 
     // delete?

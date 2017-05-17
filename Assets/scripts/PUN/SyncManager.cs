@@ -148,6 +148,7 @@ public class SyncManager : PunBehaviour {
         mm.targeting.OnCBTarget(mm.hexGrid.GetCellBehavAt(col, row));
     }
 
+    // TODO merge into SendTargetingMessage
     public void SendClearTargets() {
         if (mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
@@ -168,5 +169,16 @@ public class SyncManager : PunBehaviour {
     [PunRPC]
     public void HandleCancelTargeting() {
         mm.targeting.CancelTargeting();
+    }
+
+    public void SendEndDragTarget() {
+        if (mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleEndDragTarget", PhotonTargets.Others);
+        }
+    }
+    [PunRPC]
+    public void HandleEndDragTarget() {
+        mm.targeting.EndDragTarget();
     }
 }

@@ -14,7 +14,7 @@ public class Targeting {
     private List<CellBehav> targetCBs;
     private Vector3 lastTCenter;
     private bool largeAreaMode = false;
-
+    private TileBehav lastDragTarget;
     private List<GameObject> outlines;
 
     //public delegate void TBTargetEffect(TileBehav tb);
@@ -59,6 +59,15 @@ public class Targeting {
         yield return TargetingScreen();
     }
 
+    public IEnumerator WaitForDragTarget(int count) {
+        currentTMode = TargetMode.Drag;
+        targets = targetsLeft = count;
+        targetTBs = new List<TileBehav>();
+        Debug.Log("TARGETING: targets = " + targetsLeft);
+
+        yield return TargetingScreen();
+    }
+
     public void OnTBTarget(TileBehav tb) {
         foreach (TileBehav ctb in targetTBs) // prevent targeting a tile that's already targeted
             if (ctb.tile.HasSamePos(tb.tile))
@@ -93,7 +102,28 @@ public class Targeting {
             }
             DecTargets();
             Debug.Log("TARGETING: Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+        } else if (currentTMode == TargetMode.Drag) {
+            if (!IsDragTBValid(tb))
+                EndDragTarget();
+            lastDragTarget = tb;
+
+            Tile t = tb.tile;
+            OutlineTarget(t.col, t.row);
+            targetTBs.Add(tb);
+            DecTargets();
+            mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
+            Debug.Log("TARGETING: Targeted tile (" + t.col + ", " + t.row + ")");
         }
+    }
+
+    bool IsDragTBValid(TileBehav tb) {
+        if (lastDragTarget == null) return true;
+        return mm.hexGrid.CellsAreAdjacent(lastDragTarget.tile, tb.tile);
+    }
+
+    public void EndDragTarget() {
+        mm.syncManager.SendEndDragTarget();
+        targetsLeft = 0;
     }
 
     // TODO
@@ -176,16 +206,10 @@ public class Targeting {
 
         yield return new WaitUntil(() => targetsLeft == 0);
         Debug.Log("TARGETING: no more targets.");
+        lastDragTarget = null;
 
         mm.uiCont.UpdateMoveText("Here are your targets!");
         yield return new WaitForSeconds(1f);
-
-        //if (!canceled) { // shouldn't be here anymore
-        //    mm.RemoveSeq(seq);
-        //    //HandleTargets();
-        //    mm.BoardChanged();
-        //    p.ApplyAPCost();
-        //}
 
         foreach (GameObject go in outlines) {
             GameObject.Destroy(go);
@@ -251,4 +275,6 @@ public class Targeting {
     }
 
     public bool WasCanceled() { return canceled; }
+
+    public bool TargetsRemain() { return targetsLeft > 0; }
 }

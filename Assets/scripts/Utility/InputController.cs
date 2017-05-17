@@ -25,43 +25,39 @@ public class InputController : MonoBehaviour {
     }
 
 	void Update(){ // polling input...change to events if too much overhead
-        if (Input.GetMouseButton(0)) { // if left mouse is down
-            if (targeting.currentTMode == Targeting.TargetMode.Drag) {
-                //				HandleDrag ();
-            } else
-                HandleMouse();
+        if (Input.GetMouseButton(0) || lastClick) { // if left mouse is down
             nowClick = true; // move up?
-        } else if (Input.GetMouseButtonUp(0)) { // if left mouse was JUST released
-            nowClick = false;
-            HandleMouse();
+            if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
+                nowClick = false;
+
+            if (targeting.currentTMode == Targeting.TargetMode.Drag)
+                HandleDrag();
+            else
+                HandleMouse();
         }
 	}
 
 	void HandleMouse(){
-		if (!lastClick) { // first frame of click i.e. MouseDown
-			if (!GetClick ()) { // TODO don't need to do this every frame!!!!!!! except Drag targeting...
-//				nowClick = false;
-				return;
-			}
+		if (!lastClick && !GetClick()) { // first frame of click i.e. MouseDown
+			return;
 		}
 
 		if (!lastClick && nowClick) { // MouseDown
-			if (isClickTB) {
+			if (isClickTB)
 				TBMouseDown(clickTB);
-			} else {
+			else
 				CBMouseDown(clickCB);
-			}
 			lastClick = true;
 		} else if (lastClick && nowClick) { // MouseDrag
-			if (isClickTB) { 
+			if (isClickTB)
 				TBMouseDrag(clickTB);
-			} else {
+		    else {
 //				CBMouseDrag(clickCB);
 			}
 		} else if (lastClick && !nowClick) { // MouseUp
-			if (isClickTB) {
+			if (isClickTB)
 				TBMouseUp(clickTB);
-			} else {
+			else {
 //				CBMouseUp(clickCB);
 			}
 			lastClick = false;
@@ -107,6 +103,40 @@ public class InputController : MonoBehaviour {
 		}
 		return null;
 	}
+
+    void HandleDrag() {
+        TileBehav tb = null;
+
+        if (!lastClick && nowClick) { // MouseDown
+            tb = GetDragTarget();
+            if (tb == null) return;
+            targeting.OnTBTarget(tb);
+            dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+            lastClick = true;
+        } else if (lastClick && nowClick) { // MouseDrag
+            Vector3 mouse = Input.mousePosition;
+            if (Vector3.Distance(dragClick, mouse) > 50) {
+                Debug.Log("INPUTCONT: Drag more than 50px.");
+                tb = GetDragTarget();
+                if (tb == null)
+                    targeting.EndDragTarget();
+                targeting.OnTBTarget(tb);
+                if (!targeting.TargetsRemain())
+                    targeting.EndDragTarget();
+                dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+            }
+        } else if (lastClick && !nowClick) { // MouseUp
+            targeting.EndDragTarget();
+            lastClick = false;
+        }
+
+    }
+
+    TileBehav GetDragTarget() {
+        Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
+        return GetMouseTile(hits);
+    }
 
     bool MenuOpen() { return mm.uiCont.IsMenu(); }
 
@@ -160,6 +190,10 @@ public class InputController : MonoBehaviour {
                     }
 				    break;
 			    case TileBehav.TileState.Placed:
+                    if (targeting.IsTargetMode() && 
+                        targeting.currentTMode == Targeting.TargetMode.Drag) {
+                        targeting.OnTBTarget(tb); // maybe its own method?
+                    }
                     if (!ActionNotAllowed())
 				        SwapCheck (tb);
 				    break;

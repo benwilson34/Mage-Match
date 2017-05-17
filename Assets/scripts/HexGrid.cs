@@ -188,6 +188,14 @@ public class HexGrid {
 		return CellExists (col + dc, row + dr);
 	}
 
+    public bool CellsAreAdjacent(Tile t1, Tile t2) {
+        if (System.Math.Abs(t1.col - t2.col) > 1) return false;
+        if (System.Math.Abs(t1.row - t2.row) > 1) return false;
+        if (t1.col - t2.col == 1 && t2.row - t1.row == 1) return false;
+        if (t2.col - t1.col == 1 && t1.row - t2.row == 1) return false;
+        return true;
+    }
+
     // perimeter; doesn't add center tile
 	public List<TileBehav> GetSmallAreaTiles(int col, int row){
 		List<TileBehav> tbs = new List<TileBehav> ();
