@@ -17,6 +17,7 @@ public class EventController {
         turnEnd = new List<EventPack>();
         match = new List<EventPack>();
         drop = new List<EventPack>();
+        discard = new List<EventPack>();
     }
 
     struct EventPack { public System.Delegate ev; public Type type; }
@@ -33,6 +34,8 @@ public class EventController {
                 return match;
             case "drop":
                 return drop;
+            case "discard":
+                return discard;
             default:
                 Debug.LogError("EVENTCONT: Bad type name!!");
                 return null;
@@ -40,17 +43,16 @@ public class EventController {
     }
 
     // ex. AddEvent("swap", SwapCallbackMethod, 1)
-    void AddEvent(string type, System.Delegate e, Type t) {
-        List<EventPack> evList = GetEventList(type);
+    void AddEvent(string list, System.Delegate e, Type type) {
+        List<EventPack> evList = GetEventList(list);
 
         int i = 0;
         for (; i < evList.Count; i++) {
-            if ((int)evList[i].type < (int)t)
+            if ((int)evList[i].type < (int)type)
                 break;
         }
-        evList.Insert(i, new EventPack { ev = e, type = t });
+        evList.Insert(i, new EventPack { ev = e, type = type });
     }
-
 
     void RemoveEvent(string type, System.Delegate e) {
         List<EventPack> evList = GetEventList(type);
@@ -244,5 +246,23 @@ public class EventController {
     public void GrabTile(int id, Tile.Element elem) {
         if (grabTile != null)
             grabTile.Invoke(id, elem);
+    }
+
+    public delegate IEnumerator DiscardEvent(int id, Tile.Element elem);
+    private List<EventPack> discard;
+    public IEnumerator Discard(int id, Tile.Element elem) {
+        handlingEvents = true; // worth it?
+        foreach (EventPack pack in discard) {
+            //Debug.Log("EVENTCONT: Resolving matchEvent with p="+pack.priority);
+            yield return ((DiscardEvent)pack.ev)(id, elem); // OH YEAH
+        }
+        Debug.Log("EVENTCONT: Just finished DISCARD events...");
+        handlingEvents = false; // worth it?
+    }
+    public void AddDiscardEvent(DiscardEvent ev, Type type) {
+        AddEvent("discard", ev, type);
+    }
+    public void RemoveDiscardEvent(DiscardEvent ev) {
+        RemoveEvent("discard", ev);
     }
 }

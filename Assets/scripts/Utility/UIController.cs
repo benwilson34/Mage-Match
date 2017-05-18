@@ -122,6 +122,9 @@ public class UIController : MonoBehaviour {
         UpdateDebugGrid();
         UpdateMoveText("Fight!!");
 
+        if (mm.gameSettings.localPlayerOnLeft && !mm.MyTurn())
+            FlipGradient();
+
         for (int id = 1; id <= 2; id++) {
             Player p = mm.GetPlayer(id);
             Transform pinfo = GetPinfo(id);

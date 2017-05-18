@@ -8,6 +8,7 @@ public class AnimationController : MonoBehaviour {
     public AnimationCurve gravEase;
 
     private MageMatch mm;
+    private GameObject fireballPF, zombifyPF;
     private int animating;
 
     // Use this for initialization
@@ -17,6 +18,8 @@ public class AnimationController : MonoBehaviour {
 
     public void Init(MageMatch mm) {
         this.mm = mm;
+        fireballPF = (GameObject)Resources.Load("prefabs/anim/fireball");
+        zombifyPF = (GameObject)Resources.Load("prefabs/anim/zombify");
     }
 
     // Update is called once per frame
@@ -28,6 +31,12 @@ public class AnimationController : MonoBehaviour {
 
     public bool IsAnimating() {
         return animating > 0;
+    }
+
+    public IEnumerator _DiscardTile(Transform t) {
+        Vector3 spawn = GameObject.Find("tileSpawn").transform.position;
+        Tween tween = t.DOMove(spawn, .7f);
+        yield return tween.WaitForCompletion();
     }
 
     public IEnumerator _RemoveTile(TileBehav tb) {
@@ -112,13 +121,12 @@ public class AnimationController : MonoBehaviour {
         }
     }
 
-
     public IEnumerator _Burning(TileBehav tb) {
-        GameObject fireballPF = (GameObject)Resources.Load("prefabs/anim/fireball"); // field
+        // TODO spawn from Pinfo
         Transform spawn = GameObject.Find("tileSpawn").transform;
         GameObject fb = Instantiate(fireballPF, spawn);
 
-        Tween t = fb.transform.DOMove(tb.transform.position, 1.2f);
+        Tween t = fb.transform.DOMove(tb.transform.position, .6f);
         t.SetEase(Ease.InQuad);
         yield return t.WaitForCompletion();
 
@@ -130,7 +138,6 @@ public class AnimationController : MonoBehaviour {
     }
 
     public IEnumerator _Burning_Turn(Player p, TileBehav tb) {
-        GameObject fireballPF = (GameObject)Resources.Load("prefabs/anim/fireball"); // field
         GameObject fb = Instantiate(fireballPF, tb.transform);
 
         Vector3 dmgSpot = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(p.id).position);
@@ -145,6 +152,21 @@ public class AnimationController : MonoBehaviour {
     }
 
     Vector3 zomb_origPos;
+
+    public IEnumerator _Zombify(TileBehav tb) {
+        // TODO spawn from Pinfo
+        Transform spawn = GameObject.Find("tileSpawn").transform;
+        GameObject z = Instantiate(zombifyPF, spawn);
+
+        Tween t = z.transform.DOMove(tb.transform.position, .6f);
+        t.SetEase(Ease.InQuad);
+        yield return t.WaitForCompletion();
+
+        t = z.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .05f);
+        yield return t.WaitForCompletion();
+        Destroy(z);
+        Debug.Log("ANIMCONT: Done animating Zombify.");
+    }
 
     public IEnumerator _Zombify_Attack(Transform zomb, Transform target) {
         zomb_origPos = zomb.position;

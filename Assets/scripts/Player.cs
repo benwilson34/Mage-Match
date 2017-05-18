@@ -186,12 +186,23 @@ public class Player {
     public IEnumerator DiscardRandom(int count) {
         int tilesInHand = hand.Count;
         for (int i = 0; i < count && hand.Count > 0; i++) {
-            yield return mm.syncManager.SyncRand(id, Random.Range(0, hand.Count));
-            int rand = mm.syncManager.GetRand();
-            GameObject go = hand[rand].gameObject;
-            hand.RemoveAt(rand);
-            GameObject.Destroy(go);
+            TileBehav tb;
+            tb = hand[Random.Range(0, hand.Count)];
+            yield return mm.syncManager.SyncElement(id, tb.tile.element);
+            Tile.Element e = mm.syncManager.GetElement();
+            Debug.Log("PLAYER: DiscardRandom synced " + e);
+            yield return Discard(e);
         }
+    }
+
+    public IEnumerator Discard(Tile.Element elem) {
+        Debug.Log("PLAYER: Discarding " + elem);
+        GameObject go = GetTileFromHand(elem);
+        mm.eventCont.Discard(id, elem);
+
+        yield return mm.animCont._DiscardTile(go.transform);
+        hand.Remove(go.GetComponent<TileBehav>());
+        GameObject.Destroy(go);
     }
 
     // delete?

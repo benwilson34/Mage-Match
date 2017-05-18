@@ -115,8 +115,8 @@ public class InputController : MonoBehaviour {
             lastClick = true;
         } else if (lastClick && nowClick) { // MouseDrag
             Vector3 mouse = Input.mousePosition;
-            if (Vector3.Distance(dragClick, mouse) > 50) {
-                Debug.Log("INPUTCONT: Drag more than 50px.");
+            if (Vector3.Distance(dragClick, mouse) > 60) {
+                Debug.Log("INPUTCONT: Drag more than 60px.");
                 tb = GetDragTarget();
                 if (tb == null)
                     targeting.EndDragTarget();

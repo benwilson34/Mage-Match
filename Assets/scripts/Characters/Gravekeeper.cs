@@ -61,7 +61,7 @@ public class Gravekeeper : Character {
             TileBehav tb = tbs[i];
             if (tb.tile.element == Tile.Element.Muscle) {
                 if (tb.CanSetEnch(Enchantment.EnchType.Zombify)) {
-                    spellfx.Ench_SetZombify(playerID, tb, false);
+                    yield return spellfx.Ench_SetZombify(playerID, tb, false);
                     continue;
                 }
             }
@@ -151,12 +151,13 @@ public class Gravekeeper : Character {
     //        tb.TriggerEnchantment();
     //}
 
+    // delete
     public IEnumerator ZombifySpell() {
         yield return targeting.WaitForTileTarget(1);
         if (targeting.WasCanceled())
             yield break;
         TileBehav tb = targeting.GetTargetTBs()[0];
-        spellfx.Ench_SetZombify(playerID, tb, false);
+        yield return spellfx.Ench_SetZombify(playerID, tb, false);
     }
 
     public IEnumerator GatherTheGhouls() {
@@ -175,7 +176,7 @@ public class Gravekeeper : Character {
             // TODO sync array, not in loop...maybe
             yield return mm.syncManager.SyncRand(playerID, Random.Range(0, tbs.Count));
             int rand = mm.syncManager.GetRand();
-            spellfx.Ench_SetZombify(playerID, tbs[rand], false);
+            yield return spellfx.Ench_SetZombify(playerID, tbs[rand], false);
             tbs.RemoveAt(rand);
         }
     }

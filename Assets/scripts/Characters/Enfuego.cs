@@ -87,7 +87,7 @@ public class Enfuego : Character {
                     yield return mm.syncManager.SyncRand(playerID, Random.Range(0, ctbs.Count));
                     TileBehav ctb = ctbs[mm.syncManager.GetRand()];
                     Debug.Log("ENFUEGO: Setting Burning to " + ctb.PrintCoord());
-                    spellfx.Ench_SetBurning(playerID, ctb);
+                    mm.StartCoroutine(spellfx.Ench_SetBurning(playerID, ctb)); // yield return?
                 }
             } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
                 yield return mm.InactiveP().DiscardRandom(1);
@@ -116,15 +116,12 @@ public class Enfuego : Character {
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs)
-            spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
+            yield return spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
     }
 
     public IEnumerator Incinerate() {
-        // TODO drag targeting
         int burnCount = mm.InactiveP().hand.Count * 2;
         Debug.Log("SPELLFX: Incinerate burnCount = " + burnCount);
-        // should happen after targeting? if they cancel, the player has still discarded
-        yield return mm.InactiveP().DiscardRandom(2); 
 
         yield return targeting.WaitForDragTarget(burnCount);
         if (targeting.WasCanceled())
@@ -132,9 +129,12 @@ public class Enfuego : Character {
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
-            spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
-            yield return new WaitForSeconds(.2f);
+            Debug.Log("ENFUEGO: Enchanting tile at " + tb.PrintCoord());
+            yield return spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
+            //yield return new WaitForSeconds(.2f);
         }
+
+        yield return mm.InactiveP().DiscardRandom(2); 
     }
 
     public IEnumerator Backburner() {
@@ -175,7 +175,6 @@ public class Enfuego : Character {
         TileBehav tbSelect = tbs[mm.syncManager.GetRand()];
 
         Debug.Log("ENFUEGO: About to apply burning to the tb at " + tbSelect.PrintCoord());
-        yield return mm.animCont._Burning(tbSelect);
-        spellfx.Ench_SetBurning(id, tbSelect);
+        yield return spellfx.Ench_SetBurning(id, tbSelect);
     }
 }

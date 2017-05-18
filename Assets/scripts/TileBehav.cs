@@ -119,11 +119,12 @@ public class TileBehav : MonoBehaviour {
         yield return enchantment.TriggerEffect();
     }
 
-	public void ClearEnchantment(){
+	public void ClearEnchantment(bool removeFromList = true){
         Debug.Log("TILEBEHAV: About to remove enchantment...");
         if (HasEnchantment()) {
             Debug.Log("TILEBEHAV: About to remove enchantment with tag " + enchantment.tag);
-            mm.effectCont.RemoveTurnEffect(enchantment);
+            if(removeFromList)
+                mm.effectCont.RemoveTurnEffect(enchantment);
             enchantment = null;
             this.GetComponent<SpriteRenderer>().color = Color.white;
         }

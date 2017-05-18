@@ -10,6 +10,7 @@ public class SyncManager : PunBehaviour {
     // Use this for initialization
     void Start() {
         rands = new Queue<int>();
+        elems = new Queue<Tile.Element>();
     }
 
     // Update is called once per frame
@@ -21,6 +22,7 @@ public class SyncManager : PunBehaviour {
         eventCont.draw += OnDrawLocal;
         eventCont.AddDropEvent(OnDropLocal, EventController.Type.Network);
         eventCont.AddSwapEvent(OnSwapLocal, EventController.Type.Network);
+        //eventCont.AddDiscardEvent(OnDiscardLocal, EventController.Type.Network);
         //eventCont.commishDrop += OnCommishDrop;
         //eventCont.commishTurnDone += OnCommishTurnDone;
         //eventCont.playerHealthChange += OnPlayerHealthChange;
@@ -64,6 +66,26 @@ public class SyncManager : PunBehaviour {
         }
         return r;
     }
+
+    private Queue<Tile.Element> elems;
+
+    public IEnumerator SyncElement(int id, Tile.Element elem) {
+        PhotonView photonView = PhotonView.Get(this);
+        if (id == mm.myID) { // send/enqueue
+            photonView.RPC("HandleSyncElement", PhotonTargets.All, elem);
+        } else {             // wait for rands in queue
+            Debug.Log("SYNCMANAGER: Wating for element...");
+            yield return new WaitUntil(() => elems.Count > 0);
+        }
+        yield return null;
+    }
+    [PunRPC]
+    public void HandleSyncElement(Tile.Element elem) {
+        Debug.Log("SYNCMAN: Synced " + elem);
+        elems.Enqueue(elem);
+    }
+
+    public Tile.Element GetElement() { return elems.Dequeue(); }
 
     public void OnDrawLocal(int id, bool playerAction, bool dealt, Tile.Element elem) {
         //Debug.Log("TURNMANAGER: id=" + id + " myID=" + mm.myID);

@@ -17,7 +17,7 @@ public class Stats {
         public string name;
         public string character;
         public string loadout;
-        public int draws, drops, swaps, matches, match3s, match4s, match5s, cascades, tilesRemoved, spellsCast, timeouts;
+        public int draws, drops, swaps, matches, match3s, match4s, match5s, cascades, tilesRemoved, spellsCast, timeouts, discards;
         public int dmgDealt, dmgTaken, healingDone;
         public int longestCascade;
     }
@@ -49,6 +49,7 @@ public class Stats {
         mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats);
         mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats);
         mm.eventCont.spellCast += OnSpellCast;
+        mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
         mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
         mm.eventCont.cascade += OnCascade;
@@ -114,6 +115,12 @@ public class Stats {
         else
             report.AppendLine("Draw " + Tile.ElementToChar(elem));
         GetPS(id).draws++;
+    }
+
+    public IEnumerator OnDiscard(int id, Tile.Element elem) {
+        report.AppendLine("p" + id + " discards " + Tile.ElementToChar(elem));
+        GetPS(id).discards++;
+        yield return null;
     }
 
     public IEnumerator OnDrop(int id, bool playerAction, Tile.Element elem, int col) {

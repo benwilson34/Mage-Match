@@ -81,15 +81,18 @@ public class SpellEffects {
         yield return null; // for now
     }
 
-	public void Ench_SetBurning(int id, TileBehav tb){
+	public IEnumerator Ench_SetBurning(int id, TileBehav tb){
         // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
         //		Debug.Log("SPELLEFFECTS: Setting burning...");
+        yield return mm.animCont._Burning(tb);
+
         Enchantment ench = new Enchantment(id, 5, Enchantment.EnchType.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
 		tb.SetEnchantment (ench);
 		tb.GetComponent<SpriteRenderer> ().color = new Color (1f, .4f, .4f);
 		mm.effectCont.AddEndTurnEffect(ench, "burn");
 	}
 	IEnumerator Ench_Burning_TEffect(int id, TileBehav tb){
+        Debug.Log("SPELLFX: Burning TurnEffect at " + tb.PrintCoord());
         yield return mm.animCont._Burning_Turn(mm.GetOpponent(id), tb);
 		mm.GetPlayer(id).DealDamage (3);
         //yield return null; // for now
@@ -116,7 +119,10 @@ public class SpellEffects {
         yield return null; // for now
     }
 
-    public void Ench_SetZombify(int id, TileBehav tb, bool skip) {
+    public IEnumerator Ench_SetZombify(int id, TileBehav tb, bool skip, bool anim = true) {
+        if (anim)
+            yield return mm.animCont._Zombify(tb);
+
         Enchantment ench = new Enchantment(id, Enchantment.EnchType.Zombify, Effect.Type.Enchant, Ench_Zombify_TEffect, null);
         if (skip)
             ench.SkipCurrent();
@@ -125,6 +131,7 @@ public class SpellEffects {
 
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
+        yield return null;
     }
     IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
         //zombify_select = false; // only use if you're sloppy. 
@@ -169,7 +176,7 @@ public class SpellEffects {
             mm.GetPlayer(id).DealDamage(10);
             mm.GetPlayer(id).Heal(10);
         } else {
-            Ench_SetZombify(id, selectTB, true);
+            yield return Ench_SetZombify(id, selectTB, true, false);
         }
 
         yield return mm.animCont._Zombify_Back(tb.transform); // anim 2
