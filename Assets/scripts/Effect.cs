@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using MMDebug;
 
 public abstract class Effect {
 
@@ -221,7 +222,7 @@ public class SwapEffect : Effect {
 
     public IEnumerator TriggerEffect(int c1, int r1, int c2, int r2) {
         if (swapEffect != null) { // would it ever be? maybe if like, your third swap does something
-            Debug.Log("SWAPEFFECT: about to trigger swapEffect!");
+            MMLog.Log("SWAPEFFECT", "black", "About to trigger swapEffect!");
             yield return swapEffect(mm.ActiveP().id, c1, r1, c2, r2);
             countLeft--;
         }

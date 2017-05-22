@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 public class TileBehav : MonoBehaviour {
 
@@ -89,7 +90,7 @@ public class TileBehav : MonoBehaviour {
 
     public bool CanSetEnch(Enchantment.EnchType type) {
         if (type == GetEnchType()) {
-            Debug.Log("TILEBEHAV: Tile has same enchant: " + type.ToString());
+            MMLog.Log_TileBehav("Tile has same enchant: " + type.ToString());
             return false;
         }
 
@@ -115,14 +116,14 @@ public class TileBehav : MonoBehaviour {
     }
 
     public IEnumerator TriggerEnchantment() {
-        Debug.Log("TILEBEHAV: Triggering enchantment at " + tile.col + ", " + tile.row);
+        MMLog.Log_TileBehav("Triggering enchantment at " + tile.col + ", " + tile.row);
         yield return enchantment.TriggerEffect();
     }
 
 	public void ClearEnchantment(bool removeFromList = true){
-        Debug.Log("TILEBEHAV: About to remove enchantment...");
+        MMLog.Log_TileBehav("About to remove enchantment...");
         if (HasEnchantment()) {
-            Debug.Log("TILEBEHAV: About to remove enchantment with tag " + enchantment.tag);
+            MMLog.Log_TileBehav("About to remove enchantment with tag " + enchantment.tag);
             if(removeFromList)
                 mm.effectCont.RemoveTurnEffect(enchantment);
             enchantment = null;
@@ -132,13 +133,13 @@ public class TileBehav : MonoBehaviour {
 
 	public bool SetEnchantment(Enchantment ench){
 		if (!CanSetEnch(ench.enchType)) {
-            Debug.LogError("TILEBEHAV: Can't set ench at "+PrintCoord()+"! enchType="+ench.enchType);
+            MMLog.LogError("TILEBEHAV: Can't set ench at "+PrintCoord()+"! enchType="+ench.enchType);
 			return false;
 		}
         if(HasEnchantment())
             ClearEnchantment(); //?
 
-        Debug.Log("TILEBEHAV: About to set ench with tag="+ench.tag);
+        MMLog.Log_TileBehav("About to set ench with tag="+ench.tag);
 		ench.SetEnchantee(this);
 		enchantment = ench; 
 		return true;

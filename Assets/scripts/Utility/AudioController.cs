@@ -141,7 +141,7 @@ public class AudioController {
                 clip = grab[4];
                 break;
         }
-        GameObject go = mm.GetPlayer(id).GetTileFromHand(elem);
+        GameObject go = mm.GetPlayer(id).hand.GetTile(elem);
         AudioSource source = go.GetComponent<AudioSource>();
 
         source.clip = clip;
@@ -210,7 +210,7 @@ public class AudioController {
 
 
         // TODO this won't work...how to get the tile? maybe there should just be an audio object with a few AudioSources for everything to use?
-        GameObject go = mm.ActiveP().GetTileFromHand(elem);
+        GameObject go = mm.ActiveP().hand.GetTile(elem);
 
         AudioSource source = go.GetComponent<AudioSource>();
 

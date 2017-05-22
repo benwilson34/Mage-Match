@@ -94,6 +94,9 @@
     <Reference Include="websocket-sharp">
       <HintPath>Assets\Plugins\WebSocket\websocket-sharp.dll</HintPath>
     </Reference>
+    <Reference Include="MMDebug">
+      <HintPath>Assets\Plugins\MMDebug\MMDebug.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Plugins\WebSocket\WebSocket.cs" />

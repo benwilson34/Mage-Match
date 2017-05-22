@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 // TODO eventually handle mobile tap input instead of clicking
 public class InputController : MonoBehaviour {
@@ -116,7 +117,7 @@ public class InputController : MonoBehaviour {
         } else if (lastClick && nowClick) { // MouseDrag
             Vector3 mouse = Input.mousePosition;
             if (Vector3.Distance(dragClick, mouse) > 60) {
-                Debug.Log("INPUTCONT: Drag more than 60px.");
+                MMLog.Log_InputCont("Drag more than 60px.");
                 tb = GetDragTarget();
                 if (tb == null)
                     targeting.EndDragTarget();
@@ -161,7 +162,7 @@ public class InputController : MonoBehaviour {
                         if (targeting.IsTargetMode()
 //					        && Targeting.currentTMode == Targeting.TargetMode.Tile
                             ) {
-                            Debug.Log("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
+                            MMLog.Log_InputCont("TBMouseDown called and tile is placed.");
                             targeting.OnTBTarget(tb);
 //					    } else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
@@ -214,7 +215,7 @@ public class InputController : MonoBehaviour {
                             if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropTile)) {
                                 //tb.transform.SetParent(parentT);
                                 //parentT = null;
-                                mm.GetPlayer(mm.myID).AlignHand(.12f, false);
+                                mm.GetPlayer(mm.myID).hand.Align(.12f, false);
                             }
                             dropping = false;
                         }
@@ -236,7 +237,7 @@ public class InputController : MonoBehaviour {
 			float angle = Vector3.Angle(mouse, Vector3.right);
 			if (mouse.y < 0)
 				angle = 360 - angle;
-			//				Debug.Log("mouse = " + mouse.ToString() + "; angle = " + angle);
+			//				Debug.MMLog.Log_InputCont("mouse = " + mouse.ToString() + "; angle = " + angle);
 			dragged = false; // TODO move into cases below for continuous dragging
 			if (angle < 60) {         // NE
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 1))

@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon;
+using MMDebug;
 
 public class SyncManager : PunBehaviour {
 
     private MageMatch mm;
+    private Queue<int> rands;
+    private Queue<Tile.Element> elems;
 
     // Use this for initialization
     void Start() {
@@ -29,9 +32,6 @@ public class SyncManager : PunBehaviour {
         //eventCont.spellCast += OnSpellCast;
     }
 
-    private Queue<int> rands;
-    //private bool affectingQueue = false; // will I need this?
-
     public IEnumerator SyncRand(int id, int value) {
         yield return SyncRands(id, new int[] { value });
     }
@@ -41,7 +41,7 @@ public class SyncManager : PunBehaviour {
         if (id == mm.myID) { // send/enqueue
             photonView.RPC("HandleSyncRands", PhotonTargets.All, values);
         } else {             // wait for rands in queue
-            Debug.Log("SYNCMANAGER: Wating for " + values.Length + " values...");
+            MMLog.Log_SyncMan("Wating for " + values.Length + " values...");
             yield return new WaitUntil(() => rands.Count >= values.Length); // will the amount always be the same??
         }
         yield return null;
@@ -49,7 +49,7 @@ public class SyncManager : PunBehaviour {
     [PunRPC]
     public void HandleSyncRands(int[] values) {
         for (int i = 0; i < values.Length; i++) {
-            //Debug.Log("SYNCMANAGER: Just synced random["+i+"]=" + values[i]);
+            //Debug.MMLog.Log_SyncMan("SYNCMANAGER: Just synced random["+i+"]=" + values[i]);
             rands.Enqueue(values[i]);
         }
     }
@@ -62,33 +62,31 @@ public class SyncManager : PunBehaviour {
         int[] r = new int[count];
         for (int i = 0; i < count; i++) {
             r[i] = rands.Dequeue();
-            //Debug.Log("SYNCMANAGER: Just read random["+i+"]=" + r[i]);
+            //Debug.MMLog.Log_SyncMan("SYNCMANAGER: Just read random["+i+"]=" + r[i]);
         }
         return r;
     }
-
-    private Queue<Tile.Element> elems;
 
     public IEnumerator SyncElement(int id, Tile.Element elem) {
         PhotonView photonView = PhotonView.Get(this);
         if (id == mm.myID) { // send/enqueue
             photonView.RPC("HandleSyncElement", PhotonTargets.All, elem);
         } else {             // wait for rands in queue
-            Debug.Log("SYNCMANAGER: Wating for element...");
+            MMLog.Log_SyncMan("Wating for element...");
             yield return new WaitUntil(() => elems.Count > 0);
         }
         yield return null;
     }
     [PunRPC]
     public void HandleSyncElement(Tile.Element elem) {
-        Debug.Log("SYNCMAN: Synced " + elem);
+        MMLog.Log_SyncMan("Synced " + elem);
         elems.Enqueue(elem);
     }
 
     public Tile.Element GetElement() { return elems.Dequeue(); }
 
     public void OnDrawLocal(int id, bool playerAction, bool dealt, Tile.Element elem) {
-        //Debug.Log("TURNMANAGER: id=" + id + " myID=" + mm.myID);
+        //Debug.MMLog.Log_SyncMan("TURNMANAGER: id=" + id + " myID=" + mm.myID);
         if ((playerAction || dealt) && id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDraw", PhotonTargets.Others, id, playerAction, dealt, elem);
@@ -108,7 +106,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleDrop(int id, Tile.Element elem, int col) {
-        GameObject go = mm.ActiveP().GetTileFromHand(elem);
+        GameObject go = mm.ActiveP().hand.GetTile(elem);
         mm.PlayerDropTile(col, go);
     }
 

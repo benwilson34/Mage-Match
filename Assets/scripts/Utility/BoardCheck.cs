@@ -2,15 +2,17 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 public class BoardCheck {
 
-	private bool debugLogOn = false;
-	private List<TileSeq> matchSeqList, checkList; // dictionary, compare list??
+	private List<TileSeq> matchSeqList, checkList; // dictionary, compare list
+    private MageMatch mm;
     private HexGrid hexGrid;
+    private List<SkipCheck> skips;
 
-	// check skipping object
-	private class SkipCheck{
+    // check skipping object
+    private class SkipCheck{
 		public int col, row, dir; 
 		public SkipCheck(Tile t, int dir){
 			this.col = t.col;
@@ -18,10 +20,10 @@ public class BoardCheck {
 			this.dir = dir;
 		}
 	}
-	private List<SkipCheck> skips;
 
-	public BoardCheck(HexGrid hg){
-        hexGrid = hg;
+	public BoardCheck(MageMatch mm){
+        this.mm = mm;
+        hexGrid = mm.hexGrid;
 
         matchSeqList = new List<TileSeq> ();
 		skips = new List<SkipCheck> ();
@@ -31,11 +33,9 @@ public class BoardCheck {
 		matchSeqList.Add (new TileSeq ("eeeee"));
 		matchSeqList.Add (new TileSeq ("aaaaa"));
 		matchSeqList.Add (new TileSeq ("mmmmm"));
-
-//		Debug.Log (PrintSeqList (matchSeqList));
 	}
 
-	public int CheckColumn(int c){
+    public int CheckColumn(int c){
 		int r = hexGrid.TopOfColumn(c);
 		if (hexGrid.IsCellFilled (c, r))
 			return -1;
@@ -57,12 +57,11 @@ public class BoardCheck {
 
 		float totalf = 0;
 		foreach(float f in ratios) totalf += f;
-		if(debugLogOn)
-			Debug.Log ("EmptyCheck: totalf = " + totalf);
+        MMLog.Log_BoardCheck("EmptyCheck: totalf = ");
 		return ratios;
 	}
 
-    // note: the 8th element is the total empty cells...
+    // note: the 8th element is the total number of empty cells
     public int[] EmptyCount() {
         int[] counts = new int[8];
         counts[7] = HexGrid.numCells - hexGrid.GetPlacedTiles ().Count;
@@ -102,8 +101,7 @@ public class BoardCheck {
 						}
 					}
 
-					if (debugLogOn)
-						Debug.Log ("tiles[" + c + ", " + r + "]: Shortlist: " + PrintSeqList(shortList));
+                    MMLog.Log_BoardCheck("tiles[" + c + ", " + r + "]: Shortlist: " + PrintSeqList(shortList));
 						 // copies?? - TODO
 					//Debug.Log("Trying dir = " + d + " with shortlist: " + PrintSeqList(shortList));
 					List<TileSeq> playList = CheckTile (c, r, shortList, matchMode);
@@ -128,8 +126,7 @@ public class BoardCheck {
 			bool skip = false;
 			foreach (SkipCheck s in skips) {
 				if (s.col == c && s.row == r && s.dir == dir) {
-					if(debugLogOn)
-						Debug.Log ("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir);
+                    MMLog.Log_BoardCheck("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir);
 					skip = true;
 					break;
 				}
@@ -155,8 +152,7 @@ public class BoardCheck {
 						dr *= seqIndex;
 					}
 
-					if (debugLogOn)
-						Debug.Log ("Checking tiles[" + (c + dc) + ", " + (r + dr) + "] for seq: " + PrintSeq (checkSeq, false));
+                    MMLog.Log_BoardCheck("Checking tiles[" + (c + dc) + ", " + (r + dr) + "] for seq: " + PrintSeq (checkSeq, false));
 
 					if (!skipCurrentSeq && 
 						hexGrid.IsCellFilled(c + dc, r + dr) && // if there's something there...
@@ -173,7 +169,7 @@ public class BoardCheck {
 
 					if (seqIndex == checkSeq.sequence.Count - 1) {
 						if (matchMode && outSeq.GetSeqLength () == 5) {
-							Debug.Log ("Wow!! 5 in a row!!!!!!");
+							MMLog.Log_BoardCheck("Just picked up a 5-match!");
 							AddMatchSkips (outSeq, dir);
 						}
 						returnList.Add (outSeq);
@@ -186,8 +182,7 @@ public class BoardCheck {
 	}
 
 	void AddMatchSkips(TileSeq seq, int dir){
-		if(debugLogOn)
-			Debug.Log ("Adding skips for " + PrintSeq (seq, true));
+		MMLog.Log_BoardCheck("Adding skips for " + PrintSeq (seq, true));
 		switch (seq.GetSeqLength ()) {
 		case 3:
 			skips.Add (new SkipCheck (seq.sequence [2], OppDir(dir))); // 3

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MMDebug;
 
 public class Enfuego : Character {
 
@@ -83,10 +84,10 @@ public class Enfuego : Character {
 
                 int burns = Mathf.Min(3, ctbs.Count);
                 for (int i = 0; i < burns; i++) {
-                    Debug.Log("ENFUEGO: WHCK count=" + burns);
+                    MMLog.Log_Enfuego("WHCK count=" + burns);
                     yield return mm.syncManager.SyncRand(playerID, Random.Range(0, ctbs.Count));
                     TileBehav ctb = ctbs[mm.syncManager.GetRand()];
-                    Debug.Log("ENFUEGO: Setting Burning to " + ctb.PrintCoord());
+                    MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
                     mm.StartCoroutine(spellfx.Ench_SetBurning(playerID, ctb)); // yield return?
                 }
             } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
@@ -120,8 +121,8 @@ public class Enfuego : Character {
     }
 
     public IEnumerator Incinerate() {
-        int burnCount = mm.InactiveP().hand.Count * 2;
-        Debug.Log("SPELLFX: Incinerate burnCount = " + burnCount);
+        int burnCount = mm.InactiveP().hand.Count() * 2;
+        MMLog.Log_Enfuego("Incinerate burnCount = " + burnCount);
 
         yield return targeting.WaitForDragTarget(burnCount);
         if (targeting.WasCanceled())
@@ -129,7 +130,7 @@ public class Enfuego : Character {
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
-            Debug.Log("ENFUEGO: Enchanting tile at " + tb.PrintCoord());
+            MMLog.Log_Enfuego("Enchanting tile at " + tb.PrintCoord());
             yield return spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
             //yield return new WaitForSeconds(.2f);
         }
@@ -146,7 +147,7 @@ public class Enfuego : Character {
         yield return null;
     }
     IEnumerator Backburner_Match(int id) {
-        Debug.Log("ENFUEGO: Rewarding player " + id + " with 1 AP.");
+        MMLog.Log_Enfuego("Rewarding player " + id + " with 1 AP.");
         mm.GetPlayer(id).AP++;
         yield return null;
     }
@@ -164,7 +165,7 @@ public class Enfuego : Character {
         for (int i = 0; i < tbs.Count; i++) {
             TileBehav tb = tbs[i];
             if (!tb.CanSetEnch(Enchantment.EnchType.Burning)) {
-                Debug.Log("ENFUEGO: Removing " + tb.PrintCoord());
+                MMLog.Log_Enfuego("Removing " + tb.PrintCoord());
                 tbs.RemoveAt(i);
                 i--;
             }
@@ -174,7 +175,7 @@ public class Enfuego : Character {
         yield return mm.syncManager.SyncRand(id, rand);
         TileBehav tbSelect = tbs[mm.syncManager.GetRand()];
 
-        Debug.Log("ENFUEGO: About to apply burning to the tb at " + tbSelect.PrintCoord());
+        MMLog.Log_Enfuego("About to apply burning to the tb at " + tbSelect.PrintCoord());
         yield return spellfx.Ench_SetBurning(id, tbSelect);
     }
 }

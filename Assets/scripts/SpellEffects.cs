@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 // TODO rename to EnchantEffects
 public class SpellEffects {
@@ -70,7 +71,7 @@ public class SpellEffects {
 		tb.GetComponent<SpriteRenderer> ().color = new Color (.4f, .4f, .4f);
 	}
 	IEnumerator Ench_Cherrybomb_Remove(int id, TileBehav tb){
-        Debug.Log("SPELLEFFECTS: Resolving Cherrybomb at " + tb.PrintCoord());
+        MMLog.Log_EnchantFx("Resolving Cherrybomb at " + tb.PrintCoord());
 		mm.GetPlayer(id).DealDamage (200);
 
 		List<TileBehav> tbs = hexGrid.GetSmallAreaTiles (tb.tile.col, tb.tile.row);
@@ -83,7 +84,7 @@ public class SpellEffects {
 
 	public IEnumerator Ench_SetBurning(int id, TileBehav tb){
         // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
-        //		Debug.Log("SPELLEFFECTS: Setting burning...");
+        //		Debug.MMLog.Log_EnchantFx("SPELLEFFECTS: Setting burning...");
         yield return mm.animCont._Burning(tb);
 
         Enchantment ench = new Enchantment(id, 5, Enchantment.EnchType.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
@@ -92,7 +93,7 @@ public class SpellEffects {
 		mm.effectCont.AddEndTurnEffect(ench, "burn");
 	}
 	IEnumerator Ench_Burning_TEffect(int id, TileBehav tb){
-        Debug.Log("SPELLFX: Burning TurnEffect at " + tb.PrintCoord());
+        MMLog.Log_EnchantFx("Burning TurnEffect at " + tb.PrintCoord());
         yield return mm.animCont._Burning_Turn(mm.GetOpponent(id), tb);
 		mm.GetPlayer(id).DealDamage (3);
         //yield return null; // for now
@@ -136,26 +137,26 @@ public class SpellEffects {
     IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
         //zombify_select = false; // only use if you're sloppy. 
         if (tb == null)
-            Debug.LogError("GRAVEKEEPER: >>>>>Zombify called with a null tile!! Maybe it was removed?");
-        Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " starting -----");
+            MMLog.LogError("SPELLFX: >>>>>Zombify called with a null tile!! Maybe it was removed?");
+        MMLog.Log_EnchantFx("----- Zombify at " + tb.PrintCoord() + " starting -----");
 
         List<TileBehav> tbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-        Debug.Log("GRAVEKEEPER: Tile has " + tbs.Count + " tiles around it.");
+        MMLog.Log_EnchantFx("Tile has " + tbs.Count + " tiles around it.");
         for (int i = 0; i < tbs.Count; i++) {
             TileBehav ctb = tbs[i];
             if (!ctb.CanSetEnch(Enchantment.EnchType.Zombify)) { // other conditions where Zombify wouldn't work?
                 tbs.RemoveAt(i);
                 i--;
-                Debug.Log("GRAVEKEEPER: Ignoring tile at " + ctb.PrintCoord());
+                MMLog.Log_EnchantFx("Ignoring tile at " + ctb.PrintCoord());
             }
         }
-        Debug.Log("GRAVEKEEPER: Tile now has " + tbs.Count + " available tiles around it.");
+        MMLog.Log_EnchantFx("Tile now has " + tbs.Count + " available tiles around it.");
 
         //yield return new WaitUntil(() => zombify_select);
         //zombify_select = false;
 
         if (tbs.Count == 0) { // no targets
-            Debug.Log("GRAVEKEEPER: Zombify at "+tb.PrintCoord()+" has no targets!");
+            MMLog.Log_EnchantFx("Zombify at "+tb.PrintCoord()+" has no targets!");
             //mm.syncManager.SendZombifySelect(id, -1, -1);
             yield break;
         }
@@ -163,7 +164,7 @@ public class SpellEffects {
         int rand = Random.Range(0, tbs.Count);
         yield return mm.syncManager.SyncRand(id, rand);
         TileBehav selectTB = tbs[mm.syncManager.GetRand()];
-        Debug.Log("GRAVEKEEPER: Zombify attacking TB at " + selectTB.PrintCoord());
+        MMLog.Log_EnchantFx("Zombify attacking TB at " + selectTB.PrintCoord());
 
         //mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);
 
@@ -181,7 +182,7 @@ public class SpellEffects {
 
         yield return mm.animCont._Zombify_Back(tb.transform); // anim 2
 
-        Debug.Log("GRAVEKEEPER: ----- Zombify at " + tb.PrintCoord() + " done -----");
+        MMLog.Log_EnchantFx("----- Zombify at " + tb.PrintCoord() + " done -----");
         yield return null; // needed?
     }
 }

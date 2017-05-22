@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 public class Targeting {
 
@@ -33,7 +34,7 @@ public class Targeting {
     }
 
     void DecTargets() { // maybe remove?
-        Debug.Log("INPUTCONTROLLER: Targets remaining = " + targetsLeft);
+        MMLog.Log_Targeting("Targets remaining = " + targetsLeft);
         targetsLeft--;
         //if (targetsLeft == 0) //?
         //	currentTMode = TargetMode.Tile;
@@ -44,7 +45,7 @@ public class Targeting {
         currentTMode = TargetMode.Tile;
         targets = targetsLeft = count;
         targetTBs = new List<TileBehav>();
-        Debug.Log("TARGETING: targets = " + targetsLeft);
+        MMLog.Log_Targeting("targets = " + targetsLeft);
 
         yield return TargetingScreen();
     }
@@ -54,7 +55,7 @@ public class Targeting {
         targets = targetsLeft = 1;
         targetTBs = new List<TileBehav>();
         largeAreaMode = largeArea;
-        Debug.Log("TARGETING: Waiting for TileArea target. Targets = " + targetsLeft);
+        MMLog.Log_Targeting("Waiting for TileArea target. Targets = " + targetsLeft);
 
         yield return TargetingScreen();
     }
@@ -63,7 +64,7 @@ public class Targeting {
         currentTMode = TargetMode.Drag;
         targets = targetsLeft = count;
         targetTBs = new List<TileBehav>();
-        Debug.Log("TARGETING: targets = " + targetsLeft);
+        MMLog.Log_Targeting("targets = " + targetsLeft);
 
         yield return TargetingScreen();
     }
@@ -84,7 +85,7 @@ public class Targeting {
             targetTBs.Add(tb);
             DecTargets();
             mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
-            Debug.Log("TARGETING: Targeted tile (" + t.col + ", " + t.row + ")");
+            MMLog.Log_Targeting("Targeted tile (" + t.col + ", " + t.row + ")");
         } else if (currentTMode == TargetMode.TileArea) {
             List<TileBehav> tbs;
             Tile t = tb.tile;
@@ -101,7 +102,7 @@ public class Targeting {
                 targetTBs.Add(ctb);
             }
             DecTargets();
-            Debug.Log("TARGETING: Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+            MMLog.Log_Targeting("Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
         } else if (currentTMode == TargetMode.Drag) {
             if (!IsDragTBValid(tb))
                 EndDragTarget();
@@ -112,7 +113,7 @@ public class Targeting {
             targetTBs.Add(tb);
             DecTargets();
             mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
-            Debug.Log("TARGETING: Targeted tile (" + t.col + ", " + t.row + ")");
+            MMLog.Log_Targeting("Targeted tile (" + t.col + ", " + t.row + ")");
         }
     }
 
@@ -161,7 +162,7 @@ public class Targeting {
             targetCBs.Add(cb);
             DecTargets();
             mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
-            Debug.Log("TARGETING: Targeted tile (" + cb.col + ", " + cb.row + ")");
+            MMLog.Log_Targeting("Targeted tile (" + cb.col + ", " + cb.row + ")");
         } else if (currentTMode == TargetMode.CellArea) {
             //List<TileBehav> tbs;
             //Tile t = tb.tile;
@@ -178,7 +179,7 @@ public class Targeting {
             //    targetTBs.Add(ctb);
             //}
             //DecTargets();
-            //Debug.Log("TARGETING: Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+            //Debug.MMLog.Log_Targeting("TARGETING: Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
         }
     }
 
@@ -205,7 +206,7 @@ public class Targeting {
         OutlinePrereq(seq);
 
         yield return new WaitUntil(() => targetsLeft == 0);
-        Debug.Log("TARGETING: no more targets.");
+        MMLog.Log_Targeting("no more targets.");
         lastDragTarget = null;
 
         mm.uiCont.UpdateMoveText("Here are your targets!");

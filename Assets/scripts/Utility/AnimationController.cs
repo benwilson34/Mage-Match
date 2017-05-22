@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using MMDebug;
 
 public class AnimationController : MonoBehaviour {
 
@@ -57,7 +58,7 @@ public class AnimationController : MonoBehaviour {
         Tween moveTween = tb.transform.DOMove(newPos, duration, false);
 
         yield return moveTween.WaitForCompletion();
-        //Debug.Log("ANIMCONT: Tile moved, about to do grav. dur=" + duration);
+        //Debug.MMLog.Log_AnimCont("ANIMCONT: Tile moved, about to do grav. dur=" + duration);
         yield return _Grav(tb.transform, col, tb.tile.row);
 
         animating--;
@@ -77,14 +78,14 @@ public class AnimationController : MonoBehaviour {
     public IEnumerator _AlignHand(Player p, float dur, bool linear) {
         TileBehav tb;
         Tween tween;
-        Vector3 handPos = p.handSlot.position, tilePos;
-        for (int i = 0; i < p.hand.Count; i++) {
-            tb = p.hand[i];
+        Vector3 handPos = p.hand.GetHandPos(), tilePos;
+        for (int i = 0; i < p.hand.Count(); i++) {
+            tb = p.hand.GetTile(i);
             //			Debug.Log ("AlignHand hand[" + i + "] = " + tb.transform.name + ", position is (" + handSlot.position.x + ", " + handSlot.position.y + ")");
             tilePos = GetHandPos(p.id, handPos, i);
 
             tween = tb.transform.DOMove(tilePos, dur, false);
-            if (linear || i == p.hand.Count - 1)
+            if (linear || i == p.hand.Count() - 1)
                 yield return tween.WaitForCompletion();
         }
     }
@@ -133,7 +134,7 @@ public class AnimationController : MonoBehaviour {
         t = fb.GetComponent<SpriteRenderer>().DOColor(new Color(1, 0, 0, 0), .05f);
         yield return t.WaitForCompletion();
         Destroy(fb);
-        Debug.Log("ANIMCONT: Done animating Burning.");
+        MMLog.Log_AnimCont("Done animating Burning.");
         //yield return null; //?
     }
 
@@ -148,7 +149,7 @@ public class AnimationController : MonoBehaviour {
         //t = fb.GetComponent<SpriteRenderer>().DOColor(new Color(1, 0, 0, 0), .05f);
         //yield return t.WaitForCompletion();
         Destroy(fb);
-        Debug.Log("ANIMCONT: Done animating Burning_Turn.");
+        MMLog.Log_AnimCont("Done animating Burning_Turn.");
     }
 
     Vector3 zomb_origPos;
@@ -165,7 +166,7 @@ public class AnimationController : MonoBehaviour {
         t = z.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .05f);
         yield return t.WaitForCompletion();
         Destroy(z);
-        Debug.Log("ANIMCONT: Done animating Zombify.");
+        MMLog.Log_AnimCont("Done animating Zombify.");
     }
 
     public IEnumerator _Zombify_Attack(Transform zomb, Transform target) {

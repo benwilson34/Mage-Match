@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MMDebug;
 
 public class Gravekeeper : Character {
 
@@ -69,10 +70,10 @@ public class Gravekeeper : Character {
             i--;
         }
 
-        Debug.Log("GRAVEKEEPER: HumanResources trigger count=" + tbs.Count);
+        MMLog.Log_Gravekeeper("HumanResources trigger count=" + tbs.Count);
         foreach (TileBehav tb in tbs) {
             if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
-                Debug.Log("GRAVEKEEPER: Triggering zomb at " + tb.PrintCoord());
+                MMLog.Log_Gravekeeper("Triggering zomb at " + tb.PrintCoord());
                 yield return tb.TriggerEnchantment();
             }
         }
@@ -96,7 +97,7 @@ public class Gravekeeper : Character {
                 i--;
             }
         }
-        Debug.Log("GRAVEKEEPER: Undead Union target has " + tbs.Count + " zombs in area");
+        MMLog.Log_Gravekeeper("Undead Union target has " + tbs.Count + " zombs in area");
 
         foreach (TileBehav tb in indestructTbs) {
             tb.ableDestroy = false;
@@ -111,7 +112,7 @@ public class Gravekeeper : Character {
         yield return null;
     }
     IEnumerator UndeadUnion_TEnd(int id, TileBehav tb) {
-        Debug.Log("GRAVEKEEPER: >>>>>>>>>>>> UndeadUnion at " + tb.PrintCoord() + " is done!");
+        MMLog.Log_Gravekeeper(">>>>>>>>>>>> UndeadUnion at " + tb.PrintCoord() + " is done!");
         tb.ableDestroy = true;
         yield return null;
     }
@@ -128,7 +129,7 @@ public class Gravekeeper : Character {
                 }
             }
         }
-        Debug.Log("GRAVEKEEPER: DealAdjZombDmg has counted " + count + " adjacent zombs");
+        MMLog.Log_Gravekeeper("DealAdjZombDmg has counted " + count + " adjacent zombs");
         if(count > 0)
             mm.ActiveP().DealDamage(count * 5);
     }
