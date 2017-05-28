@@ -209,6 +209,7 @@
     <Compile Include="Assets\scripts\Commish.cs" />
     <Compile Include="Assets\scripts\Effect.cs" />
     <Compile Include="Assets\scripts\Hand.cs" />
+    <Compile Include="Assets\scripts\HandSlot.cs" />
     <Compile Include="Assets\scripts\HexGrid.cs" />
     <Compile Include="Assets\scripts\MageMatch.cs" />
     <Compile Include="Assets\scripts\PUN\GameManager.cs" />

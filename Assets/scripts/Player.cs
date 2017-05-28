@@ -51,20 +51,6 @@ public class Player {
         health = character.GetMaxHealth();
     }
 
-    //void SetHandSlot() {
-    //    if (mm.gameSettings.localPlayerOnLeft) {
-    //        if (id == mm.myID)
-    //            handSlot = GameObject.Find("handslot1").transform;
-    //        else
-    //            handSlot = GameObject.Find("handslot2").transform;
-    //    } else {
-    //        if (id == 1)
-    //            handSlot = GameObject.Find("handslot1").transform;
-    //        else
-    //            handSlot = GameObject.Find("handslot2").transform;
-    //    }
-    //}
-
     public void InitEvents() {
         character.InitEvents();
         mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Player);
@@ -161,12 +147,6 @@ public class Player {
                 go = mm.GenerateTile(elem);
 
             go.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
-            //if (id == 1)
-            //    go.transform.position = new Vector3(-5, 2);
-            //else if (id == 2)
-            //    go.transform.position = new Vector3(5, 2);
-
-            go.transform.SetParent(hand.GetHandSlot(), false);
 
             TileBehav tb = go.GetComponent<TileBehav>();
             hand.Add(tb);
@@ -175,14 +155,8 @@ public class Player {
             if (playerAction)
                 mm.eventCont.GameAction(true); //?
         }
-        hand.Align(.1f, linear);
+        MMLog.Log_Player(">>>" + hand.NumFullSlots() + " slots filled...");
     }
-
-    //public void AlignHand(float duration, bool linear) {
-    //    if (mm.gameSettings.hideOpponentHand && !ThisIsLocal())
-    //        return;
-        
-    //}
 
     public IEnumerator DiscardRandom(int count) {
         for (int i = 0; i < count && hand.Count() > 0; i++) {
@@ -205,32 +179,8 @@ public class Player {
         GameObject.Destroy(go);
     }
 
-    // delete?
-    //public void FlipHand() {
-    //    foreach (TileBehav tb in hand) {
-    //        tb.FlipTile();
-    //    }
-    //}
-
-    //public void EmptyHand() {
-    //    while (hand.Count > 0) {
-    //        GameObject.Destroy(hand[0].gameObject);
-    //        hand.RemoveAt(0);
-    //    }
-    //}
-
-    //public bool IsHandFull() { return hand.Count == handSize; }
-
-    //public GameObject GetTileFromHand(Tile.Element elem) {
-    //    for (int i = 0; i < hand.Count; i++) {
-    //        if (hand[i].tile.element == elem)
-    //            return hand[i].gameObject;
-    //    }
-    //    return null;
-    //}
-
     public bool IsTileMine(TileBehav tb) {
-        return tb.transform.parent.position.Equals(hand.GetHandSlot().position);
+        return tb.transform.parent.position.Equals(hand.GetHandPos());
     }
 
     public bool ThisIsLocal() { return mm.myID == id; }

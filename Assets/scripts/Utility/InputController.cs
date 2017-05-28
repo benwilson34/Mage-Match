@@ -12,7 +12,6 @@ public class InputController : MonoBehaviour {
     private bool dropping = false;
 
 	private Vector3 dragClick;
-	//private Transform parentT;
 	private bool dragged = false;
 
 	private bool lastClick = false, nowClick = false;
@@ -105,6 +104,17 @@ public class InputController : MonoBehaviour {
 		return null;
 	}
 
+    HandSlot GetHandSlot(RaycastHit2D[] hits) {
+        foreach (RaycastHit2D hit in hits) {
+            HandSlot slot = hit.collider.GetComponent<HandSlot>();
+            if (slot != null) {
+                //MMLog.Log_InputCont(">>>>>>Got a handslot!!! Index="+slot.handIndex);
+                return slot;
+            }
+        }
+        return null;
+    }
+
     void HandleDrag() {
         TileBehav tb = null;
 
@@ -150,9 +160,9 @@ public class InputController : MonoBehaviour {
                     case TileBehav.TileState.Hand:
                         if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsTileMine(tb)) {
                             dropping = true;
-                            //parentT = tb.transform.parent;
 
                             dropTile = tb.gameObject;
+                            mm.LocalP().hand.GrabTile(tb); //?
                             mm.eventCont.GrabTile(mm.myID, tb.tile.element);
                         }
                         break;
@@ -188,6 +198,13 @@ public class InputController : MonoBehaviour {
                         Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                         cursor.z = 0;
                         tb.transform.position = cursor;
+
+                        // TODO check for HandSlots under...
+                        RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
+                        HandSlot slot = GetHandSlot(hits);
+                        if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10) {
+                            mm.LocalP().hand.Rearrange(slot);
+                        }
                     }
 				    break;
 			    case TileBehav.TileState.Placed:
@@ -213,9 +230,11 @@ public class InputController : MonoBehaviour {
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
 
                             if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropTile)) {
-                                //tb.transform.SetParent(parentT);
-                                //parentT = null;
-                                mm.GetPlayer(mm.myID).hand.Align(.12f, false);
+
+                                mm.LocalP().hand.ReleaseTile(tb); //?
+
+                            } else {
+                                mm.LocalP().hand.ClearPlaceholder(); //?
                             }
                             dropping = false;
                         }

@@ -75,51 +75,8 @@ public class AnimationController : MonoBehaviour {
         //		Debug.Log (transform.name + " is in position: (" + tile.col + ", " + tile.row + ")");
     }
 
-    public IEnumerator _AlignHand(Player p, float dur, bool linear) {
-        TileBehav tb;
-        Tween tween;
-        Vector3 handPos = p.hand.GetHandPos(), tilePos;
-        for (int i = 0; i < p.hand.Count(); i++) {
-            tb = p.hand.GetTile(i);
-            //			Debug.Log ("AlignHand hand[" + i + "] = " + tb.transform.name + ", position is (" + handSlot.position.x + ", " + handSlot.position.y + ")");
-            tilePos = GetHandPos(p.id, handPos, i);
-
-            tween = tb.transform.DOMove(tilePos, dur, false);
-            if (linear || i == p.hand.Count() - 1)
-                yield return tween.WaitForCompletion();
-        }
-    }
-
-    Vector3 GetHandPos(int id, Vector3 handPos, int i) {
-        // should really be outside of method...
-        bool isOnLeft;
-        if (mm.gameSettings.localPlayerOnLeft) {
-            if (id == mm.myID)
-                isOnLeft = true;
-            else
-                isOnLeft = false;
-        } else {
-            if (id == 1)
-                isOnLeft = true;
-            else
-                isOnLeft = false;
-        }
-
-        if (isOnLeft) {
-            if (i < 2)
-                return new Vector3(handPos.x - i - .5f, handPos.y + HexGrid.horiz);
-            else if (i < 5)
-                return new Vector3(handPos.x - (i - 2), handPos.y);
-            else
-                return new Vector3(handPos.x - (i - 5) - .5f, handPos.y - HexGrid.horiz);
-        } else {
-            if (i < 2)
-                return new Vector3(handPos.x + i + .5f, handPos.y + HexGrid.horiz);
-            else if (i < 5)
-                return new Vector3(handPos.x + (i - 2), handPos.y);
-            else
-                return new Vector3(handPos.x + (i - 5) + .5f, handPos.y - HexGrid.horiz);
-        }
+    public IEnumerator _Move(TileBehav tb, Vector3 newPos) {
+        yield return tb.transform.DOMove(newPos, .1f);
     }
 
     public IEnumerator _Burning(TileBehav tb) {

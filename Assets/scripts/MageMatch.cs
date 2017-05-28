@@ -67,6 +67,7 @@ public class MageMatch : MonoBehaviour {
             Destroy(tileFolder);
         tileFolder = new GameObject("tilesOnBoard");
         tileFolder.transform.SetParent(this.transform);
+        tilesOnBoard = tileFolder.transform;
 
         if (p1 != null)
             p1.hand.Empty();
