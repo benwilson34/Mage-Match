@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using MMDebug;
 
 public class ButtonController : MonoBehaviour {
 
@@ -16,21 +17,22 @@ public class ButtonController : MonoBehaviour {
 	}
 
     public void OnSpellCancelButtonClick() {
-        Debug.Log("BUTTONCONTROLLER: Spell canceled.");
+        MMLog.Log("BUTTONCONT", "black", "Spell canceled.");
         mm.targeting.CancelTargeting();
     }
 
     public void OnClearTargetsButtonClick() {
-        Debug.Log("BUTTONCONTROLLER: Targets cleared.");
+        MMLog.Log("BUTTONCONT", "black", "Targets cleared.");
         mm.targeting.ClearTargets();
     }
 
     public void OnDrawButtonClick() {
-        mm.DrawTile();
+        mm.PlayerDrawTile();
     }
 
     public void OnFileButtonClick() {
         mm.stats.SaveStatsCSV();
         mm.stats.SaveReportTXT();
+        MMLog.SaveReportTXT();
     }
 }

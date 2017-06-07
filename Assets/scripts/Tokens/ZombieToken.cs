@@ -24,7 +24,7 @@ public class ZombieToken : TileBehav {
             elem = Tile.Element.Muscle;
 
         TileBehav tb = mm.GenerateTile(elem).GetComponent<TileBehav>();
-        mm.spellfx.Ench_SetZombify(id, tb, true);
+        yield return mm.spellfx.Ench_SetZombify(id, tb, true, false);
         mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
     }
 

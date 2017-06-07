@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 public class Commish  {
 
@@ -26,7 +27,7 @@ public class Commish  {
             s += i + ",";
         }
         s = s.Remove(s.Length - 1, 1) + "}";
-        Debug.Log("COMMISH: CommishMatch: lens=" + s + ", sum=" + sum);
+        MMLog.Log_Commish("CommishMatch: lens=" + s + ", sum=" + sum);
         numTiles += sum;
     }
 
@@ -50,7 +51,7 @@ public class Commish  {
 	}
 
 	IEnumerator PlaceTiles(){
-        Debug.Log("   ---------- COMMISH TURN BEGIN ----------");
+        MMLog.Log_Commish("   ---------- COMMISH TURN BEGIN ----------");
         int prevCount = 0;
         Queue<int> cols = new Queue<int>();
         Queue<Tile.Element> elems = new Queue<Tile.Element>();
@@ -66,7 +67,7 @@ public class Commish  {
                 prevCount = numTiles;
             }
             if (cols.Peek() == -1) {
-                Debug.Log ("COMMISH: The board is full. The Commissioner ends his turn early.");
+                MMLog.Log_Commish("The board is full. The Commissioner ends his turn early.");
                 break;
             }
             if (i != 0) { // wait to drop next tile (anim purposes only)
@@ -74,12 +75,10 @@ public class Commish  {
             }
 
             GameObject go = mm.GenerateTile(elems.Dequeue());
-            Debug.Log ("COMMISH: Dropping into col " + cols.Peek());
+            MMLog.Log_Commish("Dropping into col " + cols.Peek());
 
-            if (mm.DropTile(cols.Dequeue(), go)) {
-                go.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
-            } else {
-                Debug.LogError("COMMISH: Tried to drop into a full column!");
+            if (!mm.DropTile(cols.Dequeue(), go)) {
+                MMLog.LogError("COMMISH: Tried to drop into a full column!");
                 break;
             }
 
@@ -88,7 +87,7 @@ public class Commish  {
             }
         }
 
-        Debug.Log("   ---------- COMMISH TURN END ----------");
+        MMLog.Log_Commish("   ---------- COMMISH TURN END ----------");
         mm.eventCont.CommishTurnDone();
 	}
 
@@ -113,7 +112,7 @@ public class Commish  {
             case 4:
                 return Tile.Element.Muscle;
             default:
-                Debug.LogError("COMMISH: Tried to get a bad element!");
+                MMLog.LogError("COMMISH: Tried to get a bad element!");
                 return Tile.Element.None;
         }
 	}
@@ -128,7 +127,7 @@ public class Commish  {
 
 	//int GetSemiRandomCol(float[] ratios){
 	//	float val = Random.Range (0f, 1f);
- //       //Debug.Log("COMMISH: GetSemiRandomCol val=" + val);
+ //       //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol val=" + val);
  //       float thresh = 0;
 	//	for (int i = 0; i < HexGrid.numCols; i++) {
 	//		thresh += ratios [i];
@@ -149,7 +148,7 @@ public class Commish  {
             }
 
             int val = Random.Range(0, counts[7]);
-            //Debug.Log("COMMISH: GetSemiRandomCol val=" + val);
+            //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol val=" + val);
             int sum = 0;
             for (int c = 0; c < HexGrid.numCols; c++) {
                 sum += counts[c];
@@ -160,7 +159,7 @@ public class Commish  {
                     break;
                 }
             }
-            //Debug.Log("COMMISH: GetSemiRandomCol: shouldn't get to this point. val = " + val);
+            //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol: shouldn't get to this point. val = " + val);
         }
         // syncing could be here?
         return cs;

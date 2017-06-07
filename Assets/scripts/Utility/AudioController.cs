@@ -87,7 +87,7 @@ public class AudioController {
         //mm.eventCont.drop += onDrop;
         mm.eventCont.grabTile += OnGrab;
         mm.eventCont.draw += OnDraw;
-        mm.eventCont.AddSwapEvent(OnSwap, 4);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Audio);
         //mm.eventCont.match += onMatch;
     }
 
@@ -141,18 +141,18 @@ public class AudioController {
                 clip = grab[4];
                 break;
         }
-        GameObject go = mm.GetPlayer(id).GetTileFromHand(elem);
+        GameObject go = mm.GetPlayer(id).hand.GetTile(elem);
         AudioSource source = go.GetComponent<AudioSource>();
 
         source.clip = clip;
         source.Play();
     }
 
-    public void OnDraw(int id, Tile.Element elem, bool dealt) {
+    public void OnDraw(int id, bool playerAction, bool dealt, Tile.Element elem) {
         OnGrab(id, elem);
     }
 
-    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
         Tile.Element elem = tb.tile.element;
         AudioClip clip = null;
@@ -210,7 +210,7 @@ public class AudioController {
 
 
         // TODO this won't work...how to get the tile? maybe there should just be an audio object with a few AudioSources for everything to use?
-        GameObject go = mm.ActiveP().GetTileFromHand(elem);
+        GameObject go = mm.ActiveP().hand.GetTile(elem);
 
         AudioSource source = go.GetComponent<AudioSource>();
 

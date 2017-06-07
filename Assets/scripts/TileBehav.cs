@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using MMDebug;
 
 public class TileBehav : MonoBehaviour {
 
@@ -15,10 +17,12 @@ public class TileBehav : MonoBehaviour {
 
     protected MageMatch mm;
 	private Enchantment enchantment;
+    private List<TileEffect> tileEffects;
 	private bool inPos = true;
 
 	void Awake(){
         mm = GameObject.Find("board").GetComponent<MageMatch>();
+        tileEffects = new List<TileEffect>(); // move to Init?
         Init();
 	}
 
@@ -86,7 +90,7 @@ public class TileBehav : MonoBehaviour {
 
     public bool CanSetEnch(Enchantment.EnchType type) {
         if (type == GetEnchType()) {
-            Debug.Log("TILEBEHAV: Tile has same enchant: " + type.ToString());
+            MMLog.Log_TileBehav("Tile has same enchant: " + type.ToString());
             return false;
         }
 
@@ -112,15 +116,16 @@ public class TileBehav : MonoBehaviour {
     }
 
     public IEnumerator TriggerEnchantment() {
-        Debug.Log("TILEBEHAV: Triggering enchantment at " + tile.col + ", " + tile.row);
+        MMLog.Log_TileBehav("Triggering enchantment at " + tile.col + ", " + tile.row);
         yield return enchantment.TriggerEffect();
     }
 
-	public void ClearEnchantment(){
-        Debug.Log("TILEBEHAV: About to remove enchantment...");
+	public void ClearEnchantment(bool removeFromList = true){
+        MMLog.Log_TileBehav("About to remove enchantment...");
         if (HasEnchantment()) {
-            Debug.Log("TILEBEHAV: About to remove enchantment with tag " + enchantment.tag);
-            mm.effectCont.RemoveTurnEffect(enchantment);
+            MMLog.Log_TileBehav("About to remove enchantment with tag " + enchantment.tag);
+            if(removeFromList)
+                mm.effectCont.RemoveTurnEffect(enchantment);
             enchantment = null;
             this.GetComponent<SpriteRenderer>().color = Color.white;
         }
@@ -128,14 +133,14 @@ public class TileBehav : MonoBehaviour {
 
 	public bool SetEnchantment(Enchantment ench){
 		if (!CanSetEnch(ench.enchType)) {
-            Debug.LogError("TILEBEHAV: Can't set ench at "+PrintCoord()+"! enchType="+ench.enchType);
+            MMLog.LogError("TILEBEHAV: Can't set ench at "+PrintCoord()+"! enchType="+ench.enchType);
 			return false;
 		}
         if(HasEnchantment())
             ClearEnchantment(); //?
 
-        Debug.Log("TILEBEHAV: About to set ench with tag="+ench.tag);
-		ench.SetAsEnchantment(this);
+        MMLog.Log_TileBehav("About to set ench with tag="+ench.tag);
+		ench.SetEnchantee(this);
 		enchantment = ench; 
 		return true;
 	}
@@ -151,6 +156,16 @@ public class TileBehav : MonoBehaviour {
 		}
 		return false;
 	}
+
+    public void AddTileEffect(TileEffect te) { tileEffects.Add(te); }
+
+    public void RemoveTileEffect(TileEffect te) { tileEffects.Remove(te); }
+
+    public void ClearTileEffects() {
+        foreach (TileEffect te in tileEffects) {
+            mm.effectCont.RemoveTurnEffect(te);
+        }
+    }
 
     public string PrintCoord() {
         return "(" + tile.col + ", " + tile.row + ")";

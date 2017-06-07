@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MMDebug;
 
 public class Gravekeeper : Character {
 
@@ -31,7 +32,7 @@ public class Gravekeeper : Character {
 
         spells[0] = new SignatureSpell(0, "Tombstone", "EMME", 1, 20, Tombstone);
         spells[1] = new Spell(1, "Human Resources", "MEW", 1, HumanResources);
-        spells[2] = new Spell(2, "Undead Union [EMPTY]", "EMM", 1, UndeadUnion);
+        spells[2] = new Spell(2, "Undead Union", "EMM", 1, UndeadUnion);
         spells[3] = new CoreSpell(3, "Gather the Ghouls", 3, 1, GatherTheGhouls);
     }
 
@@ -52,29 +53,70 @@ public class Gravekeeper : Character {
 
     public IEnumerator HumanResources() {
         yield return targeting.WaitForTileAreaTarget(false);
+        if (targeting.WasCanceled())
+            yield break;
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         //foreach (TileBehav tb in tbs) {
         for(int i = 0; i < tbs.Count; i++) { // foreach
             TileBehav tb = tbs[i];
             if (tb.tile.element == Tile.Element.Muscle) {
-                if (tb.CanSetEnch(Enchantment.EnchType.Zombify))
-                    spellfx.Ench_SetZombify(playerID, tb, false);
+                if (tb.CanSetEnch(Enchantment.EnchType.Zombify)) {
+                    yield return spellfx.Ench_SetZombify(playerID, tb, false);
+                    continue;
+                }
             }
+            tbs.RemoveAt(i);
+            i--;
         }
 
+        MMLog.Log_Gravekeeper("HumanResources trigger count=" + tbs.Count);
         foreach (TileBehav tb in tbs) {
             if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
-                Debug.Log("GRAVEKEEPER: Triggering zomb at " + tb.PrintCoord());
-                tb.TriggerEnchantment();
+                MMLog.Log_Gravekeeper("Triggering zomb at " + tb.PrintCoord());
+                yield return tb.TriggerEnchantment();
             }
         }
     }
 
     public IEnumerator UndeadUnion() {
-        //DealAdjZombDmg(tbs);
+        yield return targeting.WaitForTileAreaTarget(false);
+        if (targeting.WasCanceled())
+            yield break;
+
+        List<TileBehav> tbs = targeting.GetTargetTBs();
+        List<TileBehav> indestructTbs = new List<TileBehav>(tbs);
+        for (int i = 0; i < tbs.Count; i++) { // filter zombs
+            TileBehav tb = tbs[i];
+            if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
+                if (!tb.ableDestroy)
+                    indestructTbs.RemoveAt(i);
+            } else {
+                tbs.RemoveAt(i);
+                indestructTbs.RemoveAt(i);
+                i--;
+            }
+        }
+        MMLog.Log_Gravekeeper("Undead Union target has " + tbs.Count + " zombs in area");
+
+        foreach (TileBehav tb in indestructTbs) {
+            tb.ableDestroy = false;
+            TileEffect e = new TileEffect(playerID, 2, Effect.Type.Enchant, null, UndeadUnion_TEnd); // dunno about these settings
+            tb.AddTileEffect(e);
+            e.SetEnchantee(tb);
+            mm.effectCont.AddEndTurnEffect(e, "union"); 
+        }
+
+        DealAdjZombDmg(tbs);
+
         yield return null;
     }
+    IEnumerator UndeadUnion_TEnd(int id, TileBehav tb) {
+        MMLog.Log_Gravekeeper(">>>>>>>>>>>> UndeadUnion at " + tb.PrintCoord() + " is done!");
+        tb.ableDestroy = true;
+        yield return null;
+    }
+
     void DealAdjZombDmg(List<TileBehav> tbs) {
         int count = 0;
         foreach (TileBehav tb in tbs) {
@@ -87,8 +129,9 @@ public class Gravekeeper : Character {
                 }
             }
         }
-        Debug.Log("GRAVEKEEPER: DealAdjZombDmg has counted " + count + " adjacent zombs");
-        mm.ActiveP().DealDamage(count * 4);
+        MMLog.Log_Gravekeeper("DealAdjZombDmg has counted " + count + " adjacent zombs");
+        if(count > 0)
+            mm.ActiveP().DealDamage(count * 5);
     }
 
     //public IEnumerator CompanyLuncheon() {
@@ -109,12 +152,13 @@ public class Gravekeeper : Character {
     //        tb.TriggerEnchantment();
     //}
 
+    // delete
     public IEnumerator ZombifySpell() {
         yield return targeting.WaitForTileTarget(1);
         if (targeting.WasCanceled())
             yield break;
         TileBehav tb = targeting.GetTargetTBs()[0];
-        spellfx.Ench_SetZombify(playerID, tb, false);
+        yield return spellfx.Ench_SetZombify(playerID, tb, false);
     }
 
     public IEnumerator GatherTheGhouls() {
@@ -133,7 +177,7 @@ public class Gravekeeper : Character {
             // TODO sync array, not in loop...maybe
             yield return mm.syncManager.SyncRand(playerID, Random.Range(0, tbs.Count));
             int rand = mm.syncManager.GetRand();
-            spellfx.Ench_SetZombify(playerID, tbs[rand], false);
+            yield return spellfx.Ench_SetZombify(playerID, tbs[rand], false);
             tbs.RemoveAt(rand);
         }
     }

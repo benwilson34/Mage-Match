@@ -66,4 +66,7 @@ MonoBehaviour:
   - HandleClearTargets
   - HandleSyncRands
   - HandleTimeout
+  - SetToggles
+  - HandleEndDragTarget
+  - HandleSyncElement
   DisableAutoOpenWizard: 1

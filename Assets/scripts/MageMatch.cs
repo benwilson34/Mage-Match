@@ -2,11 +2,12 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-
+using MMDebug;
 public class MageMatch : MonoBehaviour {
 
     public enum GameState { PlayerTurn, TargetMode, CommishTurn };
     public GameState currentState;
+    public MMLog.LogLevel debugLogLevel = MMLog.LogLevel.Standard;
     [HideInInspector]
     public int myID;
     [HideInInspector]
@@ -26,19 +27,23 @@ public class MageMatch : MonoBehaviour {
     public UIController uiCont;
     public Stats stats;
     public SpellEffects spellfx;
+    //public MMLog mmdebug;
 
     private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
     private GameObject stonePF, emberPF, tombstonePF, prereqPF, targetPF; // token prefabs
     private Player p1, p2, activep;
+    private Transform tilesOnBoard;
     private bool endGame = false;
     private int checking = 0, removing = 0, actionsPerforming = 0, matchesResolving = 0;
     private int cascade = 0; // should this be how this is handled?
 
     void Start() {
         //Random.InitState(1337420);
+        MMLog.Init(debugLogLevel);
 
+        tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
         gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
-        Debug.Log("MAGEMATCH: gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
+        MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn + ",localLeft=" + gameSettings.localPlayerOnLeft + ",hideOppHand=" + gameSettings.hideOpponentHand);
 
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
@@ -61,14 +66,15 @@ public class MageMatch : MonoBehaviour {
             Destroy(tileFolder);
         tileFolder = new GameObject("tilesOnBoard");
         tileFolder.transform.SetParent(this.transform);
+        tilesOnBoard = tileFolder.transform;
 
         if (p1 != null)
-            p1.EmptyHand();
+            p1.hand.Empty();
         if (p2 != null)
-            p2.EmptyHand();
+            p2.hand.Empty();
 
         hexGrid = new HexGrid();
-        boardCheck = new BoardCheck(hexGrid);
+        boardCheck = new BoardCheck(this);
         spellfx = new SpellEffects(this);
 
         endGame = false;
@@ -115,11 +121,11 @@ public class MageMatch : MonoBehaviour {
     public void InitEvents() {
         eventCont = new EventController(this);
         eventCont.boardAction += OnBoardAction;
-        eventCont.AddDropEvent(OnDrop, 1); // checking
-        eventCont.AddSwapEvent(OnSwap, 1); // checking
+        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction); // checking
+        eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction); // checking
         eventCont.gameAction += OnGameAction;
-        eventCont.AddTurnBeginEvent(OnTurnBegin, 1); // checking
-        eventCont.AddTurnEndEvent(OnTurnEnd, 1); // checking
+        eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.GameAction); // checking
+        eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.GameAction); // checking
 
         if (gameSettings.turnTimerOn)
             eventCont.timeout += OnTimeout;
@@ -131,6 +137,8 @@ public class MageMatch : MonoBehaviour {
         uiCont.InitEvents();
         p1.InitEvents();
         p2.InitEvents();
+
+        animCont.Init(this);
     }
 
     #region EventCont calls
@@ -147,9 +155,10 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
-    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         yield return BoardChecking();
-        eventCont.GameAction(true);
+        if(playerAction)
+            eventCont.GameAction(true);
     }
 
     public void OnGameAction(int id, bool costsAP) { // eventually just pass in int for cost?
@@ -179,7 +188,7 @@ public class MageMatch : MonoBehaviour {
 
     public void TurnTimeout() {
         Player p = GetPlayer(activep.id);
-        Debug.Log("MAGEMATCH: " + p.name + "'s turn just timed out! They had " + p.AP + " AP left.");
+        MMLog.Log_MageMatch(p.name + "'s turn just timed out! They had " + p.AP + " AP left.");
         uiCont.SetDrawButton(activep, false);
         StartCoroutine(TurnSystem());
     }
@@ -193,7 +202,7 @@ public class MageMatch : MonoBehaviour {
 
         yield return new WaitUntil(() => actionsPerforming == 0 && removing == 0); //?
         yield return new WaitUntil(() => checking == 0); //?
-        Debug.Log("   ---------- TURNSYSTEM START ----------");
+        MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM START ----------</b>");
         yield return eventCont.TurnEnd();
 
         uiCont.DeactivateAllSpellButtons(activep); //? These should be part of any boardaction...
@@ -208,14 +217,14 @@ public class MageMatch : MonoBehaviour {
         SpellCheck();
         timer.InitTimer();
 
-        Debug.Log("   ---------- TURNSYSTEM END ----------");
+        MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM END ----------</b>");
         switchingTurn = false;
     }
 
     public IEnumerator BoardChecking() {
         checking++; // prevents overcalling/retriggering
         yield return new WaitUntil(() => removing == 0); //?
-        Debug.Log("MAGEMATCH: About to check the board.");
+        MMLog.Log_MageMatch("About to check the board.");
 
         cascade = 0;
         while (true) {
@@ -224,7 +233,7 @@ public class MageMatch : MonoBehaviour {
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
             List<TileSeq> seqMatches = boardCheck.MatchCheck();
             if (seqMatches.Count > 0) { // if there's at least one MATCH
-                Debug.Log("MAGEMATCH: Resolving matches...");
+                MMLog.Log_MageMatch("Resolving matches...");
                 yield return ResolveMatches(seqMatches);
                 cascade++;
             } else {
@@ -239,7 +248,7 @@ public class MageMatch : MonoBehaviour {
                 break;
             }
         }
-        Debug.Log("MAGEMATCH: Done checking.");
+        MMLog.Log_MageMatch("Done checking.");
         checking--;
     }
 
@@ -247,8 +256,6 @@ public class MageMatch : MonoBehaviour {
         Character c = activep.character;
         List<TileSeq> spellSeqList = c.GetTileSeqList();
         List<TileSeq> spellsOnBoard = boardCheck.SpellCheck(spellSeqList);
-        //if (spellsOnBoard.Count == 0)
-        //    return;
         
         for (int s = 0; s < spellSeqList.Count; s++) {
             Spell sp = c.GetSpell(s);
@@ -259,11 +266,11 @@ public class MageMatch : MonoBehaviour {
                     //Debug.Log("MAGEMATCH: " + sp.name + " is core, and there's no effect with tag=" + sp.effectTag);
                     spellIsOnBoard = true;
                 } else {
-                    Debug.Log("MAGEMATCH: " + sp.name + " is core, but it's cooling down!");
+                    MMLog.Log_MageMatch(sp.name + " is core, but it's cooling down!");
                 }                    
             } else { // could be cleaner.
                 if (sp is SignatureSpell && !((SignatureSpell)sp).IsReadyToCast()) {
-                    Debug.Log("MAGEMATCH: " + sp.name + " is signature, but not enough meter!");
+                    //Log(sp.name + " is signature, but not enough meter!");
                     continue;
                 }
                 for (int i = 0; i < spellsOnBoard.Count; i++) {
@@ -285,10 +292,10 @@ public class MageMatch : MonoBehaviour {
 
     IEnumerator ResolveMatches(List<TileSeq> seqList) {
         matchesResolving++;
-        Debug.Log("   ---------- MATCH BEGIN ----------");
-        Debug.Log("MAGEMATCH: At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
+        MMLog.Log_MageMatch("   ---------- MATCH BEGIN ----------");
+        MMLog.Log_MageMatch("At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
         if (currentState != GameState.CommishTurn) {
-            Debug.Log("MAGEMATCH: Match was made by a player!!");
+            MMLog.Log_MageMatch("Match was made by a player!");
             string[] seqs = GetTileSeqs(seqList);
             RemoveSeqList(seqList); // hopefully putting this first makes it more responsive?
             yield return eventCont.Match(seqs); // raise player Match event
@@ -298,75 +305,94 @@ public class MageMatch : MonoBehaviour {
         }
 
         yield return BoardChecking();
-        Debug.Log("   ---------- MATCH END ----------");
+        MMLog.Log_MageMatch("   ---------- MATCH END ----------");
         matchesResolving--;
     }
 
 
     #region ----- Game Actions -----
 
-    public bool DrawTile() {
-        if (activep.IsHandFull()) {
-            uiCont.UpdateMoveText("Your hand is full!");
-            return false;
+    public void PlayerDrawTile() {
+        StartCoroutine(_Draw(activep.id, true));
+    }
+    
+    // for spells and such
+    // needed? just call mm.GetPlayer(id).DrawTiles()?
+    public void DrawTile() {
+        StartCoroutine(_Draw(activep.id, false));
+    }
+
+    public IEnumerator _Draw(int id, bool playerAction) {
+        MMLog.Log_MageMatch("   ---------- DRAW BEGIN ----------");
+        actionsPerforming++;
+        Player p = GetPlayer(id);
+        if (p.hand.IsFull()) {
+            MMLog.Log_MageMatch("Player " + id + "'s hand is full.");
         } else {
-            activep.DrawTiles(1, Tile.Element.None, false, false);
-            return true;
+            p.DrawTiles(1, Tile.Element.None, true, false, false);
         }
+        MMLog.Log_MageMatch("   ---------- DRAW END ----------");
+        actionsPerforming--;
+        yield return null;
     }
 
     public bool PlayerDropTile(int col, GameObject go) {
         int row = boardCheck.CheckColumn(col); // check that column isn't full
         if (row >= 0) {
             activep.hand.Remove(go.GetComponent<TileBehav>()); // remove from hand
-            StartCoroutine(_Drop(col, go, true));
+            StartCoroutine(_Drop(true, col, go));
             return true;
         }
         return false;
     }
 
-    // TODO separate methods for player and Commish
     public bool DropTile(int col, GameObject go) {
         int row = boardCheck.CheckColumn(col); // check that column isn't full
         if (row >= 0) { // if the col is not full
-            StartCoroutine(_Drop(col, go, false));
+            StartCoroutine(_Drop(false, col, go));
             return true;
         }
         return false;
     }
 
-    IEnumerator _Drop(int col, GameObject go, bool playerAction) {
-        Debug.Log("   ---------- DROP BEGIN ----------");
+    IEnumerator _Drop(bool playerAction, int col, GameObject go) {
+        MMLog.Log_MageMatch("   ---------- DROP BEGIN ----------");
         actionsPerforming++;
+        go.transform.SetParent(tilesOnBoard);
         TileBehav tb = go.GetComponent<TileBehav>();
         tb.SetPlaced();
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
         if (currentState == GameState.PlayerTurn) { //kinda hacky
-            yield return eventCont.Drop(tb.tile.element, col, playerAction);
+            yield return eventCont.Drop(playerAction, tb.tile.element, col);
         } else if (currentState == GameState.CommishTurn)
             eventCont.CommishDrop(tb.tile.element, col);
 
-        Debug.Log("   ---------- DROP END ----------");
+        MMLog.Log_MageMatch("   ---------- DROP END ----------");
         actionsPerforming--;
         yield return null;
     }
 
-    public void SwapTiles(int c1, int r1, int c2, int r2) {
-        StartCoroutine(_SwapTiles(c1, r1, c2, r2));
+    public void PlayerSwapTiles(int c1, int r1, int c2, int r2) {
+        StartCoroutine(_SwapTiles(true, c1, r1, c2, r2));
     }
 
-    public IEnumerator _SwapTiles(int c1, int r1, int c2, int r2) {
-        Debug.Log("   ---------- SWAP BEGIN ----------");
+    // for spells and such
+    public void SwapTiles(int c1, int r1, int c2, int r2) {
+        StartCoroutine(_SwapTiles(false, c1, r1, c2, r2));
+    }
+
+    public IEnumerator _SwapTiles( bool playerAction, int c1, int r1, int c2, int r2) {
+        MMLog.Log_MageMatch("   ---------- SWAP BEGIN ----------");
         actionsPerforming++;
         if (hexGrid.Swap(c1, r1, c2, r2)) { // I feel like this check should be in InputCont
-            yield return eventCont.Swap(c1, r1, c2, r2); 
+            yield return eventCont.Swap(playerAction, c1, r1, c2, r2); 
         }
-        Debug.Log("   ---------- SWAP END ----------");
+        MMLog.Log_MageMatch("   ---------- SWAP END ----------");
         actionsPerforming--;
     }
 
     public IEnumerator CastSpell(int spellNum) {
-        Debug.Log("   ---------- CAST SPELL BEGIN ----------");
+        MMLog.Log_MageMatch("   ---------- CAST SPELL BEGIN ----------");
         actionsPerforming++;
         syncManager.SendSpellCast(spellNum);
 
@@ -389,7 +415,7 @@ public class MageMatch : MonoBehaviour {
         } else {
             uiCont.UpdateMoveText("Not enough AP to cast!");
         }
-        Debug.Log("   ---------- CAST SPELL END ----------");
+        MMLog.Log_MageMatch("   ---------- CAST SPELL END ----------");
         actionsPerforming--;
     }
 
@@ -535,20 +561,25 @@ public class MageMatch : MonoBehaviour {
         removing++;
 
         TileBehav tb = hexGrid.GetTileBehavAt(col, row);
+
         if (tb == null) {
-            if(!tb.ableDestroy) // maybe not error
-                Debug.LogError("MAGEMATCH: RemoveTile tried to destory an indestructable tile!");
-            else
-                Debug.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
+            MMLog.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
             removing--;
             yield break;
         }
+        if (!tb.ableDestroy) {
+            MMLog.LogWarning("MAGEMATCH: RemoveTile tried to remove an indestructable tile!");
+            removing--;
+            yield break;
+        }
+
         if (tb.HasEnchantment()) {
             if (resolveEnchant) {
-                Debug.Log("MAGEMATCH: About to resolve enchant on tile " + tb.PrintCoord());
+                MMLog.Log_MageMatch("About to resolve enchant on tile " + tb.PrintCoord());
                 tb.ResolveEnchantment();
             }
             tb.ClearEnchantment(); // TODO
+            tb.ClearTileEffects(); //?
         }
         hexGrid.ClearTileBehavAt(col, row); // move up?
 

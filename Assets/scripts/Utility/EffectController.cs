@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MMDebug;
 
 // TODO events for beginning-of-turn effects and for passive/trigger effects
 public class EffectController {
@@ -25,31 +26,31 @@ public class EffectController {
     }
 
     public void InitEvents() {
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 3);
-        mm.eventCont.AddTurnEndEvent(OnTurnEnd, 3);
-        mm.eventCont.AddMatchEvent(OnMatch, 3);
-        mm.eventCont.AddSwapEvent(OnSwap, 3);
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.EventEffects);
+        mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.EventEffects);
+        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.EventEffects);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.EventEffects);
     }
 
     #region EventCont calls
     public IEnumerator OnTurnBegin(int id) {
         yield return ResolveBeginTurnEffects();
-        Debug.Log("EFFECTCONT: Just finished resolving TURN BEGIN effects.");
+        MMLog.Log_EffectCont("Just finished resolving TURN BEGIN effects.");
     }
 
     public IEnumerator OnTurnEnd(int id) {
         yield return ResolveEndTurnEffects();
-        Debug.Log("EFFECTCONT: Just finished resolving TURN END effects.");
+        MMLog.Log_EffectCont("Just finished resolving TURN END effects.");
     }
 
     public IEnumerator OnMatch(int id, string[] seqs) {
         yield return ResolveMatchEffects(id);
-        Debug.Log("EFFECTCONT: Just finished resolving MATCH effects.");
+        MMLog.Log_EffectCont("Just finished resolving MATCH effects.");
     }
 
-    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         yield return ResolveSwapEffects(id, c1, r1, c2, r2);
-        Debug.Log("EFFECTCONT: Just finished resolving SWAP effects.");
+        MMLog.Log_EffectCont("Just finished resolving SWAP effects.");
     }
     #endregion
 
@@ -62,7 +63,7 @@ public class EffectController {
             tagDict.Add(tag, 1);
             fullTag += tag + "-001";
         }
-        Debug.Log("EFFECTCONT: adding effect with tag " + fullTag);
+        MMLog.Log_EffectCont("...adding effect with tag " + fullTag);
         return fullTag;
     }
 
@@ -108,12 +109,12 @@ public class EffectController {
         for (i = 0; i < list.Count; i++) {
             Effect listE = list[i];
             if (listE.tag == e.tag) {
-                Debug.Log("EFFECT-CONT: found effect with tag " + e.tag);
+                MMLog.Log_EffectCont("found effect with tag " + e.tag);
                 list.RemoveAt(i); // can be moved up?
                 return;
             }
         }
-        Debug.LogError("EFFECT-CONT: Missed the remove! tag="+ e.tag);
+        MMLog.LogError("EFFECTCONT: Missed the remove! tag="+ e.tag);
     }
 
     // TODO generalize
@@ -132,7 +133,7 @@ public class EffectController {
         for (i = 0; i < list.Count; i++) {
             e = list[i];
             if (e.tag == tag) {
-                Debug.Log("EFFECT-CONT: found effect with tag " + e.tag);
+                MMLog.Log_EffectCont("found effect with tag " + e.tag);
                 return e;
             }
         }
@@ -145,14 +146,14 @@ public class EffectController {
         for (c = 0; c < beginTurnEffects.Count; c++) { //foreach
             Effect e = beginTurnEffects[c];
             Effect.Type t = currentType = e.type;
-            Debug.Log("EFFECTCONT: " + e.tag + " (type " + t + ", p" + (int)t + ") has " + e.TurnsLeft() + " turns left (including this one).");
+            MMLog.Log_EffectCont(e.tag + " (type " + t + ", p" + (int)t + ") has " + e.TurnsLeft() + " turns left (including this one).");
             yield return e.Turn();
 
             if (e.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
-                Debug.Log("EFFECTCONT: Removing " + e.tag + "...");
+                MMLog.Log_EffectCont("Removing " + e.tag + "...");
                 beginTurnEffects.RemoveAt(c);
                 if (e is Enchantment)
-                    ((Enchantment)e).GetEnchantee().ClearEnchantment();
+                    ((Enchantment)e).GetEnchantee().ClearEnchantment(false);
                 c--;
             }
         }
@@ -165,14 +166,18 @@ public class EffectController {
         for (c = 0; c < endTurnEffects.Count; c++) { // foreach
             e = endTurnEffects[c];
             Effect.Type t = currentType = e.type;
-            Debug.Log("EFFECTCONT: " + e.tag + " (type " + t + ", p" + (int)t + ") has " + e.TurnsLeft() + " turns left (including this one).");
+            MMLog.Log_EffectCont(e.tag + " (type " + t + ", p" + (int)t + ") has " + e.TurnsLeft() + " turns left (including this one).");
             yield return e.Turn();
 
             if (e.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
-                Debug.Log("EFFECTCONT: Removing " + e.tag + "...");
+                MMLog.Log_EffectCont("Removing " + e.tag + "...");
                 endTurnEffects.RemoveAt(c);
                 if (e is Enchantment)
-                    ((Enchantment)e).GetEnchantee().ClearEnchantment();
+                    ((Enchantment)e).GetEnchantee().ClearEnchantment(false);
+                else if (e is TileEffect) {
+                    TileEffect te = (TileEffect)e;
+                    te.GetEnchantee().RemoveTileEffect(te);
+                }
                 c--;
             } 
         }
@@ -181,11 +186,11 @@ public class EffectController {
         for (int i = 0; i < matchEffects.Count; i++) { // foreach
             MatchEffect me = matchEffects[i];
             Effect.Type t = me.type;
-            Debug.Log("EFFECTCONT: " + me.tag + " (type " + t + ", p" + (int)t + ") has " + me.TurnsLeft() + " turns left (including this one).");
+            MMLog.Log_EffectCont(me.tag + " (type " + t + ", p" + (int)t + ") has " + me.TurnsLeft() + " turns left (including this one).");
             yield return me.Turn();
 
             if (me.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
-                Debug.Log("EFFECTCONT: Removing " + me.tag + "...");
+                MMLog.Log_EffectCont("Removing " + me.tag + "...");
                 matchEffects.RemoveAt(i);
                 i--;
             }
@@ -193,11 +198,11 @@ public class EffectController {
         for (int i = 0; i < swapEffects.Count; i++) { // foreach
             SwapEffect se = swapEffects[i];
             Effect.Type t = se.type;
-            Debug.Log("EFFECTCONT: " + se.tag + " (type " + t + ", p" + (int)t + ") has " + se.TurnsLeft() + " turns left (including this one).");
+            MMLog.Log_EffectCont(se.tag + " (type " + t + ", p" + (int)t + ") has " + se.TurnsLeft() + " turns left (including this one).");
             yield return se.Turn();
 
             if (se.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
-                Debug.Log("EFFECTCONT: Removing " + se.tag + "...");
+                MMLog.Log_EffectCont("Removing " + se.tag + "...");
                 swapEffects.RemoveAt(i);
                 i--;
             }
@@ -222,7 +227,7 @@ public class EffectController {
                 yield return me.TriggerEffect();
 
                 if (me.NeedRemove()) {
-                    Debug.Log("EFFECTCONT: Removing " + me.tag + "...");
+                    MMLog.Log_EffectCont("Removing " + me.tag + "...");
                     matchEffects.RemoveAt(i);
                     i--;
                 }
@@ -252,12 +257,12 @@ public class EffectController {
         for (int i = 0; i < swapEffects.Count; i++) { // foreach
             se = swapEffects[i];
             if (se.playerID == id) {
-                Debug.Log("EFFECTCONT: Checking swapEff with tag " + se.tag + "; count=" + se.countLeft);
+                MMLog.Log_EffectCont("Checking swapEff with tag " + se.tag + "; count=" + se.countLeft);
 
                 yield return se.TriggerEffect(c1, r1, c2, r2);
 
                 if (se.NeedRemove()) {
-                    Debug.Log("EFFECTCONT: Removing " + se.tag + "...");
+                    MMLog.Log_EffectCont("Removing " + se.tag + "...");
                     swapEffects.RemoveAt(i);
                     i--;
                 }

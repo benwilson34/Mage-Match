@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 public class Targeting {
 
@@ -15,7 +16,7 @@ public class Targeting {
     private List<CellBehav> targetCBs;
     private Vector3 lastTCenter;
     private bool largeAreaMode = false;
-
+    private TileBehav lastDragTarget;
     private List<GameObject> outlines;
 
     //public delegate void TBTargetEffect(TileBehav tb);
@@ -34,7 +35,7 @@ public class Targeting {
     }
 
     void DecTargets() { // maybe remove?
-        Debug.Log("INPUTCONTROLLER: Targets remaining = " + targetsLeft);
+        MMLog.Log_Targeting("Targets remaining = " + targetsLeft);
         targetsLeft--;
         //if (targetsLeft == 0) //?
         //	currentTMode = TargetMode.Tile;
@@ -45,7 +46,7 @@ public class Targeting {
         currentTMode = TargetMode.Tile;
         targets = targetsLeft = count;
         targetTBs = new List<TileBehav>();
-        Debug.Log("TARGETING: targets = " + targetsLeft);
+        MMLog.Log_Targeting("targets = " + targetsLeft);
 
         yield return TargetingScreen();
     }
@@ -55,7 +56,16 @@ public class Targeting {
         targets = targetsLeft = 1;
         targetTBs = new List<TileBehav>();
         largeAreaMode = largeArea;
-        Debug.Log("TARGETING: Waiting for TileArea target. Targets = " + targetsLeft);
+        MMLog.Log_Targeting("Waiting for TileArea target. Targets = " + targetsLeft);
+
+        yield return TargetingScreen();
+    }
+
+    public IEnumerator WaitForDragTarget(int count) {
+        currentTMode = TargetMode.Drag;
+        targets = targetsLeft = count;
+        targetTBs = new List<TileBehav>();
+        MMLog.Log_Targeting("targets = " + targetsLeft);
 
         yield return TargetingScreen();
     }
@@ -76,7 +86,7 @@ public class Targeting {
             targetTBs.Add(tb);
             DecTargets();
             mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
-            Debug.Log("TARGETING: Targeted tile (" + t.col + ", " + t.row + ")");
+            MMLog.Log_Targeting("Targeted tile (" + t.col + ", " + t.row + ")");
         } else if (currentTMode == TargetMode.TileArea) {
             List<TileBehav> tbs;
             Tile t = tb.tile;
@@ -93,8 +103,29 @@ public class Targeting {
                 targetTBs.Add(ctb);
             }
             DecTargets();
-            Debug.Log("TARGETING: Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+            MMLog.Log_Targeting("Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+        } else if (currentTMode == TargetMode.Drag) {
+            if (!IsDragTBValid(tb))
+                EndDragTarget();
+            lastDragTarget = tb;
+
+            Tile t = tb.tile;
+            OutlineTarget(t.col, t.row);
+            targetTBs.Add(tb);
+            DecTargets();
+            mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
+            MMLog.Log_Targeting("Targeted tile (" + t.col + ", " + t.row + ")");
         }
+    }
+
+    bool IsDragTBValid(TileBehav tb) {
+        if (lastDragTarget == null) return true;
+        return mm.hexGrid.CellsAreAdjacent(lastDragTarget.tile, tb.tile);
+    }
+
+    public void EndDragTarget() {
+        mm.syncManager.SendEndDragTarget();
+        targetsLeft = 0;
     }
 
     // TODO
@@ -109,7 +140,10 @@ public class Targeting {
     }
 
     // TODO
-    public void WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) { }
+    public IEnumerator WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) {
+        currentTMode = TargetMode.CellArea;
+        yield return null;
+    }
 
     public void OnCBTarget(CellBehav cb) {
         //DecTargets ();
@@ -129,7 +163,7 @@ public class Targeting {
             targetCBs.Add(cb);
             DecTargets();
             mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
-            Debug.Log("TARGETING: Targeted tile (" + cb.col + ", " + cb.row + ")");
+            MMLog.Log_Targeting("Targeted tile (" + cb.col + ", " + cb.row + ")");
         } else if (currentTMode == TargetMode.CellArea) {
             //List<TileBehav> tbs;
             //Tile t = tb.tile;
@@ -146,7 +180,7 @@ public class Targeting {
             //    targetTBs.Add(ctb);
             //}
             //DecTargets();
-            //Debug.Log("TARGETING: Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+            //Debug.MMLog.Log_Targeting("TARGETING: Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
         }
     }
 
@@ -173,17 +207,11 @@ public class Targeting {
         OutlinePrereq(seq);
 
         yield return new WaitUntil(() => targetsLeft == 0);
-        Debug.Log("TARGETING: no more targets.");
+        MMLog.Log_Targeting("no more targets.");
+        lastDragTarget = null;
 
         mm.uiCont.UpdateMoveText("Here are your targets!");
         yield return new WaitForSeconds(1f);
-
-        //if (!canceled) { // shouldn't be here anymore
-        //    mm.RemoveSeq(seq);
-        //    //HandleTargets();
-        //    mm.BoardChanged();
-        //    p.ApplyAPCost();
-        //}
 
         foreach (GameObject go in outlines) {
             GameObject.Destroy(go);
@@ -201,28 +229,6 @@ public class Targeting {
     public List<TileBehav> GetTargetTBs() { return targetTBs; }
 
     public List<CellBehav> GetTargetCBs() { return targetCBs; }
-
-    //void HandleTargets() {
-    //    switch (currentTMode) {
-    //        case TargetMode.Tile:
-    //            foreach (TileBehav tb in targetTBs)
-    //                TBtargetEffect(tb);
-    //            break;
-    //        case TargetMode.TileArea:
-    //            Debug.Log("TARGETING: Handling TileArea effect...");
-    //            TBmultiTargetEffect(targetTBs);
-    //            break;
-    //        case TargetMode.Cell:
-    //            foreach (CellBehav cb in targetCBs) {
-    //                CBtargetEffect(cb);
-    //            }
-    //            break;
-    //        case TargetMode.CellArea:
-    //            break;
-    //        case TargetMode.Drag:
-    //            break;
-    //    }
-    //}
 
     void OutlinePrereq(TileSeq seq) {
         outlines = new List<GameObject>(); // move to Init?
@@ -280,4 +286,6 @@ public class Targeting {
     }
 
     public bool WasCanceled() { return canceled; }
+
+    public bool TargetsRemain() { return targetsLeft > 0; }
 }

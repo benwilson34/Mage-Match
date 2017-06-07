@@ -17,7 +17,7 @@ public class Stats {
         public string name;
         public string character;
         public string loadout;
-        public int draws, drops, swaps, matches, match3s, match4s, match5s, cascades, tilesRemoved, spellsCast, timeouts;
+        public int draws, drops, swaps, matches, match3s, match4s, match5s, cascades, tilesRemoved, spellsCast, timeouts, discards;
         public int dmgDealt, dmgTaken, healingDone;
         public int longestCascade;
     }
@@ -39,18 +39,19 @@ public class Stats {
 
         InitReport();
 
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 2);
-        mm.eventCont.AddTurnEndEvent(OnTurnEnd, 2);
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Stats);
+        mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
         mm.eventCont.timeout += OnTimeout;
         mm.eventCont.commishDrop += OnCommishDrop;
         mm.eventCont.commishMatch += OnCommishMatch;
 
         mm.eventCont.draw += OnDraw;
-        mm.eventCont.AddDropEvent(OnDrop, 2);
-        mm.eventCont.AddSwapEvent(OnSwap, 2);
+        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats);
         mm.eventCont.spellCast += OnSpellCast;
+        mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
-        mm.eventCont.AddMatchEvent(OnMatch, 2);
+        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
         mm.eventCont.cascade += OnCascade;
         mm.eventCont.tileRemove += OnTileRemove;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
@@ -107,12 +108,19 @@ public class Stats {
     }
 
     #region GameAction subscriptions
-    public void OnDraw(int id, Tile.Element elem, bool dealt) {
+    // TODO for all, different report lines for playerAction or not...
+    public void OnDraw(int id, bool playerAction, bool dealt, Tile.Element elem) {
         if(dealt)
             report.AppendLine("Deal p"+id+" " + Tile.ElementToChar(elem));
         else
             report.AppendLine("Draw " + Tile.ElementToChar(elem));
         GetPS(id).draws++;
+    }
+
+    public IEnumerator OnDiscard(int id, Tile.Element elem) {
+        report.AppendLine("p" + id + " discards " + Tile.ElementToChar(elem));
+        GetPS(id).discards++;
+        yield return null;
     }
 
     public IEnumerator OnDrop(int id, bool playerAction, Tile.Element elem, int col) {
@@ -124,10 +132,11 @@ public class Stats {
         yield return null;
     }
 
-    public IEnumerator OnSwap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         if (!mm.uiCont.IsMenu()) { //?
             report.AppendLine("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
-            GetPS(id).swaps++;
+            if(playerAction)
+                GetPS(id).swaps++;
         } else
             report.AppendLine("menu Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
         yield return null;

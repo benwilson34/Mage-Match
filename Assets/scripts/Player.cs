@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 public class Player {
 
@@ -9,8 +10,8 @@ public class Player {
     public Character character;
     public int health;
     public int AP;
-    public Transform handSlot;
-    public List<TileBehav> hand; // private
+    //public Transform handSlot;
+    public Hand hand;
     public int handSize = 7;
 
     private Spell currentSpell;
@@ -23,25 +24,26 @@ public class Player {
 
     public Player(int playerNum) {
         AP = 0;
-        hand = new List<TileBehav>();
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         id = playerNum;
+        hand = new Hand(mm, this);
+        //SetHandSlot();
 
         switch (playerNum) {
             case 1:
                 name = mm.gameSettings.p1name;
                 if (name == "")
                     name = "player 1";
-                handSlot = GameObject.Find("handslot1").transform;
+                //handSlot = GameObject.Find("handslot1").transform;
                 break;
             case 2:
                 name = mm.gameSettings.p2name;
                 if (name == "")
                     name = "player 2";
-                handSlot = GameObject.Find("handslot2").transform;
+                //handSlot = GameObject.Find("handslot2").transform;
                 break;
             default:
-                Debug.LogError("PLAYER: Tried to instantiate player with id not 1 or 2!");
+                MMLog.LogError("PLAYER: Tried to instantiate player with id not 1 or 2!");
                 break;
         }
 
@@ -51,8 +53,8 @@ public class Player {
 
     public void InitEvents() {
         character.InitEvents();
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, 4);
-        mm.eventCont.AddMatchEvent(OnMatch, 4);
+        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Player);
+        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Player);
     }
 
     public IEnumerator OnTurnBegin(int id) {
@@ -82,7 +84,7 @@ public class Player {
                         break;
                 }
 
-                //Debug.Log("PLAYER: Player "+id+" about to sync dmg=" + dmg);
+                //Debug.MMLog.Log_Player("PLAYER: Player "+id+" about to sync dmg=" + dmg);
                 yield return mm.syncManager.SyncRand(id, dmg);
                 DealDamage(mm.syncManager.GetRand()); // do the actual damage
             }
@@ -99,41 +101,15 @@ public class Player {
             int debuffAmount = amount + debuff_dmgExtra;
             ChangeHealth(-debuffAmount, true);
         } else
-            Debug.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
+            MMLog.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
     }
 
     public void Heal(int amount) {
         ChangeHealth(amount, false);
     }
 
-    // not totally sure this syncing stuff is totally necessary...
-    //public void ChangeHealth(int amount, bool dealt, bool sent) {
-    //    if (ThisIsLocal() || sent) { // dealt needed here?
-    //        string str = "PLAYER: >>>";
-    //        int newAmount = 0;
-    //        if (amount < 0) { // damage
-    //            newAmount = (int)(amount * buff_dmgMult) - buff_dmgExtra;
-    //            if (dealt)
-    //                str += mm.GetOpponent(id).name + " dealt " + (-1 * newAmount) + " damage; ";
-    //            else
-    //                str += name + " took " + (-1 * newAmount) + " damage; ";
-    //            str += name + "'s health changed from " + health + " to " + (health + newAmount);
-    //        } else {
-    //            newAmount = amount;
-    //            str += name + " healed for " + newAmount + " health; " + name + "'s health changed from " + health + " to " + (health + newAmount);
-    //        } // healing?
-    //        Debug.Log(str);
-
-    //        health += newAmount;
-    //        health = Mathf.Clamp(health, 0, character.GetMaxHealth());
-    //        mm.eventCont.PlayerHealthChange(id, amount, dealt, sent);
-
-    //        if (health == 0)
-    //            mm.EndTheGame();
-    //    }
-    //}
     public void ChangeHealth(int amount, bool dealt) {
-        string str = "PLAYER: >>>>>";
+        string str = ">>>>>";
         if (amount < 0) { // damage
             if (dealt)
                 str += mm.GetOpponent(id).name + " dealt " + (-1 * amount) + " damage; ";
@@ -143,7 +119,7 @@ public class Player {
             str += name + " healed for " + amount + " health; ";
         }
         str += name + "'s health changed from " + health + " to " + (health + amount);
-        Debug.Log(str);
+        MMLog.Log_Player(str);
 
         health += amount;
         health = Mathf.Clamp(health, 0, character.GetMaxHealth()); // clamp amount before event
@@ -155,83 +131,56 @@ public class Player {
 
     // bool again?
     public void DealTile() {
-        DrawTiles(1, Tile.Element.None, true, false);
+        DrawTiles(1, Tile.Element.None, false, true, false);
     }
 
-    public void DrawTiles(Tile.Element elem) {
-        DrawTiles(1, elem, false, false);
-    }
+    //public void DrawTiles(Tile.Element elem) {
+    //    DrawTiles(1, elem, true, false, false);
+    //}
 
-    // this return type isn't really necessary anymore due to the drawEvent
-    public void DrawTiles(int numTiles, Tile.Element elem, bool dealt, bool linear) {
-        for (int i = 0; i < numTiles && !IsHandFull(); i++) {
+    public void DrawTiles(int numTiles, Tile.Element elem, bool playerAction, bool dealt, bool linear) {
+        for (int i = 0; i < numTiles && !hand.IsFull(); i++) {
             GameObject go;
             if (elem == Tile.Element.None)
                 go = mm.GenerateTile(character.GetTileElement());
             else
                 go = mm.GenerateTile(elem);
 
-            if (id == 1)
-                go.transform.position = new Vector3(-5, 2);
-            else if (id == 2)
-                go.transform.position = new Vector3(5, 2);
-
-            go.transform.SetParent(handSlot, false);
+            go.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
 
             TileBehav tb = go.GetComponent<TileBehav>();
             hand.Add(tb);
 
-            mm.eventCont.Draw(id, tb.tile.element, dealt);
-            if (!dealt)
+            mm.eventCont.Draw(id, playerAction, dealt, tb.tile.element);
+            if (playerAction)
                 mm.eventCont.GameAction(true); //?
         }
-        AlignHand(.1f, linear);
+        MMLog.Log_Player(">>>" + hand.NumFullSlots() + " slots filled...");
     }
 
-    public void AlignHand(float duration, bool linear) {
-        mm.animCont.PlayAnim(mm.animCont._AlignHand(this, duration, linear));
-    }
-
-    public int DiscardRandom(int count) {
-        int tilesInHand = hand.Count;
-        int i;
-        for (i = 0; i < count; i++) {
-            if (tilesInHand > 0) {
-                int rand = Random.Range(0, tilesInHand);
-                GameObject go = hand[rand].gameObject;
-                hand.RemoveAt(rand);
-                GameObject.Destroy(go);
-            }
-        }
-        return i;
-    }
-
-    // delete?
-    //public void FlipHand() {
-    //    foreach (TileBehav tb in hand) {
-    //        tb.FlipTile();
-    //    }
-    //}
-
-    public void EmptyHand() {
-        while (hand.Count > 0) {
-            GameObject.Destroy(hand[0].gameObject);
-            hand.RemoveAt(0);
+    public IEnumerator DiscardRandom(int count) {
+        for (int i = 0; i < count && hand.Count() > 0; i++) {
+            TileBehav tb;
+            tb = hand.GetTile(Random.Range(0, hand.Count()));
+            yield return mm.syncManager.SyncElement(id, tb.tile.element);
+            Tile.Element e = mm.syncManager.GetElement();
+            MMLog.Log_Player("DiscardRandom synced " + e);
+            yield return Discard(e);
         }
     }
 
-    public bool IsHandFull() { return hand.Count == handSize; }
+    public IEnumerator Discard(Tile.Element elem) {
+        MMLog.Log_Player("Discarding " + elem);
+        GameObject go = hand.GetTile(elem);
+        mm.eventCont.Discard(id, elem);
 
-    public GameObject GetTileFromHand(Tile.Element elem) {
-        for (int i = 0; i < hand.Count; i++) {
-            if (hand[i].tile.element == elem)
-                return hand[i].gameObject;
-        }
-        return null;
+        yield return mm.animCont._DiscardTile(go.transform);
+        hand.Remove(go.GetComponent<TileBehav>());
+        GameObject.Destroy(go);
     }
 
     public bool IsTileMine(TileBehav tb) {
-        return tb.transform.parent.position.Equals(handSlot.position);
+        return tb.transform.parent.position.Equals(hand.GetHandPos());
     }
 
     public bool ThisIsLocal() { return mm.myID == id; }
@@ -243,11 +192,11 @@ public class Player {
     }
 
     public void ApplySpellCosts() {
-        Debug.Log("PLAYER: Applying AP cost...which is " + currentSpell.APcost);
+        MMLog.Log_Player("Applying AP cost...which is " + currentSpell.APcost);
         AP -= currentSpell.APcost;
         if (currentSpell is SignatureSpell) {
             int meterCost = ((SignatureSpell)currentSpell).meterCost;
-            Debug.Log("PLAYER: Applying meter cost...which is " + meterCost);
+            MMLog.Log_Player("Applying meter cost...which is " + meterCost);
             character.ChangeMeter(-meterCost);
         }
         mm.eventCont.GameAction(false);
@@ -259,17 +208,17 @@ public class Player {
 
     // buff/debuff stuff could be a switch if it's too unwieldy
     public void ChangeBuff_DmgMult(float d) {
-        Debug.Log("PLAYER: " + name + " had dmg multiply buff changed to " + d);
+        MMLog.Log_Player(name + " had dmg multiply buff changed to " + d);
         buff_dmgMult = d;
     }
 
     public void ChangeBuff_DmgBonus(int amount) {
-        Debug.Log("PLAYER: " + name + " had dmg bonus buff changed to +" + amount);
+        MMLog.Log_Player(name + " had dmg bonus buff changed to +" + amount);
         buff_dmgBonus = amount;
     }
 
     public void ChangeDebuff_DmgExtra(int amount) {
-        Debug.Log("PLAYER: " + name + " had dmg extra debuff changed to +" + amount);
+        MMLog.Log_Player(name + " had dmg extra debuff changed to +" + amount);
         debuff_dmgExtra = amount;
     }
 }

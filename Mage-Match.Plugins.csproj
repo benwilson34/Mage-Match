@@ -103,6 +103,9 @@
     <Reference Include="Photon3Unity3D">
       <HintPath>Assets\Plugins\Photon3Unity3D.dll</HintPath>
     </Reference>
+    <Reference Include="MMDebug">
+      <HintPath>Assets\Plugins\MMDebug\MMDebug.dll</HintPath>
+    </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>Assets\Plugins\WebSocket\websocket-sharp.dll</HintPath>
     </Reference>
@@ -111,6 +114,7 @@
     <Compile Include="Assets\Plugins\WebSocket\WebSocket.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\JSON\readme.txt" />
     <None Include="Assets\Lobby\Documentation.txt" />
     <None Include="Assets\Lobby\Instruction.txt" />
     <None Include="Assets\Photon Unity Networking\changelog.txt" />

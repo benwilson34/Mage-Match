@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 // TODO eventually handle mobile tap input instead of clicking
 public class InputController : MonoBehaviour {
@@ -11,7 +12,6 @@ public class InputController : MonoBehaviour {
     private bool dropping = false;
 
 	private Vector3 dragClick;
-	private Transform parentT;
 	private bool dragged = false;
 
 	private bool lastClick = false, nowClick = false;
@@ -25,43 +25,39 @@ public class InputController : MonoBehaviour {
     }
 
 	void Update(){ // polling input...change to events if too much overhead
-        if (Input.GetMouseButton(0)) { // if left mouse is down
-            if (targeting.currentTMode == Targeting.TargetMode.Drag) {
-                //				HandleDrag ();
-            } else
-                HandleMouse();
+        if (Input.GetMouseButton(0) || lastClick) { // if left mouse is down
             nowClick = true; // move up?
-        } else if (Input.GetMouseButtonUp(0)) { // if left mouse was JUST released
-            nowClick = false;
-            HandleMouse();
+            if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
+                nowClick = false;
+
+            if (targeting.currentTMode == Targeting.TargetMode.Drag)
+                HandleDrag();
+            else
+                HandleMouse();
         }
 	}
 
 	void HandleMouse(){
-		if (!lastClick) { // first frame of click i.e. MouseDown
-			if (!GetClick ()) { // TODO don't need to do this every frame!!!!!!! except Drag targeting...
-//				nowClick = false;
-				return;
-			}
+		if (!lastClick && !GetClick()) { // first frame of click i.e. MouseDown
+			return;
 		}
 
 		if (!lastClick && nowClick) { // MouseDown
-			if (isClickTB) {
+			if (isClickTB)
 				TBMouseDown(clickTB);
-			} else {
+			else
 				CBMouseDown(clickCB);
-			}
 			lastClick = true;
 		} else if (lastClick && nowClick) { // MouseDrag
-			if (isClickTB) { 
+			if (isClickTB)
 				TBMouseDrag(clickTB);
-			} else {
+		    else {
 //				CBMouseDrag(clickCB);
 			}
 		} else if (lastClick && !nowClick) { // MouseUp
-			if (isClickTB) {
+			if (isClickTB)
 				TBMouseUp(clickTB);
-			} else {
+			else {
 //				CBMouseUp(clickCB);
 			}
 			lastClick = false;
@@ -108,6 +104,51 @@ public class InputController : MonoBehaviour {
 		return null;
 	}
 
+    HandSlot GetHandSlot(RaycastHit2D[] hits) {
+        foreach (RaycastHit2D hit in hits) {
+            HandSlot slot = hit.collider.GetComponent<HandSlot>();
+            if (slot != null) {
+                //MMLog.Log_InputCont(">>>>>>Got a handslot!!! Index="+slot.handIndex);
+                return slot;
+            }
+        }
+        return null;
+    }
+
+    void HandleDrag() {
+        TileBehav tb = null;
+
+        if (!lastClick && nowClick) { // MouseDown
+            tb = GetDragTarget();
+            if (tb == null) return;
+            targeting.OnTBTarget(tb);
+            dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+            lastClick = true;
+        } else if (lastClick && nowClick) { // MouseDrag
+            Vector3 mouse = Input.mousePosition;
+            if (Vector3.Distance(dragClick, mouse) > 60) {
+                MMLog.Log_InputCont("Drag more than 60px.");
+                tb = GetDragTarget();
+                if (tb == null)
+                    targeting.EndDragTarget();
+                targeting.OnTBTarget(tb);
+                if (!targeting.TargetsRemain())
+                    targeting.EndDragTarget();
+                dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+            }
+        } else if (lastClick && !nowClick) { // MouseUp
+            targeting.EndDragTarget();
+            lastClick = false;
+        }
+
+    }
+
+    TileBehav GetDragTarget() {
+        Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
+        return GetMouseTile(hits);
+    }
+
     bool MenuOpen() { return mm.uiCont.IsMenu(); }
 
     // ------------------------------- TB & CB handling -------------------------------
@@ -119,10 +160,9 @@ public class InputController : MonoBehaviour {
                     case TileBehav.TileState.Hand:
                         if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsTileMine(tb)) {
                             dropping = true;
-                            parentT = tb.transform.parent;
-                            tb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
 
                             dropTile = tb.gameObject;
+                            mm.LocalP().hand.GrabTile(tb); //?
                             mm.eventCont.GrabTile(mm.myID, tb.tile.element);
                         }
                         break;
@@ -132,7 +172,7 @@ public class InputController : MonoBehaviour {
                         if (targeting.IsTargetMode()
 //					        && Targeting.currentTMode == Targeting.TargetMode.Tile
                             ) {
-                            Debug.Log("INPUTCONTROLLER: TBMouseDown called and tile is placed.");
+                            MMLog.Log_InputCont("TBMouseDown called and tile is placed.");
                             targeting.OnTBTarget(tb);
 //					    } else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
@@ -158,9 +198,20 @@ public class InputController : MonoBehaviour {
                         Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                         cursor.z = 0;
                         tb.transform.position = cursor;
+
+                        // TODO check for HandSlots under...
+                        RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
+                        HandSlot slot = GetHandSlot(hits);
+                        if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10) {
+                            mm.LocalP().hand.Rearrange(slot);
+                        }
                     }
 				    break;
 			    case TileBehav.TileState.Placed:
+                    if (targeting.IsTargetMode() && 
+                        targeting.currentTMode == Targeting.TargetMode.Drag) {
+                        targeting.OnTBTarget(tb); // maybe its own method?
+                    }
                     if (!ActionNotAllowed())
 				        SwapCheck (tb);
 				    break;
@@ -179,9 +230,11 @@ public class InputController : MonoBehaviour {
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
 
                             if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropTile)) {
-                                tb.transform.SetParent(parentT);
-                                parentT = null;
-                                mm.GetPlayer(mm.myID).AlignHand(.12f, false);
+
+                                mm.LocalP().hand.ReleaseTile(tb); //?
+
+                            } else {
+                                mm.LocalP().hand.ClearPlaceholder(); //?
                             }
                             dropping = false;
                         }
@@ -203,26 +256,26 @@ public class InputController : MonoBehaviour {
 			float angle = Vector3.Angle(mouse, Vector3.right);
 			if (mouse.y < 0)
 				angle = 360 - angle;
-			//				Debug.Log("mouse = " + mouse.ToString() + "; angle = " + angle);
+			//				Debug.MMLog.Log_InputCont("mouse = " + mouse.ToString() + "; angle = " + angle);
 			dragged = false; // TODO move into cases below for continuous dragging
 			if (angle < 60) {         // NE
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 1))
-					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
 			} else if (angle < 120) { // N
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 0))
-					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
 			} else if (angle < 180) { // NW
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 5))
-					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
 			} else if (angle < 240) { // SW
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 4))
-					mm.SwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
 			} else if (angle < 300) { // S
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 3))
-					mm.SwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
 			} else {                  // SE
 				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 2))
-					mm.SwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
+					mm.PlayerSwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
 			}
 		}
 	}
