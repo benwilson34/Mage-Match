@@ -18,6 +18,7 @@ public class UIController : MonoBehaviour {
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
+    private Shader targetingShader;
     //private SpellEffects spellfx;
     private Vector3 slidingTextStart;
     private bool menu = false;

@@ -11,6 +11,7 @@ public class Targeting {
     private MageMatch mm;
     private int targets, targetsLeft = 0;
     private List<TileBehav> targetTBs;
+    //private List<TileBehav> validTargets; TODO
     private List<CellBehav> targetCBs;
     private Vector3 lastTCenter;
     private bool largeAreaMode = false;
@@ -261,6 +262,15 @@ public class Targeting {
         targetsLeft = targets;
         mm.uiCont.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
     }
+
+    /* Talk with Ben about best way to validate targets.
+    public List<TileBehav> validateTargets()
+    {
+        validTargets = new List<TileBehav>();
+
+
+        return validTargets;
+    }*/
 
     public void CancelTargeting() {
         mm.syncManager.SendCancelTargeting();
