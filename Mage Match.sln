@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2017
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mage Match.Plugins", "Mage Match.Plugins.csproj", "{9F1DDD73-F095-60FF-7AE1-CC2DC8C11926}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mage Match", "Mage Match.csproj", "{47A91484-1E89-A376-D5B7-DD7F0A9661FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mage Match.Editor", "Mage Match.Editor.csproj", "{237438CB-6DC2-BAD7-B4CA-F95EACB7A43D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F1DDD73-F095-60FF-7AE1-CC2DC8C11926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F1DDD73-F095-60FF-7AE1-CC2DC8C11926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F1DDD73-F095-60FF-7AE1-CC2DC8C11926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F1DDD73-F095-60FF-7AE1-CC2DC8C11926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47A91484-1E89-A376-D5B7-DD7F0A9661FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47A91484-1E89-A376-D5B7-DD7F0A9661FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47A91484-1E89-A376-D5B7-DD7F0A9661FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47A91484-1E89-A376-D5B7-DD7F0A9661FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{237438CB-6DC2-BAD7-B4CA-F95EACB7A43D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{237438CB-6DC2-BAD7-B4CA-F95EACB7A43D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{237438CB-6DC2-BAD7-B4CA-F95EACB7A43D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{237438CB-6DC2-BAD7-B4CA-F95EACB7A43D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
