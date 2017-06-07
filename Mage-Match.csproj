@@ -105,6 +105,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\JSON\JSONObject.cs" />
+    <Compile Include="Assets\JSON\JSONTemplates.cs" />
+    <Compile Include="Assets\JSON\VectorTemplates.cs" />
     <Compile Include="Assets\Lobby\MyHook.cs" />
     <Compile Include="Assets\Lobby\Scripts\DraggablePanel.cs" />
     <Compile Include="Assets\Lobby\Scripts\EventSystemChecker.cs" />
@@ -207,6 +210,7 @@
     <Compile Include="Assets\scripts\Characters\Gravekeeper.cs" />
     <Compile Include="Assets\scripts\Characters\Rocky.cs" />
     <Compile Include="Assets\scripts\Commish.cs" />
+    <Compile Include="Assets\scripts\Db.cs" />
     <Compile Include="Assets\scripts\Effect.cs" />
     <Compile Include="Assets\scripts\Hand.cs" />
     <Compile Include="Assets\scripts\HandSlot.cs" />
@@ -218,6 +222,7 @@
     <Compile Include="Assets\scripts\PUN\PlayerNameInputField.cs" />
     <Compile Include="Assets\scripts\PUN\SyncManager.cs" />
     <Compile Include="Assets\scripts\Player.cs" />
+    <Compile Include="Assets\scripts\PlayerProfile.cs" />
     <Compile Include="Assets\scripts\Spell.cs" />
     <Compile Include="Assets\scripts\SpellEffects.cs" />
     <Compile Include="Assets\scripts\Stats.cs" />
@@ -238,6 +243,7 @@
     <Compile Include="Assets\scripts\Utility\UIController.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\JSON\readme.txt" />
     <None Include="Assets\Lobby\Documentation.txt" />
     <None Include="Assets\Lobby\Instruction.txt" />
     <None Include="Assets\Photon Unity Networking\changelog.txt" />
