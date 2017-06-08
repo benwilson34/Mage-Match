@@ -1,6 +1,6 @@
 ﻿<Properties StartupItem="Mage-Match.Plugins.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\PUN\GameSettings.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\UpdateValue.cs">
     <Files>
       <File FileName="Assets\scripts\MageMatch.cs" Line="1" Column="1" />
       <File FileName="Assets\scripts\HexGrid.cs" Line="1" Column="1" />
@@ -14,6 +14,7 @@
       <File FileName="Assets\scripts\TileSeq.cs" Line="1" Column="1" NotebookId="1" />
       <File FileName="Assets\scripts\Utility\EffectController.cs" Line="1" Column="1" NotebookId="1" />
       <File FileName="Assets\scripts\PUN\GameSettings.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\scripts\UpdateValue.cs" Line="1" Column="1" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -35,6 +35,7 @@ public class Db : MonoBehaviour {
         profileJson = new JSONObject(www.text);
     }
 
+    // TODO hashtable with id as the key?
     public JSONObject GetProfilePrefs(int i) {
         if (i < profileJson.list[0].list.Count)
             return profileJson.list[0].list[i].list[3]; //data.user.prefs object

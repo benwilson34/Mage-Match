@@ -7,33 +7,31 @@ namespace Com.SoupSkull.MageMatch {
         public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
         bool isConnecting;
-        private GameObject controlPanel, progressLabel;
+        private GameObject controlPanel, progressLabel, toggles;
         private Text progText;
         private RoomSettings rs;
 
         void Awake() {
             rs = GameObject.Find("roomSettings").GetComponent<RoomSettings>();
 
-            // #Critical
-            // we don't join the lobby. There is no need to join a lobby to get the list of rooms.
-            PhotonNetwork.autoJoinLobby = true;
+            PhotonNetwork.autoJoinLobby = true; // needed?
 
-            // #Critical
             // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
             PhotonNetwork.automaticallySyncScene = true;
 
-            // #NotImportant
-            // Force LogLevel
-            PhotonNetwork.logLevel = Loglevel;
+            PhotonNetwork.logLevel = Loglevel; // debug log level
 
             controlPanel = GameObject.Find("Control Panel");
             progressLabel = GameObject.Find("Progress Label");
+            toggles = GameObject.Find("Toggles");
             progText = progressLabel.GetComponent<Text>();
         }
 
         void Start() {
             if (rs.isNewRoom) {
                 GameObject.Find("b_play").transform.Find("Text").GetComponent<Text>().text = "Create room";
+            } else {
+                toggles.SetActive(false);
             }
 
             progressLabel.SetActive(false);
@@ -95,15 +93,6 @@ namespace Com.SoupSkull.MageMatch {
         public override void OnPhotonJoinRoomFailed(object[] codeAndMsg) {
             base.OnPhotonJoinRoomFailed(codeAndMsg);
         }
-
-        //public override void OnPhotonRandomJoinFailed(object[] codeAndMsg) {
-        //    Debug.Log("DemoAnimator/Launcher:OnPhotonRandomJoinFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom(null, new RoomOptions() {maxPlayers = 4}, null);");
-
-
-        //    // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
-        //    PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 2 }, null);
-        //    progText.text = "Connected to PUN, waiting for opponent!";
-        //}
 
         public override void OnPhotonPlayerConnected(PhotonPlayer other) {
             Debug.Log("OnPhotonPlayerConnected() " + other.NickName); // not seen if you're the player connecting
