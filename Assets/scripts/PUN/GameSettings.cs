@@ -10,12 +10,13 @@ public class GameSettings : PunBehaviour {
     public bool turnTimerOn, localPlayerOnLeft, hideOpponentHand;
 
     private bool nameSet = false;
-    private Transform control;
+    private Transform control, toggles;
     private Com.SoupSkull.MageMatch.Launcher launcher; // hideous class name
 
     void Start () {
         DontDestroyOnLoad(this);
         control = GameObject.Find("Control Panel").transform;
+        toggles = control.Find("Toggles");
         launcher = GameObject.Find("Launcher").GetComponent<Com.SoupSkull.MageMatch.Launcher>();
     }
 
@@ -31,9 +32,9 @@ public class GameSettings : PunBehaviour {
 
         if (id == 1) {
             p1name = name;
-            turnTimerOn = control.Find("Toggle_TurnTimer").GetComponent<Toggle>().isOn;
-            localPlayerOnLeft = control.Find("Toggle_PlayerOnLeft").GetComponent<Toggle>().isOn;
-            hideOpponentHand = control.Find("Toggle_HideOpponentHand").GetComponent<Toggle>().isOn;
+            turnTimerOn = toggles.Find("Toggle_TurnTimer").GetComponent<Toggle>().isOn;
+            localPlayerOnLeft = toggles.Find("Toggle_PlayerOnLeft").GetComponent<Toggle>().isOn;
+            hideOpponentHand = toggles.Find("Toggle_HideOpponentHand").GetComponent<Toggle>().isOn;
             //Debug.Log("GAMESETTINGS: player 1 here, setting turnTimerOn to " + turnTimerOn);
             photonView.RPC("SetToggles", PhotonTargets.Others, turnTimerOn, localPlayerOnLeft, hideOpponentHand);
 

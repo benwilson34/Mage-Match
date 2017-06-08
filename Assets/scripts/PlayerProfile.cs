@@ -10,7 +10,7 @@ public class PlayerProfile : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         Db db = GameObject.Find("test").GetComponent<Db>();
-        db.
+        //db.
 	}
 	
 	// Update is called once per frame
@@ -19,7 +19,7 @@ public class PlayerProfile : MonoBehaviour {
 	}
 
     public IEnumerator ShowProfiles() {
-        
+        yield return null;
     }
 
 }
