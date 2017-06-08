@@ -175,18 +175,8 @@
     <Compile Include="Assets\Unity-Logs-Viewer\Reporter\Editor\ReporterEditor.cs" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <None Include="Assets\JSON\readme.txt" />
-    <None Include="Assets\Lobby\Documentation.txt" />
-    <None Include="Assets\Lobby\Instruction.txt" />
-=======
     <None Include="Assets\Demigiant\DOTween\DOTween.XML" />
-    <None Include="Assets\Demigiant\DOTween\DOTween43.xml" />
-    <None Include="Assets\Demigiant\DOTween\DOTween46.xml" />
-    <None Include="Assets\Demigiant\DOTween\DOTween50.xml" />
-    <None Include="Assets\Demigiant\DOTween\Editor\DOTweenEditor.XML" />
-    <None Include="Assets\Demigiant\DOTween\readme.txt" />
->>>>>>> Main_Menu_Redux
+    <None Include="Assets\JSON\readme.txt" />
     <None Include="Assets\Photon Unity Networking\changelog.txt" />
     <None Include="Assets\Photon Unity Networking\link.xml" />
     <None Include="Assets\Photon Unity Networking\readme.txt" />

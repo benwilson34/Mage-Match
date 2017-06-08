@@ -105,27 +105,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <Compile Include="Assets\JSON\JSONObject.cs" />
     <Compile Include="Assets\JSON\JSONTemplates.cs" />
     <Compile Include="Assets\JSON\VectorTemplates.cs" />
-    <Compile Include="Assets\Lobby\MyHook.cs" />
-    <Compile Include="Assets\Lobby\Scripts\DraggablePanel.cs" />
-    <Compile Include="Assets\Lobby\Scripts\EventSystemChecker.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyCountdownPanel.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyHook.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyInfoPanel.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyMainMenu.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyManager.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyPlayer.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyPlayerList.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyServerEntry.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyServerList.cs" />
-    <Compile Include="Assets\Lobby\Scripts\Lobby\LobbyTopPanel.cs" />
-=======
-    <Compile Include="Assets\Demigiant\DOTween\Examples\Basics.cs" />
-    <Compile Include="Assets\Demigiant\DOTween\Examples\Sequences.cs" />
->>>>>>> Main_Menu_Redux
     <Compile Include="Assets\Photon Unity Networking\Plugins\PhotonNetwork\CustomTypes.cs" />
     <Compile Include="Assets\Photon Unity Networking\Plugins\PhotonNetwork\Enums.cs" />
     <Compile Include="Assets\Photon Unity Networking\Plugins\PhotonNetwork\Extensions.cs" />
@@ -253,18 +235,8 @@
     <Compile Include="Assets\scripts\Utility\UIController.cs" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <None Include="Assets\JSON\readme.txt" />
-    <None Include="Assets\Lobby\Documentation.txt" />
-    <None Include="Assets\Lobby\Instruction.txt" />
-=======
     <None Include="Assets\Demigiant\DOTween\DOTween.XML" />
-    <None Include="Assets\Demigiant\DOTween\DOTween43.xml" />
-    <None Include="Assets\Demigiant\DOTween\DOTween46.xml" />
-    <None Include="Assets\Demigiant\DOTween\DOTween50.xml" />
-    <None Include="Assets\Demigiant\DOTween\Editor\DOTweenEditor.XML" />
-    <None Include="Assets\Demigiant\DOTween\readme.txt" />
->>>>>>> Main_Menu_Redux
+    <None Include="Assets\JSON\readme.txt" />
     <None Include="Assets\Photon Unity Networking\changelog.txt" />
     <None Include="Assets\Photon Unity Networking\link.xml" />
     <None Include="Assets\Photon Unity Networking\readme.txt" />

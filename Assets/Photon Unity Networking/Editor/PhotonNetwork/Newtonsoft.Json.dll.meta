@@ -1,34 +1,12 @@
 fileFormatVersion: 2
 guid: 0268f98d7c649564a818b0768fc68d4b
-labels:
-- ExitGames
-- PUN
-- Photon
-- Networking
 PluginImporter:
-<<<<<<< HEAD
-  serializedVersion: 1
-=======
   serializedVersion: 2
->>>>>>> Main_Menu_Redux
   iconMap: {}
   executionOrder: {}
   isPreloaded: 0
   isOverridable: 0
   platformData:
-<<<<<<< HEAD
-    Any:
-      enabled: 0
-      settings: {}
-    Editor:
-      enabled: 1
-      settings:
-        DefaultValueInitialized: true
-    WindowsStoreApps:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
-=======
     data:
       first:
         Any: 
@@ -49,7 +27,6 @@ PluginImporter:
         enabled: 0
         settings:
           CPU: AnyCPU
->>>>>>> Main_Menu_Redux
   userData: 
   assetBundleName: 
   assetBundleVariant: 
