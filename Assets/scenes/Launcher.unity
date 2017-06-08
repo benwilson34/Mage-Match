@@ -928,7 +928,7 @@ GameObject:
   - component: {fileID: 763737232}
   - component: {fileID: 763737231}
   m_Layer: 5
-  m_Name: Play Button
+  m_Name: b_play
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2128,7 +2128,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Loglevel: 2
-  MaxPlayersPerRoom: 2
 --- !u!4 &2129229101
 Transform:
   m_ObjectHideFlags: 0

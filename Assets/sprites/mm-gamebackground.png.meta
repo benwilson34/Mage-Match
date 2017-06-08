@@ -7,7 +7,11 @@ TextureImporter:
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
+<<<<<<< HEAD:Assets/sprites/mm-gamebackground.png.meta
     enableMipMap: 0
+=======
+    enableMipMap: 1
+>>>>>>> Main_Menu_Redux:Assets/Demigiant/DOTween/Editor/Imgs/DOTweenIcon.png.meta
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -34,7 +38,11 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
+<<<<<<< HEAD:Assets/sprites/mm-gamebackground.png.meta
   spriteMode: 1
+=======
+  spriteMode: 0
+>>>>>>> Main_Menu_Redux:Assets/Demigiant/DOTween/Editor/Imgs/DOTweenIcon.png.meta
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -42,16 +50,26 @@ TextureImporter:
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
   alphaUsage: 1
+<<<<<<< HEAD:Assets/sprites/mm-gamebackground.png.meta
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
   textureType: 8
+=======
+  alphaIsTransparency: 0
+  spriteTessellationDetail: -1
+  textureType: 0
+>>>>>>> Main_Menu_Redux:Assets/Demigiant/DOTween/Editor/Imgs/DOTweenIcon.png.meta
   textureShape: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
   platformSettings:
   - buildTarget: DefaultTexturePlatform
+<<<<<<< HEAD:Assets/sprites/mm-gamebackground.png.meta
     maxTextureSize: 2048
+=======
+    maxTextureSize: 1024
+>>>>>>> Main_Menu_Redux:Assets/Demigiant/DOTween/Editor/Imgs/DOTweenIcon.png.meta
     textureFormat: -1
     textureCompression: 1
     compressionQuality: 50

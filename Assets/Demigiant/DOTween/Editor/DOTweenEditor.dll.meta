@@ -1,12 +1,13 @@
 fileFormatVersion: 2
 guid: 0d6555af380a7264a9cd5a9083b1c4ad
 PluginImporter:
-  serializedVersion: 1
+  serializedVersion: 2
   iconMap: {}
   executionOrder: {}
   isPreloaded: 0
   isOverridable: 0
   platformData:
+<<<<<<< HEAD
     Any:
       enabled: 0
       settings: {}
@@ -18,6 +19,28 @@ PluginImporter:
       enabled: 0
       settings:
         CPU: AnyCPU
+=======
+    data:
+      first:
+        Any: 
+      second:
+        enabled: 0
+        settings: {}
+    data:
+      first:
+        Editor: Editor
+      second:
+        enabled: 1
+        settings:
+          DefaultValueInitialized: true
+    data:
+      first:
+        Windows Store Apps: WindowsStoreApps
+      second:
+        enabled: 0
+        settings:
+          CPU: AnyCPU
+>>>>>>> Main_Menu_Redux
   userData: 
   assetBundleName: 
   assetBundleVariant: 

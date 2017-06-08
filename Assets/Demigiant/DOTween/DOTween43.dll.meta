@@ -1,6 +1,11 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: a4650b9c549bdf7449d2c61e08040235
 timeCreated: 1491016379
+=======
+guid: d0607307b668284449916eb0d09f9711
+timeCreated: 1490579283
+>>>>>>> Main_Menu_Redux
 licenseType: Free
 PluginImporter:
   serializedVersion: 1
