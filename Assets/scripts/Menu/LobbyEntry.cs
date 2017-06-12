@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 
 public class LobbyEntry : MonoBehaviour, IPointerClickHandler {
 
+    public string roomName = "";
+
     public void OnPointerClick(PointerEventData eventData) {
         ChooseEntry();
     }

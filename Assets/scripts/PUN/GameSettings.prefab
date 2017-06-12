@@ -41,7 +41,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   p1name: 
   p2name: 
+  p1char: 1
+  p2char: 2
+  p1loadout: 1
+  p2loadout: 0
   turnTimerOn: 0
+  localPlayerOnLeft: 0
+  hideOpponentHand: 0
 --- !u!114 &114966316800126466
 MonoBehaviour:
   m_ObjectHideFlags: 1

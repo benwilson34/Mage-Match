@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public abstract class Character {
 
+    // NOTE: keep in same order as JSON list!!
+    public enum Ch { Test = 0, Enfuego, Gravekeeper };
+
     public string characterName;
     public string loadoutName;
     public int meter = 0, meterMax = 100; // protected?
@@ -77,25 +80,40 @@ public abstract class Character {
     }
 
     public static Character Load(MageMatch mm, int id) {
-        switch (mm.uiCont.GetLoadoutNum(id)) {
-            case 0:
+        Ch myChar = mm.gameSettings.GetLocalChar(id);
+        int loadout = mm.gameSettings.GetLocalLoadout(id);
+        switch (myChar) {
+            case Ch.Test:
                 return new CharTest(mm);
-            case 1:
-                return new Enfuego(mm, id, 1);
-            case 2:
-                return new Enfuego(mm, id, 2);
-            case 3:
-                return new Gravekeeper(mm, id, 1);
-            case 4:
-                return new Gravekeeper(mm, id, 2);
-            case 5:
-                return new Rocky(mm, id, 1);
-            case 6:
-                return new Rocky(mm, id, 2);
+            case Ch.Enfuego:
+                return new Enfuego(mm, id, loadout);
+            case Ch.Gravekeeper:
+                return new Gravekeeper(mm, id, loadout);
+
             default:
-                Debug.Log("Loadout number must be 1 through 6.");
+                Debug.LogError("Loadout number must be 1 through 6.");
                 return null;
         }
+
+        //switch (mm.uiCont.GetLoadoutNum(id)) {
+        //    case 0:
+        //        return new CharTest(mm);
+        //    case 1:
+        //        return new Enfuego(mm, id, 1);
+        //    case 2:
+        //        return new Enfuego(mm, id, 2);
+        //    case 3:
+        //        return new Gravekeeper(mm, id, 1);
+        //    case 4:
+        //        return new Gravekeeper(mm, id, 2);
+        //    case 5:
+        //        return new Rocky(mm, id, 1);
+        //    case 6:
+        //        return new Rocky(mm, id, 2);
+        //    default:
+        //        Debug.Log("Loadout number must be 1 through 6.");
+        //        return null;
+        //}
     }
 }
 

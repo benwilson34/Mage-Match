@@ -27,20 +27,13 @@ public class Player {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         id = playerNum;
         hand = new Hand(mm, this);
-        //SetHandSlot();
 
         switch (playerNum) {
             case 1:
                 name = mm.gameSettings.p1name;
-                if (name == "")
-                    name = "player 1";
-                //handSlot = GameObject.Find("handslot1").transform;
                 break;
             case 2:
                 name = mm.gameSettings.p2name;
-                if (name == "")
-                    name = "player 2";
-                //handSlot = GameObject.Find("handslot2").transform;
                 break;
             default:
                 MMLog.LogError("PLAYER: Tried to instantiate player with id not 1 or 2!");

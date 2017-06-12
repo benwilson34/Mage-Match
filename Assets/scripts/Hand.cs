@@ -37,6 +37,11 @@ public class Hand {
 
         handPos = GameObject.Find("handslot" + place).transform;
 
+        if (mm.gameSettings.hideOpponentHand && p.id != mm.myID) {
+            //MMDebug.MMLog.Log("HAND", "black", "hiding opponent hand..........");
+            handPos.position = new Vector3(handPos.position.x + 5, handPos.position.y);
+        }
+
         for (int i = 0; i < maxHandSize; i++) {
             slots[i] = handPos.Find("slot" + i).GetComponent<HandSlot>();
         }

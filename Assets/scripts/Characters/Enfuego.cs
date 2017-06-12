@@ -16,7 +16,7 @@ public class Enfuego : Character {
         characterName = "Enfuego";
         spells = new Spell[4];
 
-        if (loadout == 1)
+        if (loadout == 0)
             EnfuegoA();
         else
             EnfuegoB();

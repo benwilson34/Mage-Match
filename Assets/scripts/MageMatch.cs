@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
+
 public class MageMatch : MonoBehaviour {
 
     public enum GameState { PlayerTurn, TargetMode, CommishTurn };
