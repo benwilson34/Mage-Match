@@ -202,7 +202,7 @@ public class Targeting {
         mm.currentState = MageMatch.GameState.TargetMode;
 
         mm.uiCont.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
-        mm.uiCont.ToggleTargetingUI();
+        mm.uiCont.ActivateTargetingUI(mm.hexGrid.GetPlacedTiles());
         TileSeq seq = p.GetCurrentBoardSeq();
         OutlinePrereq(seq);
 
@@ -216,7 +216,7 @@ public class Targeting {
         foreach (GameObject go in outlines) {
             GameObject.Destroy(go);
         }
-        mm.uiCont.ToggleTargetingUI();
+        mm.uiCont.DeactivateTargetingUI();
         mm.uiCont.UpdateMoveText("");
 
         currentTMode = TargetMode.Tile; // needed?

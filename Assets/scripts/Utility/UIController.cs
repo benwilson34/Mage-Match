@@ -14,17 +14,19 @@ public class UIController : MonoBehaviour {
 	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
     private MageMatch mm;
 	private Dropdown DD1, DD2;
-    private Transform leftPinfo, rightPinfo, leftPload, rightPload;
+    private Transform leftPinfo, rightPinfo, leftPload, rightPload, board;
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
-    private Shader targetingShader;
+    private GameObject overlay;
+    private SpriteRenderer[,] cellOverlays;
     //private SpellEffects spellfx;
     private Vector3 slidingTextStart;
     private bool menu = false;
 
     public void Init(){ // Awake()?
-		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+        board = GameObject.Find("hexgrid-7wide").transform;
+        mm = GameObject.Find("board").GetComponent<MageMatch> ();
 
 		moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
 		moveText.text = "";
@@ -58,6 +60,8 @@ public class UIController : MonoBehaviour {
         settingsMenu = GameObject.Find("SettingsMenu");
 
         turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
+
+        overlay = GameObject.Find("Targeting Overlay");
 
         //spellfx = new SpellEffects();
     }
@@ -340,12 +344,53 @@ public class UIController : MonoBehaviour {
         gradient.transform.Rotate(0, 0, 180);
     }
 
-    public void ToggleTargetingUI() {
-        gradient.SetActive(!gradient.activeSelf);
-        targetingBG.SetActive(!targetingBG.activeSelf);
+    public void getCellOverlays() {
+        cellOverlays = new SpriteRenderer[7,7];
+        for(int i = 0; i < 7; i++) {
+            Transform col = board.GetChild(i);
+            for(int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
+                Debug.Log(">>>2nd for of getCellOverlays at " + (i) + (j));
+                cellOverlays[i,j] = col.Find("cell" + (i) + (j)).GetComponent<SpriteRenderer>();
+            }
+        } 
+    }
+
+    public void ActivateTargetingUI(List<TileBehav> tbs) {
+        for(int i = 0; i < 7; i++) {
+            for(int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
+                Color c = cellOverlays[i,j].color;
+                c.a = 0.6f;
+                cellOverlays[i,j].color = c;
+                Debug.Log("Color = " + cellOverlays[i,j].color);
+            }
+        }
+
+        foreach(TileBehav tb in tbs) {
+            Tile t = tb.tile;
+            Color c = cellOverlays[t.col,t.row].color;
+            c.a = 0.0f;
+            cellOverlays[t.col,t.row].color = c;
+        }
+        //gradient.SetActive(!gradient.activeSelf);
+        //targetingBG.SetActive(!targetingBG.activeSelf);
         if (mm.MyTurn()) {
-            tCancelB.SetActive(!tCancelB.activeSelf);
-            tClearB.SetActive(!tClearB.activeSelf);
+            tCancelB.SetActive(true);
+            tClearB.SetActive(true);
+        }
+    }
+
+    public void DeactivateTargetingUI(){
+        for (int i = 0; i < 7; i++) {
+            for (int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
+                Color c = cellOverlays[i,j].color;
+                c.a = 0.0f;
+                cellOverlays[i,j].color = c;
+            }
+        }
+
+        if (mm.MyTurn()) {
+            tCancelB.SetActive(true);
+            tClearB.SetActive(true);
         }
     }
 

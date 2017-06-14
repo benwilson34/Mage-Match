@@ -74,6 +74,7 @@ public class MageMatch : MonoBehaviour {
             p2.hand.Empty();
 
         hexGrid = new HexGrid();
+        uiCont.getCellOverlays();
         boardCheck = new BoardCheck(this);
         spellfx = new SpellEffects(this);
 

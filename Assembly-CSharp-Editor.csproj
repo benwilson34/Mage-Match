@@ -67,15 +67,16 @@
      <Compile Include="Assets\Unity-Logs-Viewer\Reporter\Editor\ReporterEditor.cs" />
      <None Include="Assets\JSON\readme.txt" />
      <None Include="Assets\Photon Unity Networking\link.xml" />
-     <None Include="Assets\Lobby\Documentation.txt" />
      <None Include="Assets\Resources\shaders\uiElementShader.shader" />
-     <None Include="Assets\Lobby\Instruction.txt" />
      <None Include="Assets\Plugins\Photon3Unity3D.xml" />
      <None Include="Assets\StreamingAssets\build_info.txt" />
      <None Include="Assets\Plugins\release_history.txt" />
      <None Include="Assets\fonts\OpenSans\License!.txt" />
      <None Include="Assets\Photon Unity Networking\readme.txt" />
      <None Include="Assets\Photon Unity Networking\changelog.txt" />
+ <Reference Include="Facebook.Unity.Settings">
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEditor.Advertisements">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/Editor/UnityEditor.Advertisements.dll</HintPath>
  </Reference>
@@ -130,38 +131,59 @@
  <Reference Include="UnityEditor.Android.Extensions">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.WSA.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/MetroSupport/UnityEditor.WSA.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.WebGL.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEditor.WindowsStandalone.Extensions">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.OSXStandalone.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Facebook.Extensions">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/Facebook/UnityEditor.Facebook.Extensions.dll</HintPath>
+ </Reference>
  <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
- <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/2015/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
+ <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
  </Reference>
  <Reference Include="DOTween">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/DOTween.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Assets/Demigiant/DOTween/DOTween.dll</HintPath>
  </Reference>
  <Reference Include="DOTween43">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/DOTween43.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Assets/Demigiant/DOTween/DOTween43.dll</HintPath>
  </Reference>
  <Reference Include="DOTween46">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/DOTween46.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Assets/Demigiant/DOTween/DOTween46.dll</HintPath>
  </Reference>
  <Reference Include="DOTween50">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/DOTween50.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Assets/Demigiant/DOTween/DOTween50.dll</HintPath>
  </Reference>
  <Reference Include="DOTweenEditor">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Demigiant/DOTween/Editor/DOTweenEditor.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Assets/Demigiant/DOTween/Editor/DOTweenEditor.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Photon Unity Networking/Editor/PhotonNetwork/Newtonsoft.Json.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Assets/Photon Unity Networking/Editor/PhotonNetwork/Newtonsoft.Json.dll</HintPath>
  </Reference>
  <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Plugins/Photon3Unity3D.dll</HintPath>
- </Reference>
- <Reference Include="MMDebug">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Plugins/MMDebug/MMDebug.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Assets/Plugins/Photon3Unity3D.dll</HintPath>
  </Reference>
  <Reference Include="websocket-sharp">
- <HintPath>C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets/Plugins/WebSocket/websocket-sharp.dll</HintPath>
+ <HintPath>E:/Mage Match Assets/Latest Version/Mage Match/Mage-Match/Assets/Plugins/WebSocket/websocket-sharp.dll</HintPath>
+ </Reference>
+ <Reference Include="Mono.Cecil">
+ <HintPath>C:/Program Files/Unity/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions.Xcode">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions.Common">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Common.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
