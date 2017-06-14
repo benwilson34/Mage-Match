@@ -69,4 +69,6 @@ MonoBehaviour:
   - SetToggles
   - HandleEndDragTarget
   - HandleSyncElement
+  - OtherPlayerLocked
+  - SetCharAndLoadout
   DisableAutoOpenWizard: 1

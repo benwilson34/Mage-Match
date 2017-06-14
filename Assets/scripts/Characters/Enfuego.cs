@@ -44,8 +44,28 @@ public class Enfuego : Character {
 
         spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
         spells[1] = new Spell(1, "Hot Body", "MEF", 1, HotBody);
-        spells[2] = new Spell(2, "INCINERATE", "MF", 1, Incinerate); // change back to Backburner
+        spells[2] = new Spell(2, "Target only fire", "MF", 1, TargetOnlyFire); // change back to Backburner
         spells[3] = new CoreSpell(3, "Fiery Fandango", 3, 1, FieryFandango);
+    }
+
+    public IEnumerator TargetOnlyFire() {
+        yield return targeting.WaitForTileTarget(2, TOF_Filter);
+        if (targeting.WasCanceled())
+            yield return null;
+
+        List<TileBehav> tbs = targeting.GetTargetTBs();
+        foreach (TileBehav tb in tbs) {
+            yield return spellfx.Ench_SetBurning(playerID, tb);
+        }
+    }
+
+    public List<TileBehav> TOF_Filter(List<TileBehav> tbs) {
+        List<TileBehav> filts = new List<TileBehav>();
+        foreach (TileBehav tb in tbs) {
+            if (tb.tile.element == Tile.Element.Fire)
+                filts.Add(tb);
+        }
+        return filts;
     }
 
     // ----- spells -----
@@ -131,7 +151,7 @@ public class Enfuego : Character {
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
             MMLog.Log_Enfuego("Enchanting tile at " + tb.PrintCoord());
-            yield return spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
+            yield return spellfx.Ench_SetBurning(playerID, tb); // right ID?
             //yield return new WaitForSeconds(.2f);
         }
 

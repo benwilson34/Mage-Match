@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -62,6 +63,7 @@ public class UIController : MonoBehaviour {
         turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
 
         overlay = GameObject.Find("Targeting Overlay");
+        overlay.SetActive(false);
 
         //spellfx = new SpellEffects();
     }
@@ -355,7 +357,14 @@ public class UIController : MonoBehaviour {
         } 
     }
 
-    public void ActivateTargetingUI(List<TileBehav> tbs) {
+    private void ActivateTargetingUI() {
+        overlay.SetActive(true);
+
+        if (mm.MyTurn()) {
+            tCancelB.SetActive(true);
+            tClearB.SetActive(true);
+        }
+
         for(int i = 0; i < 7; i++) {
             for(int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
                 Color c = cellOverlays[i,j].color;
@@ -364,22 +373,33 @@ public class UIController : MonoBehaviour {
                 Debug.Log("Color = " + cellOverlays[i,j].color);
             }
         }
+    }
 
-        foreach(TileBehav tb in tbs) {
+    public void ActivateTargetingUI(List<TileBehav> tbs) {
+        ActivateTargetingUI();
+
+        foreach (TileBehav tb in tbs) {
             Tile t = tb.tile;
-            Color c = cellOverlays[t.col,t.row].color;
+            Color c = cellOverlays[t.col, t.row].color;
             c.a = 0.0f;
-            cellOverlays[t.col,t.row].color = c;
+            cellOverlays[t.col, t.row].color = c;
         }
-        //gradient.SetActive(!gradient.activeSelf);
-        //targetingBG.SetActive(!targetingBG.activeSelf);
-        if (mm.MyTurn()) {
-            tCancelB.SetActive(true);
-            tClearB.SetActive(true);
+    }
+
+    public void ActivateTargetingUI(List<CellBehav> cbs) {
+        foreach (CellBehav cb in cbs) {
+            // TODO filter cells
         }
     }
 
     public void DeactivateTargetingUI(){
+        overlay.SetActive(false);
+
+        if (mm.MyTurn()) {
+            tCancelB.SetActive(false);
+            tClearB.SetActive(false);
+        }
+
         for (int i = 0; i < 7; i++) {
             for (int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
                 Color c = cellOverlays[i,j].color;
@@ -388,10 +408,6 @@ public class UIController : MonoBehaviour {
             }
         }
 
-        if (mm.MyTurn()) {
-            tCancelB.SetActive(true);
-            tClearB.SetActive(true);
-        }
     }
 
     public void SetDrawButton(Player p, bool interactable) {
