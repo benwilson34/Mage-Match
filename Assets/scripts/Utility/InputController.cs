@@ -161,6 +161,7 @@ public class InputController : MonoBehaviour {
                         if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsTileMine(tb)) {
                             dropping = true;
 
+                            tb.GetComponent<SpriteRenderer>().sortingOrder = 1;
                             dropTile = tb.gameObject;
                             mm.LocalP().hand.GrabTile(tb); //?
                             mm.eventCont.GrabTile(mm.myID, tb.tile.element);
@@ -225,6 +226,7 @@ public class InputController : MonoBehaviour {
                 switch (tb.currentState) {
                     case TileBehav.TileState.Hand:
                         if (dropping) { // will always be if it's in the hand?
+                            tb.GetComponent<SpriteRenderer>().sortingOrder = 0;
                             Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                             RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
