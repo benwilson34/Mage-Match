@@ -47,6 +47,9 @@ TagManager:
   - name: tiles
     uniqueID: 4060742115
     locked: 0
+  - name: holding
+    uniqueID: 2260405979
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

@@ -66,7 +66,7 @@ public class TileBehav : MonoBehaviour {
 
 	public void SetPlaced(){
 		currentState = TileState.Placed;
-	}
+    }
 
     // delete?
 	//public void FlipTile(){
