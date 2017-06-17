@@ -9,11 +9,14 @@ EditorBuildSettings:
     path: Assets/scenes/Lobby.unity
     guid: 2838837528bfaae498f42cc730a48708
   - enabled: 1
+    path: Assets/scenes/Quickstart Launcher.unity
+    guid: bf50c968a1f811442bf6c4d5afbc3cb2
+  - enabled: 1
     path: Assets/scenes/Launcher.unity
     guid: 772aeaebb9b5ff44db2b4f275d5fd032
   - enabled: 1
     path: Assets/scenes/menu/Character Select.unity
-    guid: 00000000000000000000000000000000
+    guid: 40eed47d2f32efa4b8256e4dbf936a5e
   - enabled: 1
     path: Assets/scenes/Game Screen (Landscape).unity
     guid: 8e844e77db0559544838bc7841b72afa

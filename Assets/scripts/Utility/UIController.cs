@@ -13,7 +13,7 @@ public class UIController : MonoBehaviour {
 	private Text moveText, debugGridText, turnTimerText, slidingText;
 	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
     private MageMatch mm;
-	private Dropdown DD1, DD2;
+	//private Dropdown DD1, DD2;
     private Transform leftPinfo, rightPinfo, leftPload, rightPload;
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
@@ -44,8 +44,8 @@ public class UIController : MonoBehaviour {
         leftPload = GameObject.Find("LeftPlayer_Loadout").transform;
         rightPload = GameObject.Find("RightPlayer_Loadout").transform;
 
-        DD1 = GameObject.Find ("Dropdown_p1").GetComponent<Dropdown> ();
-		DD2 = GameObject.Find ("Dropdown_p2").GetComponent<Dropdown> ();
+  //      DD1 = GameObject.Find ("Dropdown_p1").GetComponent<Dropdown> ();
+		//DD2 = GameObject.Find ("Dropdown_p2").GetComponent<Dropdown> ();
 
         gradient = GameObject.Find("green-gradient");
         targetingBG = GameObject.Find("targetingBG");
@@ -378,12 +378,12 @@ public class UIController : MonoBehaviour {
 		}
 	}
 
-	public int GetLoadoutNum(int id){
-		if (id == 1)
-            return DD1.value; 
-        else
-			return DD2.value;
-	}
+	//public int GetLoadoutNum(int id){
+	//	if (id == 1)
+ //           return DD1.value; 
+ //       else
+	//		return DD2.value;
+	//}
 
     public void ToggleMenu() {
         menu = !menu;

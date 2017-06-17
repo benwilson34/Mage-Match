@@ -214,6 +214,7 @@
     <Compile Include="Assets\scripts\PUN\GameSettings.cs" />
     <Compile Include="Assets\scripts\PUN\Launcher.cs" />
     <Compile Include="Assets\scripts\PUN\PlayerNameInputField.cs" />
+    <Compile Include="Assets\scripts\PUN\QuickstartLauncher.cs" />
     <Compile Include="Assets\scripts\PUN\SyncManager.cs" />
     <Compile Include="Assets\scripts\Player.cs" />
     <Compile Include="Assets\scripts\PlayerProfile.cs" />

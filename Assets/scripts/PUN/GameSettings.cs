@@ -32,8 +32,6 @@ public class GameSettings : PunBehaviour {
         Transform nameText = control.Find("input_Name").Find("Text");
         string name = nameText.GetComponent<Text>().text;
         Debug.Log("id=" + id + ", name=" + name);
-        if (name == "")
-            name = "player " + id;
 
         photonView.RPC("SetPlayerName", PhotonTargets.Others, id, name);
 

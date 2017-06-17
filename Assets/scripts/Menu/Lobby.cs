@@ -73,6 +73,10 @@ public class Lobby : Photon.PunBehaviour {
         SceneManager.LoadScene("Launcher");
     }
 
+    public void Quickstart() {
+        SceneManager.LoadScene("Quickstart Launcher");
+    }
+
     public void SetCurrentEntry(LobbyEntry entry) {
         if (currentEntry != null) {
             currentEntry.transform.Find("bg").GetComponent<Image>().color = Color.yellow;

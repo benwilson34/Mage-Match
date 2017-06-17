@@ -92,7 +92,7 @@ public class CharacterSelect : MonoBehaviour {
         yield return new WaitUntil(() => otherCharacterSet);
         // then display opponent character (but not loadout)
         // then load Game Screen
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(2f);
 
         if (PhotonNetwork.isMasterClient) {
             PhotonNetwork.LoadLevel("Game Screen (Landscape)");
