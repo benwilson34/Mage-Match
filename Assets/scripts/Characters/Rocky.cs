@@ -17,7 +17,7 @@ public class Rocky : Character {
         characterName = "Rocky";
         spells = new Spell[4];
 
-        if (loadout == 1)
+        if (loadout == 0)
             RockyA();
         else
             RockyB();

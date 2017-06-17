@@ -195,12 +195,12 @@ GameObject:
   - component: {fileID: 127843141}
   - component: {fileID: 127843140}
   m_Layer: 5
-  m_Name: Name InputField
+  m_Name: input_Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &127843139
 RectTransform:
   m_ObjectHideFlags: 0
@@ -370,9 +370,9 @@ RectTransform:
   m_Father: {fileID: 1650727540}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 267.5, y: -86.31901}
   m_SizeDelta: {x: 469.5057, y: 42.32633}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &150108638
@@ -419,7 +419,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 0
+  m_IsOn: 1
 --- !u!1 &210513771
 GameObject:
   m_ObjectHideFlags: 0
@@ -928,12 +928,12 @@ GameObject:
   - component: {fileID: 763737232}
   - component: {fileID: 763737231}
   m_Layer: 5
-  m_Name: b_play
+  m_Name: b_Play
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &763737230
 RectTransform:
   m_ObjectHideFlags: 0
@@ -992,7 +992,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2129229100}
+      - m_Target: {fileID: 0}
         m_MethodName: Connect
         m_Mode: 1
         m_Arguments:
@@ -1294,9 +1294,9 @@ RectTransform:
   m_Father: {fileID: 1650727540}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 267.5, y: -151.24107}
   m_SizeDelta: {x: 469.5057, y: 42.32633}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &918578894
@@ -1343,7 +1343,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 0
+  m_IsOn: 1
 --- !u!1 &1026662064
 GameObject:
   m_ObjectHideFlags: 0
@@ -1838,7 +1838,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1650727540
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2050,9 +2050,9 @@ RectTransform:
   m_Father: {fileID: 1650727540}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 267.5, y: -21.280048}
   m_SizeDelta: {x: 469.3214, y: 42.560097}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2118656235
@@ -2124,10 +2124,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2129229099}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be779633d0847844db085c9614e9733b, type: 3}
+  m_Script: {fileID: 11500000, guid: a985fcec7dcc82d4c99e6a199712f740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Loglevel: 2
+  Loglevel: 1
+  MaxPlayersPerRoom: 2
 --- !u!4 &2129229101
 Transform:
   m_ObjectHideFlags: 0

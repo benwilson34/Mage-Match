@@ -39,9 +39,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d526b7db56a8a964ab5c328cb62c279c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  p1name: 
-  p2name: 
+  p1name: player 1
+  p2name: player 2
+  p1char: 1
+  p2char: 2
+  p1loadout: 1
+  p2loadout: 0
   turnTimerOn: 0
+  localPlayerOnLeft: 1
+  hideOpponentHand: 1
 --- !u!114 &114966316800126466
 MonoBehaviour:
   m_ObjectHideFlags: 1

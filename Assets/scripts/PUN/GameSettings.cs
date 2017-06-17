@@ -7,9 +7,13 @@ using Photon;
 public class GameSettings : PunBehaviour {
 
     public string p1name, p2name;
+    public Character.Ch p1char = Character.Ch.Enfuego;
+    public Character.Ch p2char = Character.Ch.Gravekeeper;
+    public int p1loadout = 0, p2loadout = 0;
     public bool turnTimerOn, localPlayerOnLeft, hideOpponentHand;
 
     private bool nameSet = false;
+
     private Transform control, toggles;
     private Com.SoupSkull.MageMatch.Launcher launcher; // hideous class name
 
@@ -25,9 +29,10 @@ public class GameSettings : PunBehaviour {
     public IEnumerator Settings() {
         int id = PhotonNetwork.player.ID;
         PhotonView photonView = PhotonView.Get(this);
-        Transform nameText = control.Find("Name InputField").Find("Text");
+        Transform nameText = control.Find("input_Name").Find("Text");
         string name = nameText.GetComponent<Text>().text;
         Debug.Log("id=" + id + ", name=" + name);
+
         photonView.RPC("SetPlayerName", PhotonTargets.Others, id, name);
 
         if (id == 1) {
@@ -63,5 +68,56 @@ public class GameSettings : PunBehaviour {
         this.turnTimerOn = turnTimerOn;
         this.localPlayerOnLeft = localPlayerOnLeft;
         this.hideOpponentHand = hideOpponentHand;
+    }
+
+    public void SetLocalChar(int id, Character.Ch ch) {
+        if (id == 1)
+            p1char = ch;
+        else
+            p2char = ch;
+    }
+
+    public Character.Ch GetLocalChar(int id) {
+        if (id == 1)
+            return p1char;
+        else
+            return p2char;
+    }
+
+    public void SetLocalLoadout(int id, int index) {
+        if (id == 1)
+            p1loadout = index;
+        else
+            p2loadout = index;
+    }
+
+    public int GetLocalLoadout(int id) {
+        if (id == 1)
+            return p1loadout;
+        else
+            return p2loadout;
+    }
+
+    [PunRPC]
+    public void OtherPlayerLocked() {
+        GameObject.Find("CharacterSelect").GetComponent<CharacterSelect>().OtherPlayerLocked();
+    }
+
+    public void SyncCharAndLoadout(int id) {
+        PhotonView view = PhotonView.Get(this);
+        view.RPC("SetCharAndLoadout", PhotonTargets.Others, id, GetLocalChar(id), GetLocalLoadout(id));
+    }
+
+    [PunRPC]
+    public void SetCharAndLoadout(int id, Character.Ch ch, int loadout) {
+        Debug.Log("Setting player" + id + " char/loadout to " + ch + "/" + loadout);
+        if (id == 1) {
+            p1char = ch;
+            p1loadout = loadout;
+        } else {
+            p2char = ch;
+            p2loadout = loadout;
+        }
+        GameObject.Find("CharacterSelect").GetComponent<CharacterSelect>().OtherCharacterSynced((int)ch);
     }
 }

@@ -13,8 +13,13 @@ public class UIController : MonoBehaviour {
 	private Text moveText, debugGridText, turnTimerText, slidingText;
 	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
     private MageMatch mm;
+<<<<<<< HEAD
 	private Dropdown DD1, DD2;
     private Transform leftPinfo, rightPinfo, leftPload, rightPload, board;
+=======
+	//private Dropdown DD1, DD2;
+    private Transform leftPinfo, rightPinfo, leftPload, rightPload;
+>>>>>>> menu
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?

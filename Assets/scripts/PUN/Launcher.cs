@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace Com.SoupSkull.MageMatch {
     public class Launcher : Photon.PunBehaviour {
@@ -10,6 +11,7 @@ namespace Com.SoupSkull.MageMatch {
         private GameObject controlPanel, progressLabel, toggles;
         private Text progText;
         private RoomSettings rs;
+        private GameObject nameInput;
 
         void Awake() {
             rs = GameObject.Find("roomSettings").GetComponent<RoomSettings>();
@@ -25,11 +27,12 @@ namespace Com.SoupSkull.MageMatch {
             progressLabel = GameObject.Find("Progress Label");
             toggles = GameObject.Find("Toggles");
             progText = progressLabel.GetComponent<Text>();
+            nameInput = GameObject.Find("input_Name");
         }
 
         void Start() {
             if (rs.isNewRoom) {
-                GameObject.Find("b_play").transform.Find("Text").GetComponent<Text>().text = "Create room";
+                GameObject.Find("b_Play").transform.Find("Text").GetComponent<Text>().text = "Create room";
             } else {
                 toggles.SetActive(false);
             }
@@ -75,7 +78,16 @@ namespace Com.SoupSkull.MageMatch {
         private void HandleRoomAction(){
             if (rs.isNewRoom) {
                 // make a new room
-                PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 2 }, null);
+                string name = nameInput.transform.Find("Text").GetComponent<Text>().text;
+                Debug.Log("Setting hostName to " + name);
+                Hashtable props = new Hashtable();
+                props.Add("hostName", name);
+                RoomOptions options = new RoomOptions() {
+                    MaxPlayers = 2,
+                    CustomRoomProperties = props,
+                    CustomRoomPropertiesForLobby = new string[] { "hostName" }
+                };
+                PhotonNetwork.CreateRoom(null, options, null);
                 progText.text = "Connected to PUN, waiting for opponent!";
             } else {
                 // join room named rs.roomName
@@ -83,6 +95,17 @@ namespace Com.SoupSkull.MageMatch {
                 progText.text = "Joining room...";
             }
         }
+
+        //public override void OnJoinedRoom() {
+        //    if (rs.isNewRoom) {
+        //        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
+        //        string name = nameInput.transform.Find("Text").GetComponent<Text>().text;
+        //        Debug.Log("Setting hostName to " + name);
+        //        hash.Add("hostName", name);
+        //        Debug.Log("hostName is " + hash["hostName"]);
+        //        PhotonNetwork.room.SetCustomProperties(hash);
+        //    }
+        //}
 
         public override void OnDisconnectedFromPhoton() {
             progressLabel.SetActive(false);
@@ -107,7 +130,7 @@ namespace Com.SoupSkull.MageMatch {
 
         public void LoadGameScreen() {
             Debug.Log("LAUNCHER: Loading...");
-            PhotonNetwork.LoadLevel("Game Screen (Landscape)");
+            PhotonNetwork.LoadLevel("Character Select");
         }
     }
 }

@@ -16,7 +16,7 @@ public class Gravekeeper : Character {
         spellfx = mm.spellfx;
         spells = new Spell[4];
         characterName = "The Gravekeeper";
-        if (loadout == 1)
+        if (loadout == 0)
             GravekeeperA();
         else
             GravekeeperB();

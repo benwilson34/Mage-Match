@@ -48,9 +48,14 @@ public class Lobby : Photon.PunBehaviour {
             Debug.Log(game.Name);
             Debug.Log(game.PlayerCount);
             Debug.Log(game.MaxPlayers);
+            string hostName = (string)game.CustomProperties["hostName"];
+            Debug.Log("contains key=" + game.CustomProperties.ContainsKey("hostName"));
+            Debug.Log("count=" + game.CustomProperties.Keys.Count);
+            Debug.Log("hostName=" + hostName);
 
             Transform entry = Instantiate(entryPF).transform;
-            entry.Find("t_Name").GetComponent<Text>().text = game.Name;
+            entry.GetComponent<LobbyEntry>().roomName = game.Name;
+            entry.Find("t_Name").GetComponent<Text>().text = hostName;
 
             entry.SetParent(content.transform, false);
             items.Add(entry.gameObject);
@@ -64,8 +69,12 @@ public class Lobby : Photon.PunBehaviour {
 
     public void JoinMatch() {
         rs.isNewRoom = false;
-        rs.roomName = currentEntry.transform.Find("t_Name").GetComponent<Text>().text;
+        rs.roomName = currentEntry.roomName;
         SceneManager.LoadScene("Launcher");
+    }
+
+    public void Quickstart() {
+        SceneManager.LoadScene("Quickstart Launcher");
     }
 
     public void SetCurrentEntry(LobbyEntry entry) {
