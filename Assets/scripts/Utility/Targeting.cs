@@ -11,8 +11,8 @@ public class Targeting {
 
     private MageMatch mm;
     private int targets, targetsLeft = 0;
-    private List<TileBehav> targetTBs;
-    private List<CellBehav> targetCBs;
+    private List<TileBehav> targetTBs, validTBs;
+    private List<CellBehav> targetCBs, validCBs;
     private Vector3 lastTCenter;
     private bool largeAreaMode = false;
     private TileBehav lastDragTarget;
@@ -21,10 +21,13 @@ public class Targeting {
 
     //public delegate void TBTargetEffect(TileBehav tb);
     //public delegate void TBMultiTargetEffect(List<TileBehav> tbs);
-    public delegate void CBTargetEffect(CellBehav cb);
+    //public delegate void CBTargetEffect(CellBehav cb);
     //private TBTargetEffect TBtargetEffect;
     //private TBMultiTargetEffect TBmultiTargetEffect;
-    private CBTargetEffect CBtargetEffect;
+    //private CBTargetEffect CBtargetEffect;
+
+    public delegate List<TileBehav> TileFilterFunc(List<TileBehav> tbs);
+    public delegate List<CellBehav> CellFilterFunc(List<CellBehav> cbs);
 
     public Targeting() {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
@@ -41,23 +44,32 @@ public class Targeting {
         //	currentTMode = TargetMode.Tile;
     }
 
-    public IEnumerator WaitForTileTarget(int count) {
+    List<TileBehav> GetValidTBs(TileFilterFunc filter) {
+        List<TileBehav> tbs = mm.hexGrid.GetPlacedTiles();
+        if (filter != null)
+            tbs = filter(tbs);
+        return tbs;
+    }
+
+    public IEnumerator WaitForTileTarget(int count, TileFilterFunc filter = null) {
         // TODO handle fewer tiles on board than count
         currentTMode = TargetMode.Tile;
         targets = targetsLeft = count;
         targetTBs = new List<TileBehav>();
         MMLog.Log_Targeting("targets = " + targetsLeft);
 
+        validTBs = GetValidTBs(filter);
         yield return TargetingScreen();
     }
 
-    public IEnumerator WaitForTileAreaTarget(bool largeArea) {
+    public IEnumerator WaitForTileAreaTarget(bool largeArea, TileFilterFunc filter = null) {
         currentTMode = TargetMode.TileArea;
         targets = targetsLeft = 1;
         targetTBs = new List<TileBehav>();
         largeAreaMode = largeArea;
         MMLog.Log_Targeting("Waiting for TileArea target. Targets = " + targetsLeft);
 
+        validTBs = GetValidTBs(filter);
         yield return TargetingScreen();
     }
 
@@ -77,6 +89,16 @@ public class Targeting {
         foreach (Tile ct in GetSelection().sequence) // prevent targeting prereq
             if (ct.HasSamePos(tb.tile))
                 return;
+
+        bool valid = false;
+        foreach (TileBehav ctb in validTBs) {
+            if (ctb.tile.HasSamePos(tb.tile)) {
+                valid = true;
+                break;
+            }
+        }
+        if (!valid)
+            return;
         // TODO if targetable
 
         mm.syncManager.SendTBTarget(tb);
@@ -100,6 +122,7 @@ public class Targeting {
                 Tile ct = ctb.tile;
                 OutlineTarget(ct.col, ct.row);
                 // TODO if targetable
+                // TODO remove any prereq overlap!
                 targetTBs.Add(ctb);
             }
             DecTargets();
@@ -136,14 +159,15 @@ public class Targeting {
         //CBtargetEffect = targetEffect;
         //Debug.Log ("targets = " + targetsLeft);
 
+        // TODO filter cells
         yield return TargetingScreen();
     }
 
     // TODO
-    public IEnumerator WaitForCellAreaTarget(bool largeArea, CBTargetEffect targetEffect) {
-        currentTMode = TargetMode.CellArea;
-        yield return null;
-    }
+    //public IEnumerator WaitForCellAreaTarget(bool largeArea) {
+    //    currentTMode = TargetMode.CellArea;
+    //    yield return null;
+    //}
 
     public void OnCBTarget(CellBehav cb) {
         //DecTargets ();
@@ -156,6 +180,7 @@ public class Targeting {
         //    if (ct.HasSamePos(tb.tile))
         //        return;
         // TODO if targetable
+        // TODO check validCBs
 
         mm.syncManager.SendCBTarget(cb);
         if (currentTMode == TargetMode.Cell) {
@@ -200,9 +225,13 @@ public class Targeting {
         targetingCanceled = false;
         Player p = mm.ActiveP();
         mm.currentState = MageMatch.GameState.TargetMode;
-
         mm.uiCont.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
-        mm.uiCont.ActivateTargetingUI(mm.hexGrid.GetPlacedTiles());
+
+        if(currentTMode == TargetMode.Tile || currentTMode == TargetMode.TileArea || currentTMode == TargetMode.Drag)
+            mm.uiCont.ActivateTargetingUI(validTBs);
+        else
+            mm.uiCont.ActivateTargetingUI(validCBs);
+
         OutlinePrereq(GetSelection());
 
         yield return new WaitUntil(() => targetsLeft == 0);

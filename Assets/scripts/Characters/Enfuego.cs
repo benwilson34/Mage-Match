@@ -29,6 +29,7 @@ public class Enfuego : Character {
     }
 
     public IEnumerator DoNothing() {
+        mm.uiCont.UpdateMoveText("This spell does nothing. Thanks!");
         yield return new WaitForSeconds(1.5f);
     }
 
@@ -117,11 +118,20 @@ public class Enfuego : Character {
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
             MMLog.Log_Enfuego("Enchanting tile at " + tb.PrintCoord());
-            yield return spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
+            yield return spellfx.Ench_SetBurning(playerID, tb);
             //yield return new WaitForSeconds(.2f);
         }
 
         yield return mm.InactiveP().DiscardRandom(2); 
+    }
+
+    public List<TileBehav> Inc_Filter(List<TileBehav> tbs) {
+        List<TileBehav> filterTBs = new List<TileBehav>();
+        foreach(TileBehav tb in tbs) {
+            if (tb.GetEnchType() == Enchantment.EnchType.Burning)
+                filterTBs.Add(tb);
+        }
+        return filterTBs;
     }
 
     // PLACEHOLDER

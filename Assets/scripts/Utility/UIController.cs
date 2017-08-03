@@ -402,7 +402,13 @@ public class UIController : MonoBehaviour {
         } 
     }
 
-    public void ActivateTargetingUI(List<TileBehav> tbs) {
+    public void ActivateTargetingUI() {
+        overlay.SetActive(true);
+        if (mm.MyTurn()) {
+            tCancelB.SetActive(true);
+            tClearB.SetActive(true);
+        }
+
         for(int i = 0; i < 7; i++) {
             for(int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
                 Color c = cellOverlays[i,j].color;
@@ -412,21 +418,36 @@ public class UIController : MonoBehaviour {
             }
         }
 
+        //gradient.SetActive(!gradient.activeSelf);
+        //targetingBG.SetActive(!targetingBG.activeSelf);
+    }
+
+    public void ActivateTargetingUI(List<TileBehav> tbs) {
+        ActivateTargetingUI();
+
         foreach(TileBehav tb in tbs) {
             Tile t = tb.tile;
             Color c = cellOverlays[t.col,t.row].color;
             c.a = 0.0f;
             cellOverlays[t.col,t.row].color = c;
         }
-        //gradient.SetActive(!gradient.activeSelf);
-        //targetingBG.SetActive(!targetingBG.activeSelf);
-        if (mm.MyTurn()) {
-            tCancelB.SetActive(true);
-            tClearB.SetActive(true);
+    }
+
+    public void ActivateTargetingUI(List<CellBehav> cbs) {
+        ActivateTargetingUI();
+
+        foreach (CellBehav cb in cbs) {
+            // TODO do something with the filtered cells
         }
     }
 
     public void DeactivateTargetingUI(){
+        overlay.SetActive(false);
+        if (mm.MyTurn()) {
+            tCancelB.SetActive(false);
+            tClearB.SetActive(false);
+        }
+
         for (int i = 0; i < 7; i++) {
             for (int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
                 Color c = cellOverlays[i,j].color;
@@ -435,10 +456,6 @@ public class UIController : MonoBehaviour {
             }
         }
 
-        if (mm.MyTurn()) {
-            tCancelB.SetActive(false);
-            tClearB.SetActive(false);
-        }
     }
 
     public void SetDrawButton(Player p, bool interactable) {
