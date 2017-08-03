@@ -40,6 +40,14 @@ public class TileSeq {
 		sequence [index].SetPos(x, y);
 	}
 
+    public bool IncludesTile(Tile t) {
+        foreach (Tile seqt in sequence) {
+            if (seqt.HasSamePos(t))
+                return true;
+        }
+        return false;
+    }
+
 	public string SeqAsString(){
 		string seqString = "";
 		foreach (Tile t in sequence)

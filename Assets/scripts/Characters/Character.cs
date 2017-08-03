@@ -66,7 +66,7 @@ public abstract class Character {
     }
 
     public Tile.Element GetTileElement() {
-        int rand = Random.Range(0, 100);
+        int rand = Random.Range(0, 50);
         if (rand < dfire)
             return Tile.Element.Fire;
         else if (rand < dfire + dwater)
@@ -81,41 +81,22 @@ public abstract class Character {
 
     public static Character Load(MageMatch mm, int id) {
         Ch myChar = mm.gameSettings.GetLocalChar(id);
-        int loadout = mm.gameSettings.GetLocalLoadout(id);
         switch (myChar) {
             case Ch.Test:
                 return new CharTest(mm);
             case Ch.Enfuego:
-                return new Enfuego(mm, id, loadout);
+                return new Enfuego(mm, id);
             case Ch.Gravekeeper:
-                return new Gravekeeper(mm, id, loadout);
+                return new Gravekeeper(mm, id);
 
             default:
                 Debug.LogError("Loadout number must be 1 through 6.");
                 return null;
         }
-
-        //switch (mm.uiCont.GetLoadoutNum(id)) {
-        //    case 0:
-        //        return new CharTest(mm);
-        //    case 1:
-        //        return new Enfuego(mm, id, 1);
-        //    case 2:
-        //        return new Enfuego(mm, id, 2);
-        //    case 3:
-        //        return new Gravekeeper(mm, id, 1);
-        //    case 4:
-        //        return new Gravekeeper(mm, id, 2);
-        //    case 5:
-        //        return new Rocky(mm, id, 1);
-        //    case 6:
-        //        return new Rocky(mm, id, 2);
-        //    default:
-        //        Debug.Log("Loadout number must be 1 through 6.");
-        //        return null;
-        //}
     }
 }
+
+
 
 public class CharTest : Character {
     public CharTest(MageMatch mm) : base(mm) {

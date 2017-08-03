@@ -8,44 +8,28 @@ public class Enfuego : Character {
     private HexGrid hexGrid; // eventually these will be static again?
     private Targeting targeting; // ''
 
-    public Enfuego(MageMatch mm, int id, int loadout) : base(mm) {
+    public Enfuego(MageMatch mm, int id) : base(mm) {
         playerID = id;
         spellfx = mm.spellfx;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
-        characterName = "Enfuego";
-        spells = new Spell[4];
 
-        if (loadout == 0)
-            EnfuegoA();
-        else
-            EnfuegoB();
+        characterName = "Enfuego";
+        maxHealth = 1000;
+        SetDeckElements(20, 0, 0, 15, 15);
+
+        spells = new Spell[5];
+        spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
+        spells[1] = new Spell(1, "¡Baila!", "FM", 1, Baila);
+        spells[2] = new Spell(2, "Incinerate", "FAM", 1, DoNothing);
+        spells[3] = new Spell(3, "Hot Potatoes", "FFA", 1, HotPotatoes);
+        spells[4] = new CoreSpell(4, "Fiery Fandango", 1, FieryFandango);
+
         InitSpells();
     }
 
-    void EnfuegoA() { // Enfuego A - Fiery Flamenco
-        loadoutName = "Fiery Flamenco";
-        maxHealth = 1000;
-
-        SetDeckElements(50, 0, 0, 20, 30);
-
-        spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
-        spells[1] = new Spell(1, "¡Baile!", "FM", 1, Baile);
-        spells[2] = new Spell(2, "Incinerate", "FAF", 1, Incinerate);
-        spells[3] = new CoreSpell(3, "Fiery Fandango", 3, 1, FieryFandango);
-    }
-
-    // FOCUS
-    void EnfuegoB() { // Enfuego B - Hot Feet
-        loadoutName = "Hot Feet";
-        maxHealth = 1100;
-
-        SetDeckElements(50, 0, 15, 0, 35);
-
-        spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
-        spells[1] = new Spell(1, "Hot Body", "MEF", 1, HotBody);
-        spells[2] = new Spell(2, "INCINERATE", "MF", 1, Incinerate); // change back to Backburner
-        spells[3] = new CoreSpell(3, "Fiery Fandango", 3, 1, FieryFandango);
+    public IEnumerator DoNothing() {
+        yield return new WaitForSeconds(1.5f);
     }
 
     // ----- spells -----
@@ -99,7 +83,7 @@ public class Enfuego : Character {
     }
 
     // Core
-    public IEnumerator FieryFandango() {
+    public IEnumerator FieryFandango(TileSeq seq) {
         mm.GetPlayer(playerID).ChangeDebuff_DmgExtra(15);
         mm.GetOpponent(playerID).ChangeDebuff_DmgExtra(15);
         mm.effectCont.AddEndTurnEffect(new TurnEffect(2, Effect.Type.Buff, null, FF_TEnd), "fiery");
@@ -112,8 +96,10 @@ public class Enfuego : Character {
     }
 
     // PLACEHOLDER
-    public IEnumerator Baile() {
+    public IEnumerator Baila() {
         yield return targeting.WaitForTileAreaTarget(true);
+        if (targeting.WasCanceled())
+            yield break;
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs)
@@ -138,44 +124,49 @@ public class Enfuego : Character {
         yield return mm.InactiveP().DiscardRandom(2); 
     }
 
-    public IEnumerator Backburner() {
-        yield return mm.syncManager.SyncRand(playerID, Random.Range(15, 26));
-        int dmg = mm.syncManager.GetRand();
-        mm.GetPlayer(playerID).DealDamage(dmg);
-
-        mm.effectCont.AddMatchEffect(new MatchEffect(1, Backburner_Match, null, 1), "backb");
-        yield return null;
-    }
-    IEnumerator Backburner_Match(int id) {
-        MMLog.Log_Enfuego("Rewarding player " + id + " with 1 AP.");
-        mm.GetPlayer(id).AP++;
+    // PLACEHOLDER
+    public IEnumerator HotPotatoes() {
         yield return null;
     }
 
-    public IEnumerator HotBody() {
-        mm.effectCont.AddSwapEffect(new SwapEffect(3, HotBody_Swap, null), "hotbd");
-        yield return null;
-    }
-    IEnumerator HotBody_Swap(int id, int c1, int r1, int c2, int r2) {
-        int rand = Random.Range(10, 16); // 10-15 dmg
-        yield return mm.syncManager.SyncRand(id, rand);
-        mm.GetPlayer(id).DealDamage(mm.syncManager.GetRand());
+    //public IEnumerator Backburner() {
+    //    yield return mm.syncManager.SyncRand(playerID, Random.Range(15, 26));
+    //    int dmg = mm.syncManager.GetRand();
+    //    mm.GetPlayer(playerID).DealDamage(dmg);
 
-        List<TileBehav> tbs = hexGrid.GetPlacedTiles();
-        for (int i = 0; i < tbs.Count; i++) {
-            TileBehav tb = tbs[i];
-            if (!tb.CanSetEnch(Enchantment.EnchType.Burning)) {
-                MMLog.Log_Enfuego("Removing " + tb.PrintCoord());
-                tbs.RemoveAt(i);
-                i--;
-            }
-        }
+    //    mm.effectCont.AddMatchEffect(new MatchEffect(1, Backburner_Match, null, 1), "backb");
+    //    yield return null;
+    //}
+    //IEnumerator Backburner_Match(int id) {
+    //    MMLog.Log_Enfuego("Rewarding player " + id + " with 1 AP.");
+    //    mm.GetPlayer(id).AP++;
+    //    yield return null;
+    //}
 
-        rand = Random.Range(0, tbs.Count);
-        yield return mm.syncManager.SyncRand(id, rand);
-        TileBehav tbSelect = tbs[mm.syncManager.GetRand()];
+    //public IEnumerator HotBody() {
+    //    mm.effectCont.AddSwapEffect(new SwapEffect(3, HotBody_Swap, null), "hotbd");
+    //    yield return null;
+    //}
+    //IEnumerator HotBody_Swap(int id, int c1, int r1, int c2, int r2) {
+    //    int rand = Random.Range(10, 16); // 10-15 dmg
+    //    yield return mm.syncManager.SyncRand(id, rand);
+    //    mm.GetPlayer(id).DealDamage(mm.syncManager.GetRand());
 
-        MMLog.Log_Enfuego("About to apply burning to the tb at " + tbSelect.PrintCoord());
-        yield return spellfx.Ench_SetBurning(id, tbSelect);
-    }
+    //    List<TileBehav> tbs = hexGrid.GetPlacedTiles();
+    //    for (int i = 0; i < tbs.Count; i++) {
+    //        TileBehav tb = tbs[i];
+    //        if (!tb.CanSetEnch(Enchantment.EnchType.Burning)) {
+    //            MMLog.Log_Enfuego("Removing " + tb.PrintCoord());
+    //            tbs.RemoveAt(i);
+    //            i--;
+    //        }
+    //    }
+
+    //    rand = Random.Range(0, tbs.Count);
+    //    yield return mm.syncManager.SyncRand(id, rand);
+    //    TileBehav tbSelect = tbs[mm.syncManager.GetRand()];
+
+    //    MMLog.Log_Enfuego("About to apply burning to the tb at " + tbSelect.PrintCoord());
+    //    yield return spellfx.Ench_SetBurning(id, tbSelect);
+    //}
 }

@@ -7,9 +7,10 @@ using DG.Tweening;
 
 public class UIController : MonoBehaviour {
 
-    public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
     public AnimationCurve slidingEase;
 
+    private Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
+    private GameObject spellOutlineEnd, spellOutlineMid;
 	private Text moveText, debugGridText, turnTimerText, slidingText;
 	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
     private MageMatch mm;
@@ -19,6 +20,7 @@ public class UIController : MonoBehaviour {
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
     private GameObject overlay;
+    private List<GameObject> spellOutlines;
     private SpriteRenderer[,] cellOverlays;
     //private SpellEffects spellfx;
     private Vector3 slidingTextStart;
@@ -28,7 +30,9 @@ public class UIController : MonoBehaviour {
         board = GameObject.Find("hexgrid-7wide").transform;
         mm = GameObject.Find("board").GetComponent<MageMatch> ();
 
-		moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
+        InitSprites();
+
+        moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
 		moveText.text = "";
 		debugGridText = GameObject.Find ("Text_Debug1").GetComponent<Text> (); // UI debug grid
         slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
@@ -62,6 +66,11 @@ public class UIController : MonoBehaviour {
         turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
 
         overlay = GameObject.Find("Targeting Overlay");
+        overlay.SetActive(false);
+
+        spellOutlineEnd = Resources.Load<GameObject>("prefabs/ui/spell-outline_end");
+        spellOutlineMid = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
+        spellOutlines = new List<GameObject>();
 
         //spellfx = new SpellEffects();
     }
@@ -74,6 +83,15 @@ public class UIController : MonoBehaviour {
         mm.eventCont.cascade += OnCascade;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
         mm.eventCont.playerMeterChange += OnPlayerMeterChange;
+    }
+
+    void InitSprites() {
+        Sprite[] minitiles = Resources.LoadAll<Sprite>("sprites/ui-spelltiles");
+        miniFire = minitiles[2];
+        miniWater = minitiles[4];
+        miniEarth = minitiles[1];
+        miniAir = minitiles[0];
+        miniMuscle = minitiles[3];
     }
 
     #region EventCont calls
@@ -296,15 +314,15 @@ public class UIController : MonoBehaviour {
 	void ShowLoadout(Player player){
 		Transform pload = GetPload(player.id); // i hope?
 
-		Text loadoutText = pload.Find ("Text_LoadoutName").GetComponent<Text>();
-		loadoutText.text = player.character.characterName + " - " + player.character.loadoutName;
-
-		for (int i = 0; i < 4; i++){
-			Transform t = pload.Find ("Button_Spell" + i);
+        // for each spell
+		for (int i = 0; i < 5; i++){
+			Transform t = pload.Find ("Button_Spell" + i).Find("main");
 			Spell currentSpell = player.character.GetSpell (i);
 
 			Text spellName = t.Find ("Text_SpellName").GetComponent<Text> ();
-			spellName.text = currentSpell.name + " " + currentSpell.APcost + " AP";
+            spellName.text = currentSpell.name;
+            if(currentSpell.APcost != 1)
+                spellName.text += " " + currentSpell.APcost + " AP";
 
 			for (int m = 0; m < 5; m++) {
 				Image minitile = t.Find ("minitile" + m).GetComponent<Image> ();
@@ -342,6 +360,35 @@ public class UIController : MonoBehaviour {
         //		Vector3 scale = go.transform.localScale;
         //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
         gradient.transform.Rotate(0, 0, 180);
+    }
+
+    public void ShowSpellSeqs(List<TileSeq> seqs) {
+        foreach (TileSeq seq in seqs) {
+            GameObject start = Instantiate(spellOutlineEnd);
+            int length = seq.GetSeqLength();
+            for (int i = 1; i < length; i++) {
+                GameObject piece;
+                if (i == length - 1)
+                    piece = Instantiate(spellOutlineEnd, start.transform);
+                else
+                    piece = Instantiate(spellOutlineMid, start.transform);
+                piece.transform.position = new Vector3(0, i);
+                piece.transform.rotation = Quaternion.Euler(0, 0, -90);
+            }
+
+            Vector2 tilePos = mm.hexGrid.GridCoordToPos(seq.sequence[0]);
+            start.transform.position = new Vector3(tilePos.x, tilePos.y);
+            start.transform.Rotate(0, 0, mm.hexGrid.GetDirection(seq) * -60);
+
+            spellOutlines.Add(start);
+        }
+    }
+
+    public void HideSpellSeqs() {
+        for (int i = 0; i < spellOutlines.Count;) {
+            Destroy(spellOutlines[0]);
+            spellOutlines.RemoveAt(0);
+        }
     }
 
     public void getCellOverlays() {
@@ -389,8 +436,8 @@ public class UIController : MonoBehaviour {
         }
 
         if (mm.MyTurn()) {
-            tCancelB.SetActive(true);
-            tClearB.SetActive(true);
+            tCancelB.SetActive(false);
+            tClearB.SetActive(false);
         }
     }
 
@@ -400,10 +447,16 @@ public class UIController : MonoBehaviour {
         GetPinfo(p.id).Find("Button_Draw").GetComponent<Button>().interactable = interactable;
     }
 
+    public ButtonController GetButtonCont(Player p, int index) {
+        return GetPload(p.id).Find ("Button_Spell" + index)
+            .GetComponent<ButtonController>();
+    }
+
     Button GetButton(Player player, int index){
 		return GetPload(player.id).Find ("Button_Spell" + index).GetComponent<Button>();
 	}
-
+    
+    // TODO remove player stuff
 	public void ActivateSpellButton(Player player, int index){
         if (player.ThisIsLocal()) {
             Button button = GetButton(player, index);
@@ -417,7 +470,7 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void DeactivateAllSpellButtons(Player player){
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			Button button = GetButton (player, i);
 			button.interactable = false;
 		}

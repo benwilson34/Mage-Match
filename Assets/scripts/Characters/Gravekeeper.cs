@@ -8,48 +8,40 @@ public class Gravekeeper : Character {
     private HexGrid hexGrid; // eventually these will be static again?
     private Targeting targeting; // ''
 
-    public Gravekeeper(MageMatch mm, int id, int loadout) : base(mm) {
+    public Gravekeeper(MageMatch mm, int id) : base(mm) {
         playerID = id;
         //this.mm = mm; //?
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
         spellfx = mm.spellfx;
-        spells = new Spell[4];
+
         characterName = "The Gravekeeper";
-        if (loadout == 0)
-            GravekeeperA();
-        else
-            GravekeeperB();
+        maxHealth = 1200;
+        SetDeckElements(0, 10, 20, 0, 20);
+
+        spells = new Spell[5];
+        spells[0] = new SignatureSpell(0, "Tombstone", "EMEE", 1, 20, Tombstone);
+        spells[1] = new Spell(1, "The Oogie Boogie", "ME", 1, TheOogieBoogie);
+        spells[2] = new Spell(2, "Party Crashers", "MWE", 1, PartyCrashers);
+        spells[3] = new Spell(3, "Undead Union", "WEM", 1, UndeadUnion);
+        spells[4] = new CoreSpell(4, "Business in the Front", 1, BusinessInTheFront);
+
         InitSpells();
     }
 
-    // FOCUS
-    void GravekeeperA() { // The Gravekeeper A - Business in the Front
-        loadoutName = "Business in the Front";
-        maxHealth = 1150;
-
-        SetDeckElements(0, 20, 40, 0, 40);
-
-        spells[0] = new SignatureSpell(0, "Tombstone", "EMME", 1, 20, Tombstone);
-        spells[1] = new Spell(1, "Human Resources", "MEW", 1, HumanResources);
-        spells[2] = new Spell(2, "Undead Union", "EMM", 1, UndeadUnion);
-        spells[3] = new CoreSpell(3, "Gather the Ghouls", 3, 1, GatherTheGhouls);
-    }
-
-    // Needs work, ignore for now
-    void GravekeeperB() { // The Gravekeeper B - Party in the Back
-        loadoutName = "Party in the Back";
-        maxHealth = 1050;
-
-        SetDeckElements(25, 0, 35, 0, 40);
-
-        spells[0] = new Spell(0, "Raise Zombie", "EMME", 1, ZombifySpell);
-        spells[1] = new Spell(1, "R.S.V.Z.", "MEM", 1, spellfx.Deal496Dmg); //
-        spells[2] = new Spell(2, "The Oogie Boogie", "MFE", 1, spellfx.Deal496Dmg); //
-        spells[3] = new Spell(3, "Bottle Rocket Mishap", "EMFM", 1, spellfx.Deal496Dmg); //
-    }
-
     // ----- spells -----
+
+    public IEnumerator BusinessInTheFront(TileSeq seq) {
+        yield return null;
+    }
+
+    public IEnumerator TheOogieBoogie() {
+        yield return null;
+    }
+
+    public IEnumerator PartyCrashers() {
+        yield return null;
+    }
 
     public IEnumerator HumanResources() {
         yield return targeting.WaitForTileAreaTarget(false);

@@ -5,19 +5,19 @@ using MMDebug;
 
 public class Targeting {
 
-    public enum TargetMode { Tile, TileArea, Cell, CellArea, Drag };
+    public enum TargetMode { Tile, TileArea, Cell, CellArea, Drag, Selection };
     public TargetMode currentTMode = TargetMode.Tile;
-    public bool canceled = false;
+    public bool targetingCanceled = false, selectionCanceled = false;
 
     private MageMatch mm;
     private int targets, targetsLeft = 0;
     private List<TileBehav> targetTBs;
-    //private List<TileBehav> validTargets; TODO
     private List<CellBehav> targetCBs;
     private Vector3 lastTCenter;
     private bool largeAreaMode = false;
     private TileBehav lastDragTarget;
     private List<GameObject> outlines;
+    private List<TileSeq> selections;
 
     //public delegate void TBTargetEffect(TileBehav tb);
     //public delegate void TBMultiTargetEffect(List<TileBehav> tbs);
@@ -74,7 +74,7 @@ public class Targeting {
         foreach (TileBehav ctb in targetTBs) // prevent targeting a tile that's already targeted
             if (ctb.tile.HasSamePos(tb.tile))
                 return;
-        foreach (Tile ct in mm.ActiveP().GetCurrentBoardSeq().sequence) // prevent targeting prereq
+        foreach (Tile ct in GetSelection().sequence) // prevent targeting prereq
             if (ct.HasSamePos(tb.tile))
                 return;
         // TODO if targetable
@@ -197,14 +197,13 @@ public class Targeting {
     //}
 
     IEnumerator TargetingScreen() {
-        canceled = false;
+        targetingCanceled = false;
         Player p = mm.ActiveP();
         mm.currentState = MageMatch.GameState.TargetMode;
 
         mm.uiCont.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
         mm.uiCont.ActivateTargetingUI(mm.hexGrid.GetPlacedTiles());
-        TileSeq seq = p.GetCurrentBoardSeq();
-        OutlinePrereq(seq);
+        OutlinePrereq(GetSelection());
 
         yield return new WaitUntil(() => targetsLeft == 0);
         MMLog.Log_Targeting("no more targets.");
@@ -269,23 +268,60 @@ public class Targeting {
         mm.uiCont.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
     }
 
-    /* Talk with Ben about best way to validate targets.
-    public List<TileBehav> validateTargets()
-    {
-        validTargets = new List<TileBehav>();
-
-
-        return validTargets;
-    }*/
-
     public void CancelTargeting() {
         mm.syncManager.SendCancelTargeting();
 
-        canceled = true;
+        targetingCanceled = true;
         targetsLeft = 0;
     }
 
-    public bool WasCanceled() { return canceled; }
+    public bool WasCanceled() { return targetingCanceled; }
 
     public bool TargetsRemain() { return targetsLeft > 0; }
+
+    public IEnumerator SpellSelectScreen(List<TileSeq> seqs) {
+        currentTMode = TargetMode.Selection;
+        selectionCanceled = false;
+        selections = new List<TileSeq>(seqs);
+        mm.uiCont.ShowSpellSeqs(selections);
+
+        yield return new WaitUntil(() => selections.Count == 1 || selectionCanceled);
+
+        if (selectionCanceled) {
+            selections = null; // or clear? to avoid nullrefs
+        }
+
+        mm.uiCont.HideSpellSeqs();
+        currentTMode = TargetMode.Tile;
+        yield return null; //?
+    }
+
+    public void OnSelection(TileBehav tb) {
+        List<TileSeq> newSelections = new List<TileSeq>(selections);
+
+        for (int i = 0; i < newSelections.Count; i++) {
+            TileSeq seq = newSelections[i];
+            if (!seq.IncludesTile(tb.tile)) {
+                newSelections.RemoveAt(i);
+                i--;
+            }
+        }
+
+        if (newSelections.Count != 0) {
+            mm.syncManager.SendTBSelection(tb);
+            selections = newSelections;
+            mm.uiCont.HideSpellSeqs();
+            mm.uiCont.ShowSpellSeqs(selections);
+        } else
+            MMLog.Log_Targeting("Player clicked on am invalid tile: " + tb.PrintCoord());
+    }
+
+    public TileSeq GetSelection() { return selections[0]; }
+
+    public bool IsSelectionMode() { return currentTMode == TargetMode.Selection; }
+
+    public void CancelSelection() {
+        mm.syncManager.SendCancelSelection();
+        selectionCanceled = true;
+    }
 }

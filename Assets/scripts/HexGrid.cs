@@ -107,6 +107,10 @@ public class HexGrid {
 		return true;
 	}
 
+    public Vector2 GridCoordToPos(Tile t) {
+        return GridCoordToPos(t.col, t.row);
+    }
+
 	public Vector2 GridCoordToPos(int col, int row){
 		return new Vector2 (GridColToPos (col), GridRowToPos (col, row));
 	}
@@ -194,6 +198,28 @@ public class HexGrid {
         if (t1.col - t2.col == 1 && t2.row - t1.row == 1) return false;
         if (t2.col - t1.col == 1 && t1.row - t2.row == 1) return false;
         return true;
+    }
+
+    public int GetDirection(TileSeq seq) {
+        Tile first = seq.sequence[0];
+        Tile sec = seq.sequence[1];
+        int colDiff = sec.col - first.col;
+        int rowDiff = sec.row - first.row;
+        if (colDiff == 0) {
+            if (rowDiff == 1)
+                return 0;
+            else return 3;
+        } else {
+            if (rowDiff == 0) {
+                if (colDiff == 1)
+                    return 2;
+                else return 5;
+            } else {
+                if (colDiff == 1)
+                    return 1;
+                else return 4;
+            }
+        }
     }
 
     // perimeter; doesn't add center tile

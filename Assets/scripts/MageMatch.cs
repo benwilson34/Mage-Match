@@ -36,7 +36,7 @@ public class MageMatch : MonoBehaviour {
     private Transform tilesOnBoard;
     private bool endGame = false;
     private int checking = 0, removing = 0, actionsPerforming = 0, matchesResolving = 0;
-    private int cascade = 0; // should this be how this is handled?
+    private List<TileSeq>[] spellsOnBoard;
 
     void Start() {
         //Random.InitState(1337420);
@@ -143,7 +143,7 @@ public class MageMatch : MonoBehaviour {
         animCont.Init(this);
     }
 
-    #region EventCont calls
+    #region Event callbacks
     public void OnBoardAction() {
         if (checking == 0) { //?
             StartCoroutine(BoardChecking());
@@ -211,7 +211,7 @@ public class MageMatch : MonoBehaviour {
         uiCont.SetDrawButton(activep, false);
 
         currentState = GameState.CommishTurn;
-        yield return commish.CTurn();
+        //yield return commish.CTurn();
 
         currentState = GameState.PlayerTurn;
         activep = InactiveP();
@@ -228,28 +228,28 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => removing == 0); //?
         MMLog.Log_MageMatch("About to check the board.");
 
-        cascade = 0;
-        while (true) {
+        //cascade = 0;
+        //while (true) {
             yield return new WaitUntil(() => !animCont.IsAnimating() && removing == 0); //?
             hexGrid.CheckGrav(); // TODO make IEnum
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
-            List<TileSeq> seqMatches = boardCheck.MatchCheck();
-            if (seqMatches.Count > 0) { // if there's at least one MATCH
-                MMLog.Log_MageMatch("Resolving matches...");
-                yield return ResolveMatches(seqMatches);
-                cascade++;
-            } else {
+            //List<TileSeq> seqMatches = boardCheck.MatchCheck();
+            //if (seqMatches.Count > 0) { // if there's at least one MATCH
+            //    MMLog.Log_MageMatch("Resolving matches...");
+            //    yield return ResolveMatches(seqMatches);
+            //    cascade++;
+            //} else {
                 if (currentState == GameState.PlayerTurn) {
-                    if (cascade > 1) {
-                        eventCont.Cascade(cascade);
-                        cascade = 0;
-                    }
+                    //if (cascade > 1) {
+                    //    eventCont.Cascade(cascade);
+                    //    cascade = 0;
+                    //}
                     SpellCheck();
                 }
                 uiCont.UpdateDebugGrid();
-                break;
-            }
-        }
+                //break;
+            //}
+        //}
         MMLog.Log_MageMatch("Done checking.");
         checking--;
     }
@@ -257,38 +257,42 @@ public class MageMatch : MonoBehaviour {
     void SpellCheck() { 
         Character c = activep.character;
         List<TileSeq> spellSeqList = c.GetTileSeqList();
-        List<TileSeq> spellsOnBoard = boardCheck.SpellCheck(spellSeqList);
+        spellsOnBoard = boardCheck.CheckBoard(c.GetSpells());
         
-        for (int s = 0; s < spellSeqList.Count; s++) {
+        for (int s = 0; s < spellsOnBoard.Length; s++) {
             Spell sp = c.GetSpell(s);
             //Debug.Log("MAGEMATCH: Checking "+sp.name+"...");
-            bool spellIsOnBoard = false;
-            if (sp is CoreSpell) {
-                if (((CoreSpell)sp).IsReadyToCast()) {
-                    //Debug.Log("MAGEMATCH: " + sp.name + " is core, and there's no effect with tag=" + sp.effectTag);
-                    spellIsOnBoard = true;
-                } else {
-                    MMLog.Log_MageMatch(sp.name + " is core, but it's cooling down!");
-                }                    
-            } else { // could be cleaner.
+            //bool spellIsOnBoard = false;
+            //if (sp is CooldownSpell) {
+            //    if (((CooldownSpell)sp).IsReadyToCast()) {
+            //        //Debug.Log("MAGEMATCH: " + sp.name + " is core, and there's no effect with tag=" + sp.effectTag);
+            //        //spellIsOnBoard = true;
+            //    } else {
+            //        MMLog.Log_MageMatch(sp.name + " is core, but it's cooling down!");
+            //    }                    
+            //} else { // could be cleaner.
                 if (sp is SignatureSpell && !((SignatureSpell)sp).IsReadyToCast()) {
                     //Log(sp.name + " is signature, but not enough meter!");
                     continue;
                 }
-                for (int i = 0; i < spellsOnBoard.Count; i++) {
-                    TileSeq matchSeq = spellsOnBoard[i];
-                    if (matchSeq.MatchesTileSeq(sp.GetTileSeq())) {
-                        spellIsOnBoard = true;
-                        c.GetSpell(s).SetBoardSeq(matchSeq);
-                        break;
-                    }
-                }
-            }
 
-            if (spellIsOnBoard)
-                uiCont.ActivateSpellButton(activep, s);
-            else
-                uiCont.DeactivateSpellButton(activep, s); // needed?
+                //for (int i = 0; i < spellsOnBoard.Length; i++) {
+                    MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
+                    if (spellsOnBoard[s].Count > 0)
+                        uiCont.ActivateSpellButton(activep, s);
+                    else
+                        uiCont.DeactivateSpellButton(activep, s); // needed?
+
+                    // TODO boardseq stuff will be handled by the spell selection thing
+
+                    //TileSeq matchSeq = spellsOnBoard[i];
+                    //if (matchSeq.MatchesTileSeq(sp.GetTileSeq())) {
+                    //    spellIsOnBoard = true;
+                    //    c.GetSpell(s).SetBoardSeq(matchSeq);
+                    //    break;
+                    //}
+                //}
+            //}                
         }
     }
 
@@ -393,6 +397,7 @@ public class MageMatch : MonoBehaviour {
         actionsPerforming--;
     }
 
+    // TODO somewhere in here, spell prereq selection screen!
     public IEnumerator CastSpell(int spellNum) {
         MMLog.Log_MageMatch("   ---------- CAST SPELL BEGIN ----------");
         actionsPerforming++;
@@ -401,24 +406,43 @@ public class MageMatch : MonoBehaviour {
         Player p = activep;
         Spell spell = p.character.GetSpell(spellNum);
         if (p.AP >= spell.APcost) {
-            targeting.canceled = false;
-            uiCont.DeactivateAllSpellButtons(activep); // ?
-            p.SetCurrentSpell(spellNum);
+            targeting.selectionCanceled = false; // maybe not needed here
 
-            yield return spell.Cast();
+            yield return targeting.SpellSelectScreen(spellsOnBoard[spellNum]);
 
-            if (!targeting.WasCanceled()) { // should be an event callback?
-                eventCont.SpellCast(spell);
-                RemoveSeq(p.GetCurrentBoardSeq());
-                p.ApplySpellCosts();
-                yield return BoardChecking(); //?
+            if (!targeting.selectionCanceled) {
+                StartCoroutine(uiCont.GetButtonCont(activep, spellNum).Transition_MainView());
+
+                targeting.targetingCanceled = false;
+                uiCont.DeactivateAllSpellButtons(activep); // ?
+                p.SetCurrentSpell(spellNum);
+
+                if (spell is CoreSpell)
+                    yield return ((CoreSpell)spell).CastCore(targeting.GetSelection());
+                else
+                    yield return spell.Cast();
+
+                if (!targeting.WasCanceled()) { // should be an event callback?
+                    eventCont.SpellCast(spell);
+                    RemoveSeq(targeting.GetSelection());
+                    p.ApplySpellCosts();
+                    yield return BoardChecking(); //?
+                }
             }
-//			UIController.UpdateMoveText (activep.name + " casts " + spell.name + " for " + spell.APcost + " AP!!");
         } else {
             uiCont.UpdateMoveText("Not enough AP to cast!");
         }
         MMLog.Log_MageMatch("   ---------- CAST SPELL END ----------");
         actionsPerforming--;
+    }
+
+    public IEnumerator CancelSpell() {
+        targeting.CancelSelection();
+        for (int i = 0; i < spellsOnBoard.Length; i++) {
+            if (spellsOnBoard[i].Count > 0)
+                uiCont.ActivateSpellButton(activep, i);
+        }
+        yield return null;
     }
 
     public bool IsPerformingAction() { return actionsPerforming > 0; }

@@ -1,0 +1,13 @@
+To build the MMDebug library;
+
+1. Open MMDebug.sln in Visual Studio
+
+2. You need to include UnityEngine.dll from your Unity install. In the Solution Explorer (if you 
+don't see it, go to View->Solution Explorer) click on the dropdown arrow next to MMDebug in the tree
+view; then right click References and click Add Reference... Now click on Browse on the left and then
+the Browse... button on the bottom and navigate to the library. For me the path is:
+	C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll
+	
+3. Press Ctrl+Shift+B or go to Build->Build Solution to build the library
+
+4. Move the newly built MMDebug.dll from ...\Mage-Match\MMDebug\MMDebug\bin\Debug to the Assets/Plugins folder.

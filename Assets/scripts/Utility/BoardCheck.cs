@@ -6,7 +6,7 @@ using MMDebug;
 
 public class BoardCheck {
 
-	private List<TileSeq> matchSeqList, checkList; // dictionary, compare list
+	private List<Spell> checkList; // compare list
     private MageMatch mm;
     private HexGrid hexGrid;
     private List<SkipCheck> skips;
@@ -24,16 +24,26 @@ public class BoardCheck {
 	public BoardCheck(MageMatch mm){
         this.mm = mm;
         hexGrid = mm.hexGrid;
-
-        matchSeqList = new List<TileSeq> ();
 		skips = new List<SkipCheck> ();
-		// initialize list of possible basic matches
-		matchSeqList.Add (new TileSeq ("fffff"));
-		matchSeqList.Add (new TileSeq ("wwwww"));
-		matchSeqList.Add (new TileSeq ("eeeee"));
-		matchSeqList.Add (new TileSeq ("aaaaa"));
-		matchSeqList.Add (new TileSeq ("mmmmm"));
 	}
+
+    //TileSeq GetCoreSeq(Tile t) {
+    //    switch (t.element) {
+    //        case Tile.Element.Fire:
+    //            return new TileSeq("fffff");
+    //        case Tile.Element.Water:
+    //            return new TileSeq("wwwww");
+    //        case Tile.Element.Earth:
+    //            return new TileSeq("eeeee");
+    //        case Tile.Element.Air:
+    //            return new TileSeq("aaaaa");
+    //        case Tile.Element.Muscle:
+    //            return new TileSeq("mmmmm");
+    //        default:
+    //            MMLog.Log_BoardCheck("bad element for Core Sequence at " + t.col + ", " + t.row);
+    //            return null;
+    //    }
+    //}
 
     public int CheckColumn(int c){
 		int r = hexGrid.TopOfColumn(c);
@@ -76,107 +86,164 @@ public class BoardCheck {
         return counts;
     }
 
-	public List<TileSeq> MatchCheck(){
-		return CheckBoard (matchSeqList, true);
-	}
-
-	public List<TileSeq> SpellCheck(List<TileSeq> spells){ // TODO
-		return CheckBoard (spells, false);
-	}
-
-	List<TileSeq> CheckBoard(List<TileSeq> list, bool matchMode){
+	public List<TileSeq>[] CheckBoard(List<Spell> spells){
 		skips.Clear();
 
-		List<TileSeq> shortList; // for seqs that have matching first colors
-		List<TileSeq> returnList = new List<TileSeq>(); // list of all matching seqs to be returned
+		List<TileSeq>[] returnList = new List<TileSeq>[5]; // list of all matching seqs to be returned
+        for (int i = 0; i < 5; i++) {
+            returnList[i] = new List<TileSeq>();
+        }
+
 		for(int c = 0; c < HexGrid.numCols; c++){ // for each col
 			for(int r = hexGrid.BottomOfColumn(c); r <= hexGrid.TopOfColumn(c); r++){ // for each row
-				if (hexGrid.IsCellFilled(c, r)) { // if there's a tile there
-					shortList = new List<TileSeq>(list); // copies???? just same reference?????
-					for(int i = 0; i < shortList.Count; i++){ // for each TileSeq in seqList
-						TileSeq seq = shortList [i];
-						if (!hexGrid.GetTileAt(c, r).element.Equals(seq.GetElementAt (0))) { // remove any seqs that don't start with current color
-							shortList.Remove(seq);
-							i--;
-						}
-					}
 
-                    MMLog.Log_BoardCheck("tiles[" + c + ", " + r + "]: Shortlist: " + PrintSeqList(shortList));
-						 // copies?? - TODO
-					//Debug.Log("Trying dir = " + d + " with shortlist: " + PrintSeqList(shortList));
-					List<TileSeq> playList = CheckTile (c, r, shortList, matchMode);
-					if (playList != null)
-						returnList.AddRange(playList);
+				if (hexGrid.IsCellFilled(c, r)) { // if there's a tile there
+					List<TileSeq>[] playList = CheckTile (c, r, spells);
+
+                    if (playList != null) {
+                        List<TileSeq> spellSeqs;
+                        int total = 0;
+                        for (int i = 0; i < playList.Length; i++) {
+                            spellSeqs = playList[i];
+                            if(spellSeqs.Count > 0)
+                                returnList[i].AddRange(spellSeqs);
+                            total += spellSeqs.Count;
+                        }
+                        MMLog.Log_BoardCheck("Total for [" + c + "," + r + "]: " + total, MMLog.LogLevel.Standard);
+                    }
 				} else
-					break; // breaks just inner loop
+					break; // breaks just inner loop...eventually won't because of floating tiles
 			}	
 		} // --Ends checking loops
+
+        for (int i = 0; i < 5; i++) {
+            MMLog.Log_BoardCheck(spells[i].name + " --> " + PrintSeqList(returnList[i]), MMLog.LogLevel.Standard);
+        }
 
 		return returnList;
 	}
 
-	List<TileSeq> CheckTile(int c, int r, List<TileSeq> shortList, bool matchMode){
-		// if check matches color of current, keep checking the line
-		List<TileSeq> returnList = new List<TileSeq> ();
-		if (!hexGrid.GetTileBehavAt (c, r).ableMatch) // handle current tile not matchable
+	List<TileSeq>[] CheckTile(int c, int r, List<Spell> spells){
+        // if check matches color of current, keep checking the line
+		List<TileSeq>[] returnList = new List<TileSeq>[5];
+        for (int i = 0; i < 5; i++) {
+            returnList[i] = new List<TileSeq>();
+        }
+
+        if (!hexGrid.GetTileBehavAt (c, r).ableMatch) // handle current tile not matchable
 			return returnList;
 
-		// direction loop
-		for (int dir = 0; dir < 6; dir++) {
+        List<Spell> shortList = new List<Spell>(spells);
+        Tile currentTile = hexGrid.GetTileAt(c, r);
+        for (int i = 0; i < shortList.Count; i++) { // for each TileSeq in seqList
+
+            // TODO if Spell is CoreSpell, add the right sequence...
+            if (shortList[i] is CoreSpell) {
+                //MMLog.Log_BoardCheck("Setting " + currentTile.element + " as current elem.", MMLog.LogLevel.Standard);
+                ((CoreSpell)shortList[i]).currentElem = currentTile.element;
+            } else {
+                TileSeq seq = shortList[i].GetTileSeq();
+                if (!currentTile.element.Equals(seq.GetElementAt(0))) { // remove any seqs that don't start with current color
+                    shortList.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
+        
+        if (shortList.Count == 0)
+            return returnList;
+
+        string sps = "";
+        foreach (Spell s in shortList) {
+            sps += s.GetTileSeq().SeqAsString() + ", ";
+        }
+
+        //MMLog.Log_BoardCheck("tiles[" + c + ", " + r + "]: Shortlist: " + sps, MMLog.LogLevel.Standard);
+
+        // for each direction...
+        for (int dir = 0; dir < 6; dir++) {
 			bool skip = false;
 			foreach (SkipCheck s in skips) {
 				if (s.col == c && s.row == r && s.dir == dir) {
-                    MMLog.Log_BoardCheck("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir);
+                    //MMLog.Log_BoardCheck("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir);
 					skip = true;
 					break;
 				}
 			}
-			if (skip)
+			if (skip) // or empty?
 				continue;
-			
-//			Debug.Log("dir = " + dir);
-			checkList = new List<TileSeq>(shortList); // local?
 
-			for (int i = 0; i < checkList.Count; i++) { // replaced a foreach-loop
-				TileSeq checkSeq = checkList [i]; // the sequence being compared to
+            checkList = new List<Spell>(shortList);
+            List<TileSeq> seqs = new List<TileSeq>(); // updated list of any seqs
+            foreach (Spell s in shortList) {
+                seqs.Add(new TileSeq(currentTile));
+            }
 
-				TileSeq outSeq = new TileSeq (hexGrid.GetTileAt(c, r)); // the seq being added to to be added to returnList
-				int dc = 0, dr = 0; // difference from current tile pos
-				for (int seqIndex = 1; seqIndex < checkSeq.sequence.Count; seqIndex++) {
-					bool skipCurrentSeq = false;
-					if (!hexGrid.HasAdjacentCell (c + dc, r + dr, dir))
-						skipCurrentSeq = true;
-					else {
-						hexGrid.GetOffset (dir, out dc, out dr);
-						dc *= seqIndex;
-						dr *= seqIndex;
-					}
+            int dc = 0, dr = 0;
+            // for each tile in the direction...
+            for (int seqIndex = 1; seqIndex < 5; seqIndex++) { // max seq length is 5
+                bool skipCurrentSeq = false;
+                if (!hexGrid.HasAdjacentCell(c + dc, r + dr, dir))
+                    skipCurrentSeq = true;
+                else {
+                    hexGrid.GetOffset(dir, out dc, out dr);
+                    dc *= seqIndex;
+                    dr *= seqIndex;
+                    if (!hexGrid.IsCellFilled(c + dc, r + dr))
+                        skipCurrentSeq = true;
+                }
 
-                    MMLog.Log_BoardCheck("Checking tiles[" + (c + dc) + ", " + (r + dr) + "] for seq: " + PrintSeq (checkSeq, false));
+                TileBehav ctb = hexGrid.GetTileBehavAt(c + dc, r + dr);
+                if (skipCurrentSeq || !ctb.ableMatch) {
+                    for (int i = 0; i < checkList.Count; i++) {
+                        if (checkList[i] is CoreSpell && seqs[i].GetSeqLength() >= 3) {
+                            AddMatchSkips(seqs[i], dir);
+                            returnList[checkList[i].index].Add(seqs[i]);
+                        }
+                    }
+                    break;
+                }
 
-					if (!skipCurrentSeq && 
-						hexGrid.IsCellFilled(c + dc, r + dr) && // if there's something there...
-						hexGrid.GetTileBehavAt(c + dc, r + dr).ableMatch && // and it can be matched...
-						hexGrid.GetTileAt(c + dc, r + dr).element.Equals(checkSeq.GetElementAt (seqIndex))) { // ...and the next tile matches the next in the seq
-						outSeq.sequence.Add (hexGrid.GetTileAt(c + dc, r + dr));
-					} else {
-						if (matchMode && outSeq.GetSeqLength () >= 3) {
-							AddMatchSkips (outSeq, dir);
-							returnList.Add (outSeq);
-						}
-						break;
-					}
+                //MMLog.Log_BoardCheck("About to check (" + (c + dc) + "," + (r + dr) + "), seqs=" + PrintSeqList(seqs), MMLog.LogLevel.Standard);
 
-					if (seqIndex == checkSeq.sequence.Count - 1) {
-						if (matchMode && outSeq.GetSeqLength () == 5) {
-							MMLog.Log_BoardCheck("Just picked up a 5-match!");
-							AddMatchSkips (outSeq, dir);
-						}
-						returnList.Add (outSeq);
-					}
-				} // --End of seq loop
-			} // --End of checkList loop
-		} // --End of dir loop
+                // for each spell still in the list...
+                for (int i = 0; i < checkList.Count; i++) {
+                    Spell s = checkList[i];
+                    bool remove = false;
+
+                    Tile.Element nextElem;
+                    if (s is CoreSpell) {
+                        nextElem = ((CoreSpell)s).currentElem; // could just be local var
+                        //MMLog.Log_BoardCheck("Checking core spell with elem " + nextElem, MMLog.LogLevel.Standard);
+                    } else
+                        nextElem = s.GetTileSeq().GetElementAt(seqIndex);
+
+                    if (ctb.tile.element.Equals(nextElem)) { // if the next tile matches the next in the seq
+                        seqs[i].sequence.Add(ctb.tile);
+                        //MMLog.Log_BoardCheck("Next tile matches! " + checkList[i].PrintSeq() + " length=" + seqs[i].GetSeqLength(), MMLog.LogLevel.Standard);
+
+                        if (seqs[i].GetSeqLength() == s.GetLength()) { // complete seq!
+                            returnList[checkList[i].index].Add(seqs[i]);
+                            remove = true;
+                        }
+                    } else { // it doesn't match...
+                        //MMLog.Log_BoardCheck("Seq " + checkList[i].PrintSeq() + " was not found!", MMLog.LogLevel.Standard);
+                        if (checkList[i] is CoreSpell && seqs[i].GetSeqLength() >= 3) {
+                            AddMatchSkips(seqs[i], dir);
+                            returnList[checkList[i].index].Add(seqs[i]);
+                        }
+                        remove = true;
+                    }
+
+                    if (remove) {
+                        checkList.RemoveAt(i);
+                        seqs.RemoveAt(i);
+                        i--;
+                    }
+                } // end of spell check
+            } // end of direction line
+		} // end of dir loop
 
 		return returnList;
 	}

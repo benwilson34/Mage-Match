@@ -178,7 +178,7 @@ public class Player {
 
     public bool ThisIsLocal() { return mm.myID == id; }
 
-    public void InitAP() { AP = 3; }
+    public void InitAP() { AP = 4; }
 
     public void SetCurrentSpell(int index) {
         currentSpell = character.GetSpell(index);

@@ -169,12 +169,14 @@ public class InputController : MonoBehaviour {
                         break;
 
                     case TileBehav.TileState.Placed:
-//					    Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
-                        if (targeting.IsTargetMode()
-//					        && Targeting.currentTMode == Targeting.TargetMode.Tile
-                            ) {
-                            MMLog.Log_InputCont("TBMouseDown called and tile is placed.");
-                            targeting.OnTBTarget(tb);
+                    //					    Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
+                    if (targeting.IsTargetMode()
+                        //					        && Targeting.currentTMode == Targeting.TargetMode.Tile
+                        ) {
+                        MMLog.Log_InputCont("TBMouseDown called and tile is placed.");
+                        targeting.OnTBTarget(tb);
+                    } else if (targeting.IsSelectionMode()) {
+                        targeting.OnSelection(tb);
 //					    } else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
                         } else { // disable during targeting screen?

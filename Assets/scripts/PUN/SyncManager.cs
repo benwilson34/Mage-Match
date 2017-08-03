@@ -191,6 +191,28 @@ public class SyncManager : PunBehaviour {
         mm.targeting.CancelTargeting();
     }
 
+    public void SendTBSelection(TileBehav tb) {
+        if (mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleTBSelection", PhotonTargets.Others, tb.tile.col, tb.tile.row);
+        }
+    }
+    [PunRPC]
+    public void HandleTBSelection(int col, int row) {
+        mm.targeting.OnSelection(mm.hexGrid.GetTileBehavAt(col, row));
+    }
+
+    public void SendCancelSelection() {
+        if (mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleCancelSelection", PhotonTargets.Others);
+        }
+    }
+    [PunRPC]
+    public void HandleCancelSelection() {
+        mm.targeting.CancelSelection();
+    }
+
     public void SendEndDragTarget() {
         if (mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);

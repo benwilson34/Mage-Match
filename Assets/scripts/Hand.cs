@@ -18,7 +18,7 @@ public class Hand {
     public Hand(MageMatch mm, Player p) {
         tiles = new List<TileBehav>();
         slots = new HandSlot[maxHandSize];
-        placeholderPF = Resources.Load("prefabs/placeholder") as GameObject;
+        placeholderPF = Resources.Load("prefabs/ui/placeholder") as GameObject;
         this.mm = mm;
         this.p = p;
         SetHandPos();
