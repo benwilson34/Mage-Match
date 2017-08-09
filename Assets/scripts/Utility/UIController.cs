@@ -80,7 +80,7 @@ public class UIController : MonoBehaviour {
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
         mm.eventCont.gameAction += OnGameAction;
         mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
-        mm.eventCont.cascade += OnCascade;
+        //mm.eventCont.cascade += OnCascade;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
         mm.eventCont.playerMeterChange += OnPlayerMeterChange;
     }

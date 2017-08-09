@@ -12,7 +12,6 @@ public class Spell {
 
     protected MageMatch mm;
 	protected TileSeq seq;
-	protected TileSeq boardSeq;
 
 	public delegate IEnumerator MySpellEffect();
 	protected MySpellEffect effect;
@@ -20,7 +19,6 @@ public class Spell {
 	public Spell(int index, string name, string seq, int APcost, MySpellEffect effect) 
         : this(index, name, APcost, effect) {
         this.seq = new TileSeq (seq);
-        //this.boardSeq = new TileSeq(); // empty seq...be wary of errors...
         SymmetryCheck(seq);
     }
 
@@ -57,14 +55,6 @@ public class Spell {
 
     public virtual int GetLength() { return seq.GetSeqLength(); }
 
-	public void SetBoardSeq(TileSeq boardSeq){
-		this.boardSeq = boardSeq;
-	}
-
-	public TileSeq GetBoardSeq(){
-		return boardSeq;
-	}
-
     public string PrintSeq() { return seq.SeqAsString(); }
 
 }
@@ -80,7 +70,6 @@ public class CooldownSpell : Spell {
     public CooldownSpell(int index, string name, int cooldown, int APcost, MySpellEffect effect) : base(index, name, APcost, effect) { // core spell
         this.cooldown = cooldown;
         this.seq = new TileSeq(); // empty seq...be wary of errors...
-        this.boardSeq = new TileSeq(); // empty seq...be wary of errors...
     }
 
     public override IEnumerator Cast() {
@@ -127,7 +116,6 @@ public class CoreSpell : Spell {
         :base(index, name, APcost, null) {
         this.coreEffect = coreEffect;
         seq = new TileSeq(); // empty seq...be wary of errors...
-        boardSeq = new TileSeq(); // empty seq...be wary of errors...
     }
 
     public IEnumerator CastCore(TileSeq seq) { // not a huge fan of this

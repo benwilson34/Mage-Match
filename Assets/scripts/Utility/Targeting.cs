@@ -29,8 +29,8 @@ public class Targeting {
     public delegate List<TileBehav> TileFilterFunc(List<TileBehav> tbs);
     public delegate List<CellBehav> CellFilterFunc(List<CellBehav> cbs);
 
-    public Targeting() {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
+    public Targeting(MageMatch mm) {
+        this.mm = mm;
     }
 
     public bool IsTargetMode() {
@@ -278,7 +278,7 @@ public class Targeting {
         mm.syncManager.SendClearTargets();
 
         Player p = mm.ActiveP();
-        int prereqs = p.GetCurrentBoardSeq().sequence.Count;
+        int prereqs = GetSelection().sequence.Count;
         for (int i = 0; i < outlines.Count - prereqs;) { // clear just the target outlines
             GameObject go = outlines[prereqs];
             GameObject.Destroy(go);

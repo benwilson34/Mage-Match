@@ -213,12 +213,12 @@ public class EventController {
         RemoveEvent("match", ev);
     }
 
-    public delegate void CascadeEvent(int id, int chain);
-    public event CascadeEvent cascade;
-    public void Cascade(int chain) {
-        if (cascade != null)
-            cascade.Invoke(mm.ActiveP().id, chain);
-    }
+    //public delegate void CascadeEvent(int id, int chain);
+    //public event CascadeEvent cascade;
+    //public void Cascade(int chain) {
+    //    if (cascade != null)
+    //        cascade.Invoke(mm.ActiveP().id, chain);
+    //}
 
     public delegate void TileRemoveEvent(int id, TileBehav tb);
     public event TileRemoveEvent tileRemove;

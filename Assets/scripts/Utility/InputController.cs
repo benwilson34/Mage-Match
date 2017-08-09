@@ -11,7 +11,7 @@ public class InputController : MonoBehaviour {
     private GameObject dropTile;
     private bool dropping = false;
 
-	private Vector3 dragClick;
+    private Vector3 dragClick;
 	private bool dragged = false;
 
 	private bool lastClick = false, nowClick = false;
@@ -215,7 +215,7 @@ public class InputController : MonoBehaviour {
                         targeting.currentTMode == Targeting.TargetMode.Drag) {
                         targeting.OnTBTarget(tb); // maybe its own method?
                     }
-                    if (!ActionNotAllowed())
+                    if (!ActionNotAllowed() || mm.prompt.currentMode == Prompt.PromptMode.Swap)
 				        SwapCheck (tb);
 				    break;
 			}
@@ -234,9 +234,7 @@ public class InputController : MonoBehaviour {
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
 
                             if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropTile)) {
-
                                 mm.LocalP().hand.ReleaseTile(tb); //?
-
                             } else {
                                 mm.LocalP().hand.ClearPlaceholder(); //?
                             }
@@ -257,30 +255,30 @@ public class InputController : MonoBehaviour {
 		if(Vector3.Distance(mouse, dragClick) > 50 && dragged){ // if dragged more than 50 px away
 			mouse -= dragClick;
 			mouse.z = 0;
-			float angle = Vector3.Angle(mouse, Vector3.right);
-			if (mouse.y < 0)
-				angle = 360 - angle;
-			//				Debug.MMLog.Log_InputCont("mouse = " + mouse.ToString() + "; angle = " + angle);
+            Transform t = new GameObject().transform;
+            t.position = mouse;
+
+            //MMLog.Log_InputCont("mouse = " + t.position.ToString());
+            t.RotateAround(Vector3.zero, Vector3.forward, -30f);
+            float angle = Vector3.Angle(Vector3.up, t.position);
+            if (t.position.x < 0)
+                angle = 360 - angle;
+
+            //MMLog.Log_InputCont("mouse = " + t.position.ToString() + "; angle = " + angle);
+
 			dragged = false; // TODO move into cases below for continuous dragging
-			if (angle < 60) {         // NE
-				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 1))
-					mm.PlayerSwapTiles(tile.col, tile.row, tile.col + 1, tile.row + 1);
-			} else if (angle < 120) { // N
-				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 0))
-					mm.PlayerSwapTiles(tile.col, tile.row, tile.col, tile.row + 1);
-			} else if (angle < 180) { // NW
-				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 5))
-					mm.PlayerSwapTiles(tile.col, tile.row, tile.col - 1, tile.row);
-			} else if (angle < 240) { // SW
-				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 4))
-					mm.PlayerSwapTiles(tile.col, tile.row, tile.col - 1, tile.row - 1);
-			} else if (angle < 300) { // S
-				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 3))
-					mm.PlayerSwapTiles(tile.col, tile.row, tile.col, tile.row - 1);
-			} else {                  // SE
-				if (mm.hexGrid.HasAdjacentCell(tile.col, tile.row, 2))
-					mm.PlayerSwapTiles(tile.col, tile.row, tile.col + 1, tile.row);
-			}
+            int dir = (int)Mathf.Floor(angle / 60);
+            int c2, r2;
+            mm.hexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
+            if (c2 == -1 || r2 == -1)
+                return;
+
+            if (mm.prompt.currentMode == Prompt.PromptMode.Swap) {
+                // intercept swaps for Prompt
+                mm.prompt.SetSwaps(tile.col, tile.row, c2, r2);
+            } else
+                mm.PlayerSwapTiles(tile.col, tile.row, c2, r2);
+
 		}
 	}
 

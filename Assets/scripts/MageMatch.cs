@@ -21,6 +21,7 @@ public class MageMatch : MonoBehaviour {
     public Commish commish;
     public TurnTimer timer;
     public Targeting targeting;
+    public Prompt prompt;
     public EffectController effectCont;
     public EventController eventCont;
     public AudioController audioCont;
@@ -50,7 +51,8 @@ public class MageMatch : MonoBehaviour {
         uiCont.Init();
         timer = gameObject.GetComponent<TurnTimer>();
         effectCont = new EffectController(this); //?
-        targeting = new Targeting();
+        targeting = new Targeting(this);
+        prompt = new Prompt(this);
         audioCont = new AudioController(this);
         LoadPrefabs();
         syncManager = GetComponent<SyncManager>();
@@ -211,7 +213,7 @@ public class MageMatch : MonoBehaviour {
         uiCont.SetDrawButton(activep, false);
 
         currentState = GameState.CommishTurn;
-        //yield return commish.CTurn();
+        yield return commish.CTurn();
 
         currentState = GameState.PlayerTurn;
         activep = InactiveP();
@@ -296,24 +298,24 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
-    IEnumerator ResolveMatches(List<TileSeq> seqList) {
-        matchesResolving++;
-        MMLog.Log_MageMatch("   ---------- MATCH BEGIN ----------");
-        MMLog.Log_MageMatch("At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
-        if (currentState != GameState.CommishTurn) {
-            MMLog.Log_MageMatch("Match was made by a player!");
-            string[] seqs = GetTileSeqs(seqList);
-            RemoveSeqList(seqList); // hopefully putting this first makes it more responsive?
-            yield return eventCont.Match(seqs); // raise player Match event
-        } else {
-            eventCont.CommishMatch(GetTileSeqs(seqList)); // raise CommishMatch event
-            RemoveSeqList(seqList);
-        }
+    //IEnumerator ResolveMatches(List<TileSeq> seqList) {
+    //    matchesResolving++;
+    //    MMLog.Log_MageMatch("   ---------- MATCH BEGIN ----------");
+    //    MMLog.Log_MageMatch("At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
+    //    if (currentState != GameState.CommishTurn) {
+    //        MMLog.Log_MageMatch("Match was made by a player!");
+    //        string[] seqs = GetTileSeqs(seqList);
+    //        RemoveSeqList(seqList); // hopefully putting this first makes it more responsive?
+    //        yield return eventCont.Match(seqs); // raise player Match event
+    //    } else {
+    //        eventCont.CommishMatch(GetTileSeqs(seqList)); // raise CommishMatch event
+    //        RemoveSeqList(seqList);
+    //    }
 
-        yield return BoardChecking();
-        MMLog.Log_MageMatch("   ---------- MATCH END ----------");
-        matchesResolving--;
-    }
+    //    yield return BoardChecking();
+    //    MMLog.Log_MageMatch("   ---------- MATCH END ----------");
+    //    matchesResolving--;
+    //}
 
 
     #region ----- Game Actions -----

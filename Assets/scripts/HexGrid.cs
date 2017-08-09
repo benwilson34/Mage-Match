@@ -141,7 +141,7 @@ public class HexGrid {
 	}
 
 	// TODO handle floating things, once they are implemented
-	public List<TileBehav> GetPlacedTiles(){
+	public List<TileBehav> GetPlacedTiles(TileSeq skip = null){
 		List<TileBehav> returnList = new List<TileBehav> ();
 		for(int c = 0; c < numCols; c++){ // for each col
 			for(int r = BottomOfColumn(c); r <= TopOfColumn(c); r++){ // for each row
@@ -151,6 +151,26 @@ public class HexGrid {
 					break; // breaks just inner loop
 			}	
 		}
+
+        // if skip is provided, remove those TBs
+        if (skip != null) {
+            List<Tile> skips = new List<Tile>(skip.sequence);
+            for (int i = 0; i < returnList.Count; i++) {
+                for (int s = 0; s < skips.Count; s++) {
+                    if (skips[s].HasSamePos(returnList[i].tile)) {
+                        returnList.RemoveAt(i);
+                        i--;
+                        skips.RemoveAt(s);
+                        s--;
+                        break;
+                    }
+                }
+
+                if (skips.Count == 0)
+                    break;
+            }
+        }
+
 		return returnList;
 	}
 		
@@ -191,6 +211,17 @@ public class HexGrid {
 		GetOffset (dir, out dc, out dr);
 		return CellExists (col + dc, row + dr);
 	}
+
+    public void GetAdjacentTile(int c1, int r1, int dir, out int c2, out int r2) {
+        c2 = r2 = -1;
+        int dc, dr;
+        GetOffset(dir, out dc, out dr);
+        if(!CellExists(c1 + dc, r1 + dr))
+            return;
+
+        c2 = c1 + dc;
+        r2 = r1 + dr;
+    }
 
     public bool CellsAreAdjacent(Tile t1, Tile t2) {
         if (System.Math.Abs(t1.col - t2.col) > 1) return false;

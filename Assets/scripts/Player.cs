@@ -195,10 +195,6 @@ public class Player {
         mm.eventCont.GameAction(false);
     }
 
-    public TileSeq GetCurrentBoardSeq() {
-        return currentSpell.GetBoardSeq();
-    }
-
     // buff/debuff stuff could be a switch if it's too unwieldy
     public void ChangeBuff_DmgMult(float d) {
         MMLog.Log_Player(name + " had dmg multiply buff changed to " + d);

@@ -52,7 +52,7 @@ public class Stats {
         mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
         mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
-        mm.eventCont.cascade += OnCascade;
+        //mm.eventCont.cascade += OnCascade;
         mm.eventCont.tileRemove += OnTileRemove;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
     }
@@ -163,13 +163,13 @@ public class Stats {
         yield return null;
     }
 
-    public void OnCascade(int id, int chain) {
-        report.AppendLine("...cascade of " + chain + " matches");
-        PlayerStat ps = GetPS(id);
-        ps.cascades++;
-        if (ps.longestCascade < chain)
-            ps.longestCascade = chain;
-    }
+    //public void OnCascade(int id, int chain) {
+    //    report.AppendLine("...cascade of " + chain + " matches");
+    //    PlayerStat ps = GetPS(id);
+    //    ps.cascades++;
+    //    if (ps.longestCascade < chain)
+    //        ps.longestCascade = chain;
+    //}
 
     public void OnTileRemove(int id, TileBehav tb) {
         if (!mm.IsCommishTurn()) {
