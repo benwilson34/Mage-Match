@@ -30,7 +30,7 @@ public class Enfuego : Character {
 
     public IEnumerator DoNothing() {
         mm.uiCont.UpdateMoveText("This spell does nothing. Thanks!");
-        yield return new WaitForSeconds(1.5f);
+        yield return null;
     }
 
     // ----- spells -----

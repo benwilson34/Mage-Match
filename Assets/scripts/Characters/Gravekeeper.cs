@@ -100,7 +100,7 @@ public class Gravekeeper : Character {
     }
 
     public IEnumerator TheOogieBoogie() {
-        yield return targeting.WaitForTileTarget(2);
+        yield return targeting.WaitForTileTarget(2, TOB_Filter);
         if (targeting.WasCanceled())
             yield return null;
 
@@ -112,6 +112,15 @@ public class Gravekeeper : Character {
             tb.TriggerEnchantment(); // that easy?
 
         yield return null;
+    }
+
+    public List<TileBehav> TOB_Filter(List<TileBehav> tbs) {
+        List<TileBehav> filterTBs = new List<TileBehav>();
+        foreach (TileBehav tb in tbs) {
+            if (tb.GetEnchType() == Enchantment.EnchType.Zombify)
+                filterTBs.Add(tb);
+        }
+        return filterTBs;
     }
 
     public IEnumerator PartyCrashers() {
