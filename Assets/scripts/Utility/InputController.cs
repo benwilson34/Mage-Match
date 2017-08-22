@@ -8,16 +8,16 @@ public class InputController : MonoBehaviour {
 
 	private MageMatch mm;
     private Targeting targeting;
-    private GameObject dropTile;
     private bool dropping = false;
 
     private Vector3 dragClick;
 	private bool dragged = false;
 
 	private bool lastClick = false, nowClick = false;
-	private TileBehav clickTB; // needed?
-	private CellBehav clickCB; // needed?
-	private bool isClickTB = false;
+	private HandObject clickHex; // needed?
+    private HandObject dropHex;
+    private CellBehav clickCB; // needed?
+	private bool isClickHex = false;
 
 	void Start () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -43,20 +43,20 @@ public class InputController : MonoBehaviour {
 		}
 
 		if (!lastClick && nowClick) { // MouseDown
-			if (isClickTB)
-				TBMouseDown(clickTB);
+			if (isClickHex)
+				HexMouseDown(clickHex);
 			else
 				CBMouseDown(clickCB);
 			lastClick = true;
 		} else if (lastClick && nowClick) { // MouseDrag
-			if (isClickTB)
-				TBMouseDrag(clickTB);
+			if (isClickHex)
+				HexMouseDrag(clickHex);
 		    else {
 //				CBMouseDrag(clickCB);
 			}
 		} else if (lastClick && !nowClick) { // MouseUp
-			if (isClickTB)
-				TBMouseUp(clickTB);
+			if (isClickHex)
+				HexMouseUp(clickHex);
 			else {
 //				CBMouseUp(clickCB);
 			}
@@ -65,15 +65,15 @@ public class InputController : MonoBehaviour {
 	}
 
 	bool GetClick(){
-		isClickTB = false;
+		isClickHex = false;
 		Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
 
 		if (targeting.currentTMode != Targeting.TargetMode.Cell) {
-			TileBehav tb = GetMouseTile (hits);
-			if (tb != null) {
-				clickTB = tb;
-				isClickTB = true;
+			HandObject hex = GetMouseHex(hits);
+			if (hex != null) {
+				clickHex = hex;
+				isClickHex = true;
 				return true; // void?
 			}
 		}
@@ -86,12 +86,15 @@ public class InputController : MonoBehaviour {
 		return false;
 	}
 
-	TileBehav GetMouseTile(RaycastHit2D[] hits){
+	HandObject GetMouseHex(RaycastHit2D[] hits){
 		foreach (RaycastHit2D hit in hits) {
 			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
 			if (tb != null)
 				return tb;
-		}
+            HandObject hex = hit.collider.GetComponent<HandObject>();
+            if (hex != null)
+                return hex;
+        }
 		return null;
 	}
 
@@ -146,41 +149,41 @@ public class InputController : MonoBehaviour {
     TileBehav GetDragTarget() {
         Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
-        return GetMouseTile(hits);
+        return (TileBehav)GetMouseHex(hits);
     }
 
     bool MenuOpen() { return mm.uiCont.IsMenu(); }
 
     // ------------------------------- TB & CB handling -------------------------------
 
-    void TBMouseDown(TileBehav tb){
+    void HexMouseDown(HandObject hex){
 		if (!mm.IsEnded ()) { // if the game isn't done
 			//if (!mm.menu) { // if the menu isn't open
-                switch (tb.currentState) {
-                    case TileBehav.TileState.Hand:
-                        if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsTileMine(tb)) {
+                switch (hex.currentState) {
+                    case HandObject.State.Hand:
+                        if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsHexMine(hex)) {
                             dropping = true;
 
-                            tb.GetComponent<SpriteRenderer>().sortingOrder = 1;
-                            dropTile = tb.gameObject;
-                            mm.LocalP().hand.GrabTile(tb); //?
-                            mm.eventCont.GrabTile(mm.myID, tb.tile.element);
+                            hex.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                            dropHex = hex;
+                            mm.LocalP().hand.GrabHex(hex); //?
+                            mm.eventCont.GrabTile(mm.myID, hex.tag);
                         }
                         break;
 
-                    case TileBehav.TileState.Placed:
+                    case HandObject.State.Placed:
                     //					    Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
-                    if (targeting.IsTargetMode()
-                        //					        && Targeting.currentTMode == Targeting.TargetMode.Tile
-                        ) {
-                        MMLog.Log_InputCont("TBMouseDown called and tile is placed.");
-                        targeting.OnTBTarget(tb);
-                    } else if (targeting.IsSelectionMode()) {
-                        targeting.OnSelection(tb);
+                        if (targeting.IsTargetMode()
+                            //					        && Targeting.currentTMode == Targeting.TargetMode.Tile
+                            ) {
+                            MMLog.Log_InputCont("TBMouseDown called and tile is placed.");
+                            targeting.OnTBTarget((TileBehav)hex);
+                        } else if (targeting.IsSelectionMode()) {
+                            targeting.OnSelection((TileBehav)hex);
 //					    } else if (IsTargetMode () && currentTMode == TargetMode.Drag){
 ////						OnDragTarget (tbs); // TODO
                         } else { // disable during targeting screen?
-                            dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+                            dragClick = Camera.main.WorldToScreenPoint(hex.transform.position);
                             dragged = true;
                         }
                         break;
@@ -192,49 +195,47 @@ public class InputController : MonoBehaviour {
 		}
 	}
 
-	void TBMouseDrag(TileBehav tb){
+	void HexMouseDrag(HandObject hex){
 //		Debug.Log ("TBMouseDrag called.");
 		if (!mm.IsEnded () && !targeting.IsTargetMode()) {
-			switch (tb.currentState) {
-			    case TileBehav.TileState.Hand:
+			switch (hex.currentState) {
+			    case HandObject.State.Hand:
                     if (!MenuOpen() && dropping) {
                         Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                         cursor.z = 0;
-                        tb.transform.position = cursor;
+                        hex.transform.position = cursor;
 
-                        // TODO check for HandSlots under...
                         RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
                         HandSlot slot = GetHandSlot(hits);
-                        if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10) {
+                        if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
                             mm.LocalP().hand.Rearrange(slot);
-                        }
                     }
 				    break;
-			    case TileBehav.TileState.Placed:
+			    case HandObject.State.Placed:
                     if (targeting.IsTargetMode() && 
                         targeting.currentTMode == Targeting.TargetMode.Drag) {
-                        targeting.OnTBTarget(tb); // maybe its own method?
+                        targeting.OnTBTarget((TileBehav)hex); // maybe its own method?
                     }
                     if (!ActionNotAllowed() || mm.prompt.currentMode == Prompt.PromptMode.Swap)
-				        SwapCheck (tb);
+				        SwapCheck((TileBehav)hex);
 				    break;
 			}
 		}
 	}
 
-	void TBMouseUp(TileBehav tb){
+	void HexMouseUp(HandObject hex){
         if (!mm.IsEnded () && !targeting.IsTargetMode()) {
             if (!MenuOpen()) { //?
-                switch (tb.currentState) {
-                    case TileBehav.TileState.Hand:
+                switch (hex.currentState) {
+                    case HandObject.State.Hand:
                         if (dropping) { // will always be if it's in the hand?
-                            tb.GetComponent<SpriteRenderer>().sortingOrder = 0;
+                            hex.GetComponent<SpriteRenderer>().sortingOrder = 0;
                             Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                             RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
 
-                            if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropTile)) {
-                                mm.LocalP().hand.ReleaseTile(tb); //?
+                            if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropHex)) {
+                                mm.LocalP().hand.ReleaseTile(hex); //?
                             } else {
                                 mm.LocalP().hand.ClearPlaceholder(); //?
                             }
@@ -263,6 +264,8 @@ public class InputController : MonoBehaviour {
             float angle = Vector3.Angle(Vector3.up, t.position);
             if (t.position.x < 0)
                 angle = 360 - angle;
+
+            Destroy(t.gameObject);
 
             //MMLog.Log_InputCont("mouse = " + t.position.ToString() + "; angle = " + angle);
 

@@ -37,7 +37,7 @@ public class HexGrid {
             if (IsCellFilled(col, r)) {
                 if (r == top) {
                     // handle top of column getting pushed out
-                    mm.RemoveTile(col, r, false);
+                    mm.tileMan.RemoveTile(col, r, false);
                     continue;
                 }
                 tileGrid[col, r].ChangePos(col, r + 1);

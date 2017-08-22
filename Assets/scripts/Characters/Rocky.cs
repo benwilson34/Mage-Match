@@ -13,7 +13,7 @@ public class Rocky : Character {
         this.mm = mm;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
-        spellfx = mm.spellfx;
+        objFX = mm.objFX;
         characterName = "Rocky";
         spells = new Spell[4];
 
@@ -32,8 +32,8 @@ public class Rocky : Character {
         SetDeckElements(5, 0, 45, 30, 20);
 
         spells[0] = new Spell(0, "NOTHING", "EEMEE", 1, Sinkhole); //
-        spells[1] = new Spell(1, "Sinkhole", "EAAE", 1, spellfx.Deal496Dmg); //
-        spells[2] = new Spell(2, "Boulder Barrage", "MMEE", 1, spellfx.Deal496Dmg); //
+        spells[1] = new Spell(1, "Sinkhole", "EAAE", 1, objFX.Deal496Dmg); //
+        spells[2] = new Spell(2, "Boulder Barrage", "MMEE", 1, objFX.Deal496Dmg); //
         spells[3] = new Spell(3, "Stalagmite", "AEE", 1, Stalagmite);
     }
 
@@ -45,8 +45,8 @@ public class Rocky : Character {
         SetDeckElements(0, 25, 40, 10, 25);
 
         spells[0] = new Spell(0, "NOTHING", "EEMEE", 1, Sinkhole); //
-        spells[1] = new Spell(1, "Living Flesh Armor", "EWWE", 1, spellfx.Deal496Dmg); //
-        spells[2] = new Spell(2, "Figure-Four Leglock", "MEEM", 1, spellfx.Deal496Dmg); //
+        spells[1] = new Spell(1, "Living Flesh Armor", "EWWE", 1, objFX.Deal496Dmg); //
+        spells[2] = new Spell(2, "Figure-Four Leglock", "MEEM", 1, objFX.Deal496Dmg); //
         spells[3] = new Spell(3, "Stalagmite", "AEE", 1, Stalagmite);
     }
 
@@ -95,11 +95,11 @@ public class Rocky : Character {
         int col = cb.col;
         int bottomr = hexGrid.BottomOfColumn(col);
         // hardset bottom three cells of column
-        GameObject stone;
+        HandObject stone;
         for (int i = 0; i < 3; i++) {
-            stone = mm.GenerateToken("stone");
+            stone = tileMan.GenerateToken(playerID, "stone");
             stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
-            mm.PutTile(stone, col, bottomr + i);
+            mm.PutTile(stone.gameObject, col, bottomr + i);
         }
     }
 

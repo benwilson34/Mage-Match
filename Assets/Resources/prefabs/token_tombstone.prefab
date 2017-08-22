@@ -146,16 +146,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1290115943295652}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93be99430b9daae4f895413406c02460, type: 3}
+  m_Script: {fileID: 11500000, guid: 6be07af70a896d94ebf99e1219669d7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 2
+  currentState: 0
+  tag: 
   initElement: 0
-  flipSprite: {fileID: 0}
   ableSwap: 0
   ableMatch: 0
   ableGrav: 1
   ableDestroy: 0
+  ablePrereq: 0
   ableTarget: 0
 --- !u!212 &212801604113870568
 SpriteRenderer:

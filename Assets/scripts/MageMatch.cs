@@ -18,6 +18,7 @@ public class MageMatch : MonoBehaviour {
     public SyncManager syncManager;
     public HexGrid hexGrid;
     public BoardCheck boardCheck;
+    public TileManager tileMan;
     public Commish commish;
     public TurnTimer timer;
     public Targeting targeting;
@@ -28,19 +29,19 @@ public class MageMatch : MonoBehaviour {
     public AnimationController animCont;
     public UIController uiCont;
     public Stats stats;
-    public SpellEffects spellfx;
-    //public MMLog mmdebug;
+    public ObjectEffects objFX;
 
-    private GameObject firePF, waterPF, earthPF, airPF, muscPF;      // tile prefabs
-    private GameObject stonePF, emberPF, tombstonePF, prereqPF, targetPF; // token prefabs
     private Player p1, p2, activep;
     private Transform tilesOnBoard;
     private bool endGame = false;
-    private int checking = 0, removing = 0, actionsPerforming = 0, matchesResolving = 0;
+    private int checking = 0, actionsPerforming = 0, matchesResolving = 0;
     private List<TileSeq>[] spellsOnBoard;
 
     void Start() {
-        //Random.InitState(1337420);
+        StartCoroutine(Reset());
+    }
+
+    public IEnumerator Reset() {
         MMLog.Init(debugLogLevel);
 
         tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
@@ -54,32 +55,31 @@ public class MageMatch : MonoBehaviour {
         targeting = new Targeting(this);
         prompt = new Prompt(this);
         audioCont = new AudioController(this);
-        LoadPrefabs();
-        syncManager = GetComponent<SyncManager>();
         animCont = GetComponent<AnimationController>();
+
+        syncManager = GetComponent<SyncManager>();
+        syncManager.Init();
         myID = PhotonNetwork.player.ID;
+        
+        ////clear tiles
+        //GameObject tileFolder = transform.Find("tilesOnBoard").gameObject;
+        //if (tileFolder != null)
+        //    Destroy(tileFolder);
+        //tileFolder = new GameObject("tilesOnBoard");
+        //tileFolder.transform.SetParent(this.transform);
+        //tilesOnBoard = tileFolder.transform;
 
-        Reset();
-    }
-
-    public void Reset() { // initialize board/game
-        //clear tiles
-        GameObject tileFolder = transform.Find("tilesOnBoard").gameObject;
-        if (tileFolder != null)
-            Destroy(tileFolder);
-        tileFolder = new GameObject("tilesOnBoard");
-        tileFolder.transform.SetParent(this.transform);
-        tilesOnBoard = tileFolder.transform;
-
-        if (p1 != null)
-            p1.hand.Empty();
-        if (p2 != null)
-            p2.hand.Empty();
+        //if (p1 != null)
+        //    p1.hand.Empty();
+        //if (p2 != null)
+        //    p2.hand.Empty();
 
         hexGrid = new HexGrid();
-        uiCont.getCellOverlays();
+        tileMan = new TileManager(this);
+
+        uiCont.GetCellOverlays();
         boardCheck = new BoardCheck(this);
-        spellfx = new SpellEffects(this);
+        objFX = new ObjectEffects(this);
 
         endGame = false;
 
@@ -91,14 +91,19 @@ public class MageMatch : MonoBehaviour {
 
         InitEvents();
 
-        for (int i = 0; i < 4; i++)
-            LocalP().DealTile();
-
         currentState = GameState.PlayerTurn;
         uiCont.SetDrawButton(activep, true);
         activep.InitAP();
+
+        yield return syncManager.Checkpoint(); // idk if this is really doing anything
+
+        for (int i = 0; i < 4; i++) {
+            yield return LocalP().DealTile();
+            yield return new WaitForSeconds(.25f);
+        }
+
         if (MyTurn())
-            activep.DealTile();
+            yield return activep.DealTile();
 
         stats = new Stats(p1, p2);
 
@@ -106,20 +111,7 @@ public class MageMatch : MonoBehaviour {
         uiCont.Reset();
 
         // TODO init some stuff that would otherwise be BeginTurnEvent()
-    }
-
-    public void LoadPrefabs() {
-        firePF = Resources.Load("prefabs/tile_fire") as GameObject;
-        waterPF = Resources.Load("prefabs/tile_water") as GameObject;
-        earthPF = Resources.Load("prefabs/tile_earth") as GameObject;
-        airPF = Resources.Load("prefabs/tile_air") as GameObject;
-        muscPF = Resources.Load("prefabs/tile_muscle") as GameObject;
-
-        stonePF = Resources.Load("prefabs/token_stone") as GameObject;
-        emberPF = Resources.Load("prefabs/token_ember") as GameObject;
-        tombstonePF = Resources.Load("prefabs/token_tombstone") as GameObject;
-        prereqPF = Resources.Load("prefabs/outline_prereq") as GameObject;
-        targetPF = Resources.Load("prefabs/outline_target") as GameObject;
+        yield return null;
     }
 
     public void InitEvents() {
@@ -152,7 +144,7 @@ public class MageMatch : MonoBehaviour {
         }
     }
 
-    public IEnumerator OnDrop(int id, bool playerAction, Tile.Element elem, int col) {
+    public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
         yield return BoardChecking(); // should go below? if done in a spell, should there be a similar event to this one OnSpellCast that checks the board once the spell resolves?
         if(playerAction)
             eventCont.GameAction(true);
@@ -204,12 +196,12 @@ public class MageMatch : MonoBehaviour {
         switchingTurn = true;
         timer.Pause();
 
-        yield return new WaitUntil(() => actionsPerforming == 0 && removing == 0); //?
+        yield return new WaitUntil(() => actionsPerforming == 0 && tileMan.removing == 0); //?
         yield return new WaitUntil(() => checking == 0); //?
         MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM START ----------</b>");
         yield return eventCont.TurnEnd();
 
-        uiCont.DeactivateAllSpellButtons(activep); //? These should be part of any boardaction...
+        uiCont.DeactivateAllSpellButtons(); //? These should be part of any boardaction...
         uiCont.SetDrawButton(activep, false);
 
         currentState = GameState.CommishTurn;
@@ -227,12 +219,12 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator BoardChecking() {
         checking++; // prevents overcalling/retriggering
-        yield return new WaitUntil(() => removing == 0); //?
+        yield return new WaitUntil(() => tileMan.removing == 0); //?
         MMLog.Log_MageMatch("About to check the board.");
 
         //cascade = 0;
         //while (true) {
-            yield return new WaitUntil(() => !animCont.IsAnimating() && removing == 0); //?
+            yield return new WaitUntil(() => !animCont.IsAnimating() && tileMan.removing == 0); //?
             hexGrid.CheckGrav(); // TODO make IEnum
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
             //List<TileSeq> seqMatches = boardCheck.MatchCheck();
@@ -281,9 +273,9 @@ public class MageMatch : MonoBehaviour {
                 //for (int i = 0; i < spellsOnBoard.Length; i++) {
                     MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
                     if (spellsOnBoard[s].Count > 0)
-                        uiCont.ActivateSpellButton(activep, s);
+                        uiCont.ActivateSpellButton(s);
                     else
-                        uiCont.DeactivateSpellButton(activep, s); // needed?
+                        uiCont.DeactivateSpellButton(s); // needed?
 
                     // TODO boardseq stuff will be handled by the spell selection thing
 
@@ -321,57 +313,63 @@ public class MageMatch : MonoBehaviour {
     #region ----- Game Actions -----
 
     public void PlayerDrawTile() {
-        StartCoroutine(_Draw(activep.id, true));
+        StartCoroutine(_Draw(activep.id, "", true));
     }
     
     // for spells and such
     // needed? just call mm.GetPlayer(id).DrawTiles()?
-    public void DrawTile() {
-        StartCoroutine(_Draw(activep.id, false));
+    public void DrawTile(int id) {
+        StartCoroutine(_Draw(id, "", false));
     }
 
-    public IEnumerator _Draw(int id, bool playerAction) {
+    public void DrawTile(int id, string genTag) {
+        StartCoroutine(_Draw(id, genTag, false));
+    }
+
+    public IEnumerator _Draw(int id, string genTag, bool playerAction) {
         MMLog.Log_MageMatch("   ---------- DRAW BEGIN ----------");
         actionsPerforming++;
         Player p = GetPlayer(id);
         if (p.hand.IsFull()) {
             MMLog.Log_MageMatch("Player " + id + "'s hand is full.");
         } else {
-            p.DrawTiles(1, Tile.Element.None, true, false, false);
+            yield return p.DrawTiles(1, genTag, playerAction, false);
         }
         MMLog.Log_MageMatch("   ---------- DRAW END ----------");
         actionsPerforming--;
         yield return null;
     }
 
-    public bool PlayerDropTile(int col, GameObject go) {
+    public bool PlayerDropTile(int col, HandObject hex) {
         int row = boardCheck.CheckColumn(col); // check that column isn't full
         if (row >= 0) {
-            activep.hand.Remove(go.GetComponent<TileBehav>()); // remove from hand
-            StartCoroutine(_Drop(true, col, go));
+            activep.hand.Remove(hex); // remove from hand
+            StartCoroutine(_Drop(true, col, hex));
             return true;
         }
         return false;
     }
 
-    public bool DropTile(int col, GameObject go) {
+    public bool DropTile(int col, HandObject hex) {
         int row = boardCheck.CheckColumn(col); // check that column isn't full
         if (row >= 0) { // if the col is not full
-            StartCoroutine(_Drop(false, col, go));
+            StartCoroutine(_Drop(false, col, hex));
             return true;
         }
         return false;
     }
 
-    IEnumerator _Drop(bool playerAction, int col, GameObject go) {
+    IEnumerator _Drop(bool playerAction, int col, HandObject hex) {
         MMLog.Log_MageMatch("   ---------- DROP BEGIN ----------");
         actionsPerforming++;
+
+        GameObject go = hex.gameObject;
         go.transform.SetParent(tilesOnBoard);
         TileBehav tb = go.GetComponent<TileBehav>();
         tb.SetPlaced();
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
         if (currentState == GameState.PlayerTurn) { //kinda hacky
-            yield return eventCont.Drop(playerAction, tb.tile.element, col);
+            yield return eventCont.Drop(playerAction, hex.tag, col);
         } else if (currentState == GameState.CommishTurn)
             eventCont.CommishDrop(tb.tile.element, col);
 
@@ -416,7 +414,7 @@ public class MageMatch : MonoBehaviour {
                 StartCoroutine(uiCont.GetButtonCont(activep, spellNum).Transition_MainView());
 
                 targeting.targetingCanceled = false;
-                uiCont.DeactivateAllSpellButtons(activep); // ?
+                uiCont.DeactivateAllSpellButtons(); // ?
                 p.SetCurrentSpell(spellNum);
 
                 if (spell is CoreSpell)
@@ -426,7 +424,7 @@ public class MageMatch : MonoBehaviour {
 
                 if (!targeting.WasCanceled()) { // should be an event callback?
                     eventCont.SpellCast(spell);
-                    RemoveSeq(targeting.GetSelection());
+                    tileMan.RemoveSeq(targeting.GetSelection());
                     p.ApplySpellCosts();
                     yield return BoardChecking(); //?
                 }
@@ -442,7 +440,7 @@ public class MageMatch : MonoBehaviour {
         targeting.CancelSelection();
         for (int i = 0; i < spellsOnBoard.Length; i++) {
             if (spellsOnBoard[i].Count > 0)
-                uiCont.ActivateSpellButton(activep, i);
+                uiCont.ActivateSpellButton(i);
         }
         yield return null;
     }
@@ -500,124 +498,6 @@ public class MageMatch : MonoBehaviour {
 
     public bool IsMe(int id) { return id == myID; }
 
-    public GameObject GenerateTile(Tile.Element element) {
-        return GenerateTile(element, GameObject.Find("tileSpawn").transform.position);
-    }
-
-    public GameObject GenerateTile(Tile.Element element, Vector3 position) {
-        GameObject go;
-        switch (element) {
-            case Tile.Element.Fire:
-                go = Instantiate(firePF, position, Quaternion.identity);
-                break;
-            case Tile.Element.Water:
-                go = Instantiate(waterPF, position, Quaternion.identity);
-                break;
-            case Tile.Element.Earth:
-                go = Instantiate(earthPF, position, Quaternion.identity);
-                break;
-            case Tile.Element.Air:
-                go = Instantiate(airPF, position, Quaternion.identity);
-                break;
-            case Tile.Element.Muscle:
-                go = Instantiate(muscPF, position, Quaternion.identity);
-                break;
-            default:
-                return null;
-        }
-
-        return go;
-    }
-
-    public GameObject GenerateToken(string name) {
-        GameObject go;
-        switch (name) {
-            case "stone":
-                go = Instantiate(stonePF);
-                break;
-            case "ember":
-                go = Instantiate(emberPF);
-                break;
-            case "tombstone":
-                go = Instantiate(tombstonePF);
-                break;
-            case "prereq":
-                go = Instantiate(prereqPF);
-                break;
-            case "target":
-                go = Instantiate(targetPF);
-                break;
-            default:
-                return null;
-        }
-
-        return go;
-    }
-
-    void RemoveSeqList(List<TileSeq> seqList) {
-        TileSeq seq;
-        for (int seqInd = 0; seqInd < seqList.Count; seqInd++) {
-            seq = seqList[seqInd];
-            RemoveSeq(seq);
-        }
-    }
-
-    void RemoveSeq(TileSeq seq) { // TODO messy stuff
-        //Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + boardCheck.PrintSeq(seq, true));
-        Tile tile;
-        for (int i = 0; i < seq.sequence.Count;) {
-            tile = seq.sequence[0];
-            if (hexGrid.IsCellFilled(tile.col, tile.row))
-                RemoveTile(tile, true);
-            else
-                Debug.Log("RemoveSeq(): The tile at (" + tile.col + ", " + tile.row + ") is already gone.");
-            seq.sequence.Remove(tile);
-        }
-    }
-
-    // TODO should be IEnums? Then just start the anim at the end?
-    public void RemoveTile(Tile tile, bool resolveEnchant) {
-        StartCoroutine(_RemoveTile(tile.col, tile.row, resolveEnchant));
-    }
-
-    public void RemoveTile(int col, int row, bool resolveEnchant) {
-        StartCoroutine(_RemoveTile(col, row, resolveEnchant));
-    }
-
-    public IEnumerator _RemoveTile(int col, int row, bool resolveEnchant) {
-        //		Debug.Log ("Removing (" + col + ", " + row + ")");
-        removing++;
-
-        TileBehav tb = hexGrid.GetTileBehavAt(col, row);
-
-        if (tb == null) {
-            MMLog.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
-            removing--;
-            yield break;
-        }
-        if (!tb.ableDestroy) {
-            MMLog.LogWarning("MAGEMATCH: RemoveTile tried to remove an indestructable tile!");
-            removing--;
-            yield break;
-        }
-
-        if (tb.HasEnchantment()) {
-            if (resolveEnchant) {
-                MMLog.Log_MageMatch("About to resolve enchant on tile " + tb.PrintCoord());
-                tb.ResolveEnchantment();
-            }
-            tb.ClearEnchantment(); // TODO
-            tb.ClearTileEffects(); //?
-        }
-        hexGrid.ClearTileBehavAt(col, row); // move up?
-
-        yield return animCont._RemoveTile(tb); // just start it, don't yield?
-        Destroy(tb.gameObject);
-        eventCont.TileRemove(tb); //? not needed for checking but idk
-
-        removing--;
-    }
-
     // move to BoardCheck?
     public string[] GetTileSeqs(List<TileSeq> seqs) {
         string[] ss = new string[seqs.Count];
@@ -635,8 +515,7 @@ public class MageMatch : MonoBehaviour {
     public void EndTheGame() {
         endGame = true;
         uiCont.UpdateMoveText("Wow!! " + activep.name + " has won!!");
-        uiCont.DeactivateAllSpellButtons(p1);
-        uiCont.DeactivateAllSpellButtons(p2);
+        uiCont.DeactivateAllSpellButtons();
         eventCont.boardAction -= OnBoardAction; //?
         timer.Pause();
     }

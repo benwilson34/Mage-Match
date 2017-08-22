@@ -16,7 +16,7 @@ public class Targeting {
     private Vector3 lastTCenter;
     private bool largeAreaMode = false;
     private TileBehav lastDragTarget;
-    private List<GameObject> outlines;
+    //private List<GameObject> outlines;
     private List<TileSeq> selections;
 
     //public delegate void TBTargetEffect(TileBehav tb);
@@ -104,7 +104,7 @@ public class Targeting {
         mm.syncManager.SendTBTarget(tb);
         if (currentTMode == TargetMode.Tile) {
             Tile t = tb.tile;
-            OutlineTarget(t.col, t.row);
+            mm.uiCont.OutlineTarget(t.col, t.row);
             targetTBs.Add(tb);
             DecTargets();
             mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
@@ -120,7 +120,7 @@ public class Targeting {
 
             foreach (TileBehav ctb in tbs) {
                 Tile ct = ctb.tile;
-                OutlineTarget(ct.col, ct.row);
+                mm.uiCont.OutlineTarget(ct.col, ct.row);
                 // TODO if targetable
                 // TODO remove any prereq overlap!
                 targetTBs.Add(ctb);
@@ -133,7 +133,7 @@ public class Targeting {
             lastDragTarget = tb;
 
             Tile t = tb.tile;
-            OutlineTarget(t.col, t.row);
+            mm.uiCont.OutlineTarget(t.col, t.row);
             targetTBs.Add(tb);
             DecTargets();
             mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
@@ -184,7 +184,7 @@ public class Targeting {
 
         mm.syncManager.SendCBTarget(cb);
         if (currentTMode == TargetMode.Cell) {
-            OutlineTarget(cb.col, cb.row);
+            mm.uiCont.OutlineTarget(cb.col, cb.row);
             targetCBs.Add(cb);
             DecTargets();
             mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
@@ -232,8 +232,6 @@ public class Targeting {
         else
             mm.uiCont.ActivateTargetingUI(validCBs);
 
-        OutlinePrereq(GetSelection());
-
         yield return new WaitUntil(() => targetsLeft == 0);
         MMLog.Log_Targeting("no more targets.");
         lastDragTarget = null;
@@ -241,14 +239,10 @@ public class Targeting {
         mm.uiCont.UpdateMoveText("Here are your targets!");
         yield return new WaitForSeconds(1f);
 
-        foreach (GameObject go in outlines) {
-            GameObject.Destroy(go);
-        }
         mm.uiCont.DeactivateTargetingUI();
         mm.uiCont.UpdateMoveText("");
 
         currentTMode = TargetMode.Tile; // needed?
-        outlines = null; // memory leak?
         //targetTBs = null?
 
         mm.currentState = MageMatch.GameState.PlayerTurn;
@@ -258,32 +252,8 @@ public class Targeting {
 
     public List<CellBehav> GetTargetCBs() { return targetCBs; }
 
-    void OutlinePrereq(TileSeq seq) {
-        outlines = new List<GameObject>(); // move to Init?
-        GameObject go;
-        foreach (Tile t in seq.sequence) {
-            go = mm.GenerateToken("prereq");
-            go.transform.position = mm.hexGrid.GridCoordToPos(t.col, t.row);
-            outlines.Add(go);
-        }
-    }
-
-    void OutlineTarget(int col, int row) {
-        GameObject go = mm.GenerateToken("target");
-        go.transform.position = mm.hexGrid.GridCoordToPos(col, row);
-        outlines.Add(go);
-    }
-
     public void ClearTargets() {
         mm.syncManager.SendClearTargets();
-
-        Player p = mm.ActiveP();
-        int prereqs = GetSelection().sequence.Count;
-        for (int i = 0; i < outlines.Count - prereqs;) { // clear just the target outlines
-            GameObject go = outlines[prereqs];
-            GameObject.Destroy(go);
-            outlines.Remove(go);
-        }
 
         if (currentTMode == TargetMode.Cell || currentTMode == TargetMode.CellArea) {
             for (int i = 0; i < targetCBs.Count;)
@@ -294,7 +264,7 @@ public class Targeting {
         }
 
         targetsLeft = targets;
-        mm.uiCont.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
+        mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
     }
 
     public void CancelTargeting() {

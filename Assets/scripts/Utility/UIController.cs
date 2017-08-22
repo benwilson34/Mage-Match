@@ -10,19 +10,19 @@ public class UIController : MonoBehaviour {
     public AnimationCurve slidingEase;
 
     private Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
-    private GameObject spellOutlineEnd, spellOutlineMid;
 	private Text moveText, debugGridText, turnTimerText, slidingText;
 	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
     private MageMatch mm;
 	private Dropdown DD1, DD2;
     private Transform leftPinfo, rightPinfo, leftPload, rightPload, board;
+    private GameObject spellOutlineEnd, spellOutlineMid;
+    private GameObject prereqPF, targetPF;
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject settingsMenu; // ?
     private GameObject overlay;
-    private List<GameObject> spellOutlines;
+    private List<GameObject> outlines, spellOutlines;
     private SpriteRenderer[,] cellOverlays;
-    //private SpellEffects spellfx;
     private Vector3 slidingTextStart;
     private bool menu = false;
 
@@ -67,22 +67,28 @@ public class UIController : MonoBehaviour {
 
         overlay = GameObject.Find("Targeting Overlay");
         overlay.SetActive(false);
-
-        spellOutlineEnd = Resources.Load<GameObject>("prefabs/ui/spell-outline_end");
-        spellOutlineMid = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
+        
         spellOutlines = new List<GameObject>();
+        outlines = new List<GameObject>();
 
-        //spellfx = new SpellEffects();
+        LoadPrefabs();
     }
 
     public void InitEvents() {
         mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
         mm.eventCont.gameAction += OnGameAction;
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.LastStep);
         mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
-        //mm.eventCont.cascade += OnCascade;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
         mm.eventCont.playerMeterChange += OnPlayerMeterChange;
+    }
+
+    void LoadPrefabs() {
+        spellOutlineEnd = Resources.Load<GameObject>("prefabs/ui/spell-outline_end");
+        spellOutlineMid = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
+        prereqPF = Resources.Load("prefabs/outline_prereq") as GameObject;
+        targetPF = Resources.Load("prefabs/outline_target") as GameObject;
     }
 
     void InitSprites() {
@@ -118,6 +124,11 @@ public class UIController : MonoBehaviour {
     public void OnGameAction(int id, bool costsAP) {
         UpdateAPText(mm.GetPlayer(id));
         UpdateEffTexts(); // could be considerable overhead...
+    }
+
+    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
+        // TODO update button
+        yield return null;
     }
 
     public IEnumerator OnMatch(int id, string[] seqs) {
@@ -158,7 +169,7 @@ public class UIController : MonoBehaviour {
                 nameText.text += " (ME!)";
 
             ShowLoadout(p);
-            DeactivateAllSpellButtons(p);
+            DeactivateAllSpellButtons();
             UpdateAPText(p);
 
             // TODO start health from zero so it animates
@@ -362,6 +373,8 @@ public class UIController : MonoBehaviour {
         gradient.transform.Rotate(0, 0, 180);
     }
 
+    // ----- TARGETING -----
+
     public void ShowSpellSeqs(List<TileSeq> seqs) {
         foreach (TileSeq seq in seqs) {
             GameObject start = Instantiate(spellOutlineEnd);
@@ -391,18 +404,18 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    public void getCellOverlays() {
+    public void GetCellOverlays() {
         cellOverlays = new SpriteRenderer[7,7];
         for(int i = 0; i < 7; i++) {
             Transform col = board.GetChild(i);
             for(int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
-                Debug.Log(">>>2nd for of getCellOverlays at " + (i) + (j));
+                //Debug.Log(">>>2nd for of getCellOverlays at " + (i) + (j));
                 cellOverlays[i,j] = col.Find("cell" + (i) + (j)).GetComponent<SpriteRenderer>();
             }
         } 
     }
 
-    public void ActivateTargetingUI() {
+    void ActivateTargetingUI() {
         overlay.SetActive(true);
         if (mm.MyTurn()) {
             tCancelB.SetActive(true);
@@ -417,6 +430,8 @@ public class UIController : MonoBehaviour {
                 Debug.Log("Color = " + cellOverlays[i,j].color);
             }
         }
+
+        OutlinePrereq(mm.targeting.GetSelection());
 
         //gradient.SetActive(!gradient.activeSelf);
         //targetingBG.SetActive(!targetingBG.activeSelf);
@@ -456,14 +471,52 @@ public class UIController : MonoBehaviour {
             }
         }
 
+        ClearOutlines();
     }
 
+    void OutlinePrereq(TileSeq seq) {
+        outlines = new List<GameObject>(); // move to Init?
+        GameObject go;
+        foreach (Tile t in seq.sequence) {
+            go = Instantiate(prereqPF);
+            go.transform.position = mm.hexGrid.GridCoordToPos(t.col, t.row);
+            outlines.Add(go);
+        }
+    }
+
+    public void OutlineTarget(int col, int row) {
+        GameObject go = Instantiate(targetPF);
+        go.transform.position = mm.hexGrid.GridCoordToPos(col, row);
+        outlines.Add(go);
+    }
+
+    public void ClearTargets() {
+        int prereqs = mm.targeting.GetSelection().sequence.Count;
+        for (int i = 0; i < outlines.Count - prereqs;) { // clear just the target outlines
+            GameObject go = outlines[prereqs];
+            GameObject.Destroy(go);
+            outlines.Remove(go);
+        }
+    }
+
+    void ClearOutlines() {
+        for (int i = 0; i < outlines.Count;) {
+            GameObject go = outlines[0];
+            GameObject.Destroy(go);
+            outlines.Remove(go);
+        }
+    }
+
+    // ----- SPELL BUTTONS -----
+
+    // player won't be needed once we redesign the UI
     public void SetDrawButton(Player p, bool interactable) {
         if (interactable && !p.ThisIsLocal()) // if not the localp, no draw button
             return;
         GetPinfo(p.id).Find("Button_Draw").GetComponent<Button>().interactable = interactable;
     }
 
+    // player won't be needed once we redesign the UI
     public ButtonController GetButtonCont(Player p, int index) {
         return GetPload(p.id).Find ("Button_Spell" + index)
             .GetComponent<ButtonController>();
@@ -473,32 +526,22 @@ public class UIController : MonoBehaviour {
 		return GetPload(player.id).Find ("Button_Spell" + index).GetComponent<Button>();
 	}
     
-    // TODO remove player stuff
-	public void ActivateSpellButton(Player player, int index){
-        if (player.ThisIsLocal()) {
-            Button button = GetButton(player, index);
-            button.interactable = true;
-        }
+	public void ActivateSpellButton(int index){
+        Button button = GetButton(mm.LocalP(), index); // TODO only one player it could be...
+        button.interactable = true;
 	}
 
-	public void DeactivateSpellButton(Player player, int index){
-		Button button = GetButton (player, index);
+	public void DeactivateSpellButton(int index){
+		Button button = GetButton (mm.LocalP(), index);
 		button.interactable = false;
 	}
 
-	public void DeactivateAllSpellButtons(Player player){
+	public void DeactivateAllSpellButtons(){
 		for (int i = 0; i < 5; i++) {
-			Button button = GetButton (player, i);
+			Button button = GetButton (mm.LocalP(), i);
 			button.interactable = false;
 		}
 	}
-
-	//public int GetLoadoutNum(int id){
-	//	if (id == 1)
- //           return DD1.value; 
- //       else
-	//		return DD2.value;
-	//}
 
     public void ToggleMenu() {
         menu = !menu;

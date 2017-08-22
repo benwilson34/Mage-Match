@@ -10,7 +10,7 @@ public class Enfuego : Character {
 
     public Enfuego(MageMatch mm, int id) : base(mm) {
         playerID = id;
-        spellfx = mm.spellfx;
+        objFX = mm.objFX;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
 
@@ -73,13 +73,13 @@ public class Enfuego : Character {
                     yield return mm.syncManager.SyncRand(playerID, Random.Range(0, ctbs.Count));
                     TileBehav ctb = ctbs[mm.syncManager.GetRand()];
                     MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
-                    mm.StartCoroutine(spellfx.Ench_SetBurning(playerID, ctb)); // yield return?
+                    mm.StartCoroutine(objFX.Ench_SetBurning(playerID, ctb)); // yield return?
                 }
             } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
                 yield return mm.InactiveP().DiscardRandom(1);
             }
 
-            mm.RemoveTile(tb.tile, true);
+            mm.tileMan.RemoveTile(tb.tile, true);
         }
     }
 
@@ -96,15 +96,12 @@ public class Enfuego : Character {
         yield return null;
     }
 
-    // PLACEHOLDER
     public IEnumerator Baila() {
-        yield return targeting.WaitForTileAreaTarget(true);
-        if (targeting.WasCanceled())
-            yield break;
+        mm.GetPlayer(playerID).DrawTiles(1, "", false, false); // my draw
+        mm.GetOpponent(playerID).DrawTiles(1, "", false, false); // their draw
 
-        List<TileBehav> tbs = targeting.GetTargetTBs();
-        foreach (TileBehav tb in tbs)
-            yield return spellfx.Ench_SetBurning(mm.ActiveP().id, tb); // right ID?
+        yield return mm.prompt.WaitForSwap();
+        mm.prompt.ContinueSwap();
     }
 
     public IEnumerator Incinerate() {
@@ -118,7 +115,7 @@ public class Enfuego : Character {
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
             MMLog.Log_Enfuego("Enchanting tile at " + tb.PrintCoord());
-            yield return spellfx.Ench_SetBurning(playerID, tb);
+            yield return objFX.Ench_SetBurning(playerID, tb);
             //yield return new WaitForSeconds(.2f);
         }
 

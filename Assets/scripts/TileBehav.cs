@@ -3,19 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
 
-public class TileBehav : MonoBehaviour {
-
-	public enum TileState { Hand, Flipped, Placed, Removed };
-	public TileState currentState;
+public class TileBehav : HandObject {
 
 	public Tile tile;
 	public Tile.Element initElement;
-	public Sprite flipSprite;
 
 	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
-	public bool ableTarget = true; // will eventually need a list of valid spells - maybe a hierarchy? categories?
+	public bool ablePrereq = true, ableTarget = true;
 
-    protected MageMatch mm;
 	private Enchantment enchantment;
     private List<TileEffect> tileEffects;
 	private bool inPos = true;
@@ -28,7 +23,7 @@ public class TileBehav : MonoBehaviour {
 
     protected virtual void Init() {
         tile = new Tile(initElement);
-        currentState = TileState.Hand;
+        currentState = State.Hand;
     }
 
 	public void ChangePos(int col, int row){
@@ -65,7 +60,7 @@ public class TileBehav : MonoBehaviour {
 	}
 
 	public void SetPlaced(){
-		currentState = TileState.Placed;
+		currentState = State.Placed;
 	}
 
     // delete?
@@ -146,10 +141,10 @@ public class TileBehav : MonoBehaviour {
 	}
 
 	public bool ResolveEnchantment(){
-		if (HasEnchantment() && currentState == TileState.Placed) {
+		if (HasEnchantment() && currentState == State.Placed) {
 //			Debug.Log ("About to resolve enchant: " + (this.enchantEffect != null));
 //			resolved = true;
-			currentState = TileState.Removed;
+			currentState = State.Removed;
 //			this.enchantEffect (this);
 			enchantment.CancelEffect();
 			return true;

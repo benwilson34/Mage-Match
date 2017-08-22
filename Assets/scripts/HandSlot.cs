@@ -6,14 +6,14 @@ public class HandSlot : MonoBehaviour {
 
     public int handPosition = 1, handIndex = 0;
 
-    private TileBehav tile = null;
+    private HandObject hex = null;
 
-    public void SetTile(TileBehav tb) { tile = tb; }
+    public void SetHex(HandObject hex) { this.hex = hex; }
 
-    public TileBehav GetTile() { return tile; }
+    public HandObject GetHex() { return hex; }
 
-    public void ClearTile() { tile = null; }
+    public void ClearHex() { hex = null; }
 
-    public bool IsFull() { return tile != null; }
+    public bool IsFull() { return hex != null; }
 
 }

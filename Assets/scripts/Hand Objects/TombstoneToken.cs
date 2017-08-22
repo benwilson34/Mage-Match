@@ -2,17 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-// TODO rename to TombstoneToken
-public class ZombieToken : TileBehav {
+public class TombstoneToken : TileBehav {
 
     protected override void Init() {
         ableTarget = false; //?
         tile = new Tile(initElement);
-        currentState = TileState.Placed; //?
-
-        //SpellEffects spellfx = new SpellEffects();
-        //spellfx.Ench_SetZombieTok(mm.ActiveP().id, this); // not sure about the activep here...
+        currentState = State.Placed; //?
     }
 
     public IEnumerator Tombstone_Turn(int id) {
@@ -23,12 +18,12 @@ public class ZombieToken : TileBehav {
         else
             elem = Tile.Element.Muscle;
 
-        TileBehav tb = mm.GenerateTile(elem).GetComponent<TileBehav>();
-        yield return mm.spellfx.Ench_SetZombify(id, tb, true, false);
+        TileBehav tb = (TileBehav)mm.tileMan.GenerateTile(id, elem);
+        yield return mm.objFX.Ench_SetZombify(id, tb, true, false);
         mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
     }
 
     public IEnumerator Tombstone_TEnd(int id) {
-        yield return mm._RemoveTile(tile.col, tile.row, false); // remove itself
+        yield return mm.tileMan._RemoveTile(tile.col, tile.row, false); // remove itself
     }
 }

@@ -9,7 +9,8 @@ public class Prompt {
     public PromptMode currentMode = PromptMode.None;
 
     private MageMatch mm;
-    private Tile.Element dropElem;
+    private TileBehav dropTile;
+    private int dropCol;
     private TileBehav[] swapTiles;
     private bool canceled = false;
 
@@ -37,14 +38,23 @@ public class Prompt {
         yield return new WaitUntil(() => currentMode == PromptMode.None);
     }
 
-    //public IEnumerator OnDrop(int id, bool playerAction, Tile.Element elem, int col) {
-    //    dropElem = elem;
+    public void SetDrop(int col, TileBehav tb) {
+        if (mm.MyTurn())
+            // TODO send player choice thru SyncMan
 
-    //    currentMode = PromptMode.None;
-    //    yield return null;
-    //}
+        dropTile = tb;
+        dropCol = col;
 
-    public Tile.Element GetDropElem() { return dropElem; }
+        currentMode = PromptMode.None;
+    }
+
+    public TileBehav GetDropTile() { return dropTile; }
+
+    public int GetDropCol() { return dropCol; }
+
+    public void ContinueDrop() {
+        mm.DropTile(dropCol, dropTile);
+    }
 
     // ----- SWAP -----
 

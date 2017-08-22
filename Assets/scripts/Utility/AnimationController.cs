@@ -75,8 +75,8 @@ public class AnimationController : MonoBehaviour {
         //		Debug.Log (transform.name + " is in position: (" + tile.col + ", " + tile.row + ")");
     }
 
-    public IEnumerator _Move(TileBehav tb, Vector3 newPos) {
-        yield return tb.transform.DOMove(newPos, .1f);
+    public IEnumerator _Move(HandObject hex, Vector3 newPos) {
+        yield return hex.transform.DOMove(newPos, .1f);
     }
 
     public IEnumerator _Burning(TileBehav tb) {

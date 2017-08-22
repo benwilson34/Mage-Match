@@ -8,21 +8,15 @@ public class SyncManager : PunBehaviour {
 
     private MageMatch mm;
     private Queue<int> rands;
-    private Queue<Tile.Element> elems;
+    private bool checkpoint = false;
 
-    // Use this for initialization
-    void Start() {
+    public void Init() {
         rands = new Queue<int>();
-        elems = new Queue<Tile.Element>();
-    }
-
-    // Update is called once per frame
-    void Update() {
     }
 
     public void InitEvents(MageMatch mm, EventController eventCont) {
         this.mm = mm;
-        eventCont.draw += OnDrawLocal;
+        eventCont.AddDrawEvent(OnDrawLocal, EventController.Type.Network);
         eventCont.AddDropEvent(OnDropLocal, EventController.Type.Network);
         eventCont.AddSwapEvent(OnSwapLocal, EventController.Type.Network);
         //eventCont.AddDiscardEvent(OnDiscardLocal, EventController.Type.Network);
@@ -67,47 +61,48 @@ public class SyncManager : PunBehaviour {
         return r;
     }
 
-    public IEnumerator SyncElement(int id, Tile.Element elem) {
+    public IEnumerator Checkpoint() {
         PhotonView photonView = PhotonView.Get(this);
-        if (id == mm.myID) { // send/enqueue
-            photonView.RPC("HandleSyncElement", PhotonTargets.All, elem);
-        } else {             // wait for rands in queue
-            MMLog.Log_SyncMan("Wating for element...");
-            yield return new WaitUntil(() => elems.Count > 0);
-        }
-        yield return null;
+        photonView.RPC("HandleCheckpoint", PhotonTargets.Others, true);
+
+        yield return new WaitUntil(() => checkpoint);
+        checkpoint = false;
     }
     [PunRPC]
-    public void HandleSyncElement(Tile.Element elem) {
-        MMLog.Log_SyncMan("Synced " + elem);
-        elems.Enqueue(elem);
+    public void HandleCheckpoint(bool checkpoint) {
+        MMLog.Log_SyncMan("Received checkpoint");
+        this.checkpoint = checkpoint;
     }
 
-    public Tile.Element GetElement() { return elems.Dequeue(); }
 
-    public void OnDrawLocal(int id, bool playerAction, bool dealt, Tile.Element elem) {
+    public IEnumerator OnDrawLocal(int id, string tag, bool playerAction, bool dealt) {
         //Debug.MMLog.Log_SyncMan("TURNMANAGER: id=" + id + " myID=" + mm.myID);
         if ((playerAction || dealt) && id == mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleDraw", PhotonTargets.Others, id, playerAction, dealt, elem);
-        }
-    }
-    [PunRPC]
-    public void HandleDraw(int id, bool playerAction, bool dealt, Tile.Element elem) {
-        mm.GetPlayer(id).DrawTiles(1, elem, playerAction, dealt, false);
-    }
-
-    public IEnumerator OnDropLocal(int id, bool playerAction, Tile.Element elem, int col) {
-        if (playerAction && id == mm.myID) { // if local, send to remote
-            PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleDrop", PhotonTargets.Others, id, elem, col);
+            photonView.RPC("HandleDraw", PhotonTargets.Others, id, tag, playerAction, dealt);
         }
         yield return null;
     }
     [PunRPC]
-    public void HandleDrop(int id, Tile.Element elem, int col) {
-        GameObject go = mm.ActiveP().hand.GetTile(elem);
-        mm.PlayerDropTile(col, go);
+    public void HandleDraw(int id, string tag, bool playerAction, bool dealt) {
+        MMLog.Log_SyncMan("Received draw with tag=" + tag);
+        if (dealt)
+            StartCoroutine(mm.GetPlayer(id).DealTile(tag));
+        else
+            StartCoroutine(mm._Draw(id, tag, playerAction));
+    }
+
+    public IEnumerator OnDropLocal(int id, bool playerAction, string tag, int col) {
+        if (playerAction && id == mm.myID) { // if local, send to remote
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleDrop", PhotonTargets.Others, id, tag, col);
+        }
+        yield return null;
+    }
+    [PunRPC]
+    public void HandleDrop(int id, string tag, int col) {
+        HandObject hex = mm.GetPlayer(id).hand.GetHex(tag);
+        mm.PlayerDropTile(col, hex);
     }
 
     public IEnumerator OnSwapLocal(int id, bool playerAction, int c1, int r1, int c2, int r2) {

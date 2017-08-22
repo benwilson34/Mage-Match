@@ -86,7 +86,7 @@ public class AudioController {
     public void InitEvents(){
         //mm.eventCont.drop += onDrop;
         mm.eventCont.grabTile += OnGrab;
-        mm.eventCont.draw += OnDraw;
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Audio);
         mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Audio);
         //mm.eventCont.match += onMatch;
     }
@@ -122,34 +122,37 @@ public class AudioController {
     //    source.Play();
     //}
 
-    public void OnGrab(int id, Tile.Element elem) {
+    public void OnGrab(int id, string tag) {
         AudioClip clip = null;
-        switch (elem) {
-            case Tile.Element.Fire:
+        // TODO get sounds for "colorless" and consumables
+        string type = HandObject.TagType(tag);
+        switch (type) {
+            case "F":
                 clip = grab[0];
                 break;
-            case Tile.Element.Water:
+            case "W":
                 clip = grab[1];
                 break;
-            case Tile.Element.Earth:
+            case "E":
                 clip = grab[2];
                 break;
-            case Tile.Element.Air:
+            case "A":
                 clip = grab[3];
                 break;
-            case Tile.Element.Muscle:
+            case "M":
                 clip = grab[4];
                 break;
         }
-        GameObject go = mm.GetPlayer(id).hand.GetTile(elem);
-        AudioSource source = go.GetComponent<AudioSource>();
+        HandObject hex = mm.GetPlayer(id).hand.GetHex(tag);
+        AudioSource source = hex.GetComponent<AudioSource>();
 
         source.clip = clip;
         source.Play();
     }
 
-    public void OnDraw(int id, bool playerAction, bool dealt, Tile.Element elem) {
-        OnGrab(id, elem);
+    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
+        OnGrab(id, tag);
+        yield return null;
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {

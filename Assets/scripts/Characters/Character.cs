@@ -12,14 +12,19 @@ public abstract class Character {
     public int meter = 0, meterMax = 100; // protected?
 
     protected int maxHealth;
-    protected SpellEffects spellfx;
+    protected ObjectEffects objFX; // needed here?
     protected int dfire, dwater, dearth, dair, dmuscle; // portions of 100 total
     protected Spell[] spells;
     protected MageMatch mm;
+    protected TileManager tileMan;
     protected int playerID;
+    protected List<string> runes;
+    //protected string genHexTag;
 
     public Character(MageMatch mm) {
         this.mm = mm;
+        tileMan = mm.tileMan;
+        runes = new List<string>();
     } //?
 
     public virtual void InitEvents() {
@@ -65,7 +70,7 @@ public abstract class Character {
         return outlist;
     }
 
-    public Tile.Element GetTileElement() {
+    public Tile.Element GetDeckBasicTile() {
         int rand = Random.Range(0, 50);
         if (rand < dfire)
             return Tile.Element.Fire;
@@ -78,6 +83,20 @@ public abstract class Character {
         else
             return Tile.Element.Muscle;
     }
+
+    public string GenerateHexTag() {
+        int total = 50 + (runes.Count * 10);
+        int rand = Random.Range(0, total);
+
+        if (rand < 50)
+            return "p" + playerID + "-B-" + GetDeckBasicTile().ToString().Substring(0, 1); // + "-" ?
+        else {
+            int index = Mathf.CeilToInt((rand - 50) / 10f); 
+            return runes[index]; // + "-" ?
+        }
+    }
+
+    //public string GetHexTag() { return genHexTag; }
 
     public static Character Load(MageMatch mm, int id) {
         Ch myChar = mm.gameSettings.GetLocalChar(id);
@@ -100,7 +119,7 @@ public abstract class Character {
 
 public class CharTest : Character {
     public CharTest(MageMatch mm) : base(mm) {
-        spellfx = mm.spellfx;
+        objFX = mm.objFX;
         spells = new Spell[4];
 
         characterName = "Sample";
@@ -109,10 +128,10 @@ public class CharTest : Character {
 
         SetDeckElements(20, 20, 20, 20, 20);
 
-        spells[0] = new Spell(0, "Cherrybomb", "FFA", 1, spellfx.Cherrybomb);
-        spells[1] = new Spell(1, "Massive damage", "FFA", 1, spellfx.Deal496Dmg);
-        spells[2] = new Spell(2, "Stone Test", "FAF", 1, spellfx.StoneTest);
-        spells[3] = new Spell(3, "Massive damage", "AFA", 1, spellfx.Deal496Dmg);
+        spells[0] = new Spell(0, "Cherrybomb", "FFA", 1, objFX.Cherrybomb);
+        spells[1] = new Spell(1, "Massive damage", "FFA", 1, objFX.Deal496Dmg);
+        spells[2] = new Spell(2, "Stone Test", "FAF", 1, objFX.Deal496Dmg);
+        spells[3] = new Spell(3, "Massive damage", "AFA", 1, objFX.Deal496Dmg);
         InitSpells();
     }
 }

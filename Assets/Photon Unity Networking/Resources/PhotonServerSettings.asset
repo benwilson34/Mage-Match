@@ -73,4 +73,5 @@ MonoBehaviour:
   - SetCharAndLoadout
   - HandleCancelSelection
   - HandleTBSelection
+  - HandleCheckpoint
   DisableAutoOpenWizard: 1

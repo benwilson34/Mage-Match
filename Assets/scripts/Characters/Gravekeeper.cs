@@ -12,10 +12,9 @@ public class Gravekeeper : Character {
 
     public Gravekeeper(MageMatch mm, int id) : base(mm) {
         playerID = id;
-        //this.mm = mm; //?
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
-        spellfx = mm.spellfx;
+        objFX = mm.objFX;
 
         characterName = "The Gravekeeper";
         maxHealth = 1200;
@@ -55,9 +54,9 @@ public class Gravekeeper : Character {
 
         List<TileBehav> tbs = hexGrid.GetPlacedTiles(seq);
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
-            mm.syncManager.SyncRand(playerID, Random.Range(0, tbs.Count));
+            yield return mm.syncManager.SyncRand(playerID, Random.Range(0, tbs.Count));
             int rand = mm.syncManager.GetRand();
-            spellfx.Ench_SetZombify(playerID, tbs[rand], false); // skip?
+            objFX.Ench_SetZombify(playerID, tbs[rand], false); // skip?
             tbs.RemoveAt(rand);
         }
 
@@ -125,11 +124,14 @@ public class Gravekeeper : Character {
 
     public IEnumerator PartyCrashers() {
         for (int i = 0; i < 2; i++) {
-            yield return mm.prompt.WaitForSwap();
+            yield return mm.prompt.WaitForDrop();
             // TODO if canceled
-            MMLog.Log_Gravekeeper("Player " + playerID + " dropped a " + mm.prompt.GetDropElem());
-            yield return spellfx.Ench_SetZombify(playerID, mm.prompt.GetSwapTBs()[0], false);
-            mm.prompt.ContinueSwap();
+            TileBehav tb = mm.prompt.GetDropTile();
+            MMLog.Log_Gravekeeper("Player " + playerID + " dropped " + tb.tag);
+            yield return objFX.Ench_SetZombify(playerID, tb, false);
+            mm.prompt.ContinueDrop();
+            mm.GetPlayer(playerID).DealDamage(30);
+            // TODO destroy TB under drop (if any)
         }
         yield return null;
     }
@@ -260,19 +262,19 @@ public class Gravekeeper : Character {
 
         CellBehav cb = targeting.GetTargetCBs()[0];
         int col = cb.col;
-        GameObject tomb = mm.GenerateToken("tombstone");
+        HandObject tomb = tileMan.GenerateToken(playerID, "tombstone");
         tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
 
-        ZombieToken ttb = tomb.GetComponent<ZombieToken>();
+        TombstoneToken ttb = (TombstoneToken)tomb;
         mm.effectCont.AddEndTurnEffect(new TurnEffect(5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
 
         // destroy tiles under token
         for (int row = hexGrid.BottomOfColumn(col); row < hexGrid.TopOfColumn(col); row++)
             if (hexGrid.IsCellFilled(col, row))
-                mm.RemoveTile(col, row, false);
+                tileMan.RemoveTile(col, row, false);
             else
                 break; // TODO handle floating tiles
 
-        mm.DropTile(col, tomb); // idk how to animate this one yet
+        mm.DropTile(col, ttb); // idk how to animate this one yet
     }
 }

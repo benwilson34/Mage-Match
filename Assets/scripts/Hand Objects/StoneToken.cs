@@ -5,10 +5,9 @@ using UnityEngine;
 public class StoneToken : TileBehav {
 
     protected override void Init() {
-        ableTarget = false; //?
+        ableTarget = ableDestroy = ableSwap = ablePrereq = ableTarget = false;
         tile = new Tile(initElement);
-        currentState = TileState.Placed; //?
 
-        mm.spellfx.Ench_SetStoneTok(this);
+        mm.objFX.Ench_SetStoneTok(this);
     }
 }

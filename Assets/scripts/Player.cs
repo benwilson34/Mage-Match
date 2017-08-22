@@ -55,7 +55,7 @@ public class Player {
             InitAP();
 
             if(ThisIsLocal()) // i think?
-                DealTile();
+                yield return DealTile();
         }
         yield return null;
     }
@@ -122,29 +122,27 @@ public class Player {
             mm.EndTheGame();
     }
 
-    // bool again?
-    public void DealTile() {
-        DrawTiles(1, Tile.Element.None, false, true, false);
+    public IEnumerator DealTile() {
+        yield return DrawTiles(1, "", false, true);
     }
 
-    //public void DrawTiles(Tile.Element elem) {
-    //    DrawTiles(1, elem, true, false, false);
-    //}
+    public IEnumerator DealTile(string genTag) {
+        yield return DrawTiles(1, genTag, false, true);
+    }
 
-    public void DrawTiles(int numTiles, Tile.Element elem, bool playerAction, bool dealt, bool linear) {
+    public IEnumerator DrawTiles(int numTiles, string genTag, bool playerAction, bool dealt) {
+        MMLog.Log_Player("p" + id + " drawing with genTag=" + genTag);
         for (int i = 0; i < numTiles && !hand.IsFull(); i++) {
-            GameObject go;
-            if (elem == Tile.Element.None)
-                go = mm.GenerateTile(character.GetTileElement());
-            else
-                go = mm.GenerateTile(elem);
+            HandObject hex;
+            if (genTag.Equals("")) {
+                hex = mm.tileMan.GenerateRandomHex(this);
+            } else
+                hex = mm.tileMan.GenerateHex(id, genTag);
 
-            go.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
+            hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
+            hand.Add(hex);
 
-            TileBehav tb = go.GetComponent<TileBehav>();
-            hand.Add(tb);
-
-            mm.eventCont.Draw(id, playerAction, dealt, tb.tile.element);
+            yield return mm.eventCont.Draw(id, hex.tag, playerAction, dealt);
             if (playerAction)
                 mm.eventCont.GameAction(true); //?
         }
@@ -153,27 +151,29 @@ public class Player {
 
     public IEnumerator DiscardRandom(int count) {
         for (int i = 0; i < count && hand.Count() > 0; i++) {
-            TileBehav tb;
-            tb = hand.GetTile(Random.Range(0, hand.Count()));
-            yield return mm.syncManager.SyncElement(id, tb.tile.element);
-            Tile.Element e = mm.syncManager.GetElement();
-            MMLog.Log_Player("DiscardRandom synced " + e);
-            yield return Discard(e);
+            yield return mm.syncManager.SyncRand(id, Random.Range(0, hand.Count()));
+            int rand = mm.syncManager.GetRand();
+            HandObject hex = hand.GetTile(rand);
+            yield return Discard(hex);
         }
     }
 
-    public IEnumerator Discard(Tile.Element elem) {
-        MMLog.Log_Player("Discarding " + elem);
-        GameObject go = hand.GetTile(elem);
-        mm.eventCont.Discard(id, elem);
+    public IEnumerator Discard(HandObject hex) {
+        mm.eventCont.Discard(id, hex.tag);
 
-        yield return mm.animCont._DiscardTile(go.transform);
-        hand.Remove(go.GetComponent<TileBehav>());
-        GameObject.Destroy(go);
+        yield return mm.animCont._DiscardTile(hex.transform);
+        hand.Remove(hex);
+        GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan
     }
 
-    public bool IsTileMine(TileBehav tb) {
-        return tb.transform.parent.position.Equals(hand.GetHandPos());
+    public IEnumerator Discard(string tag) {
+        MMLog.Log_Player("Discarding " + tag);
+        yield return Discard(hand.GetHex(tag));
+
+    }
+
+    public bool IsHexMine(HandObject hex) {
+        return hex.transform.parent.position.Equals(hand.GetHandPos()); // kinda weird...hand function? compare tags
     }
 
     public bool ThisIsLocal() { return mm.myID == id; }

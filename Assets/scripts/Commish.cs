@@ -74,16 +74,12 @@ public class Commish  {
                 yield return new WaitForSeconds(.15f);
             }
 
-            GameObject go = mm.GenerateTile(elems.Dequeue());
+            HandObject tb = mm.tileMan.GenerateTile(3, elems.Dequeue()); // should get own func?
             MMLog.Log_Commish("Dropping into col " + cols.Peek());
 
-            if (!mm.DropTile(cols.Dequeue(), go)) {
+            if ( !mm.DropTile(cols.Dequeue(), (TileBehav)tb) ) {
                 MMLog.LogError("COMMISH: Tried to drop into a full column!");
                 break;
-            }
-
-            if (i == numTiles - 1) {
-                yield return mm.BoardChecking(); // wait to see if there are any matches
             }
         }
 
@@ -173,30 +169,4 @@ public class Commish  {
 	public int GetMood(){
 		return mood;
 	}
-	
-	//public void AngryDamage(){
- //       mm.uiCont.UpdateMoveText("The Commissioner is furious! Both players take 50 dmg and discard one tile!");
-	//	Player p = mm.InactiveP ();
-	//	p.ChangeHealth (-50);
-	//	p.DiscardRandom (1);
-
-	//	p = mm.ActiveP();
-	//	p.ChangeHealth (-50);
-	//	p.DiscardRandom (1);
-		
-	//	mood = 0;
-	//	//mm.uiCont.UpdateCommishMeter ();
-	//}
-	
-	//public void HappyHealing(){
- //       mm.uiCont.UpdateMoveText("The Commissioner is pleased, and has decided to heal both players for 100!");
-	//	mm.InactiveP ().ChangeHealth (100);
-	//	//mm.InactiveP ().DrawTiles (1); // buggy
-
-	//	mm.ActiveP ().ChangeHealth (100);
-	//	//mm.ActiveP ().DrawTiles (1); // buggy
-		
-	//	mood = 0;
-	//	//mm.uiCont.UpdateCommishMeter ();
-	//}
 }

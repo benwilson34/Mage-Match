@@ -18,6 +18,7 @@ public class EventController {
         turnEnd = new List<EventPack>();
         match = new List<EventPack>();
         drop = new List<EventPack>();
+        draw = new List<EventPack>();
         discard = new List<EventPack>();
     }
 
@@ -33,6 +34,8 @@ public class EventController {
                 return turnEnd;
             case "match":
                 return match;
+            case "draw":
+                return draw;
             case "drop":
                 return drop;
             case "discard":
@@ -43,7 +46,7 @@ public class EventController {
         }
     }
 
-    // ex. AddEvent("swap", SwapCallbackMethod, 1)
+    // ex. AddEvent("swap", SwapCallbackMethod, Type.EventEffects)
     void AddEvent(string list, System.Delegate e, Type type) {
         List<EventPack> evList = GetEventList(list);
 
@@ -145,28 +148,34 @@ public class EventController {
             gameAction.Invoke(mm.ActiveP().id, costsAP);
     }
 
-    // TODO IEnum instead
-    public delegate void DrawEvent(int id, bool playerAction, bool dealt, Tile.Element elem);
-    public event DrawEvent draw;
-    public void Draw(int id, bool playerAction, bool dealt, Tile.Element elem) {
-        //Debug.MMLog.Log_EventCont("EVENTCONTROLLER: Draw called.");
-        if (draw != null)
-            draw.Invoke(id, playerAction, dealt, elem);
+    public delegate IEnumerator DrawEvent(int id, string tag, bool playerAction, bool dealt);
+    private List<EventPack> draw;
+    public IEnumerator Draw(int id, string tag, bool playerAction, bool dealt) {
+        handlingEvents = true; // worth it?
+        foreach (EventPack pack in draw) {
+            MMLog.Log_EventCont("going thru draw event with type " + pack.type);
+            yield return ((DrawEvent)pack.ev)(id, tag, playerAction, dealt); // OHYEAH
+        }
+        MMLog.Log_EventCont("Just finished DRAW events...");
+        handlingEvents = false; // worth it?
+    }
+    public void AddDrawEvent(DrawEvent e, Type type) {
+        AddEvent("draw", e, type);
     }
 
-    public delegate IEnumerator DropEvent(int id, bool playerAction, Tile.Element elem, int col);
+    public delegate IEnumerator DropEvent(int id, bool playerAction, string tag, int col);
     private List<EventPack> drop;
-    public IEnumerator Drop(bool playerAction, Tile.Element elem, int col) {
+    public IEnumerator Drop(bool playerAction, string tag, int col) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in drop) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
-            yield return ((DropEvent)pack.ev)(mm.ActiveP().id, playerAction, elem, col); // OHYEAH
+            yield return ((DropEvent)pack.ev)(mm.ActiveP().id, playerAction, tag, col); // OHYEAH
         }
         MMLog.Log_EventCont("Just finished DROP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddDropEvent(DropEvent se, Type type) {
-        AddEvent("drop", se, type);
+    public void AddDropEvent(DropEvent e, Type type) {
+        AddEvent("drop", e, type);
     }
 
     public delegate IEnumerator SwapEvent(int id, bool playerAction, int c1, int r1, int c2, int r2);
@@ -180,8 +189,8 @@ public class EventController {
         MMLog.Log_EventCont("Just finished SWAP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddSwapEvent(SwapEvent se, Type type) {
-        AddEvent("swap", se, type);
+    public void AddSwapEvent(SwapEvent e, Type type) {
+        AddEvent("swap", e, type);
     }
     // TODO similar method to convert for removing (if it's ever needed...)
 
@@ -242,20 +251,20 @@ public class EventController {
             playerMeterChange.Invoke(id, amount);
     }
 
-    public delegate void GrabTileEvent(int id, Tile.Element elem);
+    public delegate void GrabTileEvent(int id, string tag);
     public event GrabTileEvent grabTile;
-    public void GrabTile(int id, Tile.Element elem) {
+    public void GrabTile(int id, string tag) {
         if (grabTile != null)
-            grabTile.Invoke(id, elem);
+            grabTile.Invoke(id, tag);
     }
 
-    public delegate IEnumerator DiscardEvent(int id, Tile.Element elem);
+    public delegate IEnumerator DiscardEvent(int id, string tag);
     private List<EventPack> discard;
-    public IEnumerator Discard(int id, Tile.Element elem) {
+    public IEnumerator Discard(int id, string tag) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in discard) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: Resolving matchEvent with p="+pack.priority);
-            yield return ((DiscardEvent)pack.ev)(id, elem); // OH YEAH
+            yield return ((DiscardEvent)pack.ev)(id, tag); // OH YEAH
         }
         MMLog.Log_EventCont("Just finished DISCARD events...");
         handlingEvents = false; // worth it?

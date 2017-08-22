@@ -45,7 +45,7 @@ public class Stats {
         mm.eventCont.commishDrop += OnCommishDrop;
         mm.eventCont.commishMatch += OnCommishMatch;
 
-        mm.eventCont.draw += OnDraw;
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats);
         mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats);
         mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats);
         mm.eventCont.spellCast += OnSpellCast;
@@ -109,23 +109,24 @@ public class Stats {
 
     #region GameAction subscriptions
     // TODO for all, different report lines for playerAction or not...
-    public void OnDraw(int id, bool playerAction, bool dealt, Tile.Element elem) {
+    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
         if(dealt)
-            report.AppendLine("Deal p"+id+" " + Tile.ElementToChar(elem));
+            report.AppendLine("Deal p" + id + " " + tag);
         else
-            report.AppendLine("Draw " + Tile.ElementToChar(elem));
+            report.AppendLine("Draw " + tag);
         GetPS(id).draws++;
+        yield return null;
     }
 
-    public IEnumerator OnDiscard(int id, Tile.Element elem) {
-        report.AppendLine("p" + id + " discards " + Tile.ElementToChar(elem));
+    public IEnumerator OnDiscard(int id, string tag) {
+        report.AppendLine("p" + id + " discards " + tag);
         GetPS(id).discards++;
         yield return null;
     }
 
-    public IEnumerator OnDrop(int id, bool playerAction, Tile.Element elem, int col) {
+    public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
         if (playerAction) {
-            report.AppendLine("Drop " + Tile.ElementToChar(elem) + " col" + col);
+            report.AppendLine("Drop " + tag + " col" + col);
             GetPS(id).drops++;
         } else if (mm.uiCont.IsMenu()) //?
             report.AppendLine("menu Drop col" + col);

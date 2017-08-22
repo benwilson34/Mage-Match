@@ -73,7 +73,7 @@ public class TileEffect : Effect {
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
-    private SpellEffects spellfx;
+    private ObjectEffects objFX; //?
     private bool skip = false;
 
     public TileEffect(int id, int turns, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) : this(id, type, turnEffect, endEffect, cancelEffect) {
@@ -143,7 +143,7 @@ public class Enchantment : TileEffect {
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
-    private SpellEffects spellfx;
+    private ObjectEffects objFX; //?
     private bool skip = false;
 
     public Enchantment(int id, int turns, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
