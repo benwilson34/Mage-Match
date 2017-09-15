@@ -39,7 +39,7 @@ public class ButtonController : MonoBehaviour {
         cancelView = Instantiate(simpleTextPF, this.transform, false);
         mainView.SetActive(false);
 
-        cancelView.transform.Find("Text").GetComponent<Text>().text = "Cancel";
+        cancelView.transform.Find("t").GetComponent<Text>().text = "Cancel";
 
         mainClick = onClick;
         onClick = OnSpellCancelClick;

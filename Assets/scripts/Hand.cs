@@ -38,10 +38,10 @@ public class Hand {
 
         handPos = GameObject.Find("handslot" + place).transform;
 
-        if (mm.gameSettings.hideOpponentHand && p.id != mm.myID) {
-            //MMDebug.MMLog.Log("HAND", "black", "hiding opponent hand..........");
-            handPos.position = new Vector3(handPos.position.x + 5, handPos.position.y);
-        }
+        //if (mm.gameSettings.hideOpponentHand && p.id != mm.myID) {
+        //    //MMDebug.MMLog.Log("HAND", "black", "hiding opponent hand..........");
+        //    handPos.position = new Vector3(handPos.position.x + 5, handPos.position.y);
+        //}
 
         for (int i = 0; i < maxHandSize; i++) {
             slots[i] = handPos.Find("slot" + i).GetComponent<HandSlot>();
@@ -69,8 +69,8 @@ public class Hand {
     public void Remove(HandObject hex) {
         // TODO iterate thru, then clear corresponding handSlot
         for (int i = 0; i < maxHandSize; i++) {
-            HandObject slotTile = slots[i].GetHex();
-            if (slotTile != null && slotTile.Equals(hex)) {
+            HandObject slotHex = slots[i].GetHex();
+            if (slotHex != null && slotHex.tag.Equals(hex.tag)) {
                 slots[i].ClearHex();
                 break;
             }

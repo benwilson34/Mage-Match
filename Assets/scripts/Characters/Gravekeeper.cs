@@ -56,7 +56,7 @@ public class Gravekeeper : Character {
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
             yield return mm.syncManager.SyncRand(playerID, Random.Range(0, tbs.Count));
             int rand = mm.syncManager.GetRand();
-            objFX.Ench_SetZombify(playerID, tbs[rand], false); // skip?
+            yield return objFX.Ench_SetZombify(playerID, tbs[rand], false); // skip?
             tbs.RemoveAt(rand);
         }
 
@@ -165,8 +165,7 @@ public class Gravekeeper : Character {
     //}
 
     public IEnumerator UndeadUnion() {
-        List<TileBehav> tbs = targeting.GetTargetTBs();
-        List<TileBehav> indestructTbs = new List<TileBehav>(tbs);
+        List<TileBehav> tbs = mm.hexGrid.GetPlacedTiles();
         for (int i = 0; i < tbs.Count; i++) { // filter zombs
             TileBehav tb = tbs[i];
             if (tb.GetEnchType() != Enchantment.EnchType.Zombify) {
@@ -174,7 +173,7 @@ public class Gravekeeper : Character {
                 i--;
             }
         }
-        MMLog.Log_Gravekeeper("Undead Union target has " + tbs.Count + " zombs");
+        MMLog.Log_Gravekeeper(tbs.Count + " zombs on the board...");
 
         DealAdjZombDmg(tbs);
 

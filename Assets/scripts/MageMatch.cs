@@ -92,11 +92,12 @@ public class MageMatch : MonoBehaviour {
         InitEvents();
 
         currentState = GameState.PlayerTurn;
-        uiCont.SetDrawButton(activep, true);
+        uiCont.SetDrawButton(true);
         activep.InitAP();
 
         yield return syncManager.Checkpoint(); // idk if this is really doing anything
 
+        // TODO animate beginning of game
         for (int i = 0; i < 4; i++) {
             yield return LocalP().DealTile();
             yield return new WaitForSeconds(.25f);
@@ -163,7 +164,7 @@ public class MageMatch : MonoBehaviour {
             if (costsAP)
                 activep.AP--;
             if (activep.AP == 0) {
-                uiCont.SetDrawButton(activep, false);
+                uiCont.SetDrawButton(false);
                 StartCoroutine(TurnSystem());
             }
         }
@@ -185,7 +186,7 @@ public class MageMatch : MonoBehaviour {
     public void TurnTimeout() {
         Player p = GetPlayer(activep.id);
         MMLog.Log_MageMatch(p.name + "'s turn just timed out! They had " + p.AP + " AP left.");
-        uiCont.SetDrawButton(activep, false);
+        uiCont.SetDrawButton(false);
         StartCoroutine(TurnSystem());
     }
 
@@ -202,7 +203,7 @@ public class MageMatch : MonoBehaviour {
         yield return eventCont.TurnEnd();
 
         uiCont.DeactivateAllSpellButtons(); //? These should be part of any boardaction...
-        uiCont.SetDrawButton(activep, false);
+        uiCont.SetDrawButton(false);
 
         currentState = GameState.CommishTurn;
         yield return commish.CTurn();
@@ -340,23 +341,13 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
-    public bool PlayerDropTile(int col, HandObject hex) {
-        int row = boardCheck.CheckColumn(col); // check that column isn't full
-        if (row >= 0) {
-            activep.hand.Remove(hex); // remove from hand
-            StartCoroutine(_Drop(true, col, hex));
-            return true;
-        }
-        return false;
+    public void PlayerDropTile(int col, HandObject hex) {
+        activep.hand.Remove(hex); // remove from hand
+        StartCoroutine(_Drop(true, col, hex));
     }
 
-    public bool DropTile(int col, HandObject hex) {
-        int row = boardCheck.CheckColumn(col); // check that column isn't full
-        if (row >= 0) { // if the col is not full
-            StartCoroutine(_Drop(false, col, hex));
-            return true;
-        }
-        return false;
+    public void DropTile(int col, HandObject hex) {
+        StartCoroutine(_Drop(false, col, hex));
     }
 
     IEnumerator _Drop(bool playerAction, int col, HandObject hex) {
@@ -408,10 +399,12 @@ public class MageMatch : MonoBehaviour {
         if (p.AP >= spell.APcost) {
             targeting.selectionCanceled = false; // maybe not needed here
 
+            MMLog.Log_MageMatch("spell cast spellNum=" + spellNum + ", spell count=" + spellsOnBoard[spellNum].Count);
+
             yield return targeting.SpellSelectScreen(spellsOnBoard[spellNum]);
 
             if (!targeting.selectionCanceled) {
-                StartCoroutine(uiCont.GetButtonCont(activep, spellNum).Transition_MainView());
+                StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
 
                 targeting.targetingCanceled = false;
                 uiCont.DeactivateAllSpellButtons(); // ?

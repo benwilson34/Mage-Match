@@ -282,9 +282,14 @@ public class Targeting {
         currentTMode = TargetMode.Selection;
         selectionCanceled = false;
         selections = new List<TileSeq>(seqs);
+        MMLog.Log_Targeting("seqs=" + mm.boardCheck.PrintSeqList(seqs));
         mm.uiCont.ShowSpellSeqs(selections);
 
+        MMLog.Log_Targeting("Starting to show spell select screen, selections=" +         mm.boardCheck.PrintSeqList(selections));
+
         yield return new WaitUntil(() => selections.Count == 1 || selectionCanceled);
+
+        MMLog.Log_Targeting("Chose prereq!");
 
         if (selectionCanceled) {
             selections = null; // or clear? to avoid nullrefs

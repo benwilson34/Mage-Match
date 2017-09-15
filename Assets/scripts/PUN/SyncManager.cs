@@ -218,4 +218,26 @@ public class SyncManager : PunBehaviour {
     public void HandleEndDragTarget() {
         mm.targeting.EndDragTarget();
     }
+
+    public void SendDropSelection(int col, TileBehav tb) {
+        if (mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleDropSelection", PhotonTargets.Others, col, tb.tag);
+        }
+    }
+    [PunRPC]
+    public void HandleDropSelection(int col, string tag) {
+        mm.prompt.SetDrop(col, (TileBehav)mm.ActiveP().hand.GetHex(tag));
+    }
+
+    public void SendSwapSelection(int c1, int r1, int c2, int r2) {
+        if (mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleSwapSelection", PhotonTargets.Others, c1, r1, c2, r2);
+        }
+    }
+    [PunRPC]
+    public void HandleSwapSelection(int c1, int r1, int c2, int r2) {
+        mm.prompt.SetSwaps(c1, r1, c2, r2);
+    }
 }

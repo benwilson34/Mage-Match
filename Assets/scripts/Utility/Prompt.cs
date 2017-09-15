@@ -39,8 +39,7 @@ public class Prompt {
     }
 
     public void SetDrop(int col, TileBehav tb) {
-        if (mm.MyTurn())
-            // TODO send player choice thru SyncMan
+        mm.syncManager.SendDropSelection(col, tb);
 
         dropTile = tb;
         dropCol = col;
@@ -70,8 +69,7 @@ public class Prompt {
     }
 
     public void SetSwaps(int c1, int r1, int c2, int r2) {
-        if(mm.MyTurn())
-            // TODO send player choice thru SyncMan
+        mm.syncManager.SendSwapSelection(c1, r1, c2, r2);
 
         swapTiles = new TileBehav[2];
         swapTiles[0] = mm.hexGrid.GetTileBehavAt(c1, r1);

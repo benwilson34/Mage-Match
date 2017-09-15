@@ -97,8 +97,8 @@ public class Enfuego : Character {
     }
 
     public IEnumerator Baila() {
-        mm.GetPlayer(playerID).DrawTiles(1, "", false, false); // my draw
-        mm.GetOpponent(playerID).DrawTiles(1, "", false, false); // their draw
+        yield return mm.GetPlayer(playerID).DrawTiles(1, "", false, false); // my draw
+        yield return mm.GetOpponent(playerID).DrawTiles(1, "", false, false); // their draw
 
         yield return mm.prompt.WaitForSwap();
         mm.prompt.ContinueSwap();

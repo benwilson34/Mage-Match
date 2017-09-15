@@ -74,4 +74,6 @@ MonoBehaviour:
   - HandleCancelSelection
   - HandleTBSelection
   - HandleCheckpoint
+  - HandleDropSelection
+  - HandleSwapSelection
   DisableAutoOpenWizard: 1

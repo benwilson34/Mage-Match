@@ -77,7 +77,10 @@ public class Commish  {
             HandObject tb = mm.tileMan.GenerateTile(3, elems.Dequeue()); // should get own func?
             MMLog.Log_Commish("Dropping into col " + cols.Peek());
 
-            if ( !mm.DropTile(cols.Dequeue(), (TileBehav)tb) ) {
+            int col = cols.Dequeue();
+            if (mm.boardCheck.CheckColumn(col) >= 0)
+                mm.DropTile(col, tb);
+            else {
                 MMLog.LogError("COMMISH: Tried to drop into a full column!");
                 break;
             }

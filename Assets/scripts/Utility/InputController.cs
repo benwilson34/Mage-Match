@@ -216,7 +216,7 @@ public class InputController : MonoBehaviour {
                         targeting.currentTMode == Targeting.TargetMode.Drag) {
                         targeting.OnTBTarget((TileBehav)hex); // maybe its own method?
                     }
-                    if (!ActionNotAllowed() || mm.prompt.currentMode == Prompt.PromptMode.Swap)
+                    if (!ActionNotAllowed() || PromptedSwap())
 				        SwapCheck((TileBehav)hex);
 				    break;
 			}
@@ -234,9 +234,16 @@ public class InputController : MonoBehaviour {
                             RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
 
-                            if (ActionNotAllowed() || cb == null || !mm.PlayerDropTile(cb.col, dropHex)) {
+                            if (ActionNotAllowed() || cb == null) {
                                 mm.LocalP().hand.ReleaseTile(hex); //?
                             } else {
+                                if (DropCheck(cb.col)) {
+                                    if (PromptedDrop())
+                                        mm.prompt.SetDrop(cb.col, (TileBehav)dropHex);
+                                    else
+                                        mm.PlayerDropTile(cb.col, dropHex);
+                                }
+                                
                                 mm.LocalP().hand.ClearPlaceholder(); //?
                             }
                             dropping = false;
@@ -285,12 +292,20 @@ public class InputController : MonoBehaviour {
 		}
 	}
 
+    bool DropCheck(int col) {
+        return mm.boardCheck.CheckColumn(col) >= 0;
+    }
+
     bool ActionNotAllowed() {
         return !mm.MyTurn() || mm.switchingTurn || 
             mm.IsCommishTurn() || mm.IsPerformingAction(); // add IsEnded?
     }
 
-	void CBMouseDown(CellBehav cb){
+    bool PromptedDrop() { return mm.MyTurn() && mm.prompt.currentMode == Prompt.PromptMode.Drop; }
+
+    bool PromptedSwap() { return mm.MyTurn() && mm.prompt.currentMode == Prompt.PromptMode.Swap; }
+
+    void CBMouseDown(CellBehav cb){
 //		Debug.Log ("OnMouseDown hit on column " + cb.col);
 		if (MenuOpen()) {
 //			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();

@@ -5,16 +5,19 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 
+using MMDebug;
+
 public class UIController : MonoBehaviour {
 
     public AnimationCurve slidingEase;
 
     private Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
-	private Text moveText, debugGridText, turnTimerText, slidingText;
+	private Text debugGridText, turnTimerText, slidingText;
 	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
+    private Button localDrawButton;
     private MageMatch mm;
 	private Dropdown DD1, DD2;
-    private Transform leftPinfo, rightPinfo, leftPload, rightPload, board;
+    private Transform leftPinfo, rightPinfo, leftPload, board;
     private GameObject spellOutlineEnd, spellOutlineMid;
     private GameObject prereqPF, targetPF;
     private GameObject gradient, targetingBG;
@@ -32,8 +35,6 @@ public class UIController : MonoBehaviour {
 
         InitSprites();
 
-        moveText = GameObject.Find ("Text_Move").GetComponent<Text> (); // UI move announcement
-		moveText.text = "";
 		debugGridText = GameObject.Find ("Text_Debug1").GetComponent<Text> (); // UI debug grid
         slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
 
@@ -48,20 +49,21 @@ public class UIController : MonoBehaviour {
         leftPinfo = GameObject.Find("LeftPlayer_Info").transform;
         rightPinfo = GameObject.Find("RightPlayer_Info").transform;
         leftPload = GameObject.Find("LeftPlayer_Loadout").transform;
-        rightPload = GameObject.Find("RightPlayer_Loadout").transform;
+        localDrawButton = leftPinfo.Find("b_Draw").GetComponent<Button>();
 
   //      DD1 = GameObject.Find ("Dropdown_p1").GetComponent<Dropdown> ();
 		//DD2 = GameObject.Find ("Dropdown_p2").GetComponent<Dropdown> ();
 
-        gradient = GameObject.Find("green-gradient");
-        targetingBG = GameObject.Find("targetingBG");
-        targetingBG.SetActive(false);
-        tCancelB = GameObject.Find("Button_CancelSpell");
-        tCancelB.SetActive(false);
-        tClearB = GameObject.Find("Button_ClearTargets");
-        tClearB.SetActive(false);
+        //gradient = GameObject.Find("green-gradient");
+        //targetingBG = GameObject.Find("targetingBG");
+        //targetingBG.SetActive(false);
+        //tCancelB = GameObject.Find("Button_CancelSpell");
+        //tCancelB.SetActive(false);
+        //tClearB = GameObject.Find("Button_ClearTargets");
+        //tClearB.SetActive(false);
 
         settingsMenu = GameObject.Find("SettingsMenu");
+        settingsMenu.SetActive(false);
 
         turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
 
@@ -104,10 +106,11 @@ public class UIController : MonoBehaviour {
     public IEnumerator OnTurnBegin(int id) {
         if (mm.MyTurn())
             SendSlidingText(mm.ActiveP().name + ", make your move!");
-        UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
-        SetDrawButton(mm.ActiveP(), true);
+        //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
+
+        SetDrawButton(true);
         FlipGradient(); // ugly
-        UpdateAPText(mm.GetPlayer(id));
+        UpdateAP(mm.GetPlayer(id));
 
         //ChangePinfoColor(id, new Color(0, 1, 0, .4f));
         PinfoColorTween(id, CorrectPinfoColor(id));
@@ -117,12 +120,12 @@ public class UIController : MonoBehaviour {
 
     public IEnumerator OnTurnEnd(int id) {
         UpdateEffTexts();
-        ChangePinfoColor(id, new Color(1, 1, 1, .4f));
+        //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
         yield return null;
     }
 
     public void OnGameAction(int id, bool costsAP) {
-        UpdateAPText(mm.GetPlayer(id));
+        UpdateAP(mm.GetPlayer(id));
         UpdateEffTexts(); // could be considerable overhead...
     }
 
@@ -152,7 +155,7 @@ public class UIController : MonoBehaviour {
     }
     #endregion
 
-    public void Reset() { // could just get players from MM
+    public void Reset() {
         UpdateDebugGrid();
         UpdateMoveText("Fight!!");
 
@@ -163,27 +166,23 @@ public class UIController : MonoBehaviour {
             Player p = mm.GetPlayer(id);
             Transform pinfo = GetPinfo(id);
 
-            Text nameText = pinfo.Find("Text_Name").GetComponent<Text>();
+            Text nameText = pinfo.Find("t_name").GetComponent<Text>();
             nameText.text = "P"+id+": " + p.name;
             if (id == mm.myID)
                 nameText.text += " (ME!)";
 
-            ShowLoadout(p);
+            ShowLoadout();
             DeactivateAllSpellButtons();
-            UpdateAPText(p);
+            UpdateAP(p);
 
-            // TODO start health from zero so it animates
-            Text healthT = pinfo.Find("Health_Outline").Find("Text_Health").GetComponent<Text>();
-            healthT.text = p.health + "/" + p.character.GetMaxHealth();
+            // start health from zero so it animates
+            pinfo.Find("i_health").GetComponent<Image>().fillAmount = 0f;
+            pinfo.Find("i_health").Find("t_health").GetComponent<Text>().text = "0";
+            StartCoroutine(UpdateHealthbar(p));
 
-            Text meterT = pinfo.Find("Meter_Outline").Find("Text_Meter").GetComponent<Text>();
-            meterT.text = "0/" + p.character.meterMax;
+            // maybe just set it to empty?
             StartCoroutine(UpdateMeterbar(p));
         }
-
-        ChangePinfoColor(1, new Color(0, 1, 0, .4f));
-
-        settingsMenu.SetActive(menu); //?
     }
 
     public void UpdateDebugGrid(){
@@ -205,8 +204,8 @@ public class UIController : MonoBehaviour {
 	}
 
 	public void UpdateMoveText(string str){
-		moveText.text = str;
-	}
+        //moveText.text = str;
+    }
 
     public void SendSlidingText(string str) {
         slidingText.text = str;
@@ -237,23 +236,9 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    public Transform GetPload(int id) {
-        if (mm.gameSettings.localPlayerOnLeft) {
-            if (id == mm.myID)
-                return leftPload;
-            else
-                return rightPload;
-        } else {
-            if (id == 1)
-                return leftPload;
-            else
-                return rightPload;
-        }
-    }
-
-    void ChangePinfoColor(int id, Color c) {
-        GetPinfo(id).GetComponent<Image>().color = c; // idk why
-    }
+    //void ChangePinfoColor(int id, Color c) {
+    //    GetPinfo(id).GetComponent<Image>().color = c; // idk why
+    //}
 
     Tween PinfoColorTween(int id, Color newColor) {
         Transform pinfo = GetPinfo(id);
@@ -261,40 +246,50 @@ public class UIController : MonoBehaviour {
             .SetEase(Ease.InOutQuad).SetLoops(7, LoopType.Yoyo);
     } 
 
-    void UpdateAPText(Player p) {
-        Text APText = GetPinfo(p.id).Find ("Text_AP").GetComponent<Text>();
-		APText.text = "AP left: " + p.AP;
+    void UpdateAP(Player p) {
+  //      Text APText = GetPinfo(p.id).Find ("Text_AP").GetComponent<Text>();
+		//APText.text = "AP left: " + p.AP;
+        Transform APblock = GetPinfo(p.id).Find("i_AP");
+
+        for (int i = 0; i < 6; i++) {
+            if (i < p.AP)
+                APblock.Find("AP" + i).GetComponent<Image>().enabled = true;
+            else
+                APblock.Find("AP" + i).GetComponent<Image>().enabled = false;
+
+        }        
     }
 
     IEnumerator UpdateHealthbar(Player p) {
         Transform pinfo = GetPinfo(p.id);
-        Transform healthOutline = pinfo.Find("Health_Outline");
-        RectTransform healthbar = healthOutline.Find("Healthbar").GetComponent<RectTransform>();
-        Text healthText = healthOutline.Find("Text_Health").GetComponent<Text>();
+        Image health = pinfo.Find("i_health").GetComponent<Image>();
+        Text healthText = health.transform.Find("t_health").GetComponent<Text>();
 
-        TextNumTween(healthText, p.health, p.character.GetMaxHealth());
+        TextNumTween(healthText, p.health);
 
         float slideRatio = (float)p.health / p.character.GetMaxHealth();
 
         // TODO I have a feeling I can just Lerp this? lol
         // health bar coloring; green -> yellow -> red
-        float thresh = .6f; // point where health bar is yellow (0.6 = 60% health)
-        float r = (((Mathf.Clamp(slideRatio, thresh, 1) - thresh) / (1 - thresh)) * -1 + 1);
-        float g = Mathf.Clamp(slideRatio, 0, thresh) / thresh;
-        healthbar.GetComponent<Image>().color = new Color(r, g, 0);
+        //float thresh = .6f; // point where health bar is yellow (0.6 = 60% health)
+        //float r = (((Mathf.Clamp(slideRatio, thresh, 1) - thresh) / (1 - thresh)) * -1 + 1);
+        //float g = Mathf.Clamp(slideRatio, 0, thresh) / thresh;
+        //healthbar.GetComponent<Image>().color = new Color(r, g, 0);
 
-        yield return healthbar.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
+        //yield return healthbar.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
+        yield return health.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic);
     }
 
     IEnumerator UpdateMeterbar(Player p) {
-        Transform meterOutline = GetPinfo(p.id).Find("Meter_Outline");
-        RectTransform meter = meterOutline.Find("Meterbar").GetComponent<RectTransform>();
-        Text meterText = meterOutline.Find("Text_Meter").GetComponent<Text>();
+        Transform pinfo = GetPinfo(p.id);
+        Image sig = pinfo.Find("i_sig").GetComponent<Image>();
+        Text sigText = sig.transform.Find("t_sig").GetComponent<Text>();
 
-        TextNumTween(meterText, p.character.meter, p.character.meterMax);
+        TextNumTween(sigText, p.character.meter, "%");
 
         float slideRatio = (float) p.character.meter / p.character.meterMax;
-        yield return meter.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
+        //yield return meter.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
+        yield return sig.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic);
     }
 
     IEnumerator DamageAnim(Player p, int amount) {
@@ -309,39 +304,44 @@ public class UIController : MonoBehaviour {
 
     Color CorrectPinfoColor(int id) {
         if (id == mm.ActiveP().id && mm.currentState != MageMatch.GameState.CommishTurn) {
-            return new Color(0, 1, 0, 0.4f);
+            return new Color(0, 1, 0);
         } else
-            return new Color(1, 1, 1, 0.4f);
+            return new Color(1, 1, 1);
     }
 
-    Tween TextNumTween(Text t, int newValue, int maxValue) {
-        int oldValue = int.Parse(t.text.Split('/')[0]);
+    Tween TextNumTween(Text t, int newValue, string suffix = "") {
+        string current = t.text;
+        if (suffix != "")
+            current = current.Split(suffix[0])[0];
+
+        int oldValue = int.Parse(current);
         return DOTween.To(() => oldValue,
-            x => { oldValue = x; t.text = oldValue + "/" + maxValue; },
+            x => { oldValue = x; t.text = oldValue + suffix; },
             newValue, .8f)
             .SetEase(Ease.OutCubic);
     }
 
-	void ShowLoadout(Player player){
-		Transform pload = GetPload(player.id); // i hope?
+	void ShowLoadout(){
+        Player p = mm.LocalP();
+		Transform pload = leftPload;
 
         // for each spell
 		for (int i = 0; i < 5; i++){
-			Transform t = pload.Find ("Button_Spell" + i).Find("main");
-			Spell currentSpell = player.character.GetSpell (i);
+			Transform t = pload.Find ("b_Spell" + i).Find("main");
+			Spell currentSpell = p.character.GetSpell (i);
 
-			Text spellName = t.Find ("Text_SpellName").GetComponent<Text> ();
+			Text spellName = t.Find ("t_spellName").GetComponent<Text> ();
             spellName.text = currentSpell.name;
             if(currentSpell.APcost != 1)
                 spellName.text += " " + currentSpell.APcost + " AP";
 
+            Transform minis = t.Find("minis");
 			for (int m = 0; m < 5; m++) {
-				Image minitile = t.Find ("minitile" + m).GetComponent<Image> ();
+				Image minitile = minis.Find ("minitile" + m).GetComponent<Image> ();
 				minitile.color = Color.white;
 				Tile.Element currentEl = currentSpell.GetElementAt (m);
 //				Debug.Log (currentEl);
-				if (!currentEl.Equals(Tile.Element.None)) {
-					switch (currentEl) {
+				switch (currentEl) {
 					case Tile.Element.Fire:
 						minitile.sprite = miniFire;
 						break;
@@ -357,12 +357,10 @@ public class UIController : MonoBehaviour {
 					case Tile.Element.Muscle:
 						minitile.sprite = miniMuscle;
 						break;
-					}
-				} else {
-					// turn image transparent
-					minitile.color = new Color(1,1,1,0);
-				}
-					
+                        case Tile.Element.None:
+                            minitile.gameObject.SetActive(false);
+                            break;
+				}	
 			}
 		}
 	}
@@ -370,13 +368,14 @@ public class UIController : MonoBehaviour {
     void FlipGradient() {
         //		Vector3 scale = go.transform.localScale;
         //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
-        gradient.transform.Rotate(0, 0, 180);
+        //gradient.transform.Rotate(0, 0, 180);
     }
 
     // ----- TARGETING -----
 
     public void ShowSpellSeqs(List<TileSeq> seqs) {
         foreach (TileSeq seq in seqs) {
+            MMLog.Log_UICont("showing " + seqs.Count + " seqs");
             GameObject start = Instantiate(spellOutlineEnd);
             int length = seq.GetSeqLength();
             for (int i = 1; i < length; i++) {
@@ -417,10 +416,10 @@ public class UIController : MonoBehaviour {
 
     void ActivateTargetingUI() {
         overlay.SetActive(true);
-        if (mm.MyTurn()) {
-            tCancelB.SetActive(true);
-            tClearB.SetActive(true);
-        }
+        //if (mm.MyTurn()) {
+        //    tCancelB.SetActive(true);
+        //    tClearB.SetActive(true);
+        //}
 
         for(int i = 0; i < 7; i++) {
             for(int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
@@ -458,10 +457,10 @@ public class UIController : MonoBehaviour {
 
     public void DeactivateTargetingUI(){
         overlay.SetActive(false);
-        if (mm.MyTurn()) {
-            tCancelB.SetActive(false);
-            tClearB.SetActive(false);
-        }
+        //if (mm.MyTurn()) {
+        //    tCancelB.SetActive(false);
+        //    tClearB.SetActive(false);
+        //}
 
         for (int i = 0; i < 7; i++) {
             for (int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
@@ -509,36 +508,35 @@ public class UIController : MonoBehaviour {
 
     // ----- SPELL BUTTONS -----
 
-    // player won't be needed once we redesign the UI
-    public void SetDrawButton(Player p, bool interactable) {
-        if (interactable && !p.ThisIsLocal()) // if not the localp, no draw button
-            return;
-        GetPinfo(p.id).Find("Button_Draw").GetComponent<Button>().interactable = interactable;
+    public void SetDrawButton(bool interactable) {
+        if(mm.MyTurn())
+            localDrawButton.interactable = interactable;
     }
 
-    // player won't be needed once we redesign the UI
-    public ButtonController GetButtonCont(Player p, int index) {
-        return GetPload(p.id).Find ("Button_Spell" + index)
+    public ButtonController GetButtonCont(int index) {
+        return leftPload.Find ("b_Spell" + index)
             .GetComponent<ButtonController>();
     }
 
-    Button GetButton(Player player, int index){
-		return GetPload(player.id).Find ("Button_Spell" + index).GetComponent<Button>();
+    Button GetButton(int index){
+		return leftPload.Find ("b_Spell" + index).GetComponent<Button>();
 	}
     
 	public void ActivateSpellButton(int index){
-        Button button = GetButton(mm.LocalP(), index); // TODO only one player it could be...
-        button.interactable = true;
+        if (mm.MyTurn()) {
+            Button button = GetButton(index); // TODO only one player it could be...
+            button.interactable = true;
+        }
 	}
 
 	public void DeactivateSpellButton(int index){
-		Button button = GetButton (mm.LocalP(), index);
+		Button button = GetButton (index);
 		button.interactable = false;
 	}
 
 	public void DeactivateAllSpellButtons(){
 		for (int i = 0; i < 5; i++) {
-			Button button = GetButton (mm.LocalP(), i);
+			Button button = GetButton (i);
 			button.interactable = false;
 		}
 	}
