@@ -6,11 +6,11 @@ public class HandSlot : MonoBehaviour {
 
     public int handPosition = 1, handIndex = 0;
 
-    private HandObject hex = null;
+    private Hex hex = null;
 
-    public void SetHex(HandObject hex) { this.hex = hex; }
+    public void SetHex(Hex hex) { this.hex = hex; }
 
-    public HandObject GetHex() { return hex; }
+    public Hex GetHex() { return hex; }
 
     public void ClearHex() { hex = null; }
 

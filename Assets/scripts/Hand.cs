@@ -5,7 +5,7 @@ using MMDebug;
 
 public class Hand {
 
-    private List<HandObject> objs = null;
+    private List<Hex> objs = null;
     private Transform handPos = null;
     private HandSlot[] slots;
     private GameObject placeholderPF;
@@ -17,7 +17,7 @@ public class Hand {
     private const int maxHandSize = 7;
 
     public Hand(MageMatch mm, Player p) {
-        objs = new List<HandObject>();
+        objs = new List<Hex>();
         slots = new HandSlot[maxHandSize];
         placeholderPF = Resources.Load("prefabs/ui/placeholder") as GameObject;
         this.mm = mm;
@@ -50,7 +50,7 @@ public class Hand {
 
     public Vector3 GetHandPos() { return handPos.position; }
 
-    public void Add(HandObject hex) {
+    public void Add(Hex hex) {
         hex.transform.SetParent(handPos); // , false)?
         objs.Add(hex);
 
@@ -66,10 +66,10 @@ public class Hand {
         } 
     }
 
-    public void Remove(HandObject hex) {
+    public void Remove(Hex hex) {
         // TODO iterate thru, then clear corresponding handSlot
         for (int i = 0; i < maxHandSize; i++) {
-            HandObject slotHex = slots[i].GetHex();
+            Hex slotHex = slots[i].GetHex();
             if (slotHex != null && slotHex.tag.Equals(hex.tag)) {
                 slots[i].ClearHex();
                 break;
@@ -95,8 +95,8 @@ public class Hand {
         return null;
     }
 
-    public HandObject GetHex(string tag) {
-        foreach (HandObject obj in objs) {
+    public Hex GetHex(string tag) {
+        foreach (Hex obj in objs) {
             MMLog.Log("HAND", "black", "Trying \"" + tag + "\" against \"" + obj.tag + "\"");
             if (tag.Equals(obj.tag))
                 return obj;
@@ -117,7 +117,7 @@ public class Hand {
         foreach (HandSlot slot in slots) {
             if (slot.IsFull()) {
                 total++;
-                HandObject hex = slot.GetHex();
+                Hex hex = slot.GetHex();
                 if (hex is TileBehav)
                     str += "[" + ((TileBehav)hex).tile.ThisElementToChar() + "] ";
                 else
@@ -134,11 +134,11 @@ public class Hand {
     // maybe kinda depends on tile tagging system?
 
     // On MouseDown 
-    public void GrabHex(HandObject hex) {
+    public void GrabHex(Hex hex) {
         //NumFullSlots();
         for (int i = 0; i < maxHandSize; i++) {
             HandSlot slot = slots[i];
-            HandObject slotHex = slot.GetHex();
+            Hex slotHex = slot.GetHex();
             if (slotHex != null && hex.EqualsTag(slotHex)) {
                 //MMDebug.MMLog.Log("HAND", "black", "Found it at index=" + i);
 
@@ -185,13 +185,13 @@ public class Hand {
         // downward swap
         if (swapSlot.handIndex > newSlotInd) {
             for (int s = swapSlot.handIndex; s > newSlotInd; s--) {
-                HandObject hex = slots[s - 1].GetHex();
+                Hex hex = slots[s - 1].GetHex();
                 slots[s].SetHex(hex);
                 mm.animCont.PlayAnim(mm.animCont._Move(hex, slots[s].transform.position));
             }
         } else { // upward
             for (int s = swapSlot.handIndex; s < newSlotInd; s++) {
-                HandObject hex = slots[s + 1].GetHex();
+                Hex hex = slots[s + 1].GetHex();
                 slots[s].SetHex(hex);
                 mm.animCont.PlayAnim(mm.animCont._Move(hex, slots[s].transform.position));
             }
@@ -207,7 +207,7 @@ public class Hand {
     }
 
     // On MouseUp
-    public void ReleaseTile(HandObject hex) {
+    public void ReleaseTile(Hex hex) {
         //MMDebug.MMLog.Log("HAND", "black", "ReleaseTile called! PlaceholderSlot="+placeholderSlot.handIndex);
         mm.animCont.PlayAnim(mm.animCont._Move(hex, placeholderSlot.transform.position));
 

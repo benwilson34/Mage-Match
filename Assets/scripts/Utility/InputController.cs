@@ -14,8 +14,8 @@ public class InputController : MonoBehaviour {
 	private bool dragged = false;
 
 	private bool lastClick = false, nowClick = false;
-	private HandObject clickHex; // needed?
-    private HandObject dropHex;
+	private Hex clickHex; // needed?
+    private Hex dropHex;
     private CellBehav clickCB; // needed?
 	private bool isClickHex = false;
 
@@ -70,7 +70,7 @@ public class InputController : MonoBehaviour {
 		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
 
 		if (targeting.currentTMode != Targeting.TargetMode.Cell) {
-			HandObject hex = GetMouseHex(hits);
+			Hex hex = GetMouseHex(hits);
 			if (hex != null) {
 				clickHex = hex;
 				isClickHex = true;
@@ -86,12 +86,12 @@ public class InputController : MonoBehaviour {
 		return false;
 	}
 
-	HandObject GetMouseHex(RaycastHit2D[] hits){
+	Hex GetMouseHex(RaycastHit2D[] hits){
 		foreach (RaycastHit2D hit in hits) {
 			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
 			if (tb != null)
 				return tb;
-            HandObject hex = hit.collider.GetComponent<HandObject>();
+            Hex hex = hit.collider.GetComponent<Hex>();
             if (hex != null)
                 return hex;
         }
@@ -156,11 +156,11 @@ public class InputController : MonoBehaviour {
 
     // ------------------------------- TB & CB handling -------------------------------
 
-    void HexMouseDown(HandObject hex){
+    void HexMouseDown(Hex hex){
 		if (!mm.IsEnded ()) { // if the game isn't done
 			//if (!mm.menu) { // if the menu isn't open
                 switch (hex.currentState) {
-                    case HandObject.State.Hand:
+                    case Hex.State.Hand:
                         if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsHexMine(hex)) {
                             dropping = true;
 
@@ -171,7 +171,7 @@ public class InputController : MonoBehaviour {
                         }
                         break;
 
-                    case HandObject.State.Placed:
+                    case Hex.State.Placed:
                     //					    Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
                         if (targeting.IsTargetMode()
                             //					        && Targeting.currentTMode == Targeting.TargetMode.Tile
@@ -195,11 +195,11 @@ public class InputController : MonoBehaviour {
 		}
 	}
 
-	void HexMouseDrag(HandObject hex){
+	void HexMouseDrag(Hex hex){
 //		Debug.Log ("TBMouseDrag called.");
 		if (!mm.IsEnded () && !targeting.IsTargetMode()) {
 			switch (hex.currentState) {
-			    case HandObject.State.Hand:
+			    case Hex.State.Hand:
                     if (!MenuOpen() && dropping) {
                         Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                         cursor.z = 0;
@@ -211,7 +211,7 @@ public class InputController : MonoBehaviour {
                             mm.LocalP().hand.Rearrange(slot);
                     }
 				    break;
-			    case HandObject.State.Placed:
+			    case Hex.State.Placed:
                     if (targeting.IsTargetMode() && 
                         targeting.currentTMode == Targeting.TargetMode.Drag) {
                         targeting.OnTBTarget((TileBehav)hex); // maybe its own method?
@@ -223,11 +223,11 @@ public class InputController : MonoBehaviour {
 		}
 	}
 
-	void HexMouseUp(HandObject hex){
+	void HexMouseUp(Hex hex){
         if (!mm.IsEnded () && !targeting.IsTargetMode()) {
             if (!MenuOpen()) { //?
                 switch (hex.currentState) {
-                    case HandObject.State.Hand:
+                    case Hex.State.Hand:
                         if (dropping) { // will always be if it's in the hand?
                             hex.GetComponent<SpriteRenderer>().sortingOrder = 0;
                             Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);

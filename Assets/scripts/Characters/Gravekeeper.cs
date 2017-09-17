@@ -261,7 +261,7 @@ public class Gravekeeper : Character {
 
         CellBehav cb = targeting.GetTargetCBs()[0];
         int col = cb.col;
-        HandObject tomb = tileMan.GenerateToken(playerID, "tombstone");
+        Hex tomb = tileMan.GenerateToken(playerID, "tombstone");
         tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
 
         TombstoneToken ttb = (TombstoneToken)tomb;

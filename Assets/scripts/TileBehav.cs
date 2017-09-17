@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
 
-public class TileBehav : HandObject {
+public class TileBehav : Hex {
 
 	public Tile tile;
 	public Tile.Element initElement;

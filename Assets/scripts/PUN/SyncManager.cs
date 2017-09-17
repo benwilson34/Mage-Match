@@ -101,7 +101,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleDrop(int id, string tag, int col) {
-        HandObject hex = mm.GetPlayer(id).hand.GetHex(tag);
+        Hex hex = mm.GetPlayer(id).hand.GetHex(tag);
         mm.PlayerDropTile(col, hex);
     }
 

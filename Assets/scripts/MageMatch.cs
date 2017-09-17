@@ -341,22 +341,24 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
-    public void PlayerDropTile(int col, HandObject hex) {
+    public void PlayerDropTile(int col, Hex hex) {
         activep.hand.Remove(hex); // remove from hand
         StartCoroutine(_Drop(true, col, hex));
     }
 
-    public void DropTile(int col, HandObject hex) {
+    public void DropTile(int col, Hex hex) {
         StartCoroutine(_Drop(false, col, hex));
     }
 
-    IEnumerator _Drop(bool playerAction, int col, HandObject hex) {
+    IEnumerator _Drop(bool playerAction, int col, Hex hex) {
         MMLog.Log_MageMatch("   ---------- DROP BEGIN ----------");
         actionsPerforming++;
 
+        hex.Reveal();
+
         GameObject go = hex.gameObject;
         go.transform.SetParent(tilesOnBoard);
-        TileBehav tb = go.GetComponent<TileBehav>();
+        TileBehav tb = hex.GetComponent<TileBehav>();
         tb.SetPlaced();
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
         if (currentState == GameState.PlayerTurn) { //kinda hacky

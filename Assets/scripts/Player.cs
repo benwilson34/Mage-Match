@@ -133,11 +133,14 @@ public class Player {
     public IEnumerator DrawTiles(int numTiles, string genTag, bool playerAction, bool dealt) {
         MMLog.Log_Player("p" + id + " drawing with genTag=" + genTag);
         for (int i = 0; i < numTiles && !hand.IsFull(); i++) {
-            HandObject hex;
+            Hex hex;
             if (genTag.Equals("")) {
                 hex = mm.tileMan.GenerateRandomHex(this);
             } else
                 hex = mm.tileMan.GenerateHex(id, genTag);
+
+            if (!ThisIsLocal())
+                hex.Flip();
 
             hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
             hand.Add(hex);
@@ -153,12 +156,12 @@ public class Player {
         for (int i = 0; i < count && hand.Count() > 0; i++) {
             yield return mm.syncManager.SyncRand(id, Random.Range(0, hand.Count()));
             int rand = mm.syncManager.GetRand();
-            HandObject hex = hand.GetTile(rand);
+            Hex hex = hand.GetTile(rand);
             yield return Discard(hex);
         }
     }
 
-    public IEnumerator Discard(HandObject hex) {
+    public IEnumerator Discard(Hex hex) {
         mm.eventCont.Discard(id, hex.tag);
 
         yield return mm.animCont._DiscardTile(hex.transform);
@@ -172,7 +175,7 @@ public class Player {
 
     }
 
-    public bool IsHexMine(HandObject hex) {
+    public bool IsHexMine(Hex hex) {
         return hex.transform.parent.position.Equals(hand.GetHandPos()); // kinda weird...hand function? compare tags
     }
 

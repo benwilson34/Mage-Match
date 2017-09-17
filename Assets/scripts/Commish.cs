@@ -74,7 +74,7 @@ public class Commish  {
                 yield return new WaitForSeconds(.15f);
             }
 
-            HandObject tb = mm.tileMan.GenerateTile(3, elems.Dequeue()); // should get own func?
+            Hex tb = mm.tileMan.GenerateTile(3, elems.Dequeue()); // should get own func?
             MMLog.Log_Commish("Dropping into col " + cols.Peek());
 
             int col = cols.Dequeue();

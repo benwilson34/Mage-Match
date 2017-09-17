@@ -6,6 +6,7 @@ using MMDebug;
 public class TileManager { // should maybe inherit MonoBehaviour? or maybe static?
 
     public int removing = 0;
+    public Sprite flipSprite;
 
     private Dictionary<string, int>[] tagDicts;
     private MageMatch mm;
@@ -13,8 +14,6 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
 
     private GameObject firePF, waterPF, earthPF, airPF, muscPF; // tile prefabs
     private GameObject stonePF, emberPF, tombstonePF; // token prefabs
-
-    private HandObject genHex;
 
     public TileManager(MageMatch mm) {
         this.mm = mm;
@@ -36,7 +35,9 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
         stonePF = Resources.Load("prefabs/token_stone") as GameObject;
         emberPF = Resources.Load("prefabs/token_ember") as GameObject;
         tombstonePF = Resources.Load("prefabs/token_tombstone") as GameObject;
-        
+
+        flipSprite = Resources.Load<Sprite>("sprites/hex-back");
+
         //TODO consumables
         // load only what could be used by either player??
     }
@@ -55,17 +56,17 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
         return fullTag;
     }
 
-    public HandObject GenerateRandomHex(Player p) {
+    public Hex GenerateRandomHex(Player p) {
         string genTag = p.character.GenerateHexTag();
         return GenerateHex(p.id, genTag);
     }
 
     //public HandObject GetRandomHex() { return genHex; }
 
-    public HandObject GenerateHex(int id, string genTag) {
+    public Hex GenerateHex(int id, string genTag) {
         MMLog.Log("TILEMAN", "black", "Generating tile from genTag \"" + genTag + "\"");
-        string type = HandObject.TagType(genTag);
-        switch (HandObject.TagCat(genTag)) {
+        string type = Hex.TagType(genTag);
+        switch (Hex.TagCat(genTag)) {
             case "B":
                 return GenerateTile(id, Tile.CharToElement(type[0]));
             case "T":
@@ -79,12 +80,12 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
     }
 
     // maybe return TB?
-    public HandObject GenerateTile(int id, Tile.Element element) {
+    public Hex GenerateTile(int id, Tile.Element element) {
         return GenerateTile(id, element, GameObject.Find("tileSpawn").transform.position);
     }
 
     // maybe return TB?
-    public HandObject GenerateTile(int id, Tile.Element element, Vector3 position) {
+    public Hex GenerateTile(int id, Tile.Element element, Vector3 position) {
         GameObject go;
         string tag;
         switch (element) {
@@ -120,7 +121,7 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
     }
 
     // maybe return TB?
-    public HandObject GenerateToken(int id, string name) {
+    public Hex GenerateToken(int id, string name) {
         GameObject go;
         string tag = "";
         switch (name) {
@@ -144,7 +145,7 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
         return tb;
     }
 
-    public HandObject GenerateConsumable(int id, string name) {
+    public Hex GenerateConsumable(int id, string name) {
         GameObject go;
         string tag = "";
         switch (name) {
@@ -153,7 +154,7 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
                 return null;
         }
 
-        HandObject hex = go.GetComponent<HandObject>();
+        Hex hex = go.GetComponent<Hex>();
         hex.tag = GenFullTag(id, "C", tag); // C for consumable
         hex.gameObject.name = hex.tag;
         return hex;

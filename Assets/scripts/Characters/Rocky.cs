@@ -95,7 +95,7 @@ public class Rocky : Character {
         int col = cb.col;
         int bottomr = hexGrid.BottomOfColumn(col);
         // hardset bottom three cells of column
-        HandObject stone;
+        Hex stone;
         for (int i = 0; i < 3; i++) {
             stone = tileMan.GenerateToken(playerID, "stone");
             stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);

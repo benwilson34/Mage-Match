@@ -125,7 +125,7 @@ public class AudioController {
     public void OnGrab(int id, string tag) {
         AudioClip clip = null;
         // TODO get sounds for "colorless" and consumables
-        string type = HandObject.TagType(tag);
+        string type = Hex.TagType(tag);
         switch (type) {
             case "F":
                 clip = grab[0];
@@ -143,7 +143,7 @@ public class AudioController {
                 clip = grab[4];
                 break;
         }
-        HandObject hex = mm.GetPlayer(id).hand.GetHex(tag);
+        Hex hex = mm.GetPlayer(id).hand.GetHex(tag);
         AudioSource source = hex.GetComponent<AudioSource>();
 
         source.clip = clip;
