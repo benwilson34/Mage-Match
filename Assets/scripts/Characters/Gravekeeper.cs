@@ -8,7 +8,7 @@ public class Gravekeeper : Character {
     private HexGrid hexGrid; // eventually these will be static again?
     private Targeting targeting; // ''
 
-    private CoreSpell altCoreSpell;
+    private Spell altCoreSpell;
 
     public Gravekeeper(MageMatch mm, int id) : base(mm) {
         playerID = id;
@@ -60,8 +60,7 @@ public class Gravekeeper : Character {
             tbs.RemoveAt(rand);
         }
 
-        // TODO switch to Party in the Back...can easily do the logical side here, but how to do it with ButtonCont?
-        // something like spells[4] = altCoreSpell; ...then tell ButtonCont what to do...should generalize
+        SwitchCoreSpell();
 
         yield return null;
     }
@@ -95,9 +94,19 @@ public class Gravekeeper : Character {
             tb.TriggerEnchantment(); // that easy?
         }
 
+        SwitchCoreSpell();
+
         yield return null;
     }
 
+    void SwitchCoreSpell() {
+        Spell newSpell = altCoreSpell;
+        altCoreSpell = spells[4];
+        spells[4] = newSpell;
+        mm.uiCont.GetButtonCont(4).SpellChanged();
+    }
+
+    // TODO handle 0 or 1 zombies on the board
     public IEnumerator TheOogieBoogie() {
         yield return targeting.WaitForTileTarget(2, TOB_Filter);
         if (targeting.WasCanceled())
@@ -122,6 +131,7 @@ public class Gravekeeper : Character {
         return filterTBs;
     }
 
+    // TODO handle no tiles in hand...should be part of WaitForDrop?
     public IEnumerator PartyCrashers() {
         for (int i = 0; i < 2; i++) {
             yield return mm.prompt.WaitForDrop();

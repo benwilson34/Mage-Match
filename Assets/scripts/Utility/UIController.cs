@@ -10,8 +10,8 @@ using MMDebug;
 public class UIController : MonoBehaviour {
 
     public AnimationCurve slidingEase;
+    public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
 
-    private Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
 	private Text debugGridText, turnTimerText, slidingText;
 	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
     private Button localDrawButton;
@@ -322,47 +322,9 @@ public class UIController : MonoBehaviour {
     }
 
 	void ShowLoadout(){
-        Player p = mm.LocalP();
-		Transform pload = leftPload;
-
         // for each spell
-		for (int i = 0; i < 5; i++){
-			Transform t = pload.Find ("b_Spell" + i).Find("main");
-			Spell currentSpell = p.character.GetSpell (i);
-
-			Text spellName = t.Find ("t_spellName").GetComponent<Text> ();
-            spellName.text = currentSpell.name;
-            if(currentSpell.APcost != 1)
-                spellName.text += " " + currentSpell.APcost + " AP";
-
-            Transform minis = t.Find("minis");
-			for (int m = 0; m < 5; m++) {
-				Image minitile = minis.Find ("minitile" + m).GetComponent<Image> ();
-				minitile.color = Color.white;
-				Tile.Element currentEl = currentSpell.GetElementAt (m);
-//				Debug.Log (currentEl);
-				switch (currentEl) {
-					case Tile.Element.Fire:
-						minitile.sprite = miniFire;
-						break;
-					case Tile.Element.Water:
-						minitile.sprite = miniWater;
-						break;
-					case Tile.Element.Earth:
-						minitile.sprite = miniEarth;
-						break;
-					case Tile.Element.Air:
-						minitile.sprite = miniAir;
-						break;
-					case Tile.Element.Muscle:
-						minitile.sprite = miniMuscle;
-						break;
-                        case Tile.Element.None:
-                            minitile.gameObject.SetActive(false);
-                            break;
-				}	
-			}
-		}
+		for (int i = 0; i < 5; i++)
+            GetButtonCont(i).ShowSpellInfo();
 	}
 
     void FlipGradient() {

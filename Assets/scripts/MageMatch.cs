@@ -60,19 +60,6 @@ public class MageMatch : MonoBehaviour {
         syncManager = GetComponent<SyncManager>();
         syncManager.Init();
         myID = PhotonNetwork.player.ID;
-        
-        ////clear tiles
-        //GameObject tileFolder = transform.Find("tilesOnBoard").gameObject;
-        //if (tileFolder != null)
-        //    Destroy(tileFolder);
-        //tileFolder = new GameObject("tilesOnBoard");
-        //tileFolder.transform.SetParent(this.transform);
-        //tilesOnBoard = tileFolder.transform;
-
-        //if (p1 != null)
-        //    p1.hand.Empty();
-        //if (p2 != null)
-        //    p2.hand.Empty();
 
         hexGrid = new HexGrid();
         tileMan = new TileManager(this);
@@ -406,7 +393,6 @@ public class MageMatch : MonoBehaviour {
             yield return targeting.SpellSelectScreen(spellsOnBoard[spellNum]);
 
             if (!targeting.selectionCanceled) {
-                StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
 
                 targeting.targetingCanceled = false;
                 uiCont.DeactivateAllSpellButtons(); // ?
@@ -419,6 +405,7 @@ public class MageMatch : MonoBehaviour {
 
                 if (!targeting.WasCanceled()) { // should be an event callback?
                     eventCont.SpellCast(spell);
+                    StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
                     tileMan.RemoveSeq(targeting.GetSelection());
                     p.ApplySpellCosts();
                     yield return BoardChecking(); //?

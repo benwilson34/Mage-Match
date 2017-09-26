@@ -14,6 +14,7 @@ public class ButtonController : MonoBehaviour {
     private GameObject simpleTextPF;
     private GameObject mainView, cancelView;
     private ButtonClick onClick, mainClick;
+    private bool newSpell = false;
 
 	void Start () {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -35,6 +36,44 @@ public class ButtonController : MonoBehaviour {
         onClick();
     }
 
+    public void ShowSpellInfo() {
+        Spell currentSpell = mm.LocalP().character.GetSpell(spellNum);
+        Transform t = transform.Find("main");
+
+        Text spellName = t.Find("t_spellName").GetComponent<Text>();
+        spellName.text = currentSpell.name;
+        if (currentSpell.APcost != 1)
+            spellName.text += " " + currentSpell.APcost + " AP";
+
+        Transform minis = t.Find("minis");
+        for (int m = 0; m < 5; m++) {
+            Image minitile = minis.Find("minitile" + m).GetComponent<Image>();
+            minitile.color = Color.white;
+            Tile.Element currentEl = currentSpell.GetElementAt(m);
+            //				Debug.Log (currentEl);
+            switch (currentEl) {
+                case Tile.Element.Fire:
+                    minitile.sprite = mm.uiCont.miniFire;
+                    break;
+                case Tile.Element.Water:
+                    minitile.sprite = mm.uiCont.miniWater;
+                    break;
+                case Tile.Element.Earth:
+                    minitile.sprite = mm.uiCont.miniEarth;
+                    break;
+                case Tile.Element.Air:
+                    minitile.sprite = mm.uiCont.miniAir;
+                    break;
+                case Tile.Element.Muscle:
+                    minitile.sprite = mm.uiCont.miniMuscle;
+                    break;
+                case Tile.Element.None:
+                    minitile.gameObject.SetActive(false);
+                    break;
+            }
+        }
+    }
+
     IEnumerator Transition_Cancel() {
         cancelView = Instantiate(simpleTextPF, this.transform, false);
         mainView.SetActive(false);
@@ -48,6 +87,15 @@ public class ButtonController : MonoBehaviour {
     }
 
     public IEnumerator Transition_MainView() {
+        if (newSpell) {
+            MMLog.Log("BUTTONCONT", "black", "button" + spellNum + " showing new spell info");
+            //bool act = mainView.GetActive();
+            mainView.SetActive(true);
+            ShowSpellInfo();
+            mainView.SetActive(false);
+            newSpell = false;
+        }
+
         if(cancelView != null)
             Destroy(cancelView.gameObject);
         mainView.gameObject.SetActive(true);
@@ -56,8 +104,9 @@ public class ButtonController : MonoBehaviour {
         yield return null;
     }
 
+    public void SpellChanged() { newSpell = true; }
+
 	void OnSpellButtonClick(){
-        //spellNum = int.Parse (gameObject.name.Substring (12)); // kinda shitty but it works
         StartCoroutine(Transition_Cancel());
 		StartCoroutine(mm.CastSpell (spellNum));
 	}

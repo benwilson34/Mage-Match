@@ -109,7 +109,7 @@ public class BoardCheck {
                                 returnList[i].AddRange(spellSeqs);
                             total += spellSeqs.Count;
                         }
-                        MMLog.Log_BoardCheck("Total for [" + c + "," + r + "]: " + total, MMLog.LogLevel.Standard);
+                        //MMLog.Log_BoardCheck("Total for [" + c + "," + r + "]: " + total, MMLog.LogLevel.Standard);
                     }
 				} else
 					break; // breaks just inner loop...eventually won't because of floating tiles
