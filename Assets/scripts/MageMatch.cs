@@ -37,6 +37,10 @@ public class MageMatch : MonoBehaviour {
     private int checking = 0, actionsPerforming = 0, matchesResolving = 0;
     private List<TileSeq>[] spellsOnBoard;
 
+    public delegate void LoadEvent();
+    public event LoadEvent onEffectContReady;
+    public event LoadEvent onEventContReady;
+
     void Start() {
         StartCoroutine(Reset());
     }
@@ -51,7 +55,7 @@ public class MageMatch : MonoBehaviour {
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
         timer = gameObject.GetComponent<TurnTimer>();
-        effectCont = new EffectController(this); //?
+        
         targeting = new Targeting(this);
         prompt = new Prompt(this);
         audioCont = new AudioController(this);
@@ -76,6 +80,8 @@ public class MageMatch : MonoBehaviour {
 
         commish = new Commish(this);
 
+        effectCont = new EffectController(this);
+        EffectContLoaded();
         InitEvents();
 
         currentState = GameState.PlayerTurn;
@@ -123,6 +129,16 @@ public class MageMatch : MonoBehaviour {
         p2.InitEvents();
 
         animCont.Init(this);
+    }
+
+    public void EffectContLoaded() {
+        if(onEffectContReady != null)
+            onEffectContReady();
+    }
+
+    public void EventContLoaded() {
+        if(onEventContReady != null)
+        onEventContReady();
     }
 
     #region Event callbacks

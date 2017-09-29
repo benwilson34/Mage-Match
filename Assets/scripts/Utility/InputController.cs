@@ -234,9 +234,7 @@ public class InputController : MonoBehaviour {
                             RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
                             CellBehav cb = GetMouseCell(hits); // get cell underneath
 
-                            if (ActionNotAllowed() || cb == null) {
-                                mm.LocalP().hand.ReleaseTile(hex); //?
-                            } else {
+                            if ((!ActionNotAllowed() || PromptedDrop()) && cb != null) {
                                 if (DropCheck(cb.col)) {
                                     if (PromptedDrop())
                                         mm.prompt.SetDrop(cb.col, (TileBehav)dropHex);
@@ -245,7 +243,11 @@ public class InputController : MonoBehaviour {
                                 }
                                 
                                 mm.LocalP().hand.ClearPlaceholder(); //?
+                            } else {
+                                mm.LocalP().hand.ReleaseTile(hex); //?
                             }
+                            
+
                             dropping = false;
                         }
                         break;

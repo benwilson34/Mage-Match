@@ -28,17 +28,19 @@ public class Prompt {
     // ----- DROP -----
 
     public IEnumerator WaitForDrop() {
+        MMDebug.MMLog.Log("PROMPT", "blue", "Waiting for DROP...");
+        mm.uiCont.SendSlidingText("Drop a tile into the board!");
         if (mm.ActiveP().hand.Count() == 0) // if player hand is empty, break
             yield return null;
 
         canceled = false;
         currentMode = PromptMode.Drop;
-        mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", drop a tile!");
 
         yield return new WaitUntil(() => currentMode == PromptMode.None);
     }
 
     public void SetDrop(int col, TileBehav tb) {
+        MMDebug.MMLog.Log("PROMPT", "blue", "DROP is " + tb.tag);
         mm.syncManager.SendDropSelection(col, tb);
 
         dropTile = tb;
@@ -58,6 +60,8 @@ public class Prompt {
     // ----- SWAP -----
 
     public IEnumerator WaitForSwap() {
+        MMDebug.MMLog.Log("PROMPT", "blue", "Waiting for SWAP...");
+        mm.uiCont.SendSlidingText("Swap two tiles into the board!");
         if (mm.hexGrid.GetPlacedTiles().Count == 0) // if board is empty, break
             yield return null;
 
@@ -74,6 +78,8 @@ public class Prompt {
         swapTiles = new TileBehav[2];
         swapTiles[0] = mm.hexGrid.GetTileBehavAt(c1, r1);
         swapTiles[1] = mm.hexGrid.GetTileBehavAt(c2, r2);
+        MMDebug.MMLog.Log("PROMPT", "blue", "SWAPS are " + 
+            swapTiles[0].tag + " and " + swapTiles[1].tag);
 
         currentMode = PromptMode.None;
     }

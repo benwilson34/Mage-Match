@@ -97,11 +97,11 @@ public class Hand {
 
     public Hex GetHex(string tag) {
         foreach (Hex obj in objs) {
-            MMLog.Log("HAND", "black", "Trying \"" + tag + "\" against \"" + obj.tag + "\"");
+            //MMLog.Log("HAND", "black", "Trying \"" + tag + "\" against \"" + obj.tag + "\"");
             if (tag.Equals(obj.tag))
                 return obj;
         }
-        MMLog.Log("HAND", "black", "Failed to find hex with tag \"" + tag + "\"");
+        MMLog.LogError("HAND: Failed to find hex with tag \"" + tag + "\"");
         return null;
     }
 

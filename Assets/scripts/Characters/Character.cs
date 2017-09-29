@@ -25,10 +25,21 @@ public abstract class Character {
         this.mm = mm;
         tileMan = mm.tileMan;
         runes = new List<string>();
+
+        mm.onEffectContReady += OnEffectContLoad;
+        mm.onEventContReady += OnEventContLoad;
     } //?
 
     public virtual void InitEvents() {
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+    }
+
+    public virtual void OnEventContLoad() {
+        
+    }
+
+    public virtual void OnEffectContLoad() {
+
     }
 
     public void InitSpells() {

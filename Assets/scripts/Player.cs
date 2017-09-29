@@ -10,7 +10,6 @@ public class Player {
     public Character character;
     public int health;
     public int AP;
-    //public Transform handSlot;
     public Hand hand;
     public int handSize = 7;
 
@@ -18,9 +17,7 @@ public class Player {
     private MageMatch mm;
     private MatchEffect matchEffect;
 
-    private float buff_dmgMult = 1;
-    private int buff_dmgBonus;
-    private int debuff_dmgExtra;
+    private List<Buff> buffs;
 
     public Player(int playerNum) {
         AP = 0;
@@ -42,6 +39,7 @@ public class Player {
 
         character = Character.Load(mm, id);
         health = character.GetMaxHealth();
+        buffs = new List<Buff>();
     }
 
     public void InitEvents() {
@@ -85,13 +83,15 @@ public class Player {
     }
 
     public void DealDamage(int amount) {
-        int buffAmount = (int)(amount*buff_dmgMult) + buff_dmgBonus;
+        int bonus = CalcBonus(); // TODO displaying the bonus amt in UI would be cool
+        // TODO get multiplier
+        int buffAmount = amount + bonus;
         mm.GetOpponent(id).TakeDamage(buffAmount);
     }
 
     public void TakeDamage(int amount) {
         if (amount > 0) {
-            int debuffAmount = amount + debuff_dmgExtra;
+            int debuffAmount = amount + CalcExtra();
             ChangeHealth(-debuffAmount, true);
         } else
             MMLog.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
@@ -101,7 +101,7 @@ public class Player {
         ChangeHealth(amount, false);
     }
 
-    public void ChangeHealth(int amount, bool dealt) {
+    void ChangeHealth(int amount, bool dealt) {
         string str = ">>>>>";
         if (amount < 0) { // damage
             if (dealt)
@@ -198,19 +198,32 @@ public class Player {
         mm.eventCont.GameAction(false);
     }
 
-    // buff/debuff stuff could be a switch if it's too unwieldy
-    public void ChangeBuff_DmgMult(float d) {
-        MMLog.Log_Player(name + " had dmg multiply buff changed to " + d);
-        buff_dmgMult = d;
+    // ----- buffs -----
+
+    public void AddBuff(Buff b) {
+        buffs.Add(b);
     }
 
-    public void ChangeBuff_DmgBonus(int amount) {
-        MMLog.Log_Player(name + " had dmg bonus buff changed to +" + amount);
-        buff_dmgBonus = amount;
+    public void RemoveBuff(string tag) {
+        // TODO iterate thru list and remove appropriate buff
+        buffs = null;
     }
 
-    public void ChangeDebuff_DmgExtra(int amount) {
-        MMLog.Log_Player(name + " had dmg extra debuff changed to +" + amount);
-        debuff_dmgExtra = amount;
+    public int CalcBonus() {
+        int total = 0;
+        foreach (Buff b in buffs) {
+            if (b.type == Buff.Type.Dmg_Bonus)
+                total += b.GetModifiedValue(0, this); // dmg doesn't matter here...
+        }
+        return total;
+    }
+
+    public int CalcExtra() {
+        int total = 0;
+        foreach (Buff b in buffs) {
+            if (b.type == Buff.Type.Dmg_Extra)
+                total += b.GetModifiedValue(0, this); // dmg doesn't matter here...
+        }
+        return total;
     }
 }

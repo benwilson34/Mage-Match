@@ -139,9 +139,16 @@ public class Gravekeeper : Character {
             TileBehav tb = mm.prompt.GetDropTile();
             MMLog.Log_Gravekeeper("Player " + playerID + " dropped " + tb.tag);
             yield return objFX.Ench_SetZombify(playerID, tb, false);
+            int col = mm.prompt.GetDropCol();
+            int nextTBrow = mm.boardCheck.CheckColumn(col) - 1; // next TB under, if any
+
             mm.prompt.ContinueDrop();
+
+            if (nextTBrow >= mm.hexGrid.BottomOfColumn(col)) {
+                tileMan.RemoveTile(col, nextTBrow, false);
+            }
+
             mm.GetPlayer(playerID).DealDamage(30);
-            // TODO destroy TB under drop (if any)
         }
         yield return null;
     }
