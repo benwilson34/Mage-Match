@@ -21,7 +21,6 @@ public abstract class Effect {
     public virtual void CancelEffect() { } // IEnumerator??
     public int TurnsLeft() { return turnsLeft; }
     public virtual bool NeedRemove() { return turnsLeft == 0; }
-    //public void SetPriority(int p) { priority = p; }
 }
 
 
@@ -65,6 +64,7 @@ public class TurnEffect : Effect {
             cancelEffect(playerID);
     }
 }
+
 
 
 public class TileEffect : Effect {
@@ -134,6 +134,7 @@ public class TileEffect : Effect {
     }
 
 }
+
 
 
 public class Enchantment : TileEffect {
@@ -243,4 +244,41 @@ public class SwapEffect : Effect {
     }
 
     public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
+}
+
+
+
+public class HealthEffect : Effect {
+
+    public delegate float MyHealthEffect(Player p, int dmg);
+    public bool isAdditive; // simple enough for now, could be an enum in time
+    public bool isBuff = true;
+    public int countLeft = -1;
+
+    private MyHealthEffect healthEffect;
+
+    // TODO add infinite Constructor...or just pass in a negative for turns?
+    public HealthEffect(int id, int turns, MyHealthEffect healthEffect, bool isAdditive, bool isBuff = true, int count = -1) {
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = id;
+        turnsLeft = turns;
+        this.type = Type.Buff; //?
+        this.healthEffect = healthEffect;
+        this.isAdditive = isAdditive;
+        this.isBuff = isBuff;
+        countLeft = count;
+    }
+
+    public override IEnumerator Turn() {
+        turnsLeft--;
+        yield return null;
+    }
+
+    public float GetResult(Player p, int dmg) {
+        countLeft--;
+        return healthEffect( p, dmg);
+    }
+
+    public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
+
 }

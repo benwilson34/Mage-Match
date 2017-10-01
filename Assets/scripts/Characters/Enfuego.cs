@@ -188,24 +188,15 @@ public class Enfuego : Character {
         return filterTBs;
     }
 
-    private string hotPotTag = "";
-
     public IEnumerator HotPotatoes() {
-        TurnEffect te = new TurnEffect(3, Effect.Type.Buff, null, HotPot_E);
-        mm.effectCont.AddEndTurnEffect(te, "hotpo");
-
-        Buff b = new Buff();
-        b.SetAdditional(HotPot_Buff, false);
-        mm.GetPlayer(playerID).AddBuff(b);
+        HealthEffect he = new HealthEffect(mm.OpponentId(playerID), 3, HotPot_Buff, true, false);
+        mm.effectCont.AddHealthEffect(he, "hotpo");
 
         yield return null;
     }
-    public int HotPot_Buff(Player p) {
+    public float HotPot_Buff(Player p, int dmg) {
+        MMLog.Log_Enfuego("Hot Potato debuff on " + p.name + ", handcount=" + p.hand.Count());
         return p.hand.Count() * 3;
-    }
-    public IEnumerator HotPot_E(int id) {
-        mm.GetPlayer(id).RemoveBuff(hotPotTag);
-        yield return null;
     }
 
     //public IEnumerator Backburner() {

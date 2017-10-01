@@ -110,6 +110,8 @@ public class MageMatch : MonoBehaviour {
 
     public void InitEvents() {
         eventCont = new EventController(this);
+        EventContLoaded();
+
         eventCont.boardAction += OnBoardAction;
         eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction); // checking
         eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction); // checking
@@ -138,7 +140,7 @@ public class MageMatch : MonoBehaviour {
 
     public void EventContLoaded() {
         if(onEventContReady != null)
-        onEventContReady();
+            onEventContReady();
     }
 
     #region Event callbacks
@@ -484,10 +486,14 @@ public class MageMatch : MonoBehaviour {
     }
 
     public Player GetOpponent(int id) {
+        return GetPlayer(OpponentId(id));
+    }
+
+    public int OpponentId(int id) {
         if (id == 1)
-            return p2;
+            return 2;
         else
-            return p1;
+            return 1;
     }
 
     public Player LocalP() { return GetPlayer(myID); }

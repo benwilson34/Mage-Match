@@ -10,6 +10,7 @@ public class EffectController {
     private List<Effect> beginTurnEffects, endTurnEffects;
     private List<MatchEffect> matchEffects;
     private List<SwapEffect> swapEffects;
+    private List<HealthEffect> healthEffects;
     private Dictionary<string, int> tagDict;
     private int effectsResolving = 0, beginTurnRes = 0, endTurnRes = 0; // TODO match+swap effs
 
@@ -22,6 +23,7 @@ public class EffectController {
         endTurnEffects = new List<Effect>();
         matchEffects = new List<MatchEffect>();
         swapEffects = new List<SwapEffect>();
+        healthEffects = new List<HealthEffect>();
         tagDict = new Dictionary<string, int>();
     }
 
@@ -207,6 +209,18 @@ public class EffectController {
                 i--;
             }
         }
+        for (int i = 0; i < healthEffects.Count; i++) { // foreach
+            HealthEffect he = healthEffects[i];
+            Effect.Type t = he.type;
+            MMLog.Log_EffectCont(he.tag + " (type " + t + ", p" + (int)t + ") has " + he.TurnsLeft() + " turns left (including this one).");
+            yield return he.Turn();
+
+            if (he.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
+                MMLog.Log_EffectCont("Removing " + he.tag + "...");
+                healthEffects.RemoveAt(i);
+                i--;
+            }
+        }
 
         endTurnRes--;
     }
@@ -280,6 +294,56 @@ public class EffectController {
     //}
     #endregion
 
+
+    #region HealthEffects
+    public void AddHealthEffect(HealthEffect he, string tag) {
+        he.tag = GenFullTag("hlth", tag);
+        healthEffects.Add(he);
+    }
+
+    private int healthResult_add = 0;
+    private float healthResult_mult = 1;
+
+    public IEnumerator ResolveHealthEffects(int id, int dmg, bool dealing) {
+        HealthEffect he;
+        healthResult_add = 0;
+        healthResult_mult = 1;
+
+        Player p = mm.GetPlayer(id);
+
+        for (int i = 0; i < healthEffects.Count; i++) { // foreach
+            he = healthEffects[i];
+            if (he.playerID == id && he.isBuff == dealing) {
+                MMLog.Log_EffectCont("Checking healthEff with tag " + he.tag + "; count=" + he.countLeft);
+
+                if (he.isAdditive)
+                    healthResult_add += (int)he.GetResult(p, dmg);
+                else
+                    healthResult_mult *= he.GetResult(p, dmg);
+
+                if (he.NeedRemove()) {
+                    MMLog.Log_EffectCont("Removing " + he.tag + "...");
+                    healthEffects.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
+        yield return null;
+    }
+
+    public int GetHEResult_Additive() { return healthResult_add; }
+    public float GetHEResult_Mult() { return healthResult_mult; }
+
+    //public void RemoveSwapEffect(string tag) { // TODO test
+    //    SwapEffect se = swapEffects[0];
+    //    for (int i = 0; i < swapEffects.Count; se = swapEffects[i], i++) {
+    //        if (se.tag == tag)
+    //            break;
+    //    }
+    //    swapEffects.Remove(se);
+    //}
+    #endregion
 
     public bool IsResolving() { return effectsResolving + beginTurnRes + endTurnRes > 0; }
 

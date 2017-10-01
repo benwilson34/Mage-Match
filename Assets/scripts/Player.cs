@@ -17,8 +17,6 @@ public class Player {
     private MageMatch mm;
     private MatchEffect matchEffect;
 
-    private List<Buff> buffs;
-
     public Player(int playerNum) {
         AP = 0;
         mm = GameObject.Find("board").GetComponent<MageMatch>();
@@ -39,7 +37,6 @@ public class Player {
 
         character = Character.Load(mm, id);
         health = character.GetMaxHealth();
-        buffs = new List<Buff>();
     }
 
     public void InitEvents() {
@@ -83,18 +80,28 @@ public class Player {
     }
 
     public void DealDamage(int amount) {
-        int bonus = CalcBonus(); // TODO displaying the bonus amt in UI would be cool
-        // TODO get multiplier
-        int buffAmount = amount + bonus;
+        //int bonus = CalcBonus(); // TODO displaying the bonus amt in UI would be cool
+        mm.StartCoroutine(mm.effectCont.ResolveHealthEffects(id, amount, true));
+        int bonus = mm.effectCont.GetHEResult_Additive();
+        float mult = mm.effectCont.GetHEResult_Mult();
+        int buffAmount = (int)(amount * mult) + bonus;
+        if (bonus != 0 || mult != 1)
+            MMLog.Log_Player("BUFF: bonus="+bonus+", mult="+mult+"; amount changed from "+amount+" to "+buffAmount);
         mm.GetOpponent(id).TakeDamage(buffAmount);
     }
 
     public void TakeDamage(int amount) {
-        if (amount > 0) {
-            int debuffAmount = amount + CalcExtra();
-            ChangeHealth(-debuffAmount, true);
-        } else
+        if (amount <= 0) {
             MMLog.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
+            return;
+        }
+        mm.StartCoroutine(mm.effectCont.ResolveHealthEffects(id, amount, false));
+        int bonus = mm.effectCont.GetHEResult_Additive();
+        float mult = mm.effectCont.GetHEResult_Mult();
+        int debuffAmount = (int)(amount * mult) + bonus;
+        if (bonus != 0 || mult != 1)
+            MMLog.Log_Player("DEBUFF: bonus=" + bonus + ", mult=" + mult + "; amount changed from " + amount + " to " + debuffAmount);
+        ChangeHealth(-debuffAmount, true);
     }
 
     public void Heal(int amount) {
@@ -196,34 +203,5 @@ public class Player {
             character.ChangeMeter(-meterCost);
         }
         mm.eventCont.GameAction(false);
-    }
-
-    // ----- buffs -----
-
-    public void AddBuff(Buff b) {
-        buffs.Add(b);
-    }
-
-    public void RemoveBuff(string tag) {
-        // TODO iterate thru list and remove appropriate buff
-        buffs = null;
-    }
-
-    public int CalcBonus() {
-        int total = 0;
-        foreach (Buff b in buffs) {
-            if (b.type == Buff.Type.Dmg_Bonus)
-                total += b.GetModifiedValue(0, this); // dmg doesn't matter here...
-        }
-        return total;
-    }
-
-    public int CalcExtra() {
-        int total = 0;
-        foreach (Buff b in buffs) {
-            if (b.type == Buff.Type.Dmg_Extra)
-                total += b.GetModifiedValue(0, this); // dmg doesn't matter here...
-        }
-        return total;
     }
 }
