@@ -23,7 +23,7 @@ public class Enfuego : Character {
         spells = new Spell[5];
         spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
         spells[1] = new Spell(1, "¡Baila!", "FM", 1, Baila);
-        spells[2] = new Spell(2, "Incinerate", "FAM", 1, DoNothing);
+        spells[2] = new Spell(2, "DRAG SAMPLE", "FM", 1, DragSample);
         spells[3] = new Spell(3, "Hot Potatoes", "FFA", 1, HotPotatoes);
         spells[4] = new CoreSpell(4, "Fiery Fandango", 1, FieryFandango);
 
@@ -70,6 +70,17 @@ public class Enfuego : Character {
         mm.uiCont.SendSlidingText("This spell does nothing. Thanks!");
         yield return null;
     }
+
+    public IEnumerator DragSample() {
+        yield return targeting.WaitForDragTarget(4);
+        if (targeting.WasCanceled())
+            yield return null;
+
+        foreach (TileBehav tb in targeting.GetTargetTBs()) {
+            mm.StartCoroutine(objFX.Ench_SetBurning(playerID, tb));
+        }
+    }
+    // TODO sample filter???
 
     // ----- spells -----
 
@@ -182,8 +193,10 @@ public class Enfuego : Character {
     public List<TileBehav> Inc_Filter(List<TileBehav> tbs) {
         List<TileBehav> filterTBs = new List<TileBehav>();
         foreach(TileBehav tb in tbs) {
-            if (tb.GetEnchType() == Enchantment.EnchType.Burning)
+            if (tb.GetEnchType() == Enchantment.EnchType.Burning) {
+                MMLog.Log_Enfuego("Incinerate adding tile at " + tb.PrintCoord());
                 filterTBs.Add(tb);
+            }
         }
         return filterTBs;
     }

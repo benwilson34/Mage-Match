@@ -19,7 +19,9 @@ public class InputController : MonoBehaviour {
     private CellBehav clickCB; // needed?
 	private bool isClickHex = false;
 
-	void Start () {
+    private bool freshClick = true;
+
+	void Start() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
     }
@@ -29,6 +31,16 @@ public class InputController : MonoBehaviour {
             nowClick = true; // move up?
             if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
                 nowClick = false;
+
+            if (!freshClick) { // this block is ugly
+                lastClick = true;
+                MMLog.Log_InputCont("Picked up input, but the click isn't fresh!");
+                if (!nowClick) {
+                    freshClick = true;
+                    lastClick = false;
+                }
+                return;
+            }
 
             if (targeting.currentTMode == Targeting.TargetMode.Drag)
                 HandleDrag();
@@ -118,6 +130,11 @@ public class InputController : MonoBehaviour {
         return null;
     }
 
+    public void InvalidateClick() {
+        if(nowClick)
+            freshClick = false;
+    }
+
     void HandleDrag() {
         TileBehav tb = null;
 
@@ -129,8 +146,9 @@ public class InputController : MonoBehaviour {
             lastClick = true;
         } else if (lastClick && nowClick) { // MouseDrag
             Vector3 mouse = Input.mousePosition;
-            if (Vector3.Distance(dragClick, mouse) > 60) {
-                MMLog.Log_InputCont("Drag more than 60px.");
+            MMLog.Log_InputCont("drag=" + dragClick + ", mouse=" + mouse);
+            if (Vector3.Distance(dragClick, mouse) > 50) {
+                MMLog.Log_InputCont("Drag more than 50px.");
                 tb = GetDragTarget();
                 if (tb == null)
                     targeting.EndDragTarget();

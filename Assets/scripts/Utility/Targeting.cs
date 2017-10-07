@@ -73,12 +73,13 @@ public class Targeting {
         yield return TargetingScreen();
     }
 
-    public IEnumerator WaitForDragTarget(int count) {
+    public IEnumerator WaitForDragTarget(int count, TileFilterFunc filter = null) {
         currentTMode = TargetMode.Drag;
         targets = targetsLeft = count;
         targetTBs = new List<TileBehav>();
-        MMLog.Log_Targeting("targets = " + targetsLeft);
+        MMLog.Log_Targeting("Waiting for Drag target. Targets = " + targetsLeft);
 
+        validTBs = GetValidTBs(filter);
         yield return TargetingScreen();
     }
 
@@ -128,8 +129,10 @@ public class Targeting {
             DecTargets();
             MMLog.Log_Targeting("Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
         } else if (currentTMode == TargetMode.Drag) {
-            if (!IsDragTBValid(tb))
+            if (!IsDragTBValid(tb)) {
                 EndDragTarget();
+                return;
+            }
             lastDragTarget = tb;
 
             Tile t = tb.tile;
@@ -234,10 +237,11 @@ public class Targeting {
 
         yield return new WaitUntil(() => targetsLeft == 0);
         MMLog.Log_Targeting("no more targets.");
+        mm.GetComponent<InputController>().InvalidateClick(); // prevent weirdness from player still dragging
         lastDragTarget = null;
 
-        mm.uiCont.UpdateMoveText("Here are your targets!");
-        yield return new WaitForSeconds(1f);
+        mm.uiCont.SendSlidingText("Here are your targets!");
+        yield return new WaitForSeconds(2f);
 
         mm.uiCont.DeactivateTargetingUI();
         mm.uiCont.UpdateMoveText("");
@@ -297,6 +301,7 @@ public class Targeting {
 
         mm.uiCont.HideSpellSeqs();
         currentTMode = TargetMode.Tile;
+        mm.GetComponent<InputController>().InvalidateClick(); // i don't like this 
         yield return null; //?
     }
 

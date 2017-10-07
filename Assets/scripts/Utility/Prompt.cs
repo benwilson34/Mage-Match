@@ -61,7 +61,7 @@ public class Prompt {
 
     public IEnumerator WaitForSwap() {
         MMDebug.MMLog.Log("PROMPT", "blue", "Waiting for SWAP...");
-        mm.uiCont.SendSlidingText("Swap two tiles into the board!");
+        mm.uiCont.SendSlidingText("Swap two tiles on the board!");
         if (mm.hexGrid.GetPlacedTiles().Count == 0) // if board is empty, break
             yield return null;
 

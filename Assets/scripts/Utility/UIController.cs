@@ -30,7 +30,7 @@ public class UIController : MonoBehaviour {
     private bool menu = false;
 
     public void Init(){ // Awake()?
-        board = GameObject.Find("hexgrid-7wide").transform;
+        board = GameObject.Find("cells").transform;
         mm = GameObject.Find("board").GetComponent<MageMatch> ();
 
         InitSprites();
@@ -388,7 +388,7 @@ public class UIController : MonoBehaviour {
                 Color c = cellOverlays[i,j].color;
                 c.a = 0.6f;
                 cellOverlays[i,j].color = c;
-                Debug.Log("Color = " + cellOverlays[i,j].color);
+                //Debug.Log("Color = " + cellOverlays[i,j].color);
             }
         }
 
