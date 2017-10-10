@@ -38,24 +38,17 @@ public class CharacterSelect : MonoBehaviour {
 
         myID = PhotonNetwork.player.ID;
         //myID = 1; // testing
-        int loadout;
-
         string localName, oppName;
         if (myID == 1) {
             localName = gameSettings.p1name;
             oppName = gameSettings.p2name;
             charDD.value = (int)gameSettings.p1char;
-            Debug.Log("p1 loadout=" + gameSettings.p1loadout);
-            loadout = gameSettings.p1loadout;
         } else {
             localName = gameSettings.p2name;
             oppName = gameSettings.p1name;
             charDD.value = (int)gameSettings.p2char;
-            loadout = gameSettings.p2loadout;
         }
         UpdateCharInfo(charDD.value);
-        loadoutDD.value = loadout; //shitty
-        UpdateLoadoutInfo(loadout); //shitty
 
         localBlock.transform.Find("t_name").GetComponent<Text>().text = localName;
         opponentBlock.transform.Find("t_name").GetComponent<Text>().text = oppName;
@@ -70,7 +63,6 @@ public class CharacterSelect : MonoBehaviour {
     private IEnumerator LockedIn() {
         // store chosen char and loadout
         gameSettings.SetLocalChar(myID, (Character.Ch)charDD.value);
-        gameSettings.SetLocalLoadout(myID, loadoutDD.value);
 
         // disable dropdowns & change background to green
         charDD.interactable = false;
@@ -120,13 +112,6 @@ public class CharacterSelect : MonoBehaviour {
         string info = CharacterInfo.GetCharacterInfo((Character.Ch)index);
         charT.text = info;
         loadoutDD.value = 0;
-        UpdateLoadoutInfo(0);
         // TODO change names of loadouts in loadoutDD
-    }
-
-    public void UpdateLoadoutInfo(int index) {
-        //Debug.Log("loadout index is " + index);
-        string info = CharacterInfo.GetLoadoutInfo((Character.Ch)charDD.value, index); // ew
-        loadoutT.text = info;
     }
 }

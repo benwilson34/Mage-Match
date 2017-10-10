@@ -37,11 +37,24 @@ public class MageMatch : MonoBehaviour {
     private int checking = 0, actionsPerforming = 0, matchesResolving = 0;
     private List<TileSeq>[] spellsOnBoard;
 
+    private DebugSettings debugSettings;
+    private bool isDebugMode = false;
+
     public delegate void LoadEvent();
     public event LoadEvent onEffectContReady;
     public event LoadEvent onEventContReady;
 
     void Start() {
+        GameObject debugObj = GameObject.Find("debugSettings");
+        if (debugObj != null) {
+            debugSettings = debugObj.GetComponent<DebugSettings>();
+            isDebugMode = true;
+            MMLog.LogWarning("This scene is in debug mode!!");
+            PhotonNetwork.offlineMode = true;
+            PhotonNetwork.CreateRoom("debug");
+            PhotonNetwork.JoinRoom("debug");
+        }
+
         StartCoroutine(Reset());
     }
 
@@ -49,8 +62,8 @@ public class MageMatch : MonoBehaviour {
         MMLog.Init(debugLogLevel);
 
         tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
-        gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
-        MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn + ",localLeft=" + gameSettings.localPlayerOnLeft + ",hideOppHand=" + gameSettings.hideOpponentHand);
+        gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
+        MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
 
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
@@ -63,7 +76,11 @@ public class MageMatch : MonoBehaviour {
 
         syncManager = GetComponent<SyncManager>();
         syncManager.Init();
-        myID = PhotonNetwork.player.ID;
+
+        if (IsDebugMode())
+            myID = 1;
+        else
+            myID = PhotonNetwork.player.ID;
 
         hexGrid = new HexGrid();
         tileMan = new TileManager(this);
@@ -88,7 +105,8 @@ public class MageMatch : MonoBehaviour {
         uiCont.SetDrawButton(true);
         activep.InitAP();
 
-        yield return syncManager.Checkpoint(); // idk if this is really doing anything
+        if(!IsDebugMode())
+            yield return syncManager.Checkpoint(); // idk if this is really doing anything
 
         // TODO animate beginning of game
         for (int i = 0; i < 4; i++) {
@@ -143,6 +161,22 @@ public class MageMatch : MonoBehaviour {
             onEventContReady();
     }
 
+    public bool IsDebugMode() { return isDebugMode; }
+
+    // passthru function...not the best.
+    public bool Debug_ApplyAPcost() {
+        if (debugSettings != null)
+            return debugSettings.applyAPcost;
+        else return true;
+    }
+
+    // passthru function...not the best.
+    public bool Debug_OnePlayerMode() {
+        if (debugSettings != null)
+            return debugSettings.onePlayerMode;
+        else return false;
+    }
+
     #region Event callbacks
     public void OnBoardAction() {
         if (checking == 0) { //?
@@ -164,6 +198,9 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void OnGameAction(int id, bool costsAP) { // eventually just pass in int for cost?
+        if (!Debug_ApplyAPcost())
+            return;
+
         if (currentState != GameState.CommishTurn) { //?
             //Debug.Log("MAGEMATCH: OnGameAction called!");
             if (costsAP)
@@ -214,7 +251,10 @@ public class MageMatch : MonoBehaviour {
         yield return commish.CTurn();
 
         currentState = GameState.PlayerTurn;
-        activep = InactiveP();
+
+        if(!Debug_OnePlayerMode())
+            activep = InactiveP();
+
         yield return eventCont.TurnBegin();
         SpellCheck();
         timer.InitTimer();

@@ -14,7 +14,8 @@ public class Lobby : Photon.PunBehaviour {
     private List<GameObject> items;
     private LobbyEntry currentEntry;
 
-	// Use this for initialization
+    private GameObject testSettingsMenu;
+
 	void Start () {
         rs = GameObject.Find("roomSettings").GetComponent<RoomSettings>();
         b_join = GameObject.Find("b_Join");
@@ -23,9 +24,10 @@ public class Lobby : Photon.PunBehaviour {
         PhotonNetwork.ConnectUsingSettings("1");
 
         items = new List<GameObject>();
+        testSettingsMenu = GameObject.Find("testSettingsMenu");
+        ToggleTestSettings();
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		
 	}
@@ -75,6 +77,26 @@ public class Lobby : Photon.PunBehaviour {
 
     public void Quickstart() {
         SceneManager.LoadScene("Quickstart Launcher");
+    }
+
+    public void ToggleTestSettings() {
+        testSettingsMenu.SetActive(!testSettingsMenu.GetActive());
+    }
+
+    public void StartTestScene() {
+        GameObject debugSettingsGO = new GameObject("debugSettings");
+        DebugSettings dbs = debugSettingsGO.AddComponent<DebugSettings>();
+        dbs.applyAPcost = testSettingsMenu.transform.Find("tog_applyAPcosts").GetComponent<Toggle>().isOn;
+        dbs.onePlayerMode = testSettingsMenu.transform.Find("tog_onlyP1").GetComponent<Toggle>().isOn;
+
+        GameSettings settings = new GameObject("gameSettings").AddComponent<GameSettings>();
+        settings.p1name = "GOD";
+        settings.p2name = "Training dummy";
+        settings.turnTimerOn = false;
+
+        PhotonNetwork.Disconnect();
+
+        SceneManager.LoadScene("Game Screen (Landscape)");
     }
 
     public void SetCurrentEntry(LobbyEntry entry) {

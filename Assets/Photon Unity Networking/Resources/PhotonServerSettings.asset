@@ -76,4 +76,5 @@ MonoBehaviour:
   - HandleCheckpoint
   - HandleDropSelection
   - HandleSwapSelection
+  - SetChar
   DisableAutoOpenWizard: 1

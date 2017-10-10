@@ -51,17 +51,6 @@ public class UIController : MonoBehaviour {
         leftPload = GameObject.Find("LeftPlayer_Loadout").transform;
         localDrawButton = leftPinfo.Find("b_Draw").GetComponent<Button>();
 
-  //      DD1 = GameObject.Find ("Dropdown_p1").GetComponent<Dropdown> ();
-		//DD2 = GameObject.Find ("Dropdown_p2").GetComponent<Dropdown> ();
-
-        //gradient = GameObject.Find("green-gradient");
-        //targetingBG = GameObject.Find("targetingBG");
-        //targetingBG.SetActive(false);
-        //tCancelB = GameObject.Find("Button_CancelSpell");
-        //tCancelB.SetActive(false);
-        //tClearB = GameObject.Find("Button_ClearTargets");
-        //tClearB.SetActive(false);
-
         settingsMenu = GameObject.Find("SettingsMenu");
         settingsMenu.SetActive(false);
 
@@ -159,7 +148,7 @@ public class UIController : MonoBehaviour {
         UpdateDebugGrid();
         UpdateMoveText("Fight!!");
 
-        if (mm.gameSettings.localPlayerOnLeft && !mm.MyTurn())
+        if (!mm.MyTurn())
             FlipGradient();
 
         for (int id = 1; id <= 2; id++) {
@@ -223,17 +212,10 @@ public class UIController : MonoBehaviour {
     }
 
     public Transform GetPinfo(int id) {
-        if (mm.gameSettings.localPlayerOnLeft) {
-            if (id == mm.myID)
-                return leftPinfo;
-            else
-                return rightPinfo;
-        } else {
-            if (id == 1)
-                return leftPinfo;
-            else
-                return rightPinfo;
-        }
+        if (id == mm.myID)
+            return leftPinfo;
+        else
+            return rightPinfo;
     }
 
     //void ChangePinfoColor(int id, Color c) {

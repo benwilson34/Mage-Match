@@ -1,15 +1,39 @@
 {
   "Test": {
     "name": "Test character",
-    "key-elements": "none",
+    "keyElements": "none",
+    "health": 0,
+    "deck": [ 0, 0, 0, 0, 0 ],
     "passive": {
       "title": "none",
       "desc": "no desc"
     },
-    "core-spell": {
+
+    "coreSpell": {
       "title": "none",
       "cost": 1,
       "cooldown": 0,
+      "type": "none",
+      "desc": "no desc"
+    },
+    "spell1": {
+      "title": "none",
+      "prereq": "none",
+      "cost": 1,
+      "type": "none",
+      "desc": "no desc"
+    },
+    "spell2": {
+      "title": "none",
+      "prereq": "none",
+      "cost": 1,
+      "type": "none",
+      "desc": "no desc"
+    },
+    "spell3": {
+      "title": "none",
+      "prereq": "none",
+      "cost": 1,
       "type": "none",
       "desc": "no desc"
     },
@@ -17,171 +41,114 @@
       "title": "none",
       "prereq": "none",
       "cost": 1,
-      "meter-cost": 0,
+      "meterCost": 0,
       "type": "none",
       "desc": "no desc"
-    },
-    "loadout-A": {
-      "nickname": "none",
-      "health": 0,
-      "deck": [ 0, 0, 0, 0, 0 ],
-      "spell-1": {
-        "title": "none",
-        "prereq": "none",
-        "cost": 1,
-        "type": "none",
-        "desc": "no desc"
-      },
-      "spell-2": {
-        "title": "none",
-        "prereq": "none",
-        "cost": 1,
-        "type": "none",
-        "desc": "no desc"
-      }
-    },
-    "loadout-B": {
-      "nickname": "none",
-      "health": 0,
-      "deck": [ 0, 0, 0, 0, 0 ],
-      "spell-1": {
-        "title": "none",
-        "prereq": "none",
-        "cost": 1,
-        "type": "none",
-        "desc": "no desc"
-      },
-      "spell-2": {
-        "title": "none",
-        "prereq": "none",
-        "cost": 1,
-        "type": "none",
-        "desc": "no desc"
-      }
     }
   },
+
 
   "Enfuego": {
     "name": "Enfuego Martín",
-    "key-elements": "F",
+    "keyElements": "F",
+    "health": 1100,
+    "deck": [ 20, 0, 0, 15, 15 ],
     "passive": {
       "title": "Burning Rhythm",
-      "desc": "Enfuego deals 10 damage to his opponent at the end of each of his turns if he finishes his turn while there are 10 or more seconds left in that turn."
+      "desc": "Each swap Enfuego makes deals 4 damage for each swap he has made so far this turn."
     },
-    "core-spell": {
+
+    "coreSpell": {
       "title": "Fiery Fandango",
       "cost": 1,
-      "cooldown": 3,
+      "cooldown": 0,
+      "type": "none",
+      "desc": "Deal 30/50/80 damage to your opponent, force them to discard 0/1/2 hexes, and inflict 2/4/7 random tiles with burning. Deal 20 additional damage when consuming a fire match."
+    },
+    "spell1": {
+      "title": "Baila!",
+      "prereq": "FM",
+      "cost": 1,
+      "type": "Swap Prompt",
+      "desc": "Both players draw two hexes. Perform a swap."
+    },
+    "spell2": {
+      "title": "Incinerate",
+      "prereq": "FAM",
+      "cost": 1,
+      "type": "Drag Target",
+      "desc": "Drag target up to 6 burning tiles, destroying them and dealing 35 damage for each destroyed."
+    },
+    "spell3": {
+      "title": "Hot Potatoes",
+      "prereq": "FFA",
+      "cost": 1,
       "type": "Debuff",
-      "desc": "For 2 turns, both players gain a debuff that makes them take 15 more damage whenever they take damage."
+      "desc": "Place a 3-turn debuff on your opponent that causes them to take 3 additional damage whenever they take damage for each tile in their hand."
     },
     "signature": {
       "title": "White-Hot Combination Kick",
-      "prereq": "MFFM",
+      "prereq": "FMMF",
       "cost": 1,
-      "meter-cost": 100,
+      "meterCost": 100,
       "type": "Tile Target",
-      "desc": "Target any 3 tiles on the board and destroy them. Deal 70 damage to your opponent for each tile destroyed. Destroying fire tiles inflicts burning on 3 random adjacent tiles, and destroying muscle tiles causes your opponent to discard 1 tile."
-    },
-    "loadout-A": {
-      "nickname": "Fiery Flamenco",
-      "health": 1000,
-      "deck": [ 50, 0, 0, 20, 30 ],
-      "spell-1": {
-        "title": "¡Baile!",
-        "prereq": "FM",
-        "cost": 1,
-        "type": "Buff",
-        "desc": "Deal 25 damage. Both players draw 2 tiles. Any fire tiles Enfuego draws this way transform into Ember tiles."
-      },
-      "spell-2": {
-        "title": "Incinerate",
-        "prereq": "FAF",
-        "cost": 1,
-        "type": "Drag Target",
-        "desc": "Drag a line on the board with length equal to the number of tiles in your opponent’s hand. Those tiles are inflicted with burning, then your opponent discards two random tiles."
-      }
-    },
-    "loadout-B": {
-      "nickname": "Hot Feet",
-      "health": 1100,
-      "deck": [ 50, 0, 15, 0, 35 ],
-      "spell-1": {
-        "title": "Hot Body",
-        "prereq": "MEF",
-        "cost": 1,
-        "type": "Buff",
-        "desc": "Gain 3-turn buff that causes any swaps you make to deal 10-15 damage and inflict a random tile on the board with burning."
-      },
-      "spell-2": {
-        "title": "Backburner",
-        "prereq": "MF",
-        "cost": 1,
-        "type": "Drag Target",
-        "desc": "Deal 15-25 damage, and gain a buff this turn that causes your next match to grant you 1 AP."
-      }
+      "desc": "Destroy 3 tiles, dealing 70 damage for each tile destroyed. Any fire tiles destroyed this way inflict burning on 4 random adjacent tiles. Any muscle tiles destroyed this way cause your opponent to discard 1 hex."
     }
   },
 
+
   "Gravekeeper": {
     "name": "The Gravekeeper",
-    "key-elements": "ME",
+    "keyElements": "ME",
+    "health": 1200,
+    "deck": [ 0, 10, 20, 0, 20 ],
     "passive": {
-      "title": "Undying Leader",
-      "desc": "The Gravekeeper energizes his fellow employees and fellow partiers, and they energize him back! The Gravekeeper takes 1% less damage and gains 1% more Signature meter for each Zombified tile on the board."
+      "title": "Zombie Lord",
+      "desc": "Each of The Gravekeeper’s Zombies can Attack a random adjacent non-Zombie tile. When Zombies Attack another tile they Zombify their victim. If their victim is a muscle tile, they will destroy it instead, healing The Gravekeeper for 15 health and dealing 15 damage to the opponent."
     },
-    "core-spell": {
-      "title": "Gather the Ghouls",
+
+    "coreSpell": {
+      "title": "Business in the Front",
       "cost": 1,
-      "cooldown": 3,
-      "type": "Full Board",
-      "desc": "Zombify up to 3 random tiles on the board."
+      "cooldown": 0,
+      "type": "none",
+      "desc": "Deal 10/30/60 damage and Zombify 1/2/3 random tiles on the board. Zombify 1 extra random tile when consuming an earth match. Switch to Party in the Back."
+    },
+    "altCoreSpell": {
+      "title": "Party in the Back",
+      "cost": 1,
+      "cooldown": 0,
+      "type": "Area Target",
+      "desc": "Deal 20/50/90 damage. All Zombies in a 1x1/2x2/3x3 area Attack. Deal 20 extra damage when consuming a muscle match. Switch to Business in the Front."
+    },
+    "spell1": {
+      "title": "The Oogie Boogie",
+      "prereq": "ME",
+      "cost": 1,
+      "type": "Tile Target",
+      "desc": "Distance swap any 2 Zombie tiles, then those Zombies attack."
+    },
+    "spell2": {
+      "title": "Party Crashers",
+      "prereq": "MWE",
+      "cost": 1,
+      "type": "Drop Prompt",
+      "desc": "Drop 2 tiles into the board. Each tile dropped deals 30 damage to the opponent and destroys the tile directly below it as it enters the board. Additionally, both enter the board as Zombie tiles."
+    },
+    "spell3": {
+      "title": "Undead Union",
+      "prereq": "WEM",
+      "cost": 1,
+      "type": "none",
+      "desc": "All Zombies deal 5 damage for each adjacent Zombie."
     },
     "signature": {
       "title": "Tombstone",
-      "prereq": "EMME",
+      "prereq": "EMEE",
       "cost": 1,
-      "meter-cost": 100,
+      "meterCost": 100,
       "type": "Cell Target",
-      "desc": "Throw a Tombstone into the board, destroying all tiles in target column upon entering and dealing 95-125 damage. At the end of each turn, the Tombstone spawns one Zombified earth or muscle tile above itself. The Tombstone cannot be swapped or destroyed, and lasts 5 turns."
-    },
-    "loadout-A": {
-      "nickname": "Business in the Front",
-      "health": 1100,
-      "deck": [ 0, 20, 40, 0, 40 ],
-      "spell-1": {
-        "title": "Human Resources",
-        "prereq": "MEW",
-        "cost": 1,
-        "type": "Area Target",
-        "desc": "Zombify all muscle tiles in target small area, then have all Zombies in that area attack."
-      },
-      "spell-2": {
-        "title": "Undead Union",
-        "prereq": "EMM",
-        "cost": 1,
-        "type": "Area Target",
-        "desc": "All Zombies in target small area are indestructible for 2 turns. On cast, each Zombie in that area deals 5 damage to the opponent for each adjacent Zombie."
-      }
-    },
-    "loadout-B": {
-      "nickname": "Party in the Back",
-      "health": 1050,
-      "deck": [ 25, 0, 35, 0, 40 ],
-      "spell-1": {
-        "title": "The Oogie Boogie",
-        "prereq": "MF",
-        "cost": 1,
-        "type": "Tile Target",
-        "desc": "Distance swap any two Zombified tiles. Zombify 2 random tiles on the board and draw a tile if this causes a match."
-      },
-      "spell-2": {
-        "title": "Snack Attack",
-        "prereq": "MFE",
-        "cost": 1,
-        "type": "Full Board",
-        "desc": "Discard your hand, then deal 10 damage and place 2 muscle tiles into the board in random columns for each tile discarded this way."
-      }
+      "desc": "Drop a Tombstone into target column, dealing 225 damage and destroying all tiles in that column on the way down. At the end of each turn, the Tombstone will spawn one Zombie earth or muscle tile directly above itself. The Tombstone cannot be moved from its place, is indestructible, and lasts 5 turns."
     }
   }
 

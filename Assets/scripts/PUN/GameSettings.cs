@@ -9,8 +9,7 @@ public class GameSettings : PunBehaviour {
     public string p1name, p2name;
     public Character.Ch p1char = Character.Ch.Enfuego;
     public Character.Ch p2char = Character.Ch.Gravekeeper;
-    public int p1loadout = 0, p2loadout = 0;
-    public bool turnTimerOn, localPlayerOnLeft, hideOpponentHand;
+    public bool turnTimerOn;
 
     private bool nameSet = false;
 
@@ -19,9 +18,16 @@ public class GameSettings : PunBehaviour {
 
     void Start () {
         DontDestroyOnLoad(this);
-        control = GameObject.Find("Control Panel").transform;
-        toggles = control.Find("Toggles");
-        launcher = GameObject.Find("Launcher").GetComponent<Com.SoupSkull.MageMatch.Launcher>();
+
+        GameObject controlGO = GameObject.Find("Control Panel");
+        if (controlGO != null) {
+            control = controlGO.transform;
+            toggles = control.Find("Toggles");
+        }
+
+        GameObject launcherGO = GameObject.Find("Launcher");
+        if(launcherGO != null)
+            launcher = launcherGO.GetComponent<Com.SoupSkull.MageMatch.Launcher>();
     }
 
     [PunRPC]
@@ -38,10 +44,7 @@ public class GameSettings : PunBehaviour {
         if (id == 1) {
             p1name = name;
             turnTimerOn = toggles.Find("Toggle_TurnTimer").GetComponent<Toggle>().isOn;
-            localPlayerOnLeft = toggles.Find("Toggle_PlayerOnLeft").GetComponent<Toggle>().isOn;
-            hideOpponentHand = toggles.Find("Toggle_HideOpponentHand").GetComponent<Toggle>().isOn;
-            //Debug.Log("GAMESETTINGS: player 1 here, setting turnTimerOn to " + turnTimerOn);
-            photonView.RPC("SetToggles", PhotonTargets.Others, turnTimerOn, localPlayerOnLeft, hideOpponentHand);
+            photonView.RPC("SetToggles", PhotonTargets.Others, turnTimerOn);
 
             // warn that the toggle RPC might outrun this "callback"...
             yield return new WaitUntil(() => nameSet); // wait for RPC
@@ -63,11 +66,9 @@ public class GameSettings : PunBehaviour {
     }
 
     [PunRPC]
-    public void SetToggles(bool turnTimerOn, bool localPlayerOnLeft, bool hideOpponentHand) {
+    public void SetToggles(bool turnTimerOn) {
         //Debug.Log("GAMESETTINGS: SetTurnTimer to " + b);
         this.turnTimerOn = turnTimerOn;
-        this.localPlayerOnLeft = localPlayerOnLeft;
-        this.hideOpponentHand = hideOpponentHand;
     }
 
     public void SetLocalChar(int id, Character.Ch ch) {
@@ -84,20 +85,6 @@ public class GameSettings : PunBehaviour {
             return p2char;
     }
 
-    public void SetLocalLoadout(int id, int index) {
-        if (id == 1)
-            p1loadout = index;
-        else
-            p2loadout = index;
-    }
-
-    public int GetLocalLoadout(int id) {
-        if (id == 1)
-            return p1loadout;
-        else
-            return p2loadout;
-    }
-
     [PunRPC]
     public void OtherPlayerLocked() {
         GameObject.Find("CharacterSelect").GetComponent<CharacterSelect>().OtherPlayerLocked();
@@ -105,18 +92,16 @@ public class GameSettings : PunBehaviour {
 
     public void SyncCharAndLoadout(int id) {
         PhotonView view = PhotonView.Get(this);
-        view.RPC("SetCharAndLoadout", PhotonTargets.Others, id, GetLocalChar(id), GetLocalLoadout(id));
+        view.RPC("SetChar", PhotonTargets.Others, id, GetLocalChar(id));
     }
 
     [PunRPC]
-    public void SetCharAndLoadout(int id, Character.Ch ch, int loadout) {
-        Debug.Log("Setting player" + id + " char/loadout to " + ch + "/" + loadout);
+    public void SetChar(int id, Character.Ch ch) {
+        Debug.Log("Setting player" + id + " char to " + ch);
         if (id == 1) {
             p1char = ch;
-            p1loadout = loadout;
         } else {
             p2char = ch;
-            p2loadout = loadout;
         }
         GameObject.Find("CharacterSelect").GetComponent<CharacterSelect>().OtherCharacterSynced((int)ch);
     }

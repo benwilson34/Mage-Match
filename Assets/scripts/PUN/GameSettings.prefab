@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 114878208336447898}
   - component: {fileID: 114966316800126466}
   m_Layer: 5
-  m_Name: GameSettings
+  m_Name: gameSettings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,11 +43,7 @@ MonoBehaviour:
   p2name: player 2
   p1char: 1
   p2char: 2
-  p1loadout: 1
-  p2loadout: 0
   turnTimerOn: 0
-  localPlayerOnLeft: 1
-  hideOpponentHand: 1
 --- !u!114 &114966316800126466
 MonoBehaviour:
   m_ObjectHideFlags: 1

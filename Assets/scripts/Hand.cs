@@ -27,14 +27,10 @@ public class Hand {
 
     void SetHandPos() {
         int place = 0;
-        if (mm.gameSettings.localPlayerOnLeft) {
-            if (p.id == mm.myID)
-                place = 1;
-            else
-                place = 2;
-        } else {
-            place = p.id;
-        }
+        if (p.id == mm.myID)
+            place = 1;
+        else
+            place = 2;
 
         handPos = GameObject.Find("handslot" + place).transform;
 

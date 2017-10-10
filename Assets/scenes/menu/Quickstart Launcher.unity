@@ -1510,15 +1510,19 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1508767165246268, guid: fec87ec786eefb04aad755c6be1056af, type: 2}
+      propertyPath: m_Name
+      value: gameSettings
+      objectReference: {fileID: 0}
     - target: {fileID: 114966316800126466, guid: fec87ec786eefb04aad755c6be1056af,
         type: 2}
       propertyPath: viewIdField
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114966316800126466, guid: fec87ec786eefb04aad755c6be1056af,
         type: 2}
       propertyPath: instantiationId
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fec87ec786eefb04aad755c6be1056af, type: 2}
