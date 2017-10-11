@@ -232,6 +232,7 @@
     <Compile Include="Assets\scripts\Utility\BoardCheck.cs" />
     <Compile Include="Assets\scripts\Utility\ButtonController.cs" />
     <Compile Include="Assets\scripts\Utility\DebugSettings.cs" />
+    <Compile Include="Assets\scripts\Utility\DebugTools.cs" />
     <Compile Include="Assets\scripts\Utility\EffectController.cs" />
     <Compile Include="Assets\scripts\Utility\EventController.cs" />
     <Compile Include="Assets\scripts\Utility\InputController.cs" />

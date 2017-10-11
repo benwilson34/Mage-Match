@@ -224,13 +224,15 @@ public class Stats {
         File.WriteAllText(filePath, sb.ToString());
     }
 
+    public string GetReportText() { return report.ToString(); }
+
     public void SaveReportTXT() {
         DateTime dt = DateTime.Now;
         string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
         filePath += dt.Hour + "-" + dt.Minute + "-" + dt.Second + "_Report";
         filePath = @"/" + filePath + ".txt";
 
-        File.WriteAllText(filePath, report.ToString());
+        File.WriteAllText(filePath, GetReportText());
     }
 
 }

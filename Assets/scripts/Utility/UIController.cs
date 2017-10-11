@@ -10,10 +10,16 @@ using MMDebug;
 public class UIController : MonoBehaviour {
 
     public AnimationCurve slidingEase;
+    [HideInInspector]
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
 
 	private Text debugGridText, turnTimerText, slidingText;
-	private Text beginTurnEffText, endTurnEffText, matchEffText, swapEffText;
+
+    private GameObject debugItemPF;
+    private Transform debugContent;
+    private GameObject debugReport;
+    private Text debugReportText;
+
     private Button localDrawButton;
     private MageMatch mm;
 	private Dropdown DD1, DD2;
@@ -22,7 +28,7 @@ public class UIController : MonoBehaviour {
     private GameObject prereqPF, targetPF;
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
-    private GameObject settingsMenu; // ?
+    private GameObject menus; // ?
     private GameObject overlay;
     private List<GameObject> outlines, spellOutlines;
     private SpriteRenderer[,] cellOverlays;
@@ -35,25 +41,35 @@ public class UIController : MonoBehaviour {
 
         InitSprites();
 
-		debugGridText = GameObject.Find ("Text_Debug1").GetComponent<Text> (); // UI debug grid
+		debugGridText = GameObject.Find ("t_debugHex").GetComponent<Text> (); // UI debug grid
         slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
 
         slidingTextStart = new Vector3(Screen.width, slidingText.rectTransform.position.y);
         slidingText.rectTransform.position = slidingTextStart;
-
-        beginTurnEffText = GameObject.Find("Text_BeginTurnEff").GetComponent<Text>();
-        endTurnEffText = GameObject.Find("Text_EndTurnEff").GetComponent<Text>();
-        matchEffText = GameObject.Find("Text_MatchEff").GetComponent<Text>();
-        swapEffText = GameObject.Find("Text_SwapEff").GetComponent<Text>();
 
         leftPinfo = GameObject.Find("LeftPlayer_Info").transform;
         rightPinfo = GameObject.Find("RightPlayer_Info").transform;
         leftPload = GameObject.Find("LeftPlayer_Loadout").transform;
         localDrawButton = leftPinfo.Find("b_Draw").GetComponent<Button>();
 
-        settingsMenu = GameObject.Find("SettingsMenu");
-        settingsMenu.SetActive(false);
+        // menus
+        menus = GameObject.Find("menus");
+        Transform scroll = menus.transform.Find("debugMenu").Find("scr_debugEffects");
+        debugContent = scroll.transform.Find("Viewport").Find("Content");
+        debugReport = menus.transform.Find("scr_report").gameObject;
+        debugReportText = debugReport.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>();
+        debugReport.SetActive(false);
 
+        GameObject toolsMenu = menus.transform.Find("toolsMenu").gameObject;
+        if (mm.IsDebugMode())
+            toolsMenu.GetComponent<DebugTools>().Init(mm);
+        else {
+            toolsMenu.SetActive(false);
+        }
+
+        menus.SetActive(false);
+
+        // other
         turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
 
         overlay = GameObject.Find("Targeting Overlay");
@@ -80,6 +96,8 @@ public class UIController : MonoBehaviour {
         spellOutlineMid = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
         prereqPF = Resources.Load("prefabs/outline_prereq") as GameObject;
         targetPF = Resources.Load("prefabs/outline_target") as GameObject;
+
+        debugItemPF = Resources.Load("prefabs/ui/debug_statusItem") as GameObject;
     }
 
     void InitSprites() {
@@ -493,7 +511,7 @@ public class UIController : MonoBehaviour {
         } else {
             menuButtonText.text = "Menu";
         }
-        settingsMenu.SetActive(menu);
+        menus.SetActive(menu);
     }
 
     public bool IsMenu() { return menu; }
@@ -548,33 +566,53 @@ public class UIController : MonoBehaviour {
 
     public void UpdateEffTexts() {
         object[] lists = mm.effectCont.GetLists();
+        List<GameObject> debugItems = new List<GameObject>();
+
+        Color lightBlue = new Color(.07f, .89f, .93f, .8f);
 
         List<Effect> beginTurnEff = (List<Effect>)lists[0];
-        string bte = "BeginTurnEffs:\n";
+        debugItems.Add(InstantiateDebugEntry("BeginTurnEffs:", lightBlue));
         foreach (Effect e in beginTurnEff) {
-            bte += e.tag + "\n";
+            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
         }
-        beginTurnEffText.text = bte;
 
         List<Effect> endTurnEff = (List<Effect>)lists[1];
-        string ete = "EndTurnEffs:\n";
+        debugItems.Add(InstantiateDebugEntry("EndTurnEffs:", lightBlue));
         foreach (Effect e in endTurnEff) {
-            ete += e.tag + "\n";
+            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
         }
-        endTurnEffText.text = ete;
 
         List<MatchEffect> matchEff = (List<MatchEffect>)lists[2];
-        string me = "MatchEffs:\n";
+        debugItems.Add(InstantiateDebugEntry("MatchEffs:", lightBlue));
         foreach (MatchEffect e in matchEff) {
-            me += e.tag + "\n";
+            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
         }
-        matchEffText.text = me;
 
         List<SwapEffect> swapEff = (List<SwapEffect>)lists[3];
-        string se = "SwapEffs:\n";
+        debugItems.Add(InstantiateDebugEntry("SwapEffs:", lightBlue));
         foreach (SwapEffect e in swapEff) {
-            se += e.tag + "\n";
+            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
         }
-        swapEffText.text = se;
+
+        foreach (Transform child in debugContent) {
+            Destroy(child.gameObject);
+        }
+        foreach (GameObject go in debugItems) {
+            go.transform.SetParent(debugContent);
+        }
+    }
+
+    public GameObject InstantiateDebugEntry(string t, Color c) {
+        GameObject item = Instantiate(debugItemPF);
+        item.GetComponent<Image>().color = c;
+        item.transform.Find("Text").GetComponent<Text>().text = t;
+        return item;
+    }
+
+    public void ToggleReport(bool b) {
+        if (b)
+            debugReportText.text = mm.stats.GetReportText();
+
+        debugReport.SetActive(b);
     }
 }
