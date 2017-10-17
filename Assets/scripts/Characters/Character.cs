@@ -130,7 +130,7 @@ public abstract class Character {
 
 public class CharTest : Character {
     public CharTest(MageMatch mm) : base(mm) {
-        objFX = mm.objFX;
+        objFX = mm.hexFX;
         spells = new Spell[4];
 
         characterName = "Sample";

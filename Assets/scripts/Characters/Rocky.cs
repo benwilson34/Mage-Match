@@ -13,7 +13,7 @@ public class Rocky : Character {
         this.mm = mm;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
-        objFX = mm.objFX;
+        objFX = mm.hexFX;
         characterName = "Rocky";
         spells = new Spell[4];
 
@@ -95,11 +95,11 @@ public class Rocky : Character {
         int col = cb.col;
         int bottomr = hexGrid.BottomOfColumn(col);
         // hardset bottom three cells of column
-        Hex stone;
+        TileBehav stone;
         for (int i = 0; i < 3; i++) {
-            stone = tileMan.GenerateToken(playerID, "stone");
+            stone = (TileBehav) tileMan.GenerateToken(playerID, "stone");
             stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
-            mm.PutTile(stone.gameObject, col, bottomr + i);
+            mm.PutTile(stone, col, bottomr + i);
         }
     }
 

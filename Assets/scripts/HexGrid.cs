@@ -18,6 +18,7 @@ public class HexGrid {
     }
 
     public void HardSetTileBehavAt(TileBehav tb, int col, int row){
+        MMDebug.MMLog.Log_HexGrid("setting (" + col + ", " + row + ") to " + tb.tag, MMDebug.MMLog.LogLevel.Standard);
 		if (IsCellFilled (col, row))
             tileGrid[col, row] = null;
         SetTileBehavAt (tb, col, row);

@@ -12,7 +12,7 @@ public class Enfuego : Character {
 
     public Enfuego(MageMatch mm, int id) : base(mm) {
         playerID = id;
-        objFX = mm.objFX;
+        objFX = mm.hexFX;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
 

@@ -128,13 +128,13 @@ public class Stats {
         if (playerAction) {
             report.AppendLine("Drop " + tag + " col" + col);
             GetPS(id).drops++;
-        } else if (mm.uiCont.IsMenu()) //?
+        } else if (mm.uiCont.IsMenuOpen()) //?
             report.AppendLine("menu Drop col" + col);
         yield return null;
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        if (!mm.uiCont.IsMenu()) { //?
+        if (!mm.uiCont.IsMenuOpen()) { //?
             report.AppendLine("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
             if(playerAction)
                 GetPS(id).swaps++;
@@ -174,7 +174,7 @@ public class Stats {
 
     public void OnTileRemove(int id, TileBehav tb) {
         if (!mm.IsCommishTurn()) {
-            if (!mm.uiCont.IsMenu()) //?
+            if (!mm.uiCont.IsMenuOpen()) //?
                 GetPS(id).tilesRemoved++;
             else
                 report.AppendLine("menu Remove (" + tb.tile.col + "," + tb.tile.row + ")");

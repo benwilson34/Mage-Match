@@ -6,8 +6,12 @@ using MMDebug;
 
 public class MageMatch : MonoBehaviour {
 
-    public enum GameState { PlayerTurn, TargetMode, CommishTurn };
-    public GameState currentState;
+    // how to handle performing action here? also better name for Normal?
+    public enum State { Normal, Selecting, Targeting, Menu, TurnSwitching };
+    private Stack<State> stateStack;
+
+    public enum Turn { PlayerTurn, CommishTurn }; // MyTurn, OppTurn?
+    public Turn currentTurn;
     public MMLog.LogLevel debugLogLevel = MMLog.LogLevel.Standard;
     [HideInInspector]
     public int myID;
@@ -29,7 +33,8 @@ public class MageMatch : MonoBehaviour {
     public AnimationController animCont;
     public UIController uiCont;
     public Stats stats;
-    public ObjectEffects objFX;
+    public ObjectEffects hexFX;
+    public InputController inputCont;
 
     private Player p1, p2, activep;
     private Transform tilesOnBoard;
@@ -39,28 +44,34 @@ public class MageMatch : MonoBehaviour {
 
     private DebugSettings debugSettings;
     private bool isDebugMode = false;
+    public DebugTools debugTools;
 
     public delegate void LoadEvent();
     public event LoadEvent onEffectContReady;
     public event LoadEvent onEventContReady;
 
     void Start() {
+        MMLog.Init(debugLogLevel);
+
         GameObject debugObj = GameObject.Find("debugSettings");
         if (debugObj != null) {
             debugSettings = debugObj.GetComponent<DebugSettings>();
             isDebugMode = true;
+            debugTools = GameObject.Find("toolsMenu").GetComponent<DebugTools>();
+            debugTools.Init(this);
+
             MMLog.LogWarning("This scene is in debug mode!!");
             PhotonNetwork.offlineMode = true;
             PhotonNetwork.CreateRoom("debug");
             PhotonNetwork.JoinRoom("debug");
         }
 
+        stateStack = new Stack<State>();
+
         StartCoroutine(Reset());
     }
 
     public IEnumerator Reset() {
-        MMLog.Init(debugLogLevel);
-
         tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
         gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
         MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
@@ -87,7 +98,7 @@ public class MageMatch : MonoBehaviour {
 
         uiCont.GetCellOverlays();
         boardCheck = new BoardCheck(this);
-        objFX = new ObjectEffects(this);
+        hexFX = new ObjectEffects(this);
 
         endGame = false;
 
@@ -101,7 +112,7 @@ public class MageMatch : MonoBehaviour {
         EffectContLoaded();
         InitEvents();
 
-        currentState = GameState.PlayerTurn;
+        currentTurn = Turn.PlayerTurn;
         uiCont.SetDrawButton(true);
         activep.InitAP();
 
@@ -121,6 +132,9 @@ public class MageMatch : MonoBehaviour {
 
         timer.InitTimer();
         uiCont.Reset();
+
+        inputCont = GetComponent<InputController>();
+        EnterState(State.Normal);
 
         // TODO init some stuff that would otherwise be BeginTurnEvent()
         yield return null;
@@ -159,6 +173,23 @@ public class MageMatch : MonoBehaviour {
     public void EventContLoaded() {
         if(onEventContReady != null)
             onEventContReady();
+    }
+
+    // could have event if there are other things that depend on this
+    public void EnterState(State state) {
+        stateStack.Push(state);
+        inputCont.SwitchContext(state); 
+    }
+
+    public void ExitState() {
+        State s = stateStack.Pop();
+        if (s == State.Menu)
+            BoardChanged();
+        inputCont.SwitchContext(stateStack.Peek());
+    } 
+
+    public State GetState() {
+        return stateStack.Peek();
     }
 
     public bool IsDebugMode() { return isDebugMode; }
@@ -201,7 +232,7 @@ public class MageMatch : MonoBehaviour {
         if (!Debug_ApplyAPcost())
             return;
 
-        if (currentState != GameState.CommishTurn) { //?
+        if (currentTurn != Turn.CommishTurn) { //?
             //Debug.Log("MAGEMATCH: OnGameAction called!");
             if (costsAP)
                 activep.AP--;
@@ -233,8 +264,10 @@ public class MageMatch : MonoBehaviour {
     }
 
     IEnumerator TurnSystem() {
-        if (switchingTurn)
+        if (switchingTurn) // could just use state I think
             yield break;
+
+        EnterState(State.TurnSwitching);
 
         switchingTurn = true;
         timer.Pause();
@@ -247,10 +280,10 @@ public class MageMatch : MonoBehaviour {
         uiCont.DeactivateAllSpellButtons(); //? These should be part of any boardaction...
         uiCont.SetDrawButton(false);
 
-        currentState = GameState.CommishTurn;
+        currentTurn = Turn.CommishTurn;
         yield return commish.CTurn();
 
-        currentState = GameState.PlayerTurn;
+        currentTurn = Turn.PlayerTurn;
 
         if(!Debug_OnePlayerMode())
             activep = InactiveP();
@@ -260,6 +293,7 @@ public class MageMatch : MonoBehaviour {
         timer.InitTimer();
 
         MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM END ----------</b>");
+        ExitState();
         switchingTurn = false;
     }
 
@@ -279,7 +313,7 @@ public class MageMatch : MonoBehaviour {
             //    yield return ResolveMatches(seqMatches);
             //    cascade++;
             //} else {
-                if (currentState == GameState.PlayerTurn) {
+                if (currentTurn == Turn.PlayerTurn) {
                     //if (cascade > 1) {
                     //    eventCont.Cascade(cascade);
                     //    cascade = 0;
@@ -406,9 +440,9 @@ public class MageMatch : MonoBehaviour {
         TileBehav tb = hex.GetComponent<TileBehav>();
         tb.SetPlaced();
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
-        if (currentState == GameState.PlayerTurn) { //kinda hacky
+        if (currentTurn == Turn.PlayerTurn) { //kinda hacky
             yield return eventCont.Drop(playerAction, hex.tag, col);
-        } else if (currentState == GameState.CommishTurn)
+        } else if (currentTurn == Turn.CommishTurn)
             eventCont.CommishDrop(tb.tile.element, col);
 
         MMLog.Log_MageMatch("   ---------- DROP END ----------");
@@ -490,14 +524,13 @@ public class MageMatch : MonoBehaviour {
     #endregion
 
 
-    // TODO
-    public void PutTile(GameObject go, int col, int row) {
-        TileBehav currentTileBehav = go.GetComponent<TileBehav>();
+    public void PutTile(TileBehav tb, int col, int row, bool checkGrav = false) {
         if (hexGrid.IsCellFilled(col, row))
-            Destroy(hexGrid.GetTileBehavAt(col, row).gameObject);
-        currentTileBehav.SetPlaced();
-        currentTileBehav.HardSetPos(col, row);
-        BoardChanged();
+            tileMan.RemoveTile(col, row, false);
+        tb.HardSetPos(col, row);
+        // TODO move to tilesOnBoard obj
+        if(checkGrav)
+            BoardChanged();
     }
 
     //public void Transmute(int col, int row, Tile.Element element) {
@@ -566,5 +599,5 @@ public class MageMatch : MonoBehaviour {
 
     public bool IsEnded() { return endGame; }
 
-    public bool IsCommishTurn() { return currentState == GameState.CommishTurn; }
+    public bool IsCommishTurn() { return currentTurn == Turn.CommishTurn; }
 }

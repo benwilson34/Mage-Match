@@ -19,7 +19,7 @@ public class TombstoneToken : TileBehav {
             elem = Tile.Element.Muscle;
 
         TileBehav tb = (TileBehav)mm.tileMan.GenerateTile(id, elem);
-        yield return mm.objFX.Ench_SetZombify(id, tb, true, false);
+        yield return mm.hexFX.Ench_SetZombify(id, tb, true, false);
         mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
     }
 

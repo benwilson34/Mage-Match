@@ -61,11 +61,8 @@ public class UIController : MonoBehaviour {
         debugReport.SetActive(false);
 
         GameObject toolsMenu = menus.transform.Find("toolsMenu").gameObject;
-        if (mm.IsDebugMode())
-            toolsMenu.GetComponent<DebugTools>().Init(mm);
-        else {
+        if (!mm.IsDebugMode())
             toolsMenu.SetActive(false);
-        }
 
         menus.SetActive(false);
 
@@ -303,7 +300,7 @@ public class UIController : MonoBehaviour {
     }
 
     Color CorrectPinfoColor(int id) {
-        if (id == mm.ActiveP().id && mm.currentState != MageMatch.GameState.CommishTurn) {
+        if (id == mm.ActiveP().id && mm.currentTurn != MageMatch.Turn.CommishTurn) {
             return new Color(0, 1, 0);
         } else
             return new Color(1, 1, 1);
@@ -508,13 +505,15 @@ public class UIController : MonoBehaviour {
         Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
         if (menu) {
             menuButtonText.text = "Close Menu";
+            mm.EnterState(MageMatch.State.Menu);
         } else {
             menuButtonText.text = "Menu";
+            mm.ExitState();
         }
         menus.SetActive(menu);
     }
 
-    public bool IsMenu() { return menu; }
+    public bool IsMenuOpen() { return menu; }
 
     // TODO methods for two edit dropdowns
     //public Tile.Element GetClickElement() {

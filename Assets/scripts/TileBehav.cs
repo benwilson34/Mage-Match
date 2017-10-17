@@ -57,6 +57,7 @@ public class TileBehav : Hex {
 		tile.SetPos(col, row);
         mm.hexGrid.HardSetTileBehavAt (this, col, row);
 		transform.position = mm.hexGrid.GridCoordToPos (col, row);
+        SetPlaced();
 	}
 
 	public void SetPlaced(){

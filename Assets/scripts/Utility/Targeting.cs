@@ -227,7 +227,8 @@ public class Targeting {
     IEnumerator TargetingScreen() {
         targetingCanceled = false;
         Player p = mm.ActiveP();
-        mm.currentState = MageMatch.GameState.TargetMode;
+        mm.EnterState(MageMatch.State.Targeting);
+
         mm.uiCont.UpdateMoveText(p.name + ", choose " + targetsLeft + " more targets.");
 
         if(currentTMode == TargetMode.Tile || currentTMode == TargetMode.TileArea || currentTMode == TargetMode.Drag)
@@ -249,7 +250,7 @@ public class Targeting {
         currentTMode = TargetMode.Tile; // needed?
         //targetTBs = null?
 
-        mm.currentState = MageMatch.GameState.PlayerTurn;
+        mm.ExitState();
     }
 
     public List<TileBehav> GetTargetTBs() { return targetTBs; }
@@ -286,6 +287,9 @@ public class Targeting {
         currentTMode = TargetMode.Selection;
         selectionCanceled = false;
         selections = new List<TileSeq>(seqs);
+
+        mm.EnterState(MageMatch.State.Selecting);
+
         MMLog.Log_Targeting("seqs=" + mm.boardCheck.PrintSeqList(seqs));
         mm.uiCont.ShowSpellSeqs(selections);
 
@@ -302,6 +306,8 @@ public class Targeting {
         mm.uiCont.HideSpellSeqs();
         currentTMode = TargetMode.Tile;
         mm.GetComponent<InputController>().InvalidateClick(); // i don't like this 
+
+        mm.ExitState();
         yield return null; //?
     }
 

@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using MMDebug;
 
 // TODO eventually handle mobile tap input instead of clicking
@@ -8,31 +6,34 @@ public class InputController : MonoBehaviour {
 
 	private MageMatch mm;
     private Targeting targeting;
-    private bool dropping = false;
+    private MonoBehaviour mouseObj;
 
-    private Vector3 dragClick;
-	private bool dragged = false;
+    private bool holdingHex = false;
+    private Hex heldHex;
+
+	private bool dragging = false;
+    private Vector3 dragHexPos;
 
 	private bool lastClick = false, nowClick = false;
-	private Hex clickHex; // needed?
-    private Hex dropHex;
-    private CellBehav clickCB; // needed?
-	private bool isClickHex = false;
+	//private Hex clickHex; // needed?
+ //   private CellBehav clickCB; // needed?
+	//private bool isClickHex = false;
 
     private bool freshClick = true;
 
 	void Start() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
+        InitContexts();
     }
 
-	void Update(){ // polling input...change to events if too much overhead
+	void Update(){
         if (Input.GetMouseButton(0) || lastClick) { // if left mouse is down
-            nowClick = true; // move up?
+            nowClick = true;
             if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
                 nowClick = false;
 
-            if (!freshClick) { // this block is ugly
+            if (!freshClick) { // this block is ugly...click invalidation handling
                 lastClick = true;
                 MMLog.Log_InputCont("Picked up input, but the click isn't fresh!");
                 if (!nowClick) {
@@ -42,61 +43,73 @@ public class InputController : MonoBehaviour {
                 return;
             }
 
-            if (targeting.currentTMode == Targeting.TargetMode.Drag)
-                HandleDrag();
-            else
-                HandleMouse();
+            InputStatus status = InputStatus.Unhandled;
+            MouseState state = GetMouseState();
+            if(state == MouseState.Down)
+                mouseObj = GetObject(state, currentContext.type);
+
+            if (mouseObj == null)
+                return;
+
+            // LAYER 1 current context
+            if(mm.MyTurn())
+                status = currentContext.TakeInput(state, mouseObj);
+
+            if (mouseObj is CellBehav && state == MouseState.Down)
+                mouseObj = GetObject(state, InputContext.ObjType.Hex);
+
+            // LAYER 2 standard context
+            if (status != InputStatus.FullyHandled)
+                standardContext.TakeInput(state, mouseObj, status);
+
+            UpdateMouseState();
         }
 	}
 
-	void HandleMouse(){
-		if (!lastClick && !GetClick()) { // first frame of click i.e. MouseDown
-			return;
-		}
+    public enum MouseState { None, Down, Drag, Up };
 
-		if (!lastClick && nowClick) { // MouseDown
-			if (isClickHex)
-				HexMouseDown(clickHex);
-			else
-				CBMouseDown(clickCB);
-			lastClick = true;
-		} else if (lastClick && nowClick) { // MouseDrag
-			if (isClickHex)
-				HexMouseDrag(clickHex);
-		    else {
-//				CBMouseDrag(clickCB);
-			}
-		} else if (lastClick && !nowClick) { // MouseUp
-			if (isClickHex)
-				HexMouseUp(clickHex);
-			else {
-//				CBMouseUp(clickCB);
-			}
-			lastClick = false;
-		}
-	}
+    MouseState GetMouseState() { // only get once
+        if (!lastClick && nowClick) { // MouseDown
+            return MouseState.Down;
+        } else if (lastClick && nowClick) { // MouseDrag
+            return MouseState.Drag;
+        } else if (lastClick && !nowClick) { // MouseUp
+            return MouseState.Up;
+        } else
+            return MouseState.None; // shouldn't be needed?
+    }
 
-	bool GetClick(){
-		isClickHex = false;
-		Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    void UpdateMouseState() {
+        switch (GetMouseState()) { // please make not global...
+            case MouseState.Down:
+                lastClick = true;
+                break;
+            case MouseState.Up:
+                lastClick = false;
+                break;
+        }
+    }
+
+    MonoBehaviour GetObject(MouseState state, InputContext.ObjType type) {
+        if (state == MouseState.Down) {
+            MonoBehaviour obj = null;
+                // if type == none, break?
+            if (type == InputContext.ObjType.Hex) {
+                obj = GetMouseHex();
+            } else if (currentContext.type == InputContext.ObjType.Cell) {
+                obj = GetMouseCell();
+            }
+            return obj;
+        }
+        MMLog.LogWarning("GetObject shouldn't be passed any state except Down?");
+        return null;
+    }
+
+    Hex GetMouseHex() {
+        Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
-
-		if (targeting.currentTMode != Targeting.TargetMode.Cell) {
-			Hex hex = GetMouseHex(hits);
-			if (hex != null) {
-				clickHex = hex;
-				isClickHex = true;
-				return true; // void?
-			}
-		}
-		CellBehav cb = GetMouseCell (hits);
-		if (cb != null) {
-			clickCB = cb;
-			return true; // void?
-		}
-
-		return false;
-	}
+        return GetMouseHex(hits);
+    }
 
 	Hex GetMouseHex(RaycastHit2D[] hits){
 		foreach (RaycastHit2D hit in hits) {
@@ -109,6 +122,12 @@ public class InputController : MonoBehaviour {
         }
 		return null;
 	}
+
+    CellBehav GetMouseCell() {
+        Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
+        return GetMouseCell(hits);
+    }
 
 	CellBehav GetMouseCell(RaycastHit2D[] hits){
 		foreach (RaycastHit2D hit in hits) {
@@ -135,153 +154,17 @@ public class InputController : MonoBehaviour {
             freshClick = false;
     }
 
-    void HandleDrag() {
-        TileBehav tb = null;
-
-        if (!lastClick && nowClick) { // MouseDown
-            tb = GetDragTarget();
-            if (tb == null) return;
-            targeting.OnTBTarget(tb);
-            dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
-            lastClick = true;
-        } else if (lastClick && nowClick) { // MouseDrag
-            Vector3 mouse = Input.mousePosition;
-            MMLog.Log_InputCont("drag=" + dragClick + ", mouse=" + mouse);
-            if (Vector3.Distance(dragClick, mouse) > 50) {
-                MMLog.Log_InputCont("Drag more than 50px.");
-                tb = GetDragTarget();
-                if (tb == null)
-                    targeting.EndDragTarget();
-                targeting.OnTBTarget(tb);
-                if (!targeting.TargetsRemain())
-                    targeting.EndDragTarget();
-                dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
-            }
-        } else if (lastClick && !nowClick) { // MouseUp
-            targeting.EndDragTarget();
-            lastClick = false;
-        }
-
-    }
-
     TileBehav GetDragTarget() {
         Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
         return (TileBehav)GetMouseHex(hits);
     }
 
-    bool MenuOpen() { return mm.uiCont.IsMenu(); }
-
-    // ------------------------------- TB & CB handling -------------------------------
-
-    void HexMouseDown(Hex hex){
-		if (!mm.IsEnded ()) { // if the game isn't done
-			//if (!mm.menu) { // if the menu isn't open
-                switch (hex.currentState) {
-                    case Hex.State.Hand:
-                        if (!targeting.IsTargetMode() && !MenuOpen() && mm.LocalP().IsHexMine(hex)) {
-                            dropping = true;
-
-                            hex.GetComponent<SpriteRenderer>().sortingOrder = 1;
-                            dropHex = hex;
-                            mm.LocalP().hand.GrabHex(hex); //?
-                            mm.eventCont.GrabTile(mm.myID, hex.tag);
-                        }
-                        break;
-
-                    case Hex.State.Placed:
-                    //					    Debug.Log ("INPUTCONTROLLER: TBMouseDown called!");
-                        if (targeting.IsTargetMode()
-                            //					        && Targeting.currentTMode == Targeting.TargetMode.Tile
-                            ) {
-                            MMLog.Log_InputCont("TBMouseDown called and tile is placed.");
-                            targeting.OnTBTarget((TileBehav)hex);
-                        } else if (targeting.IsSelectionMode()) {
-                            targeting.OnSelection((TileBehav)hex);
-//					    } else if (IsTargetMode () && currentTMode == TargetMode.Drag){
-////						OnDragTarget (tbs); // TODO
-                        } else { // disable during targeting screen?
-                            dragClick = Camera.main.WorldToScreenPoint(hex.transform.position);
-                            dragged = true;
-                        }
-                        break;
-
-                }
-			//} else { // menu mode
-                //uiCont.GetClickEffect(tb); //?
-			//}
-		}
-	}
-
-	void HexMouseDrag(Hex hex){
-//		Debug.Log ("TBMouseDrag called.");
-		if (!mm.IsEnded () && !targeting.IsTargetMode()) {
-			switch (hex.currentState) {
-			    case Hex.State.Hand:
-                    if (!MenuOpen() && dropping) {
-                        Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        cursor.z = 0;
-                        hex.transform.position = cursor;
-
-                        RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
-                        HandSlot slot = GetHandSlot(hits);
-                        if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
-                            mm.LocalP().hand.Rearrange(slot);
-                    }
-				    break;
-			    case Hex.State.Placed:
-                    if (targeting.IsTargetMode() && 
-                        targeting.currentTMode == Targeting.TargetMode.Drag) {
-                        targeting.OnTBTarget((TileBehav)hex); // maybe its own method?
-                    }
-                    if (!ActionNotAllowed() || PromptedSwap())
-				        SwapCheck((TileBehav)hex);
-				    break;
-			}
-		}
-	}
-
-	void HexMouseUp(Hex hex){
-        if (!mm.IsEnded () && !targeting.IsTargetMode()) {
-            if (!MenuOpen()) { //?
-                switch (hex.currentState) {
-                    case Hex.State.Hand:
-                        if (dropping) { // will always be if it's in the hand?
-                            hex.GetComponent<SpriteRenderer>().sortingOrder = 0;
-                            Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                            RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
-                            CellBehav cb = GetMouseCell(hits); // get cell underneath
-
-                            if ((!ActionNotAllowed() || PromptedDrop()) && cb != null) {
-                                if (DropCheck(cb.col)) {
-                                    if (PromptedDrop())
-                                        mm.prompt.SetDrop(cb.col, (TileBehav)dropHex);
-                                    else
-                                        mm.PlayerDropTile(cb.col, dropHex);
-                                }
-                                
-                                mm.LocalP().hand.ClearPlaceholder(); //?
-                            } else {
-                                mm.LocalP().hand.ReleaseTile(hex); //?
-                            }
-                            
-
-                            dropping = false;
-                        }
-                        break;
-                }
-            } else {
-                // TODO bool menuSwap
-                //uiCont.GetClickEffect(tb);
-            }
-		}
-	}
-
 	void SwapCheck(TileBehav tb){
 		Tile tile = tb.tile;
 		Vector3 mouse = Input.mousePosition;
-		if(Vector3.Distance(mouse, dragClick) > 50 && dragged){ // if dragged more than 50 px away
-			mouse -= dragClick;
+		if(Vector3.Distance(mouse, dragHexPos) > 50 && dragging){ // if dragged more than 50 px away
+			mouse -= dragHexPos;
 			mouse.z = 0;
             Transform t = new GameObject().transform;
             t.position = mouse;
@@ -296,7 +179,7 @@ public class InputController : MonoBehaviour {
 
             //MMLog.Log_InputCont("mouse = " + t.position.ToString() + "; angle = " + angle);
 
-			dragged = false; // TODO move into cases below for continuous dragging
+			dragging = false; // TODO move into cases below for continuous dragging
             int dir = (int)Mathf.Floor(angle / 60);
             int c2, r2;
             mm.hexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
@@ -316,29 +199,334 @@ public class InputController : MonoBehaviour {
         return mm.boardCheck.CheckColumn(col) >= 0;
     }
 
-    bool ActionNotAllowed() {
-        return !mm.MyTurn() || mm.switchingTurn || 
-            mm.IsCommishTurn() || mm.IsPerformingAction(); // add IsEnded?
-    }
-
     bool PromptedDrop() { return mm.MyTurn() && mm.prompt.currentMode == Prompt.PromptMode.Drop; }
 
     bool PromptedSwap() { return mm.MyTurn() && mm.prompt.currentMode == Prompt.PromptMode.Swap; }
 
-    void CBMouseDown(CellBehav cb){
-//		Debug.Log ("OnMouseDown hit on column " + cb.col);
-		if (MenuOpen()) {
-//			MageMatch mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-//			Tile.Element element = uiCont.GetClickElement ();
-//			if (element != Tile.Element.None) {
-////				Debug.Log ("Clicked on col " + col + "; menu element is not None.");
-//				GameObject go = mm.GenerateTile (element);
-//				go.transform.SetParent (GameObject.Find ("tilesOnBoard").transform);
-//				mm.DropTile (cb.col, go, .15f);
-//			}
-		} else if(targeting.IsTargetMode() && targeting.currentTMode == Targeting.TargetMode.Cell) {
-			targeting.OnCBTarget (cb);
-			//Put target return here!
-		}
-	}
+
+    // --------------------------------- CONTEXTS ------------------------------------
+
+    public enum InputStatus { Unhandled, PartiallyHandled, FullyHandled };
+
+    public class InputContext {
+        public enum ObjType { None, Hex, Cell };
+        public ObjType type = ObjType.None;
+
+        protected MageMatch mm;
+        protected InputController input;
+
+        public InputContext(MageMatch mm, InputController input, ObjType type = ObjType.None) {
+            this.mm = mm;
+            this.input = input;
+            this.type = type;
+        }
+
+        public InputStatus TakeInput(MouseState state, MonoBehaviour obj, 
+            InputStatus status = InputStatus.Unhandled) {
+            switch (state) {
+                case MouseState.Down:
+                    return OnMouseDown(obj, status);
+                case MouseState.Drag:
+                    return OnMouseDrag(obj, status);
+                case MouseState.Up:
+                    return OnMouseUp(obj, status);
+                default:
+                    MMLog.LogError("Something is really wrong with an inputcontext.");
+                    return InputStatus.Unhandled;
+            }
+        }
+
+        public virtual InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+            return InputStatus.Unhandled;
+        }
+
+        public virtual InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
+            return InputStatus.Unhandled;
+        }
+
+        public virtual InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
+            return InputStatus.Unhandled;
+        }
+    }
+
+    private class Target_TileContext : InputContext {
+        public Target_TileContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
+
+        public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+            Hex h = (Hex)obj;
+            if (h.currentState == Hex.State.Hand)
+                return InputStatus.Unhandled;
+
+            TileBehav tb = (TileBehav)obj;
+            mm.targeting.OnTBTarget(tb);
+            return InputStatus.FullyHandled;
+        }
+    }
+
+    private class Target_CellContext : InputContext {
+        public Target_CellContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Cell) { }
+
+        public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+            CellBehav cb = (CellBehav)obj;
+            mm.targeting.OnCBTarget(cb);
+            return InputStatus.FullyHandled;
+        }
+    }
+
+    private class Target_DragContext : InputContext {
+
+        private Vector3 dragClick;
+
+        public Target_DragContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
+
+        public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+            TileBehav tb = null;
+            tb = input.GetDragTarget();
+            if (tb == null)
+                return InputStatus.Unhandled;
+            mm.targeting.OnTBTarget(tb);
+            dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+            return InputStatus.FullyHandled;
+        }
+
+        public override InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
+            TileBehav tb = null;
+            Vector3 mouse = Input.mousePosition;
+            MMLog.Log_InputCont("drag=" + dragClick + ", mouse=" + mouse);
+            if (Vector3.Distance(dragClick, mouse) > 50) {
+                MMLog.Log_InputCont("Drag more than 50px.");
+                tb = input.GetDragTarget();
+                if (tb == null)
+                    mm.targeting.EndDragTarget();
+                mm.targeting.OnTBTarget(tb);
+                if (!mm.targeting.TargetsRemain())
+                    mm.targeting.EndDragTarget();
+                dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+                return InputStatus.FullyHandled;
+            }
+            return InputStatus.Unhandled; //?
+        }
+
+        public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
+            mm.targeting.EndDragTarget();
+            return InputStatus.FullyHandled;
+        }
+
+    }
+
+    private class Target_SelectionContext : InputContext {
+        public Target_SelectionContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
+
+        public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+            Hex h = (Hex)obj;
+            if (h.currentState == Hex.State.Hand)
+                return InputStatus.Unhandled;
+
+            TileBehav tb = (TileBehav)obj;
+            mm.targeting.OnSelection(tb);
+            return InputStatus.FullyHandled;
+        }
+    }
+
+    private class DebugToolsContext : InputContext {
+        public DebugToolsContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
+
+        public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+            mm.debugTools.HandleInput(obj);
+            return InputStatus.FullyHandled;
+        }
+    }
+
+    private class MyTurnContext : InputContext {
+        public MyTurnContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
+
+        public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+            Hex hex = (Hex)obj;
+            //MMLog.Log_InputCont("MyTurn mouse down, hex state="+hex.currentState);
+            if (hex.currentState == Hex.State.Placed) {
+                    input.dragging = true;
+                    input.dragHexPos = Camera.main.WorldToScreenPoint(hex.transform.position);
+                    return InputStatus.FullyHandled;
+
+            }
+            return InputStatus.Unhandled;
+        }
+
+        public override InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
+            Hex hex = (Hex)obj;
+            if (hex.currentState == Hex.State.Placed) {
+                if (!mm.IsPerformingAction() || input.PromptedSwap()) // i want to change this check now since there's more uniform game states
+                    input.SwapCheck((TileBehav)hex); // move here?
+                return InputStatus.FullyHandled;
+            }
+            return InputStatus.Unhandled;
+        }
+
+        public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
+            MMLog.Log_InputCont("MyTurn mouse up");
+
+            Hex hex = (Hex)obj;
+            if (hex.currentState == Hex.State.Hand) {
+                if (input.holdingHex) {
+                    input.heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
+                    Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
+                    CellBehav cb = input.GetMouseCell(hits); // get cell underneath
+
+                    if ((!mm.IsPerformingAction() || input.PromptedDrop()) && cb != null) {
+                        if (input.DropCheck(cb.col)) {
+                            if (input.PromptedDrop())
+                                mm.prompt.SetDrop(cb.col, (TileBehav)input.heldHex);
+                            else
+                                mm.PlayerDropTile(cb.col, input.heldHex);
+                            return InputStatus.PartiallyHandled;
+                        }
+                    }
+                }
+            }
+            return InputStatus.Unhandled; // fall through to standard context
+        }
+    }
+
+    private class StandardContext : InputContext {
+        public StandardContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
+
+        public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+
+            Hex hex = (Hex)obj;
+            MMLog.Log_InputCont("Standard mouse ; hex state="+hex.currentState);
+
+            if (hex.currentState == Hex.State.Hand) {
+                if (mm.LocalP().IsHexMine(hex)) {
+                    MMLog.Log_InputCont("Standard mouse down");
+
+                    input.holdingHex = true;
+
+                    hex.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                    input.heldHex = hex;
+                    mm.LocalP().hand.GrabHex(hex); //?
+                    mm.eventCont.GrabTile(mm.myID, hex.tag);
+                    return InputStatus.FullyHandled;
+                }
+            }
+            return InputStatus.Unhandled;
+        }
+
+        // doesn't need obj passed...
+        public override InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
+            //MMLog.Log_InputCont("Standard mouse drag, holdingHex="+input.holdingHex);
+
+            //Hex hex = (Hex)obj;
+            //if (hex.currentState == Hex.State.Hand) {
+                if (input.holdingHex) {
+                    Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    cursor.z = 0;
+                    input.heldHex.transform.position = cursor;
+
+                    RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
+                    HandSlot slot = input.GetHandSlot(hits);
+                    if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
+                        mm.LocalP().hand.Rearrange(slot);
+                    return InputStatus.FullyHandled;
+                }
+            //}
+            return InputStatus.Unhandled;
+        }
+
+        // doesn't need obj passed...
+        public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
+            MMLog.Log_InputCont("Standard mouse up");
+
+            //Hex hex = (Hex)obj;
+            //if (hex.currentState == Hex.State.Hand) {
+                if (input.holdingHex) {
+                    input.heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
+                    //Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    //RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
+                    //CellBehav cb = input.GetMouseCell(hits); // get cell underneath
+
+                    //if ((!mm.IsPerformingAction() || input.PromptedDrop()) && cb != null) {
+                    //    if (input.DropCheck(cb.col)) {
+                    //        if (input.PromptedDrop())
+                    //            mm.prompt.SetDrop(cb.col, (TileBehav)input.heldHex);
+                    //        else
+                    //            mm.PlayerDropTile(cb.col, input.heldHex);
+                    //    }
+                    if(status == InputStatus.Unhandled)
+                        mm.LocalP().hand.ReleaseTile(input.heldHex); //?
+                    else
+                        mm.LocalP().hand.ClearPlaceholder();
+
+                    input.holdingHex = false;
+                    return InputStatus.FullyHandled;
+                }
+        //}
+            return InputStatus.Unhandled;
+        }
+    }
+
+    private InputContext currentContext, standardContext;
+    private InputContext target_tile, target_cell, target_drag;
+    private InputContext selection, debugMenu, myTurn, empty;
+
+    void InitContexts() {
+        empty = new InputContext(mm, this);
+        target_tile = new Target_TileContext(mm, this);
+        target_cell = new Target_CellContext(mm, this);
+        target_drag = new Target_DragContext(mm, this);
+        selection = new Target_SelectionContext(mm, this);
+        debugMenu = new DebugToolsContext(mm, this);
+        myTurn = new MyTurnContext(mm, this);
+
+        standardContext = new StandardContext(mm, this);
+        MMLog.Log_InputCont("~~~~~~~~~~~~~~Contexts init!");
+    }
+
+    public void SetDebugInputMode(InputContext.ObjType type) {
+        debugMenu.type = type;
+    }
+
+    public void SwitchContext(MageMatch.State state) {
+        MMLog.Log_InputCont("Switching context with state=" + state);
+        switch (state) {
+            case MageMatch.State.Targeting:
+                Targeting.TargetMode tMode = targeting.currentTMode;
+                if (tMode == Targeting.TargetMode.Drag)
+                    currentContext = target_drag;
+                else if (tMode == Targeting.TargetMode.Tile || tMode == Targeting.TargetMode.TileArea)
+                    currentContext = target_tile;
+                else
+                    currentContext = target_cell;
+                break;
+
+            case MageMatch.State.Selecting:
+                currentContext = selection;
+                break;
+
+            case MageMatch.State.Menu:
+                if (mm.IsDebugMode()) {
+                    currentContext = debugMenu;
+                    mm.debugTools.ValueChanged("insert");
+                } else
+                    currentContext = empty;
+                break;
+
+            case MageMatch.State.Normal:
+                // check for my turn?
+                MMLog.Log_InputCont("Normal context set.");
+                currentContext = myTurn;
+                break;
+
+            case MageMatch.State.TurnSwitching:
+                currentContext = empty; // idk
+                break;
+        }
+
+        //       if (targeting.IsTargetMode()) {
+        //} else if (targeting.IsSelectionMode()) {
+        //} else if (mm.uiCont.IsMenuOpen()) {
+        //} else if (mm.MyTurn()) {
+        //} else  { // not my turn
+        //}
+    }
 }

@@ -74,7 +74,7 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
             case "C":
                 return GenerateConsumable(id, type);
             default:
-                MMLog.LogError("TILEMAN: Failed " + genTag);
+                MMLog.LogError("TILEMAN: Failed " + genTag + " with cat="+Hex.TagCat(genTag));
                 return null;
         }
     }

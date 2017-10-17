@@ -14,7 +14,7 @@ public class Gravekeeper : Character {
         playerID = id;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
-        objFX = mm.objFX;
+        objFX = mm.hexFX;
 
         characterName = "The Gravekeeper";
         maxHealth = 1200;

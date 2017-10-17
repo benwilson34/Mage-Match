@@ -104,7 +104,7 @@ public class ObjectEffects {
         yield return null; // for now
     }
 
-    public void Ench_SetStoneTok(TileBehav tb) {
+    public void Ench_SetStone(TileBehav tb) {
         Enchantment ench = new Enchantment(5, Enchantment.EnchType.StoneTok, Effect.Type.Destruct, Ench_StoneTok_TEffect, Ench_StoneTok_End, null);
         tb.SetEnchantment(ench);
         mm.effectCont.AddEndTurnEffect(ench, "stoT");

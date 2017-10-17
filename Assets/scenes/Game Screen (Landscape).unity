@@ -1978,7 +1978,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 96154272}
   m_HandleRect: {fileID: 96154271}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2798,7 +2798,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 455636400}
   m_HandleRect: {fileID: 455636399}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4822,7 +4822,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 438231264}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 806486848}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &438231264
@@ -5052,18 +5063,16 @@ MonoBehaviour:
   m_CaptionImage: {fileID: 0}
   m_ItemText: {fileID: 614433381}
   m_ItemImage: {fileID: 0}
-  m_Value: 4
+  m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Fire
+    - m_Text: Burning
       m_Image: {fileID: 0}
-    - m_Text: Water
+    - m_Text: Cherrybomb
       m_Image: {fileID: 0}
-    - m_Text: Earth
+    - m_Text: Stone
       m_Image: {fileID: 0}
-    - m_Text: Air
-      m_Image: {fileID: 0}
-    - m_Text: Muscle
+    - m_Text: Zombify
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5135,7 +5144,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 217.7, y: -6.898993}
+  m_AnchoredPosition: {x: 217.70001, y: -6.898993}
   m_SizeDelta: {x: 30.4, y: 13.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &449759769
@@ -5277,7 +5286,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 249.30002, y: -22.5}
+  m_AnchoredPosition: {x: 249.3, y: -22.5}
   m_SizeDelta: {x: 30.4, y: 13.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &457375981
@@ -6012,7 +6021,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1125574344}
   toggleTransition: 1
   graphic: {fileID: 99836680}
@@ -8133,6 +8142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53d7d0c0e77891c41aa1b1806cc3ff68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mode: 0
 --- !u!1001 &831297472
 Prefab:
   m_ObjectHideFlags: 0
@@ -9416,7 +9426,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 795019990}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.6277289
+  m_Size: 0.6600484
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -13227,7 +13237,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 138774686}
   toggleTransition: 1
   graphic: {fileID: 2089902368}
@@ -13815,7 +13825,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1164616801}
   toggleTransition: 1
   graphic: {fileID: 1632620932}
@@ -14238,7 +14248,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1329209392}
   toggleTransition: 1
   graphic: {fileID: 1608662995}
@@ -14555,7 +14565,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1965602009}
   toggleTransition: 1
   graphic: {fileID: 2095516631}
@@ -14994,7 +15004,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 942923035}
   toggleTransition: 1
   graphic: {fileID: 639021735}
@@ -17170,7 +17180,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Muscle
+  m_Text: Burning
 --- !u!222 &1803903236
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -17644,7 +17654,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 544548474}
   toggleTransition: 1
   graphic: {fileID: 101251255}
@@ -17904,7 +17914,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d8aa892b6e7d804d84100d7e7017175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 0
+  currentTurn: 0
   debugLogLevel: 1
   myID: 0
   switchingTurn: 0
@@ -17913,6 +17923,8 @@ MonoBehaviour:
   timer: {fileID: 0}
   animCont: {fileID: 0}
   uiCont: {fileID: 0}
+  inputCont: {fileID: 0}
+  debugTools: {fileID: 0}
 --- !u!82 &1888761541
 AudioSource:
   m_ObjectHideFlags: 0
@@ -19754,7 +19766,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 691071333}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
