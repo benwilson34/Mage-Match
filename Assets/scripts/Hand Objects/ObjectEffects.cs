@@ -129,6 +129,8 @@ public class ObjectEffects {
         if (skip)
             ench.SkipCurrent();
 
+        MMLog.Log("ObjEffects", "orange", "Zombify's enchtype is "+ench.enchType);
+
         mm.effectCont.AddEndTurnEffect(ench, "zomb");
 
         tb.SetEnchantment(ench);

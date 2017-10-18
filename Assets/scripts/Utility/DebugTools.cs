@@ -113,20 +113,24 @@ public class DebugTools : MonoBehaviour {
     }
 
     string GetHexGenTag() {
+        return GetHexGenTag(GetPlayerId());
+    }
+
+    string GetHexGenTag(int id) {
         string selection = dd_hex.options[dd_hex.value].text;
         switch (selection) {
             case "Fire":
-                return "p1-B-F";
+                return "p" + id + "-B-F";
             case "Water":
-                return "p1-B-W";
+                return "p" + id + "-B-W";
             case "Earth":
-                return "p1-B-E";
+                return "p" + id + "-B-E";
             case "Air":
-                return "p1-B-A";
+                return "p" + id + "-B-A";
             case "Muscle":
-                return "p1-B-M";
+                return "p" + id + "-B-M";
             default:
-                MMDebug.MMLog.LogError("DEBUGTOOLS: Couldn't make tag from \"" + selection + "\"");
+                MMLog.LogError("DEBUGTOOLS: Couldn't make tag from \"" + selection + "\"");
                 return "";
         }
     }
@@ -193,15 +197,13 @@ public class DebugTools : MonoBehaviour {
 
 
     void InsertMode_OnClick(CellBehav cb) {
-        MMLog.Log("DebugTools", "orange", "calling insert mode!"); 
-        TileBehav insertTB = (TileBehav) mm.tileMan.GenerateHex(mm.ActiveP().id, GetHexGenTag());
-        MMLog.Log("DebugTools", "orange", "inserting into ("+cb.col+", "+cb.row+")");
+        TileBehav insertTB = (TileBehav) mm.tileMan.GenerateHex(mm.ActiveP().id, GetHexGenTag(1));
         mm.PutTile(insertTB, cb.col, cb.row);
         insertTB.HardSetPos(cb.col, cb.row);
     }
 
     void DestroyMode_OnClick(TileBehav tb) {
-        MMDebug.MMLog.Log("DebugTools", "orange", "calling destroy mode!"); 
+        MMLog.Log("DebugTools", "orange", "calling destroy mode!"); 
         mm.tileMan.RemoveTile(tb.tile, false);
     }
 
@@ -209,16 +211,16 @@ public class DebugTools : MonoBehaviour {
         string option = dd_enchant.options[dd_enchant.value].text;
         switch (option) {
             case "Burning":
-                mm.hexFX.Ench_SetBurning(id, tb);
+                StartCoroutine(mm.hexFX.Ench_SetBurning(id, tb));
                 break;
-            case "Cherrybomb":
-                mm.hexFX.Ench_SetCherrybomb(id, tb);
-                break;
-            case "Stone":
-                mm.hexFX.Ench_SetStone(tb);
-                break;
+            //case "Cherrybomb":
+            //    StartCoroutine(mm.hexFX.Ench_SetCherrybomb(id, tb));
+            //    break;
+            //case "Stone":
+            //    mm.hexFX.Ench_SetStone(tb);
+            //    break;
             case "Zombify":
-                mm.hexFX.Ench_SetZombify(id, tb, false);
+                StartCoroutine(mm.hexFX.Ench_SetZombify(id, tb, false));
                 break;
         }
     }
@@ -228,16 +230,21 @@ public class DebugTools : MonoBehaviour {
     }
 
     void ClearMode_OnClick(TileBehav tb) {
-        // TODO clear enchantment and reset props
+        // TODO reset props
+        tb.ClearEnchantment();
     }
 
     void AddToHandMode_OnClick() {
-        StartCoroutine(mm._Draw(id, GetHexGenTag(), false));
+        StartCoroutine(mm._Draw(GetPlayerId(), GetHexGenTag(), false));
     }
 
     void DiscardMode_OnClick(Hex h) {
-        // this simple?
-        mm.GetPlayer(GetPlayerId()).Discard(h);
+        if (mm.GetPlayer(1).IsHexMine(h)) {
+            mm.GetPlayer(1).Discard(h);
+        } else if (mm.GetPlayer(2).IsHexMine(h)) {
+            mm.GetPlayer(2).Discard(h);
+        } else
+            MMLog.LogWarning("DebugTools: user clicked on a non-hand hex! Naughty!");
     }
 
     void ChangeHealthMode_OnClick() {
@@ -251,10 +258,7 @@ public class DebugTools : MonoBehaviour {
     }
 
     void ChangeMeterMode_OnClick() {
-        // TODO
-    }
-
-    void ChangeAPMode_OnClick() {
-        // needed?
+        int amt = int.Parse(input.text);
+        mm.GetPlayer(GetPlayerId()).character.ChangeMeter(amt);
     }
 }

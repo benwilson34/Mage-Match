@@ -139,7 +139,7 @@ public class TileEffect : Effect {
 
 public class Enchantment : TileEffect {
 
-    public enum EnchType { None = 0, Burning = 1, Zombify = 1, Cherrybomb = 2, ZombieTok = 3, StoneTok = 3 }
+    public enum EnchType { None = 0, Burning, Zombify, Cherrybomb, ZombieTok, StoneTok }
     public EnchType enchType; // private?
 
     private MyTileEffect turnEffect, endEffect, cancelEffect;
@@ -158,6 +158,15 @@ public class Enchantment : TileEffect {
         this.enchType = enchType;
     }
 
+    public static int GetEnchTier(EnchType enchType) {
+        if (enchType == EnchType.None)
+            return 0;
+        else if ((int)enchType < (int)EnchType.Cherrybomb)
+            return 1;
+        else
+            return 2;
+        // TODO handle tier 3 ench (like tombstone...or should those just have the ableEnchant flag off?
+    }
 }
 
 

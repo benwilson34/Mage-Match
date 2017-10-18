@@ -237,15 +237,15 @@ public class InputController : MonoBehaviour {
         }
 
         public virtual InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
-            return InputStatus.Unhandled;
+            return InputStatus.FullyHandled;
         }
 
         public virtual InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
-            return InputStatus.Unhandled;
+            return InputStatus.FullyHandled;
         }
 
         public virtual InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
-            return InputStatus.Unhandled;
+            return InputStatus.FullyHandled;
         }
     }
 
@@ -467,10 +467,10 @@ public class InputController : MonoBehaviour {
 
     private InputContext currentContext, standardContext;
     private InputContext target_tile, target_cell, target_drag;
-    private InputContext selection, debugMenu, myTurn, empty;
+    private InputContext selection, debugMenu, myTurn, block;
 
     void InitContexts() {
-        empty = new InputContext(mm, this);
+        block = new InputContext(mm, this);
         target_tile = new Target_TileContext(mm, this);
         target_cell = new Target_CellContext(mm, this);
         target_drag = new Target_DragContext(mm, this);
@@ -508,7 +508,7 @@ public class InputController : MonoBehaviour {
                     currentContext = debugMenu;
                     mm.debugTools.ValueChanged("insert");
                 } else
-                    currentContext = empty;
+                    currentContext = block;
                 break;
 
             case MageMatch.State.Normal:
@@ -518,7 +518,7 @@ public class InputController : MonoBehaviour {
                 break;
 
             case MageMatch.State.TurnSwitching:
-                currentContext = empty; // idk
+                currentContext = block; // idk
                 break;
         }
 

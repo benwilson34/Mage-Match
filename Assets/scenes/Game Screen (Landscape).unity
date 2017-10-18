@@ -1050,7 +1050,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 66702682}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 806486853}
+        m_MethodName: HandleButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &66702682
@@ -4823,12 +4834,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 806486848}
+      - m_Target: {fileID: 806486853}
         m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -5068,10 +5079,6 @@ MonoBehaviour:
     m_Options:
     - m_Text: Burning
       m_Image: {fileID: 0}
-    - m_Text: Cherrybomb
-      m_Image: {fileID: 0}
-    - m_Text: Stone
-      m_Image: {fileID: 0}
     - m_Text: Zombify
       m_Image: {fileID: 0}
   m_OnValueChanged:
@@ -5144,7 +5151,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 217.70001, y: -6.898993}
+  m_AnchoredPosition: {x: 217.7, y: -6.898993}
   m_SizeDelta: {x: 30.4, y: 13.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &449759769
@@ -5286,7 +5293,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 249.3, y: -22.5}
+  m_AnchoredPosition: {x: 249.30002, y: -22.5}
   m_SizeDelta: {x: 30.4, y: 13.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &457375981
@@ -6021,7 +6028,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1125574344}
   toggleTransition: 1
   graphic: {fileID: 99836680}
@@ -12731,7 +12738,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Muscle
+  m_Text: Swap
 --- !u!222 &1303566404
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13237,7 +13244,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 138774686}
   toggleTransition: 1
   graphic: {fileID: 2089902368}
@@ -13527,18 +13534,18 @@ MonoBehaviour:
   m_CaptionImage: {fileID: 0}
   m_ItemText: {fileID: 1795163551}
   m_ItemImage: {fileID: 0}
-  m_Value: 4
+  m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Fire
+    - m_Text: Swap
       m_Image: {fileID: 0}
-    - m_Text: Water
+    - m_Text: Grav
       m_Image: {fileID: 0}
-    - m_Text: Earth
+    - m_Text: Destroy
       m_Image: {fileID: 0}
-    - m_Text: Air
+    - m_Text: Target
       m_Image: {fileID: 0}
-    - m_Text: Muscle
+    - m_Text: Prereq
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14248,7 +14255,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1329209392}
   toggleTransition: 1
   graphic: {fileID: 1608662995}
@@ -14459,7 +14466,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1526122051}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 806486853}
+        m_MethodName: TogglePlayer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1526122051
@@ -14565,7 +14583,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1965602009}
   toggleTransition: 1
   graphic: {fileID: 2095516631}
@@ -15004,7 +15022,7 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 942923035}
   toggleTransition: 1
   graphic: {fileID: 639021735}

@@ -105,10 +105,7 @@ public class TileBehav : Hex {
     }
 
     int GetEnchTier() {
-        if (HasEnchantment())
-            return (int)enchantment.enchType;
-        else
-            return 0;
+        return Enchantment.GetEnchTier(GetEnchType());
     }
 
     public IEnumerator TriggerEnchantment() {
