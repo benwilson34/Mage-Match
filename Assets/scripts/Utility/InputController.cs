@@ -33,29 +33,22 @@ public class InputController : MonoBehaviour {
             if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
                 nowClick = false;
 
-            if (!freshClick) { // this block is ugly...click invalidation handling
-                lastClick = true;
-                MMLog.Log_InputCont("Picked up input, but the click isn't fresh!");
-                if (!nowClick) {
-                    freshClick = true;
-                    lastClick = false;
-                }
-                return;
-            }
+            //if (!IsFreshClick())
+            //    return;
 
             InputStatus status = InputStatus.Unhandled;
             MouseState state = GetMouseState();
-            if(state == MouseState.Down)
+            if (state == MouseState.Down)
                 mouseObj = GetObject(state, currentContext.type);
 
             if (mouseObj == null)
                 return;
 
             // LAYER 1 current context
-            if(mm.MyTurn())
+            if (mm.MyTurn() && IsFreshClick())
                 status = currentContext.TakeInput(state, mouseObj);
 
-            if (mouseObj is CellBehav && state == MouseState.Down)
+            if (mouseObj is CellBehav && state == MouseState.Down) // only getObject if other context gets a CellBehav
                 mouseObj = GetObject(state, InputContext.ObjType.Hex);
 
             // LAYER 2 standard context
@@ -63,7 +56,10 @@ public class InputController : MonoBehaviour {
                 standardContext.TakeInput(state, mouseObj, status);
 
             UpdateMouseState();
+        } else if (!freshClick) {
+            freshClick = true;
         }
+
 	}
 
     public enum MouseState { None, Down, Drag, Up };
@@ -88,6 +84,24 @@ public class InputController : MonoBehaviour {
                 lastClick = false;
                 break;
         }
+    }
+
+    public void InvalidateClick() {
+        if(mm.MyTurn() && nowClick)
+            freshClick = false;
+    }
+
+    public bool IsFreshClick() {
+        if (!freshClick) {  // if invalidated
+            //lastClick = true;
+            MMLog.Log_InputCont("Picked up input, but the click isn't fresh!");
+            if (!nowClick) {
+                freshClick = true;
+                //lastClick = false;
+            }
+            return false;
+        }
+        return true;
     }
 
     MonoBehaviour GetObject(MouseState state, InputContext.ObjType type) {
@@ -147,11 +161,6 @@ public class InputController : MonoBehaviour {
             }
         }
         return null;
-    }
-
-    public void InvalidateClick() {
-        if(nowClick)
-            freshClick = false;
     }
 
     TileBehav GetDragTarget() {

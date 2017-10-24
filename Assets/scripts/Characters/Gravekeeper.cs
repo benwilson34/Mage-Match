@@ -91,7 +91,8 @@ public class Gravekeeper : Character {
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
-            tb.TriggerEnchantment(); // that easy?
+            if(tb.GetEnchType() == Enchantment.EnchType.Zombify)
+                yield return tb.TriggerEnchantment(); // that easy?
         }
 
         SwitchCoreSpell();
@@ -117,7 +118,7 @@ public class Gravekeeper : Character {
         yield return mm._SwapTiles(false, a.col, a.row, b.col, b.row);
 
         foreach (TileBehav tb in tbs)
-            tb.TriggerEnchantment(); // that easy?
+            yield return tb.TriggerEnchantment(); // that easy?
 
         yield return null;
     }

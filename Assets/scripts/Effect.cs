@@ -74,7 +74,7 @@ public class TileEffect : Effect {
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
     private ObjectEffects objFX; //?
-    private bool skip = false;
+    protected bool skip = false;
 
     public TileEffect(int id, int turns, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) : this(id, type, turnEffect, endEffect, cancelEffect) {
         turnsLeft = turns;
@@ -106,15 +106,12 @@ public class TileEffect : Effect {
         turnsLeft--;
         if (skip) {
             skip = false;
-            //return false; //?
             yield break;
         }
         if (turnsLeft != 0) {
             yield return TriggerEffect();
-            //return false;
         } else {
             yield return EndEffect();
-            //return true;
         }
     }
 
@@ -145,7 +142,7 @@ public class Enchantment : TileEffect {
     private MyTileEffect turnEffect, endEffect, cancelEffect;
     private TileBehav enchantee;
     private ObjectEffects objFX; //?
-    private bool skip = false;
+    private bool hasTurnEffect = false;
 
     public Enchantment(int id, int turns, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
         turnsLeft = turns;
@@ -156,6 +153,21 @@ public class Enchantment : TileEffect {
         playerID = id; // NO!!!
         turnsLeft = -1;
         this.enchType = enchType;
+    }
+
+    public void TriggerEffectEveryTurn() { hasTurnEffect = true; }
+
+    public override IEnumerator Turn() {
+        turnsLeft--;
+        if (skip) {
+            skip = false;
+            yield break;
+        }
+        if (turnsLeft != 0 && hasTurnEffect) { // important difference here
+            yield return TriggerEffect();
+        } else {
+            yield return EndEffect();
+        }
     }
 
     public static int GetEnchTier(EnchType enchType) {

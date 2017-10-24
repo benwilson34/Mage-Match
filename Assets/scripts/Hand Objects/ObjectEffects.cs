@@ -89,6 +89,8 @@ public class ObjectEffects {
         yield return mm.animCont._Burning(tb);
 
         Enchantment ench = new Enchantment(id, 5, Enchantment.EnchType.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
+        ench.TriggerEffectEveryTurn();
+
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(1f, .4f, .4f);
         mm.effectCont.AddEndTurnEffect(ench, "burn");
