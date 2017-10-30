@@ -52,6 +52,7 @@ public class MageMatch : MonoBehaviour {
 
     void Start() {
         MMLog.Init(debugLogLevel);
+        CharacterInfo.Init();
 
         GameObject debugObj = GameObject.Find("debugSettings");
         if (debugObj != null) {
@@ -174,6 +175,10 @@ public class MageMatch : MonoBehaviour {
         if(onEventContReady != null)
             onEventContReady();
     }
+
+    
+
+    // GAME STATE
 
     // could have event if there are other things that depend on this
     public void EnterState(State state) {

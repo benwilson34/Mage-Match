@@ -10,7 +10,7 @@ public class Enfuego : Character {
 
     private int swapsThisTurn = 0;
 
-    public Enfuego(MageMatch mm, int id) : base(mm) {
+    public Enfuego(MageMatch mm, int id) : base(mm, Ch.Enfuego) {
         playerID = id;
         objFX = mm.hexFX;
         hexGrid = mm.hexGrid;

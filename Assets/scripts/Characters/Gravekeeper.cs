@@ -10,7 +10,7 @@ public class Gravekeeper : Character {
 
     private Spell altCoreSpell;
 
-    public Gravekeeper(MageMatch mm, int id) : base(mm) {
+    public Gravekeeper(MageMatch mm, int id) : base(mm, Ch.Gravekeeper) {
         playerID = id;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;

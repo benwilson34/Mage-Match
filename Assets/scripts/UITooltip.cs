@@ -7,7 +7,7 @@ public class UITooltip : MonoBehaviour, Tooltipable {
     public string tooltipInfo;
 
     public string GetTooltipInfo() {
-        return "This is UI element! " + tooltipInfo;
+        return tooltipInfo;
     }
 
     // Use this for initialization

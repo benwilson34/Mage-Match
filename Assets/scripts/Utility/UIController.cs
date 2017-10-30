@@ -332,6 +332,8 @@ public class UIController : MonoBehaviour {
         //gradient.transform.Rotate(0, 0, 180);
     }
 
+
+
     // ----- TARGETING -----
 
     public void ShowSpellSeqs(List<TileSeq> seqs) {
@@ -466,6 +468,8 @@ public class UIController : MonoBehaviour {
             outlines.Remove(go);
         }
     }
+
+
 
     // ----- SPELL BUTTONS -----
 

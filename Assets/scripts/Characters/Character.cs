@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public abstract class Character {
 
     // NOTE: keep in same order as JSON list!!
-    public enum Ch { Test = 0, Enfuego, Gravekeeper };
+    public enum Ch { Test = 0, Enfuego, Gravekeeper, Rocky };
+    public Ch ch;
 
     public string characterName;
     public string loadoutName;
@@ -21,8 +22,9 @@ public abstract class Character {
     protected List<string> runes;
     //protected string genHexTag;
 
-    public Character(MageMatch mm) {
+    public Character(MageMatch mm, Ch ch) {
         this.mm = mm;
+        this.ch = ch;
         tileMan = mm.tileMan;
         runes = new List<string>();
 
@@ -129,7 +131,7 @@ public abstract class Character {
 
 
 public class CharTest : Character {
-    public CharTest(MageMatch mm) : base(mm) {
+    public CharTest(MageMatch mm) : base(mm, Ch.Test) {
         objFX = mm.hexFX;
         spells = new Spell[4];
 
