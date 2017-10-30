@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Hex : MonoBehaviour {
+public class Hex : MonoBehaviour, Tooltipable {
 
 	public enum State { Hand, Placed, Removed };
 	public State currentState;
@@ -48,4 +49,9 @@ public class Hex : MonoBehaviour {
             Flip();
     }
 
+    public virtual string GetTooltipInfo() {
+        string str = "This is a <b>hex</b>.\n";
+        str += "Its <color=green>tag</color> is " + tag;
+        return str;
+    }
 }

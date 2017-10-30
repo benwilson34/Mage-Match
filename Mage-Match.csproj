@@ -227,6 +227,8 @@
     <Compile Include="Assets\scripts\Tile.cs" />
     <Compile Include="Assets\scripts\TileBehav.cs" />
     <Compile Include="Assets\scripts\TileSeq.cs" />
+    <Compile Include="Assets\scripts\TooltipManager.cs" />
+    <Compile Include="Assets\scripts\UITooltip.cs" />
     <Compile Include="Assets\scripts\Utility\AnimationController.cs" />
     <Compile Include="Assets\scripts\Utility\AudioController.cs" />
     <Compile Include="Assets\scripts\Utility\BoardCheck.cs" />

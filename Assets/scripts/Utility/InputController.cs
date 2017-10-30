@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 using MMDebug;
+using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using System.Collections;
 
 // TODO eventually handle mobile tap input instead of clicking
 public class InputController : MonoBehaviour {
@@ -41,15 +45,19 @@ public class InputController : MonoBehaviour {
             if (state == MouseState.Down)
                 mouseObj = GetObject(state, currentContext.type);
 
-            if (mouseObj == null)
-                return;
+            //if (mouseObj == null)
+            //    return;
 
             // LAYER 1 current context
-            if (mm.MyTurn() && IsFreshClick())
+            if (mm.MyTurn() && IsFreshClick() && mouseObj != null)
                 status = currentContext.TakeInput(state, mouseObj);
 
-            if (mouseObj is CellBehav && state == MouseState.Down) // only getObject if other context gets a CellBehav
-                mouseObj = GetObject(state, InputContext.ObjType.Hex);
+            if (state == MouseState.Down) {
+                if(!mm.uiCont.IsMenuOpen()) // i don't like this
+                    ((StandardContext)standardContext).SetTooltip(GetTooltipable()); // hoo
+                if (mouseObj != null && mouseObj is CellBehav) // only getObject if other context gets a CellBehav
+                    mouseObj = GetObject(state, InputContext.ObjType.Hex);
+            }
 
             // LAYER 2 standard context
             if (status != InputStatus.FullyHandled)
@@ -167,6 +175,46 @@ public class InputController : MonoBehaviour {
         Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
         return (TileBehav)GetMouseHex(hits);
+    }
+
+    Tooltipable GetTooltipable() {
+        Vector3 clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D[] hits = Physics2D.LinecastAll(clickPosition, clickPosition);
+
+        foreach (RaycastHit2D hit in hits) {
+            //MMLog.Log_InputCont("2D Raycast hit "+hit.collider.gameObject.name);
+            Tooltipable tt = hit.collider.GetComponent<Tooltipable>(); // is this okay?
+            if (tt != null) {
+                MMLog.Log_InputCont("GetTooltipable found a Tooltipable! " + 
+                    tt.GetTooltipInfo());
+                return tt;
+            }
+        }
+
+        foreach (RaycastResult hit in GetUIRaycast()) {
+            //MMLog.Log_InputCont("UI Raycast hit "+hit.gameObject.name);
+            Tooltipable tt = hit.gameObject.GetComponent<Tooltipable>(); // is this okay?
+            if (tt != null) {
+                MMLog.Log_InputCont("GetTooltipable found a Tooltipable! " + 
+                    tt.GetTooltipInfo());
+                return tt;
+            }
+        }
+        return null;
+    }
+
+    List<RaycastResult> GetUIRaycast() {
+        MMLog.Log_InputCont("calling UIRaycast");
+        GraphicRaycaster gr = mm.uiCont.GetComponent<GraphicRaycaster>();
+        //Create the PointerEventData with null for the EventSystem
+        PointerEventData ped = new PointerEventData(null);
+        //Set required parameters, in this case, mouse position
+        ped.position = Input.mousePosition;
+        //Create list to receive all results
+        List<RaycastResult> results = new List<RaycastResult>();
+        //Raycast it
+        gr.Raycast(ped, results);
+        return results;
     }
 
 	void SwapCheck(TileBehav tb){
@@ -355,7 +403,7 @@ public class InputController : MonoBehaviour {
             if (hex.currentState == Hex.State.Placed) {
                     input.dragging = true;
                     input.dragHexPos = Camera.main.WorldToScreenPoint(hex.transform.position);
-                    return InputStatus.FullyHandled;
+                    return InputStatus.PartiallyHandled;
 
             }
             return InputStatus.Unhandled;
@@ -398,9 +446,24 @@ public class InputController : MonoBehaviour {
     }
 
     private class StandardContext : InputContext {
+
+        private Tooltipable tooltip;
+        private Vector3 mouseDownPos;
+
+        private const int TOOLTIP_MOUSE_RADIUS = 50;   // in pixels
+
         public StandardContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
 
+        public void SetTooltip(Tooltipable tooltip) {
+            this.tooltip = tooltip;
+        }
+
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+            mouseDownPos = Input.mousePosition;
+            mm.uiCont.tooltipMan.SetTooltip(tooltip); // where to check for null?
+
+            if (obj == null)
+                return InputStatus.FullyHandled;
 
             Hex hex = (Hex)obj;
             MMLog.Log_InputCont("Standard mouse ; hex state="+hex.currentState);
@@ -418,32 +481,44 @@ public class InputController : MonoBehaviour {
                     return InputStatus.FullyHandled;
                 }
             }
-            return InputStatus.Unhandled;
+            return InputStatus.Unhandled; // probably can just return fullyhandled unless there's going to be an context layer chained after this one...
         }
 
         // doesn't need obj passed...
         public override InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
             //MMLog.Log_InputCont("Standard mouse drag, holdingHex="+input.holdingHex);
 
+            if (tooltip != null) { // if there's a tooltip
+                //MMLog.Log_InputCont(">>>Tooltip is not null<<< ");
+                if (Vector3.Distance(mouseDownPos, Input.mousePosition) > TOOLTIP_MOUSE_RADIUS) {
+                    mm.uiCont.tooltipMan.HideOrCancelTooltip();
+                    tooltip = null;
+                }
+            }
+
             //Hex hex = (Hex)obj;
             //if (hex.currentState == Hex.State.Hand) {
-                if (input.holdingHex) {
-                    Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    cursor.z = 0;
-                    input.heldHex.transform.position = cursor;
+            if (input.holdingHex) {
+                Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                cursor.z = 0;
+                input.heldHex.transform.position = cursor;
 
-                    RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
-                    HandSlot slot = input.GetHandSlot(hits);
-                    if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
-                        mm.LocalP().hand.Rearrange(slot);
-                    return InputStatus.FullyHandled;
-                }
+                RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
+                HandSlot slot = input.GetHandSlot(hits);
+                if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
+                    mm.LocalP().hand.Rearrange(slot);
+                return InputStatus.FullyHandled;
+            }
             //}
             return InputStatus.Unhandled;
         }
 
         // doesn't need obj passed...
         public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
+
+            mm.uiCont.tooltipMan.HideOrCancelTooltip();
+            tooltip = null;
+
             MMLog.Log_InputCont("Standard mouse up");
 
             //Hex hex = (Hex)obj;
@@ -530,6 +605,10 @@ public class InputController : MonoBehaviour {
                 currentContext = block; // idk
                 break;
         }
+
+
+        // TODO Invalidate click?
+
 
         //       if (targeting.IsTargetMode()) {
         //} else if (targeting.IsSelectionMode()) {

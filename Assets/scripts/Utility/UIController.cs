@@ -12,9 +12,9 @@ public class UIController : MonoBehaviour {
     public AnimationCurve slidingEase;
     [HideInInspector]
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
+    public TooltipManager tooltipMan;
 
 	private Text debugGridText, turnTimerText, slidingText;
-
     private GameObject debugItemPF;
     private Transform debugContent;
     private GameObject debugReport;
@@ -76,6 +76,8 @@ public class UIController : MonoBehaviour {
         outlines = new List<GameObject>();
 
         LoadPrefabs();
+
+        tooltipMan = GetComponent<TooltipManager>();
     }
 
     public void InitEvents() {
