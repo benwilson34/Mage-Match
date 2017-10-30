@@ -73,7 +73,7 @@ public class ButtonController : MonoBehaviour {
             }
         }
 
-        GetComponent<UITooltip>().tooltipInfo = CharacterInfo.GetSpellInfo(mm.LocalP().character.ch, spellNum);
+        GetComponent<UITooltip>().tooltipInfo = CharacterInfo.GetSpellInfo(mm.LocalP().character.ch, spellNum, true);
     }
 
     IEnumerator Transition_Cancel() {

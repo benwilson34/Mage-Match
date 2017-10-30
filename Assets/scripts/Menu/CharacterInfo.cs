@@ -34,17 +34,20 @@ public class CharacterInfo {
         return s;
     }
 
-    public static string GetSpellInfo(Character.Ch ch, int index) {
-        string s = "";
+    public static string GetSpellInfo(Character.Ch ch, int index, bool formatted = false) {
         JSONObject c = GetCharacter(ch);
         Dictionary<string, string> spell = c.list[5 + index].ToDictionary();
-        s += string.Format("{0} - {1}/{2} - {3}\n", 
+
+        // title, prereq, type, desc
+        string format = "{0} - {1}/{2} - {3}\n";
+        if (formatted)
+            format = "<b>{0}</b>\n{1}/{2}\n\n{3}\n";
+
+        return string.Format(format, 
             spell["title"], 
             spell.ContainsKey("prereq") ? spell["prereq"] : "", 
             spell["type"], 
             spell["desc"]
         );
-
-        return s;
     }
 }

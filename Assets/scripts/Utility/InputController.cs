@@ -450,7 +450,7 @@ public class InputController : MonoBehaviour {
         private Tooltipable tooltip;
         private Vector3 mouseDownPos;
 
-        private const int TOOLTIP_MOUSE_RADIUS = 50;   // in pixels
+        private const int TOOLTIP_MOUSE_RADIUS = 40;   // in pixels
 
         public StandardContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
 
@@ -516,8 +516,10 @@ public class InputController : MonoBehaviour {
         // doesn't need obj passed...
         public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
 
-            mm.uiCont.tooltipMan.HideOrCancelTooltip();
-            tooltip = null;
+            if (tooltip != null) {
+                mm.uiCont.tooltipMan.HideOrCancelTooltip();
+                tooltip = null;
+            }
 
             MMLog.Log_InputCont("Standard mouse up");
 
