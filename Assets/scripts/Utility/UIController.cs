@@ -15,6 +15,7 @@ public class UIController : MonoBehaviour {
     public TooltipManager tooltipMan;
 
 	private Text debugGridText, turnTimerText, slidingText;
+    private Text turnCounterText, newsText;
     private GameObject debugItemPF;
     private Transform debugContent;
     private GameObject debugReport;
@@ -66,8 +67,16 @@ public class UIController : MonoBehaviour {
 
         menus.SetActive(false);
 
+        // newsfeed
+        Transform newsfeed = GameObject.Find("Newsfeed").transform;
+        turnTimerText = newsfeed.Find("p_timer").Find("t_timer").GetComponent<Text>();
+        turnCounterText = newsfeed.Find("p_turns").Find("t_turnCount").GetComponent<Text>();
+        turnCounterText.text = "1";
+        newsText = newsfeed.Find("p_news").Find("t_news").GetComponent<Text>();
+        newsText.text = "!!! FIGHT !!!";
+
         // other
-        turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
+        //turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
 
         overlay = GameObject.Find("Targeting Overlay");
         overlay.SetActive(false);
@@ -126,6 +135,7 @@ public class UIController : MonoBehaviour {
 
     public IEnumerator OnTurnEnd(int id) {
         UpdateEffTexts();
+        turnCounterText.text = ""+mm.stats.turns;
         //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
         yield return null;
     }
@@ -191,28 +201,6 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    public void UpdateDebugGrid(){
-		string grid = "   0  1  2  3  4  5  6 \n";
-		for (int r = HexGrid.numRows - 1; r >= 0; r--) {
-			grid += r + " ";
-			for (int c = 0; c < HexGrid.numCols; c++) {
-				if (r <= mm.hexGrid.TopOfColumn (c) && r >= mm.hexGrid.BottomOfColumn (c)) {
-					if (mm.hexGrid.IsCellFilled (c, r))
-						grid += "[" + mm.hexGrid.GetTileAt (c, r).ThisElementToChar() + "]";
-					else
-						grid += "[ ]";
-				} else
-					grid += " - ";
-			}
-			grid += '\n';
-		}
-		debugGridText.text = grid;
-	}
-
-	public void UpdateMoveText(string str){
-        //moveText.text = str;
-    }
-
     public void SendSlidingText(string str) {
         slidingText.text = str;
         StartCoroutine(_SlidingText());
@@ -228,6 +216,40 @@ public class UIController : MonoBehaviour {
         slidingText.rectTransform.position = slidingTextStart;
     }
 
+    // delete
+    void FlipGradient() {
+        //		Vector3 scale = go.transform.localScale;
+        //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
+        //gradient.transform.Rotate(0, 0, 180);
+    }
+
+
+    #region ----- NEWSFEED -----
+    public void UpdateTurnTimer(float time) {
+        turnTimerText.text = time.ToString("0.0");
+    }
+
+    // delete
+    public void UpdateMoveText(string str){
+        //moveText.text = str;
+    }
+
+    public void UpdateNewsfeed(string str) {
+        StartCoroutine(_UpdateNewsfeed(str));
+    }
+
+    IEnumerator _UpdateNewsfeed(string str) {
+        yield return newsText.DOFade(0, .2f);
+
+        yield return new WaitForSeconds(.3f);
+        newsText.text = str;
+
+        yield return newsText.DOFade(1, .2f);
+    }
+    #endregion
+
+
+    #region ----- PLAYER INFO -----
     public Transform GetPinfo(int id) {
         if (id == mm.myID)
             return leftPinfo;
@@ -325,17 +347,10 @@ public class UIController : MonoBehaviour {
 		for (int i = 0; i < 5; i++)
             GetButtonCont(i).ShowSpellInfo();
 	}
-
-    void FlipGradient() {
-        //		Vector3 scale = go.transform.localScale;
-        //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
-        //gradient.transform.Rotate(0, 0, 180);
-    }
+    #endregion
 
 
-
-    // ----- TARGETING -----
-
+    #region ----- TARGETING -----
     public void ShowSpellSeqs(List<TileSeq> seqs) {
         foreach (TileSeq seq in seqs) {
             MMLog.Log_UICont("showing " + seqs.Count + " seqs");
@@ -469,10 +484,10 @@ public class UIController : MonoBehaviour {
         }
     }
 
+    #endregion
 
 
-    // ----- SPELL BUTTONS -----
-
+    #region ----- BUTTONS -----
     public void SetDrawButton(bool interactable) {
         if(mm.MyTurn())
             localDrawButton.interactable = interactable;
@@ -505,7 +520,10 @@ public class UIController : MonoBehaviour {
 			button.interactable = false;
 		}
 	}
+    #endregion
 
+
+    #region ----- MENU -----
     public void ToggleMenu() {
         menu = !menu;
         Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
@@ -521,52 +539,22 @@ public class UIController : MonoBehaviour {
 
     public bool IsMenuOpen() { return menu; }
 
-    // TODO methods for two edit dropdowns
-    //public Tile.Element GetClickElement() {
-    //    Dropdown dd = GameObject.Find("Dropdown_DropColor").GetComponent<Dropdown>();
-    //    switch (dd.value) {
-    //        default:
-    //            return Tile.Element.None;
-    //        case 1:
-    //            return Tile.Element.Fire;
-    //        case 2:
-    //            return Tile.Element.Water;
-    //        case 3:
-    //            return Tile.Element.Earth;
-    //        case 4:
-    //            return Tile.Element.Air;
-    //        case 5:
-    //            return Tile.Element.Muscle;
-    //    }
-    //}
-
-    //public void GetClickEffect(TileBehav tb) {
-    //    Dropdown dd = GameObject.Find("Dropdown_ClickEffect").GetComponent<Dropdown>();
-    //    MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
-
-    //    switch (dd.value) {
-    //        default: // none
-    //            break;
-    //        case 1: // destroy tile
-    //            mm.RemoveTile(tb.tile, false); // FIXME will probably throw null reference exception
-    //            break;
-    //        case 2: // clear enchant
-    //            tb.ClearEnchantment();
-    //            break;
-    //        case 3: // cherrybomb
-    //            spellfx.Ench_SetCherrybomb(mm.ActiveP().id, tb);
-    //            break;
-    //        case 4: // burning
-    //            spellfx.Ench_SetBurning(mm.ActiveP().id, tb);
-    //            break;
-    //        case 5: // zombify
-    //            spellfx.Ench_SetZombify(mm.ActiveP().id, tb, false);
-    //            break;
-    //    }
-    //}
-
-    public void UpdateTurnTimer(float time) {
-        turnTimerText.text = time.ToString("0.0");
+    public void UpdateDebugGrid() {
+        string grid = "   0  1  2  3  4  5  6 \n";
+        for (int r = HexGrid.numRows - 1; r >= 0; r--) {
+            grid += r + " ";
+            for (int c = 0; c < HexGrid.numCols; c++) {
+                if (r <= mm.hexGrid.TopOfColumn(c) && r >= mm.hexGrid.BottomOfColumn(c)) {
+                    if (mm.hexGrid.IsCellFilled(c, r))
+                        grid += "[" + mm.hexGrid.GetTileAt(c, r).ThisElementToChar() + "]";
+                    else
+                        grid += "[ ]";
+                } else
+                    grid += " - ";
+            }
+            grid += '\n';
+        }
+        debugGridText.text = grid;
     }
 
     public void UpdateEffTexts() {
@@ -620,4 +608,5 @@ public class UIController : MonoBehaviour {
 
         debugReport.SetActive(b);
     }
+    #endregion
 }

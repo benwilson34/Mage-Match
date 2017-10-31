@@ -111,40 +111,40 @@ public class Stats {
     // TODO for all, different report lines for playerAction or not...
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
         if(dealt)
-            report.AppendLine("Deal p" + id + " " + tag);
+            Report("Deal p" + id + " " + tag);
         else
-            report.AppendLine("Draw " + tag);
+            Report("Draw " + tag);
         GetPS(id).draws++;
         yield return null;
     }
 
     public IEnumerator OnDiscard(int id, string tag) {
-        report.AppendLine("p" + id + " discards " + tag);
+        Report("p" + id + " discards " + tag);
         GetPS(id).discards++;
         yield return null;
     }
 
     public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
         if (playerAction) {
-            report.AppendLine("Drop " + tag + " col" + col);
+            Report("Drop " + tag + " col" + col);
             GetPS(id).drops++;
         } else if (mm.uiCont.IsMenuOpen()) //?
-            report.AppendLine("menu Drop col" + col);
+            Report("menu Drop col" + col);
         yield return null;
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         if (!mm.uiCont.IsMenuOpen()) { //?
-            report.AppendLine("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
+            Report("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
             if(playerAction)
                 GetPS(id).swaps++;
         } else
-            report.AppendLine("menu Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
+            Report("menu Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
         yield return null;
     }
 
     public void OnSpellCast(int id, Spell spell) {
-        report.AppendLine("Spell " + spell.name);
+        Report("Spell " + spell.name);
         GetPS(id).spellsCast++;
     }
     #endregion
@@ -222,6 +222,11 @@ public class Stats {
 
         // TODO write num of each spell cast from EffectCont.tagDict
         File.WriteAllText(filePath, sb.ToString());
+    }
+
+    void Report(string str) {
+        report.AppendLine(str);
+        mm.uiCont.UpdateNewsfeed(str);
     }
 
     public string GetReportText() { return report.ToString(); }
