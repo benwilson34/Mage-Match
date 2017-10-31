@@ -120,6 +120,8 @@ public class MageMatch : MonoBehaviour {
         if(!IsDebugMode())
             yield return syncManager.Checkpoint(); // idk if this is really doing anything
 
+        uiCont.Reset();
+
         // TODO animate beginning of game
         for (int i = 0; i < 4; i++) {
             yield return LocalP().DealTile();
@@ -132,7 +134,6 @@ public class MageMatch : MonoBehaviour {
         stats = new Stats(p1, p2);
 
         timer.InitTimer();
-        uiCont.Reset();
 
         inputCont = GetComponent<InputController>();
         EnterState(State.Normal);
