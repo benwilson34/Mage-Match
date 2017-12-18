@@ -32,16 +32,10 @@ public class InputController : MonoBehaviour {
     }
 
 	void Update(){
-        if (mm.uiCont.newsfeed.isMenuOpen())
-            return;
-
         if (Input.GetMouseButton(0) || lastClick) { // if left mouse is down
             nowClick = true;
             if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
                 nowClick = false;
-
-            //if (!IsFreshClick())
-            //    return;
 
             InputStatus status = InputStatus.Unhandled;
             MouseState state = GetMouseState();
@@ -56,7 +50,7 @@ public class InputController : MonoBehaviour {
                 status = currentContext.TakeInput(state, mouseObj);
 
             if (state == MouseState.Down) {
-                if(!mm.uiCont.IsMenuOpen()) // i don't like this
+                if(!mm.uiCont.IsDebugMenuOpen()) // i don't like this
                     ((StandardContext)standardContext).SetTooltip(GetTooltipable()); // hoo
                 if (mouseObj != null && mouseObj is CellBehav) // only getObject if other context gets a CellBehav
                     mouseObj = GetObject(state, InputContext.ObjType.Hex);
@@ -87,7 +81,7 @@ public class InputController : MonoBehaviour {
     }
 
     void UpdateMouseState() {
-        switch (GetMouseState()) { // please make not global...
+        switch (GetMouseState()) {
             case MouseState.Down:
                 lastClick = true;
                 break;
@@ -103,7 +97,7 @@ public class InputController : MonoBehaviour {
     }
 
     public bool IsValidClick() {
-        if (!validClick) {  // if invalidated
+        if (!validClick) {
             //lastClick = true;
             MMLog.Log_InputCont("Picked up input, but the click isn't valid!");
             if (!nowClick) {
@@ -213,9 +207,8 @@ public class InputController : MonoBehaviour {
         PointerEventData ped = new PointerEventData(null);
         //Set required parameters, in this case, mouse position
         ped.position = Input.mousePosition;
-        //Create list to receive all results
+
         List<RaycastResult> results = new List<RaycastResult>();
-        //Raycast it
         gr.Raycast(ped, results);
         return results;
     }
@@ -592,7 +585,11 @@ public class InputController : MonoBehaviour {
                 currentContext = selection;
                 break;
 
-            case MageMatch.State.Menu:
+            case MageMatch.State.NewsfeedMenu:
+                currentContext = block;
+                break;
+
+            case MageMatch.State.DebugMenu:
                 if (mm.IsDebugMode()) {
                     currentContext = debugMenu;
                     mm.debugTools.ValueChanged("insert");
@@ -614,12 +611,5 @@ public class InputController : MonoBehaviour {
 
         // TODO Invalidate click?
 
-
-        //       if (targeting.IsTargetMode()) {
-        //} else if (targeting.IsSelectionMode()) {
-        //} else if (mm.uiCont.IsMenuOpen()) {
-        //} else if (mm.MyTurn()) {
-        //} else  { // not my turn
-        //}
     }
 }

@@ -199,7 +199,7 @@ public class DebugTools : MonoBehaviour {
     void InsertMode_OnClick(CellBehav cb) {
         TileBehav insertTB = (TileBehav) mm.tileMan.GenerateHex(mm.ActiveP().id, GetHexGenTag(1));
         mm.PutTile(insertTB, cb.col, cb.row);
-        insertTB.HardSetPos(cb.col, cb.row);
+        //insertTB.HardSetPos(cb.col, cb.row);
     }
 
     void DestroyMode_OnClick(TileBehav tb) {

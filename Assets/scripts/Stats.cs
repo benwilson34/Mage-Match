@@ -16,7 +16,6 @@ public class Stats {
     private class PlayerStat {
         public string name;
         public string character;
-        public string loadout;
         public int draws, drops, swaps, matches, match3s, match4s, match5s, cascades, tilesRemoved, spellsCast, timeouts, discards;
         public int dmgDealt, dmgTaken, healingDone;
         public int longestCascade;
@@ -28,13 +27,11 @@ public class Stats {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         ps1 = new PlayerStat() {
             name = p1.name,
-            character = p1.character.characterName,
-            loadout = p1.character.loadoutName
+            character = p1.character.characterName
         };
         ps2 = new PlayerStat() {
             name = p2.name,
-            character = p2.character.characterName,
-            loadout = p2.character.loadoutName
+            character = p2.character.characterName
         };
 
         InitReport();
@@ -59,8 +56,8 @@ public class Stats {
 
     void InitReport() {
         report = new StringBuilder();
-        report.Append(ps1.name + " (" + ps1.character + " - " + ps1.loadout + ") vs ");
-        report.AppendLine(ps2.name + " (" + ps2.character + " - " + ps2.loadout + ")");
+        report.Append(ps1.name + " (" + ps1.character + ") vs ");
+        report.AppendLine(ps2.name + " (" + ps2.character + ")");
         int rand = UnityEngine.Random.state.GetHashCode(); //?
         report.AppendLine("random seed - " + rand);
         report.AppendLine("...setup - deal p1 4, deal p2 4"); //?
@@ -128,13 +125,13 @@ public class Stats {
         if (playerAction) {
             Report("Drop " + tag + " col" + col);
             GetPS(id).drops++;
-        } else if (mm.uiCont.IsMenuOpen()) //?
+        } else if (mm.uiCont.IsDebugMenuOpen()) //?
             Report("menu Drop col" + col);
         yield return null;
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        if (!mm.uiCont.IsMenuOpen()) { //?
+        if (!mm.uiCont.IsDebugMenuOpen()) { //?
             Report("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
             if(playerAction)
                 GetPS(id).swaps++;
@@ -174,7 +171,7 @@ public class Stats {
 
     public void OnTileRemove(int id, TileBehav tb) {
         if (!mm.IsCommishTurn()) {
-            if (!mm.uiCont.IsMenuOpen()) //?
+            if (!mm.uiCont.IsDebugMenuOpen()) //?
                 GetPS(id).tilesRemoved++;
             else
                 report.AppendLine("menu Remove (" + tb.tile.col + "," + tb.tile.row + ")");
@@ -207,7 +204,7 @@ public class Stats {
         for (int id = 1; id <= 2; id++) {
             PlayerStat ps = GetPS(id);
             sb.AppendLine("Player " + id);
-            sb.AppendLine(ps.name + "," + ps.character + "," + ps.loadout);
+            sb.AppendLine(ps.name + "," + ps.character);
             sb.AppendLine("Tiles drawn," + ps.draws);
             sb.AppendLine("Tiles dropped," + ps.drops);
             sb.AppendLine("Tiles swapped," + ps.swaps);

@@ -9,7 +9,6 @@ public abstract class Character {
     public Ch ch;
 
     public string characterName;
-    public string loadoutName;
     public int meter = 0, meterMax = 100; // protected?
 
     protected int maxHealth;
@@ -136,7 +135,6 @@ public class CharTest : Character {
         spells = new Spell[4];
 
         characterName = "Sample";
-        loadoutName = "Test Loadout";
         maxHealth = 1000;
 
         SetDeckElements(20, 20, 20, 20, 20);

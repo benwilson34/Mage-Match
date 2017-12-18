@@ -7,7 +7,7 @@ using MMDebug;
 public class MageMatch : MonoBehaviour {
 
     // how to handle performing action here? also better name for Normal?
-    public enum State { Normal, Selecting, Targeting, Menu, TurnSwitching };
+    public enum State { Normal, Selecting, Targeting, NewsfeedMenu, DebugMenu, TurnSwitching };
     private Stack<State> stateStack;
 
     public enum Turn { PlayerTurn, CommishTurn }; // MyTurn, OppTurn?
@@ -54,6 +54,7 @@ public class MageMatch : MonoBehaviour {
         MMLog.Init(debugLogLevel);
         CharacterInfo.Init();
 
+        // set game to debug (single-client) mode if appropriate
         GameObject debugObj = GameObject.Find("debugSettings");
         if (debugObj != null) {
             debugSettings = debugObj.GetComponent<DebugSettings>();
@@ -189,7 +190,7 @@ public class MageMatch : MonoBehaviour {
 
     public void ExitState() {
         State s = stateStack.Pop();
-        if (s == State.Menu)
+        if (s == State.DebugMenu)
             BoardChanged();
         inputCont.SwitchContext(stateStack.Peek());
     } 

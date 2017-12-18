@@ -24,7 +24,6 @@ public class Rocky : Character {
 
     // TODO
     void RockyA() { // Rocky A - Tectonic Titan 
-        loadoutName = "Tectonic Titan";
         maxHealth = 1100;
 
         SetDeckElements(5, 0, 45, 30, 20);
@@ -37,7 +36,6 @@ public class Rocky : Character {
 
     // TODO
     void RockyB() { // Rocky B - Continental Champion
-        loadoutName = "Continental Champion";
         maxHealth = 1300;
 
         SetDeckElements(0, 25, 40, 10, 25);

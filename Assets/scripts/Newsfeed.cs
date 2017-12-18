@@ -14,6 +14,7 @@ public class Newsfeed : MonoBehaviour {
     private bool isFirstAction = true;
 
     private GameObject lastActionLog;
+    private MageMatch mm;
 
 	// Use this for initialization
 	void Start () {
@@ -38,6 +39,9 @@ public class Newsfeed : MonoBehaviour {
 		
 	}
 
+    public void Init(MageMatch mm) {
+        this.mm = mm;
+    }
 
     public void UpdateTurnTimer(float time) {
         turnTimerText.text = time.ToString("0.0");
@@ -91,7 +95,13 @@ public class Newsfeed : MonoBehaviour {
     }
 
     public void ToggleMenu() {
-        newsfeedMenu.SetActive(!newsfeedMenu.GetActive());
+        bool menuOpen = !newsfeedMenu.GetActive();
+        if (menuOpen)
+            mm.EnterState(MageMatch.State.NewsfeedMenu);
+        else
+            mm.ExitState();
+
+        newsfeedMenu.SetActive(menuOpen);
     }
 
     public bool isMenuOpen() { return newsfeedMenu.GetActive(); }

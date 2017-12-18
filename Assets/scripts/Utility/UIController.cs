@@ -35,7 +35,6 @@ public class UIController : MonoBehaviour {
     private List<GameObject> outlines, spellOutlines;
     private SpriteRenderer[,] cellOverlays;
     private Vector3 slidingTextStart;
-    private bool menu = false;
 
     public void Init(){
         board = GameObject.Find("cells").transform;
@@ -78,6 +77,7 @@ public class UIController : MonoBehaviour {
 
         // newsfeed
         newsfeed = GameObject.Find("Newsfeed").GetComponent<Newsfeed>();
+        newsfeed.Init(mm);
 
 
         // other
@@ -507,21 +507,21 @@ public class UIController : MonoBehaviour {
     #endregion
 
 
-    #region ----- MENU -----
-    public void ToggleMenu() {
-        menu = !menu;
+    #region ----- DEBUG MENU -----
+    public void ToggleDebugMenu() {
+        bool menuOpen = !menus.GetActive();
         Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
-        if (menu) {
+        if (menuOpen) {
             menuButtonText.text = "Close Menu";
-            mm.EnterState(MageMatch.State.Menu);
+            mm.EnterState(MageMatch.State.DebugMenu);
         } else {
             menuButtonText.text = "Menu";
             mm.ExitState();
         }
-        menus.SetActive(menu);
+        menus.SetActive(menuOpen);
     }
 
-    public bool IsMenuOpen() { return menu; }
+    public bool IsDebugMenuOpen() { return menus.GetActive(); }
 
     public void UpdateDebugGrid() {
         string grid = "   0  1  2  3  4  5  6 \n";
