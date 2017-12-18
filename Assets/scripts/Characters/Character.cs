@@ -17,7 +17,7 @@ public abstract class Character {
     protected int dfire, dwater, dearth, dair, dmuscle; // portions of 100 total
     protected Spell[] spells;
     protected MageMatch mm;
-    protected TileManager tileMan;
+    protected HexManager tileMan;
     protected int playerID;
     protected List<string> runes;
     //protected string genHexTag;

@@ -22,7 +22,7 @@ public class MageMatch : MonoBehaviour {
     public SyncManager syncManager;
     public HexGrid hexGrid;
     public BoardCheck boardCheck;
-    public TileManager tileMan;
+    public HexManager tileMan;
     public Commish commish;
     public TurnTimer timer;
     public Targeting targeting;
@@ -95,7 +95,7 @@ public class MageMatch : MonoBehaviour {
             myID = PhotonNetwork.player.ID;
 
         hexGrid = new HexGrid();
-        tileMan = new TileManager(this);
+        tileMan = new HexManager(this);
 
         uiCont.GetCellOverlays();
         boardCheck = new BoardCheck(this);
@@ -133,7 +133,7 @@ public class MageMatch : MonoBehaviour {
 
         stats = new Stats(p1, p2);
 
-        timer.InitTimer();
+        timer.StartTimer();
 
         inputCont = GetComponent<InputController>();
         EnterState(State.Normal);
@@ -296,7 +296,7 @@ public class MageMatch : MonoBehaviour {
 
         yield return eventCont.TurnBegin();
         SpellCheck();
-        timer.InitTimer();
+        timer.StartTimer();
 
         MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM END ----------</b>");
         ExitState();
@@ -451,6 +451,7 @@ public class MageMatch : MonoBehaviour {
         } else if (currentTurn == Turn.CommishTurn)
             eventCont.CommishDrop(tb.tile.element, col);
 
+        syncManager.CheckHandContents(activep.id);
         MMLog.Log_MageMatch("   ---------- DROP END ----------");
         actionsPerforming--;
         yield return null;
@@ -503,7 +504,10 @@ public class MageMatch : MonoBehaviour {
 
                 if (!targeting.WasCanceled()) { // should be an event callback?
                     eventCont.SpellCast(spell);
-                    StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
+
+                    if(MyTurn()) // this doesn't seem right...
+                        StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
+
                     tileMan.RemoveSeq(targeting.GetSelection());
                     p.ApplySpellCosts();
                     yield return BoardChecking(); //?

@@ -226,7 +226,7 @@ public class Stats {
 
     void Report(string str) {
         report.AppendLine(str);
-        mm.uiCont.UpdateNewsfeed(str);
+        mm.uiCont.newsfeed.UpdateNewsfeed(str);
     }
 
     public string GetReportText() { return report.ToString(); }

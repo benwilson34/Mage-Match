@@ -61,6 +61,7 @@ public class SyncManager : PunBehaviour {
         return r;
     }
 
+    // i don't think this works
     public IEnumerator Checkpoint() {
         PhotonView photonView = PhotonView.Get(this);
         photonView.RPC("HandleCheckpoint", PhotonTargets.Others, true);
@@ -72,6 +73,28 @@ public class SyncManager : PunBehaviour {
     public void HandleCheckpoint(bool checkpoint) {
         MMLog.Log_SyncMan("Received checkpoint");
         this.checkpoint = checkpoint;
+    }
+
+    public void CheckHandContents(int id) {
+        if (id != mm.myID)
+            return;
+
+        List<string> tags = mm.GetPlayer(id).hand.Debug_GetAllTags();
+
+        PhotonView photonView = PhotonView.Get(this);
+        photonView.RPC("HandleCheckHandContents", PhotonTargets.Others, id, tags.ToArray());
+    }
+    [PunRPC]
+    public void HandleCheckHandContents(int id, string[] theirTagArray) {
+        MMLog.Log_SyncMan("About to check player"+id+"'s hand...");
+        List<string> theirTags = new List<string>(theirTagArray);
+
+        bool match = mm.GetPlayer(id).hand.Debug_CheckTags(theirTags);
+        if (!match) {
+            List<string> myTags = mm.GetPlayer(id).hand.Debug_GetAllTags();
+            MMLog.LogError("Hand desync!!\nmine =" + myTags.ToString() + 
+                "\ntheirs=" + theirTags.ToString());
+        }
     }
 
 

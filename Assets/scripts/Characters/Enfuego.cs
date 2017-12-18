@@ -175,6 +175,7 @@ public class Enfuego : Character {
         mm.prompt.ContinueSwap();
     }
 
+    // TODO new effect
     public IEnumerator Incinerate() {
         yield return targeting.WaitForDragTarget(6);
         if (targeting.WasCanceled())
@@ -189,7 +190,6 @@ public class Enfuego : Character {
 
         yield return mm.InactiveP().DiscardRandom(2); 
     }
-
     public List<TileBehav> Inc_Filter(List<TileBehav> tbs) {
         List<TileBehav> filterTBs = new List<TileBehav>();
         foreach(TileBehav tb in tbs) {

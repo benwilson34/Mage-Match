@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MMDebug;
 
-public class TileManager { // should maybe inherit MonoBehaviour? or maybe static?
+public class HexManager { // should maybe inherit MonoBehaviour? or maybe static?
 
     public int removing = 0;
     public Sprite flipSprite;
@@ -15,7 +15,7 @@ public class TileManager { // should maybe inherit MonoBehaviour? or maybe stati
     private GameObject firePF, waterPF, earthPF, airPF, muscPF; // tile prefabs
     private GameObject stonePF, emberPF, tombstonePF; // token prefabs
 
-    public TileManager(MageMatch mm) {
+    public HexManager(MageMatch mm) {
         this.mm = mm;
         hexGrid = mm.hexGrid;
         tagDicts = new Dictionary<string, int>[3];

@@ -23,7 +23,7 @@ public class InputController : MonoBehaviour {
  //   private CellBehav clickCB; // needed?
 	//private bool isClickHex = false;
 
-    private bool freshClick = true;
+    private bool validClick = true;
 
 	void Start() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
@@ -32,6 +32,9 @@ public class InputController : MonoBehaviour {
     }
 
 	void Update(){
+        if (mm.uiCont.newsfeed.isMenuOpen())
+            return;
+
         if (Input.GetMouseButton(0) || lastClick) { // if left mouse is down
             nowClick = true;
             if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
@@ -49,7 +52,7 @@ public class InputController : MonoBehaviour {
             //    return;
 
             // LAYER 1 current context
-            if (mm.MyTurn() && IsFreshClick() && mouseObj != null)
+            if (mm.MyTurn() && IsValidClick() && mouseObj != null)
                 status = currentContext.TakeInput(state, mouseObj);
 
             if (state == MouseState.Down) {
@@ -64,8 +67,8 @@ public class InputController : MonoBehaviour {
                 standardContext.TakeInput(state, mouseObj, status);
 
             UpdateMouseState();
-        } else if (!freshClick) {
-            freshClick = true;
+        } else if (!validClick) {
+            validClick = true;
         }
 
 	}
@@ -96,15 +99,15 @@ public class InputController : MonoBehaviour {
 
     public void InvalidateClick() {
         if(mm.MyTurn() && nowClick)
-            freshClick = false;
+            validClick = false;
     }
 
-    public bool IsFreshClick() {
-        if (!freshClick) {  // if invalidated
+    public bool IsValidClick() {
+        if (!validClick) {  // if invalidated
             //lastClick = true;
-            MMLog.Log_InputCont("Picked up input, but the click isn't fresh!");
+            MMLog.Log_InputCont("Picked up input, but the click isn't valid!");
             if (!nowClick) {
-                freshClick = true;
+                validClick = true;
                 //lastClick = false;
             }
             return false;
@@ -204,7 +207,7 @@ public class InputController : MonoBehaviour {
     }
 
     List<RaycastResult> GetUIRaycast() {
-        MMLog.Log_InputCont("calling UIRaycast");
+        //MMLog.Log_InputCont("calling UIRaycast");
         GraphicRaycaster gr = mm.uiCont.GetComponent<GraphicRaycaster>();
         //Create the PointerEventData with null for the EventSystem
         PointerEventData ped = new PointerEventData(null);

@@ -7,7 +7,7 @@ using MMDebug;
 public class ObjectEffects {
 
     private MageMatch mm;
-    private TileManager tileMan;
+    private HexManager tileMan;
     private Targeting targeting;
     private HexGrid hexGrid;
 

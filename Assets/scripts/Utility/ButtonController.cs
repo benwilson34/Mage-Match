@@ -16,24 +16,38 @@ public class ButtonController : MonoBehaviour {
     private ButtonClick onClick, mainClick;
     private bool newSpell = false;
 
-	void Start () {
-		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+    public void Init(MageMatch mm) {
+        MMLog.Log("ButtonCont", "black", "Init button " + spellNum);
+        this.mm = mm;
         if(spellNum >= 0)
             mainView = transform.Find("main").gameObject;
         simpleTextPF = Resources.Load<GameObject>("prefabs/ui/simpleTextView");
 
         switch (type) {
             case Type.Spell:
-                onClick = OnSpellButtonClick;
+                SetOnClick(OnSpellButtonClick);
+                //onClick = OnSpellButtonClick;
                 break;
             default:
                 MMLog.LogError("BUTTONCONT: Tried to init a button with bad type!");
                 break;
         }
-	}
+
+        if(onClick == null)
+            MMLog.LogError("BUTTONCONT: Button onClick is somehow null!");
+    }
+
+    void SetOnClick(ButtonClick click) {
+        MMLog.Log("ButtonCont", "black","Setting onClick of spell" + spellNum + " to " + click.ToString());
+        onClick = click;
+    }
 
     public void OnClick() {
-        onClick();
+        MMLog.Log("ButtonCont","black","Button " + spellNum + " clicked...");
+        if (onClick != null)
+            onClick();
+        else
+            MMLog.LogError("BUTTONCONT: Button was clicked and onClick is somehow null!");
     }
 
     public void ShowSpellInfo() {
@@ -83,7 +97,8 @@ public class ButtonController : MonoBehaviour {
         cancelView.transform.Find("t").GetComponent<Text>().text = "Cancel";
 
         mainClick = onClick;
-        onClick = OnSpellCancelClick;
+        SetOnClick(OnSpellButtonClick);
+        //onClick = OnSpellCancelClick;
 
         yield return null;
     }
@@ -91,7 +106,6 @@ public class ButtonController : MonoBehaviour {
     public IEnumerator Transition_MainView() {
         if (newSpell) {
             MMLog.Log("BUTTONCONT", "black", "button" + spellNum + " showing new spell info");
-            //bool act = mainView.GetActive();
             mainView.SetActive(true);
             ShowSpellInfo();
             mainView.SetActive(false);
@@ -100,8 +114,10 @@ public class ButtonController : MonoBehaviour {
 
         if(cancelView != null)
             Destroy(cancelView.gameObject);
-        mainView.gameObject.SetActive(true);
-        onClick = mainClick;
+        mainView.SetActive(true);
+
+        SetOnClick(mainClick);
+        //onClick = mainClick;
 
         yield return null;
     }
@@ -133,6 +149,7 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void OnFileButtonClick() {
+        MMLog.Log("ButtonCont", "black", "Saving files...");
         mm.stats.SaveStatsCSV();
         mm.stats.SaveReportTXT();
         MMLog.SaveReportTXT();

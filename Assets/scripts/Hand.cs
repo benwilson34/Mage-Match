@@ -5,7 +5,7 @@ using MMDebug;
 
 public class Hand {
 
-    private List<Hex> objs = null;
+    private List<Hex> hexes = null;
     private Transform handPos = null;
     private HandSlot[] slots;
     private GameObject placeholderPF;
@@ -17,7 +17,7 @@ public class Hand {
     private const int maxHandSize = 7;
 
     public Hand(MageMatch mm, Player p) {
-        objs = new List<Hex>();
+        hexes = new List<Hex>();
         slots = new HandSlot[maxHandSize];
         placeholderPF = Resources.Load("prefabs/ui/placeholder") as GameObject;
         this.mm = mm;
@@ -48,7 +48,7 @@ public class Hand {
 
     public void Add(Hex hex) {
         hex.transform.SetParent(handPos); // , false)?
-        objs.Add(hex);
+        hexes.Add(hex);
 
         int i;
         for (i = 0; i < maxHandSize; i++) {
@@ -71,28 +71,28 @@ public class Hand {
                 break;
             }
         }
-        objs.Remove(hex);
+        hexes.Remove(hex);
     }
 
     public void Empty() {
-        while (objs.Count > 0) {
-            GameObject.Destroy(objs[0].gameObject);
-            objs.RemoveAt(0);
+        while (hexes.Count > 0) {
+            GameObject.Destroy(hexes[0].gameObject);
+            hexes.RemoveAt(0);
         }
     }
 
-    public TileBehav GetTile(int i) { return (TileBehav)objs[i]; }
+    public TileBehav GetTile(int i) { return (TileBehav)hexes[i]; }
 
     public GameObject GetTile(Tile.Element elem) {
-        for (int i = 0; i < objs.Count; i++) {
-            if (((TileBehav)objs[i]).tile.element == elem)
-                return objs[i].gameObject;
+        for (int i = 0; i < hexes.Count; i++) {
+            if (((TileBehav)hexes[i]).tile.element == elem)
+                return hexes[i].gameObject;
         }
         return null;
     }
 
     public Hex GetHex(string tag) {
-        foreach (Hex obj in objs) {
+        foreach (Hex obj in hexes) {
             //MMLog.Log("HAND", "black", "Trying \"" + tag + "\" against \"" + obj.tag + "\"");
             if (tag.Equals(obj.tag))
                 return obj;
@@ -101,9 +101,31 @@ public class Hand {
         return null;
     }
 
-    public int Count() { return objs.Count; }
+    public List<string> Debug_GetAllTags() {
+        List<string> tags = new List<string>();
+        foreach (Hex h in hexes) {
+            tags.Add(h.tag);
+        }
+        tags.Sort();
+        return tags;
+    }
+    public bool Debug_CheckTags(List<string> theirTags) {
+        List<string> myTags = Debug_GetAllTags();
+        for (int i = 0; i < theirTags.Count; i++) {
+            string ttag = theirTags[i];
+            if (theirTags[i] != myTags[i]) {
+                // that's bad
+                MMLog.LogError("Hand desync!!\nmine =" + myTags.ToString() + 
+                    "\ntheirs=" + theirTags.ToString());
+                return false;
+            }
+        }
+        return true;
+    }
 
-    public bool IsFull() { return objs.Count == maxHandSize; }
+    public int Count() { return hexes.Count; }
+
+    public bool IsFull() { return hexes.Count == maxHandSize; }
 
     public HandSlot GetHandSlot(int ind) { return slots[ind]; }
 

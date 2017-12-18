@@ -115,6 +115,9 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>Library\UnityAssemblies\SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="ConsoleE">
+      <HintPath>Assets\ConsoleE\Editor\ConsoleE.dll</HintPath>
+    </Reference>
     <Reference Include="DOTween">
       <HintPath>Assets\Demigiant\DOTween\DOTween.dll</HintPath>
     </Reference>
@@ -141,9 +144,6 @@
     </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>Assets\Plugins\WebSocket\websocket-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="ConsoleE">
-      <HintPath>Assets\ConsoleE\Editor\ConsoleE.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

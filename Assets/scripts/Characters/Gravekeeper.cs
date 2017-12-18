@@ -104,7 +104,10 @@ public class Gravekeeper : Character {
         Spell newSpell = altCoreSpell;
         altCoreSpell = spells[4];
         spells[4] = newSpell;
-        mm.uiCont.GetButtonCont(4).SpellChanged();
+
+        // keep in mind here that only the LOCAL player needs this
+        if(mm.myID == playerID) 
+            mm.uiCont.GetButtonCont(4).SpellChanged();
     }
 
     // TODO handle 0 or 1 zombies on the board

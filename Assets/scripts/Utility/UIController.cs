@@ -13,9 +13,9 @@ public class UIController : MonoBehaviour {
     [HideInInspector]
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
     public TooltipManager tooltipMan;
+    public Newsfeed newsfeed;
 
-	private Text debugGridText, turnTimerText, slidingText;
-    private Text turnCounterText, newsText;
+	private Text debugGridText, slidingText;
     private GameObject debugItemPF;
     private Transform debugContent;
     private GameObject debugReport;
@@ -30,33 +30,41 @@ public class UIController : MonoBehaviour {
     private GameObject gradient, targetingBG;
     private GameObject tCancelB, tClearB;
     private GameObject menus; // ?
+    private GameObject newsfeedMenu;
     private GameObject overlay;
     private List<GameObject> outlines, spellOutlines;
     private SpriteRenderer[,] cellOverlays;
     private Vector3 slidingTextStart;
     private bool menu = false;
 
-    public void Init(){ // Awake()?
+    public void Init(){
         board = GameObject.Find("cells").transform;
         mm = GameObject.Find("board").GetComponent<MageMatch> ();
 
-        InitSprites();
-
-		debugGridText = GameObject.Find ("t_debugHex").GetComponent<Text> (); // UI debug grid
         slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
-
         slidingTextStart = new Vector3(Screen.width, slidingText.rectTransform.position.y);
         slidingText.rectTransform.position = slidingTextStart;
 
         leftPinfo = GameObject.Find("LeftPlayer_Info").transform;
         rightPinfo = GameObject.Find("RightPlayer_Info").transform;
         leftPload = GameObject.Find("LeftPlayer_Loadout").transform;
+
+        // buttons
+        InitSprites();
+        for (int i = 0; i < 5; i++) {
+            MMLog.Log_UICont("Init button " + i);
+            GetButtonCont(i).Init(mm);
+        }
         localDrawButton = leftPinfo.Find("b_Draw").GetComponent<Button>();
+        localDrawButton.GetComponent<ButtonController>().Init(mm);
+        GameObject.Find("b_saveFiles").GetComponent<ButtonController>().Init(mm);
+
 
         // menus
         menus = GameObject.Find("menus");
         Transform scroll = menus.transform.Find("debugMenu").Find("scr_debugEffects");
         debugContent = scroll.transform.Find("Viewport").Find("Content");
+		debugGridText = GameObject.Find ("t_debugHex").GetComponent<Text>(); // UI debug grid
         debugReport = menus.transform.Find("scr_report").gameObject;
         debugReportText = debugReport.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>();
         debugReport.SetActive(false);
@@ -67,17 +75,12 @@ public class UIController : MonoBehaviour {
 
         menus.SetActive(false);
 
+
         // newsfeed
-        Transform newsfeed = GameObject.Find("Newsfeed").transform;
-        turnTimerText = newsfeed.Find("p_timer").Find("t_timer").GetComponent<Text>();
-        turnCounterText = newsfeed.Find("p_turns").Find("t_turnCount").GetComponent<Text>();
-        turnCounterText.text = "1";
-        newsText = newsfeed.Find("p_news").Find("t_news").GetComponent<Text>();
-        newsText.text = "!!! FIGHT !!!";
+        newsfeed = GameObject.Find("Newsfeed").GetComponent<Newsfeed>();
+
 
         // other
-        //turnTimerText = GameObject.Find("Text_Timer").GetComponent<Text>();
-
         overlay = GameObject.Find("Targeting Overlay");
         overlay.SetActive(false);
         
@@ -135,7 +138,7 @@ public class UIController : MonoBehaviour {
 
     public IEnumerator OnTurnEnd(int id) {
         UpdateEffTexts();
-        turnCounterText.text = ""+mm.stats.turns;
+        newsfeed.UpdateTurnCount(mm.stats.turns);
         //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
         yield return null;
     }
@@ -224,29 +227,10 @@ public class UIController : MonoBehaviour {
     }
 
 
-    #region ----- NEWSFEED -----
-    public void UpdateTurnTimer(float time) {
-        turnTimerText.text = time.ToString("0.0");
-    }
-
     // delete
     public void UpdateMoveText(string str){
         //moveText.text = str;
     }
-
-    public void UpdateNewsfeed(string str) {
-        StartCoroutine(_UpdateNewsfeed(str));
-    }
-
-    IEnumerator _UpdateNewsfeed(string str) {
-        yield return newsText.DOFade(0, .2f);
-
-        yield return new WaitForSeconds(.3f);
-        newsText.text = str;
-
-        yield return newsText.DOFade(1, .2f);
-    }
-    #endregion
 
 
     #region ----- PLAYER INFO -----
