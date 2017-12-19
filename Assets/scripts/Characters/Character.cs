@@ -44,8 +44,12 @@ public abstract class Character {
     }
 
     public void InitSpells() {
-        foreach (Spell sp in spells)
+        Spell sp;
+        for (int i = 0; i < 5; i++) {
+            sp = spells[i];
             sp.Init(mm);
+            sp.info = CharacterInfo.GetSpellInfo(ch, i, true);
+        }
     }
 
     public void OnPlayerHealthChange(int id, int amount, bool dealt) {
@@ -139,10 +143,10 @@ public class CharTest : Character {
 
         SetDeckElements(20, 20, 20, 20, 20);
 
-        spells[0] = new Spell(0, "Cherrybomb", "FFA", 1, objFX.Cherrybomb);
-        spells[1] = new Spell(1, "Massive damage", "FFA", 1, objFX.Deal496Dmg);
-        spells[2] = new Spell(2, "Stone Test", "FAF", 1, objFX.Deal496Dmg);
-        spells[3] = new Spell(3, "Massive damage", "AFA", 1, objFX.Deal496Dmg);
+        spells[0] = new Spell(0, "Cherrybomb", "FFA", objFX.Cherrybomb);
+        spells[1] = new Spell(1, "Massive damage", "FFA", objFX.Deal496Dmg);
+        spells[2] = new Spell(2, "Stone Test", "FAF", objFX.Deal496Dmg);
+        spells[3] = new Spell(3, "Massive damage", "AFA", objFX.Deal496Dmg);
         InitSpells();
     }
 }

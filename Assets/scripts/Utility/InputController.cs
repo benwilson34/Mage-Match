@@ -49,8 +49,8 @@ public class InputController : MonoBehaviour {
             //if (mouseObj == null)
             //    return;
 
-            // return if the report overlay is showing
-            if (reporter != null && reporter.show)
+            // return if the report overlay is showing, or if the newsfeed is open
+            if ((reporter != null && reporter.show) || mm.uiCont.newsfeed.isMenuOpen())
                 return;
 
             // LAYER 1 current context

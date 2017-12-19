@@ -21,13 +21,14 @@ public class Gravekeeper : Character {
         SetDeckElements(0, 10, 20, 0, 20);
 
         spells = new Spell[5];
-        spells[0] = new SignatureSpell(0, "Tombstone", "EMEE", 1, 20, Tombstone);
-        spells[1] = new Spell(1, "The Oogie Boogie", "ME", 1, TheOogieBoogie);
-        spells[2] = new Spell(2, "Party Crashers", "MWE", 1, PartyCrashers);
-        spells[3] = new Spell(3, "Undead Union", "WEM", 1, UndeadUnion);
-        spells[4] = new CoreSpell(4, "Business in the Front", 1, BusinessInTheFront);
+        spells[0] = new CoreSpell(0, "Business in the Front", BusinessInTheFront);
+        spells[1] = new Spell(1, "The Oogie Boogie", "ME", TheOogieBoogie);
+        spells[2] = new Spell(2, "Party Crashers", "MWE", PartyCrashers);
+        spells[3] = new Spell(3, "Undead Union", "WEM", UndeadUnion);
+        spells[4] = new SignatureSpell(4, "Tombstone", "EMEE", Tombstone);
 
-        altCoreSpell = new CoreSpell(4, "Party in the Back", 1, PartyInTheBack);
+        altCoreSpell = new CoreSpell(4, "Party in the Back", PartyInTheBack);
+        altCoreSpell.info = CharacterInfo.GetSpellInfo(ch, 5, true);
 
         InitSpells();
     }

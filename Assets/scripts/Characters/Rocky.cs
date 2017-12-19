@@ -28,10 +28,10 @@ public class Rocky : Character {
 
         SetDeckElements(5, 0, 45, 30, 20);
 
-        spells[0] = new Spell(0, "NOTHING", "EEMEE", 1, Sinkhole); //
-        spells[1] = new Spell(1, "Sinkhole", "EAAE", 1, objFX.Deal496Dmg); //
-        spells[2] = new Spell(2, "Boulder Barrage", "MMEE", 1, objFX.Deal496Dmg); //
-        spells[3] = new Spell(3, "Stalagmite", "AEE", 1, Stalagmite);
+        spells[0] = new Spell(0, "NOTHING", "EEMEE", Sinkhole); //
+        spells[1] = new Spell(1, "Sinkhole", "EAAE", objFX.Deal496Dmg); //
+        spells[2] = new Spell(2, "Boulder Barrage", "MMEE", objFX.Deal496Dmg); //
+        spells[3] = new Spell(3, "Stalagmite", "AEE", Stalagmite);
     }
 
     // TODO
@@ -40,10 +40,10 @@ public class Rocky : Character {
 
         SetDeckElements(0, 25, 40, 10, 25);
 
-        spells[0] = new Spell(0, "NOTHING", "EEMEE", 1, Sinkhole); //
-        spells[1] = new Spell(1, "Living Flesh Armor", "EWWE", 1, objFX.Deal496Dmg); //
-        spells[2] = new Spell(2, "Figure-Four Leglock", "MEEM", 1, objFX.Deal496Dmg); //
-        spells[3] = new Spell(3, "Stalagmite", "AEE", 1, Stalagmite);
+        spells[0] = new Spell(0, "NOTHING", "EEMEE", Sinkhole); //
+        spells[1] = new Spell(1, "Living Flesh Armor", "EWWE", objFX.Deal496Dmg); //
+        spells[2] = new Spell(2, "Figure-Four Leglock", "MEEM", objFX.Deal496Dmg); //
+        spells[3] = new Spell(3, "Stalagmite", "AEE", Stalagmite);
     }
 
 
