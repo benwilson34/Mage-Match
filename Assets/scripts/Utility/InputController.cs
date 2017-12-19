@@ -11,6 +11,7 @@ public class InputController : MonoBehaviour {
 	private MageMatch mm;
     private Targeting targeting;
     private MonoBehaviour mouseObj;
+    private Reporter reporter;
 
     private bool holdingHex = false;
     private Hex heldHex;
@@ -29,6 +30,9 @@ public class InputController : MonoBehaviour {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
         InitContexts();
+        GameObject reporterGO = GameObject.Find("Reporter");
+        if (reporterGO != null)
+            reporter = reporterGO.GetComponent<Reporter>();
     }
 
 	void Update(){
@@ -44,6 +48,10 @@ public class InputController : MonoBehaviour {
 
             //if (mouseObj == null)
             //    return;
+
+            // return if the report overlay is showing
+            if (reporter != null && reporter.show)
+                return;
 
             // LAYER 1 current context
             if (mm.MyTurn() && IsValidClick() && mouseObj != null)

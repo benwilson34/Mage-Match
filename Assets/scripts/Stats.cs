@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text;
 using System.IO;
 using System;
+using MMDebug;
 
 public class Stats {
 
@@ -191,11 +192,40 @@ public class Stats {
     }
 
 
-    public void SaveStatsCSV() {
+    void Report(string str) {
+        report.AppendLine(str);
+        mm.uiCont.newsfeed.UpdateNewsfeed(str);
+    }
+
+    public string GetReportText() { return report.ToString(); }
+
+
+    public void SaveFiles() {
         DateTime dt = DateTime.Now;
-        string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
-        filePath += dt.Hour + "-" + dt.Minute + "-" + dt.Second + "_Stats";
-        filePath = @"/" + filePath + ".csv";
+        string timestamp = dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
+        timestamp += dt.Hour + "-" + dt.Minute + "-" + dt.Second;
+
+        string dirPath = Application.dataPath;
+        MMLog.Log("Stats", "black", "dataPath is " + dirPath + "...");
+        dirPath = Directory.CreateDirectory(dirPath + "/" + timestamp).FullName;
+        MMLog.Log("Stats", "black", "saving files to " + dirPath + "...");
+
+        SaveReportTXT(dirPath, timestamp);
+        SaveStatsCSV(dirPath, timestamp);
+        MMLog.SaveReportTXT(dirPath, timestamp);
+    }
+
+    void SaveReportTXT(string path, string timestamp) {
+        string filename = "MageMatch_" + timestamp + "_Report";
+        filename = @"/" + filename + ".txt";
+
+        File.WriteAllText(path + filename, GetReportText());
+    }
+
+    public void SaveStatsCSV(string path, string timestamp) {
+        DateTime dt = DateTime.Now;
+        string filename = "MageMatch_" + timestamp + "_Stats";
+        filename = @"/" + filename + ".csv";
 
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("Turns complete," + turns);
@@ -218,23 +248,6 @@ public class Stats {
         }
 
         // TODO write num of each spell cast from EffectCont.tagDict
-        File.WriteAllText(filePath, sb.ToString());
+        File.WriteAllText(path + filename, sb.ToString());
     }
-
-    void Report(string str) {
-        report.AppendLine(str);
-        mm.uiCont.newsfeed.UpdateNewsfeed(str);
-    }
-
-    public string GetReportText() { return report.ToString(); }
-
-    public void SaveReportTXT() {
-        DateTime dt = DateTime.Now;
-        string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
-        filePath += dt.Hour + "-" + dt.Minute + "-" + dt.Second + "_Report";
-        filePath = @"/" + filePath + ".txt";
-
-        File.WriteAllText(filePath, GetReportText());
-    }
-
 }

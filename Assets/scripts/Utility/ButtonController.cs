@@ -150,8 +150,6 @@ public class ButtonController : MonoBehaviour {
 
     public void OnFileButtonClick() {
         MMLog.Log("ButtonCont", "black", "Saving files...");
-        mm.stats.SaveStatsCSV();
-        mm.stats.SaveReportTXT();
-        MMLog.SaveReportTXT();
+        mm.stats.SaveFiles();
     }
 }

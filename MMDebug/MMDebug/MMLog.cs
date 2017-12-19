@@ -40,13 +40,11 @@ namespace MMDebug {
                 report.AppendLine(msg);
         }
 
-        public static void SaveReportTXT() {
-            DateTime dt = DateTime.Now;
-            string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
-            filePath += dt.Hour + "-" + dt.Minute + "-" + dt.Second + "_DebugLog";
-            filePath = @"/" + filePath + ".txt";
+        public static void SaveReportTXT(string path, string timestamp) {
+            string filename = "MageMatch_" + timestamp + "_DebugLog";
+            filename = @"/" + filename + ".txt";
 
-            File.WriteAllText(filePath, report.ToString());
+            File.WriteAllText(path + filename, report.ToString());
         }
 
         // ---------------------------------------------------------------------------------
