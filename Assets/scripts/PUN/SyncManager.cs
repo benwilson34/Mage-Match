@@ -187,16 +187,16 @@ public class SyncManager : PunBehaviour {
     }
 
     // TODO merge into SendTargetingMessage
-    public void SendClearTargets() {
-        if (mm.MyTurn()) {
-            PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleClearTargets", PhotonTargets.Others);
-        }
-    }
-    [PunRPC]
-    public void HandleClearTargets() {
-        mm.targeting.ClearTargets();
-    }
+    //public void SendClearTargets() {
+    //    if (mm.MyTurn()) {
+    //        PhotonView photonView = PhotonView.Get(this);
+    //        photonView.RPC("HandleClearTargets", PhotonTargets.Others);
+    //    }
+    //}
+    //[PunRPC]
+    //public void HandleClearTargets() {
+    //    mm.targeting.ClearTargets();
+    //}
 
     public void SendCancelTargeting() {
         if (mm.MyTurn()) {

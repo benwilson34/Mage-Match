@@ -8,9 +8,7 @@ public class Rocky : Character {
     private HexGrid hexGrid;
     private Targeting targeting;
 
-    public Rocky(MageMatch mm, int id) : base(mm, Ch.Rocky) {
-        playerID = id;
-        this.mm = mm;
+    public Rocky(MageMatch mm, int id) : base(mm, Ch.Rocky, id) {
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
         objFX = mm.hexFX;
@@ -74,15 +72,15 @@ public class Rocky : Character {
     //    yield return null; // for now
     //}
 
-    public IEnumerator Sinkhole() {
+    public IEnumerator Sinkhole(TileSeq prereq) {
         yield return null;
     }
 
-    public void BoulderBarrage() {
+    public void BoulderBarrage(TileSeq prereq) {
 
     }
 
-    public IEnumerator Stalagmite() {
+    public IEnumerator Stalagmite(TileSeq prereq) {
         yield return targeting.WaitForCellTarget(1);
         if (targeting.WasCanceled())
             yield break;
@@ -93,17 +91,17 @@ public class Rocky : Character {
         // hardset bottom three cells of column
         TileBehav stone;
         for (int i = 0; i < 3; i++) {
-            stone = (TileBehav) tileMan.GenerateToken(playerID, "stone");
+            stone = (TileBehav) tileMan.GenerateToken(playerId, "stone");
             stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
             mm.PutTile(stone, col, bottomr + i);
         }
     }
 
-    public void LivingFleshArmor() {
+    public void LivingFleshArmor(TileSeq prereq) {
 
     }
 
-    public void FigureFourLeglock() {
+    public void FigureFourLeglock(TileSeq prereq) {
 
     }
 }

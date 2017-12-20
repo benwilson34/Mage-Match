@@ -140,8 +140,8 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void Targeting_OnClearButton() {
-        MMLog.Log("BUTTONCONT", "black", "Targets cleared.");
-        mm.targeting.ClearTargets();
+        MMLog.Log("BUTTONCONT", "black", "This currently does nothing. Thanks!");
+        //mm.targeting.ClearTargets();
     }
 
     public void OnDrawButtonClick() {

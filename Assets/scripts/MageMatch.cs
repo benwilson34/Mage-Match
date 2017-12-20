@@ -59,6 +59,7 @@ public class MageMatch : MonoBehaviour {
         if (debugObj != null) {
             debugSettings = debugObj.GetComponent<DebugSettings>();
             isDebugMode = true;
+
             debugTools = GameObject.Find("toolsMenu").GetComponent<DebugTools>();
             debugTools.Init(this);
 
@@ -428,7 +429,7 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void PlayerDropTile(int col, Hex hex) {
-        activep.hand.Remove(hex); // remove from hand
+        activep.hand.Remove(hex);
         StartCoroutine(_Drop(true, col, hex));
     }
 
@@ -436,7 +437,7 @@ public class MageMatch : MonoBehaviour {
         StartCoroutine(_Drop(false, col, hex));
     }
 
-    IEnumerator _Drop(bool playerAction, int col, Hex hex) {
+    public IEnumerator _Drop(bool playerAction, int col, Hex hex) {
         MMLog.Log_MageMatch("   ---------- DROP BEGIN ----------");
         actionsPerforming++;
 
@@ -462,7 +463,7 @@ public class MageMatch : MonoBehaviour {
         StartCoroutine(_SwapTiles(true, c1, r1, c2, r2));
     }
 
-    // for spells and such
+    // for spells and such?
     public void SwapTiles(int c1, int r1, int c2, int r2) {
         StartCoroutine(_SwapTiles(false, c1, r1, c2, r2));
     }
@@ -477,13 +478,13 @@ public class MageMatch : MonoBehaviour {
         actionsPerforming--;
     }
 
-    // TODO somewhere in here, spell prereq selection screen!
     public IEnumerator CastSpell(int spellNum) {
         MMLog.Log_MageMatch("   ---------- CAST SPELL BEGIN ----------");
         actionsPerforming++;
         syncManager.SendSpellCast(spellNum);
 
         Player p = activep;
+        uiCont.SetDrawButton(false);
         Spell spell = p.character.GetSpell(spellNum);
         if (p.AP >= spell.APcost) {
             targeting.selectionCanceled = false; // maybe not needed here
@@ -498,10 +499,11 @@ public class MageMatch : MonoBehaviour {
                 uiCont.DeactivateAllSpellButtons(); // ?
                 p.SetCurrentSpell(spellNum);
 
+                // TODO this won't be needed anymore :)
                 if (spell is CoreSpell)
                     yield return ((CoreSpell)spell).CastCore(targeting.GetSelection());
                 else
-                    yield return spell.Cast();
+                    yield return spell.Cast(targeting.GetSelection());
 
                 if (!targeting.WasCanceled()) { // should be an event callback?
                     eventCont.SpellCast(spell);
@@ -517,6 +519,8 @@ public class MageMatch : MonoBehaviour {
         } else {
             uiCont.UpdateMoveText("Not enough AP to cast!");
         }
+
+        uiCont.SetDrawButton(true);
         MMLog.Log_MageMatch("   ---------- CAST SPELL END ----------");
         actionsPerforming--;
     }

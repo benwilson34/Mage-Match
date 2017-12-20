@@ -20,7 +20,7 @@ public class ObjectEffects {
 
     // -------------------------------------- SPELLS ------------------------------------------
 
-    public IEnumerator Deal496Dmg() {
+    public IEnumerator Deal496Dmg(TileSeq prereq) {
         mm.ActiveP().DealDamage(496);
         yield return null;
     }
@@ -52,7 +52,7 @@ public class ObjectEffects {
         }
     }
 
-    public IEnumerator Cherrybomb() {
+    public IEnumerator Cherrybomb(TileSeq prereq) {
         yield return targeting.WaitForTileTarget(1);
         if (targeting.WasCanceled())
             yield break;

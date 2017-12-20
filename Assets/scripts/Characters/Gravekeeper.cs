@@ -10,8 +10,7 @@ public class Gravekeeper : Character {
 
     private Spell altCoreSpell;
 
-    public Gravekeeper(MageMatch mm, int id) : base(mm, Ch.Gravekeeper) {
-        playerID = id;
+    public Gravekeeper(MageMatch mm, int id) : base(mm, Ch.Gravekeeper, id) {
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
         objFX = mm.hexFX;
@@ -48,16 +47,16 @@ public class Gravekeeper : Character {
                 zombs = 3;
                 break;
         }
-        mm.ActiveP().DealDamage(dmg);
+        ThisPlayer().DealDamage(dmg);
 
         if (seq.GetElementAt(0) == Tile.Element.Earth) // not safe if there are multi-color tiles
             zombs++;
 
         List<TileBehav> tbs = hexGrid.GetPlacedTiles(seq);
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
-            yield return mm.syncManager.SyncRand(playerID, Random.Range(0, tbs.Count));
+            yield return mm.syncManager.SyncRand(playerId, Random.Range(0, tbs.Count));
             int rand = mm.syncManager.GetRand();
-            yield return objFX.Ench_SetZombify(playerID, tbs[rand], false); // skip?
+            yield return objFX.Ench_SetZombify(playerId, tbs[rand], false); // skip?
             tbs.RemoveAt(rand);
         }
 
@@ -107,12 +106,12 @@ public class Gravekeeper : Character {
         spells[4] = newSpell;
 
         // keep in mind here that only the LOCAL player needs this
-        if(mm.myID == playerID) 
+        if(mm.myID == playerId) 
             mm.uiCont.GetButtonCont(4).SpellChanged();
     }
 
     // TODO handle 0 or 1 zombies on the board
-    public IEnumerator TheOogieBoogie() {
+    public IEnumerator TheOogieBoogie(TileSeq prereq) {
         yield return targeting.WaitForTileTarget(2, TOB_Filter);
         if (targeting.WasCanceled())
             yield return null;
@@ -136,24 +135,25 @@ public class Gravekeeper : Character {
         return filterTBs;
     }
 
-    // TODO handle no tiles in hand...should be part of WaitForDrop?
-    public IEnumerator PartyCrashers() {
+    public IEnumerator PartyCrashers(TileSeq prereq) {
         for (int i = 0; i < 2; i++) {
             yield return mm.prompt.WaitForDrop();
-            // TODO if canceled
+            if (!mm.prompt.WasSuccessful())
+                break;
+
             TileBehav tb = mm.prompt.GetDropTile();
-            MMLog.Log_Gravekeeper("Player " + playerID + " dropped " + tb.tag);
-            yield return objFX.Ench_SetZombify(playerID, tb, false);
+            MMLog.Log_Gravekeeper("Player " + playerId + " dropped " + tb.tag);
+            yield return objFX.Ench_SetZombify(playerId, tb, false);
             int col = mm.prompt.GetDropCol();
             int nextTBrow = mm.boardCheck.CheckColumn(col) - 1; // next TB under, if any
 
-            mm.prompt.ContinueDrop();
+            yield return mm.prompt.ContinueDrop();
 
             if (nextTBrow >= mm.hexGrid.BottomOfColumn(col)) {
                 tileMan.RemoveTile(col, nextTBrow, false);
             }
 
-            mm.GetPlayer(playerID).DealDamage(30);
+            ThisPlayer().DealDamage(30);
         }
         yield return null;
     }
@@ -186,7 +186,7 @@ public class Gravekeeper : Character {
     //    }
     //}
 
-    public IEnumerator UndeadUnion() {
+    public IEnumerator UndeadUnion(TileSeq prereq) {
         List<TileBehav> tbs = mm.hexGrid.GetPlacedTiles();
         for (int i = 0; i < tbs.Count; i++) { // filter zombs
             TileBehav tb = tbs[i];
@@ -274,8 +274,8 @@ public class Gravekeeper : Character {
     //    Ench_SetZombify(playerID, tb, false);
     //}
 
-    public IEnumerator Tombstone() {
-        mm.GetPlayer(playerID).DealDamage(225);
+    public IEnumerator Tombstone(TileSeq prereq) {
+        ThisPlayer().DealDamage(225);
 
         yield return targeting.WaitForCellTarget(1);
         if (targeting.WasCanceled())
@@ -283,7 +283,7 @@ public class Gravekeeper : Character {
 
         CellBehav cb = targeting.GetTargetCBs()[0];
         int col = cb.col;
-        Hex tomb = tileMan.GenerateToken(playerID, "tombstone");
+        Hex tomb = tileMan.GenerateToken(playerId, "tombstone");
         tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
 
         TombstoneToken ttb = (TombstoneToken)tomb;

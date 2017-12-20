@@ -17,13 +17,14 @@ public abstract class Character {
     protected Spell[] spells;
     protected MageMatch mm;
     protected HexManager tileMan;
-    protected int playerID;
+    protected int playerId;
     protected List<string> runes;
     //protected string genHexTag;
 
-    public Character(MageMatch mm, Ch ch) {
+    public Character(MageMatch mm, Ch ch, int playerId) {
         this.mm = mm;
         this.ch = ch;
+        this.playerId = playerId;
         tileMan = mm.tileMan;
         runes = new List<string>();
 
@@ -53,7 +54,7 @@ public abstract class Character {
     }
 
     public void OnPlayerHealthChange(int id, int amount, bool dealt) {
-        if (dealt && id != playerID) // if the other player was dealt dmg (not great)
+        if (dealt && id != playerId) // if the other player was dealt dmg (not great)
             ChangeMeter((-amount) / 3);
     }
 
@@ -68,7 +69,7 @@ public abstract class Character {
     public void ChangeMeter(int amount) {
         meter += amount;
         meter = Mathf.Clamp(meter, 0, meterMax); // TODO clamp amount before event
-        mm.eventCont.PlayerMeterChange(playerID, amount);
+        mm.eventCont.PlayerMeterChange(playerId, amount);
     }
 
     public int GetMaxHealth() { return maxHealth; }
@@ -105,11 +106,15 @@ public abstract class Character {
         int rand = Random.Range(0, total);
 
         if (rand < 50)
-            return "p" + playerID + "-B-" + GetDeckBasicTile().ToString().Substring(0, 1); // + "-" ?
+            return "p" + playerId + "-B-" + GetDeckBasicTile().ToString().Substring(0, 1); // + "-" ?
         else {
             int index = Mathf.CeilToInt((rand - 50) / 10f); 
             return runes[index]; // + "-" ?
         }
+    }
+
+    public Player ThisPlayer() {
+        return mm.GetPlayer(playerId);
     }
 
     //public string GetHexTag() { return genHexTag; }
@@ -118,7 +123,7 @@ public abstract class Character {
         Ch myChar = mm.gameSettings.GetLocalChar(id);
         switch (myChar) {
             case Ch.Test:
-                return new CharTest(mm);
+                return new CharTest(mm, id);
             case Ch.Enfuego:
                 return new Enfuego(mm, id);
             case Ch.Gravekeeper:
@@ -134,19 +139,20 @@ public abstract class Character {
 
 
 public class CharTest : Character {
-    public CharTest(MageMatch mm) : base(mm, Ch.Test) {
+    public CharTest(MageMatch mm, int id) : base(mm, Ch.Test, id) {
         objFX = mm.hexFX;
-        spells = new Spell[4];
 
         characterName = "Sample";
         maxHealth = 1000;
 
         SetDeckElements(20, 20, 20, 20, 20);
 
+        spells = new Spell[5];
         spells[0] = new Spell(0, "Cherrybomb", "FFA", objFX.Cherrybomb);
         spells[1] = new Spell(1, "Massive damage", "FFA", objFX.Deal496Dmg);
-        spells[2] = new Spell(2, "Stone Test", "FAF", objFX.Deal496Dmg);
+        spells[2] = new Spell(2, "Massive damage", "FAF", objFX.Deal496Dmg);
         spells[3] = new Spell(3, "Massive damage", "AFA", objFX.Deal496Dmg);
+        spells[4] = new Spell(4, "Massive damage", "AFA", objFX.Deal496Dmg);
         InitSpells();
     }
 }

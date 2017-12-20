@@ -14,7 +14,7 @@ public class Spell {
     protected MageMatch mm;
 	protected TileSeq seq;
 
-	public delegate IEnumerator MySpellEffect();
+	public delegate IEnumerator MySpellEffect(TileSeq prereq);
 	protected MySpellEffect effect;
 	
 	public Spell(int index, string name, string seq, MySpellEffect effect, int APcost = 1) 
@@ -44,8 +44,8 @@ public class Spell {
         isSymmetric = first.Equals(second);
     }
 
-    public virtual IEnumerator Cast(){
-		return effect (); //yield??
+    public virtual IEnumerator Cast(TileSeq prereq){
+		return effect (prereq); //yield??
 	}
 
 	public Tile.Element GetElementAt(int index){
@@ -74,11 +74,11 @@ public class CooldownSpell : Spell {
         this.seq = new TileSeq(); // empty seq...be wary of errors...
     }
 
-    public override IEnumerator Cast() {
+    public override IEnumerator Cast(TileSeq prereq) {
         TurnEffect te = new TurnEffect(cooldown, Effect.Type.Cooldown, null, null);
         effectTag = mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 5) + "-C");
 
-        return effect(); // yield??
+        return effect(prereq); // yield??
     }
 
     // TODO maybe override boardSeq stuff since it's not needed?
@@ -108,6 +108,7 @@ public class SignatureSpell : Spell {
 
 public class CoreSpell : Spell {
 
+    // TODO remove since all spells will get the prereq now
     public delegate IEnumerator CoreSpellEffect(TileSeq seq);
 
     public Tile.Element currentElem = Tile.Element.None;

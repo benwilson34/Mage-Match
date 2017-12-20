@@ -232,6 +232,24 @@ public class HexGrid {
         return true;
     }
 
+    public bool HasAdjacentNonprereqTile(Tile t, TileSeq prereq) {
+        List<TileBehav> tbs = GetSmallAreaTiles(t.col, t.row);
+        foreach (TileBehav tb in tbs) {
+            bool isPrereqAdj = false;
+            foreach (Tile prereqT in prereq.sequence) {
+                if (tb.tile.HasSamePos(prereqT)) {
+                    isPrereqAdj = true;
+                    break;
+                }
+            }
+
+            if (!isPrereqAdj) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int GetDirection(TileSeq seq) {
         Tile first = seq.sequence[0];
         Tile sec = seq.sequence[1];
