@@ -108,21 +108,11 @@ public class SignatureSpell : Spell {
 
 public class CoreSpell : Spell {
 
-    // TODO remove since all spells will get the prereq now
-    public delegate IEnumerator CoreSpellEffect(TileSeq seq);
-
     public Tile.Element currentElem = Tile.Element.None;
 
-    private CoreSpellEffect coreEffect;
-
-    public CoreSpell(int index, string name, CoreSpellEffect coreEffect, int APcost = 1) 
-        : base(index, name, null, APcost) {
-        this.coreEffect = coreEffect;
+    public CoreSpell(int index, string name, MySpellEffect effect, int APcost = 1) 
+        : base(index, name, effect, APcost) {
         seq = new TileSeq(); // empty seq...be wary of errors...
-    }
-
-    public IEnumerator CastCore(TileSeq seq) { // not a huge fan of this
-        return coreEffect(seq); // yield?
     }
 
     public override int GetLength() {

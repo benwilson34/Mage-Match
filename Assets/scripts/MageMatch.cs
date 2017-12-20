@@ -499,11 +499,7 @@ public class MageMatch : MonoBehaviour {
                 uiCont.DeactivateAllSpellButtons(); // ?
                 p.SetCurrentSpell(spellNum);
 
-                // TODO this won't be needed anymore :)
-                if (spell is CoreSpell)
-                    yield return ((CoreSpell)spell).CastCore(targeting.GetSelection());
-                else
-                    yield return spell.Cast(targeting.GetSelection());
+                yield return spell.Cast(targeting.GetSelection());
 
                 if (!targeting.WasCanceled()) { // should be an event callback?
                     eventCont.SpellCast(spell);
