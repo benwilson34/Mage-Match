@@ -112,6 +112,9 @@ public class Gravekeeper : Character {
 
     // TODO handle 0 or 1 zombies on the board
     public IEnumerator TheOogieBoogie(TileSeq prereq) {
+        if (TOB_Filter(hexGrid.GetPlacedTiles()).Count < 2) // if not enough Zombies
+            yield break; // TODO feedback for whiffs
+
         yield return targeting.WaitForTileTarget(2, TOB_Filter);
         if (targeting.WasCanceled())
             yield return null;

@@ -195,13 +195,17 @@ public class Player {
     }
 
     public void ApplySpellCosts() {
-        MMLog.Log_Player("Applying AP cost...which is " + currentSpell.APcost);
-        AP -= currentSpell.APcost;
+        if (mm.IsDebugMode() && mm.debugSettings.applyAPcost) {
+            MMLog.Log_Player("Applying AP cost...which is " + currentSpell.APcost);
+            AP -= currentSpell.APcost;
+        }
+
         if (currentSpell is SignatureSpell) {
             int meterCost = ((SignatureSpell)currentSpell).meterCost;
             MMLog.Log_Player("Applying meter cost...which is " + meterCost);
             character.ChangeMeter(-meterCost);
         }
+
         mm.eventCont.GameAction(false);
     }
 }

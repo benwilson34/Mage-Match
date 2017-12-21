@@ -97,7 +97,7 @@ public class ButtonController : MonoBehaviour {
         cancelView.transform.Find("t").GetComponent<Text>().text = "Cancel";
 
         mainClick = onClick;
-        SetOnClick(OnSpellButtonClick);
+        SetOnClick(OnSpellCancelClick);
         //onClick = OnSpellCancelClick;
 
         yield return null;

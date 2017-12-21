@@ -42,9 +42,9 @@ public class MageMatch : MonoBehaviour {
     private int checking = 0, actionsPerforming = 0, matchesResolving = 0;
     private List<TileSeq>[] spellsOnBoard;
 
-    private DebugSettings debugSettings;
-    private bool isDebugMode = false;
+    public DebugSettings debugSettings;
     public DebugTools debugTools;
+    private bool isDebugMode = false;
 
     public delegate void LoadEvent();
     public event LoadEvent onEffectContReady;
@@ -216,6 +216,8 @@ public class MageMatch : MonoBehaviour {
         else return false;
     }
 
+
+
     #region Event callbacks
     public void OnBoardAction() {
         if (checking == 0) { //?
@@ -263,6 +265,8 @@ public class MageMatch : MonoBehaviour {
         syncManager.TurnTimeout();
     }
     #endregion
+
+
 
     public void TurnTimeout() {
         Player p = GetPlayer(activep.id);
