@@ -117,7 +117,7 @@ public class BoardCheck {
 		} // --Ends checking loops
 
         for (int i = 0; i < 5; i++) {
-            MMLog.Log_BoardCheck(spells[i].name + " --> " + PrintSeqList(returnList[i]), MMLog.LogLevel.Standard);
+            MMLog.Log_BoardCheck(spells[i].name + " --> " + PrintSeqList(returnList[i]));
         }
 
 		return returnList;

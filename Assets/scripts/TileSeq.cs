@@ -61,4 +61,11 @@ public class TileSeq {
 			result = true;
 		return result;
 	}
+
+    public TileSeq Copy() {
+        TileSeq newSeq = new TileSeq();
+        foreach (Tile t in sequence)
+            newSeq.sequence.Add(t.Copy());
+        return newSeq;
+    }
 }

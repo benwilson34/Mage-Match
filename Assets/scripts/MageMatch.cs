@@ -363,7 +363,7 @@ public class MageMatch : MonoBehaviour {
                 }
 
                 //for (int i = 0; i < spellsOnBoard.Length; i++) {
-                    MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
+                    //MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
                     if (spellsOnBoard[s].Count > 0)
                         uiCont.ActivateSpellButton(s);
                     else
@@ -499,22 +499,25 @@ public class MageMatch : MonoBehaviour {
 
             if (!targeting.selectionCanceled) {
 
-                targeting.targetingCanceled = false;
+                //targeting.targetingCanceled = false;
                 uiCont.DeactivateAllSpellButtons(); // ?
                 p.SetCurrentSpell(spellNum);
 
-                yield return spell.Cast(targeting.GetSelection());
+                TileSeq seq = targeting.GetSelection();
+                TileSeq seqCopy = seq.Copy();
+                tileMan.RemoveSeq(seq);
 
-                if (!targeting.WasCanceled()) { // should be an event callback?
+                yield return spell.Cast(seqCopy);
+
+                //if (!targeting.WasCanceled()) { // should be an event callback?
                     eventCont.SpellCast(spell);
 
                     if(MyTurn()) // this doesn't seem right...
                         StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
 
-                    tileMan.RemoveSeq(targeting.GetSelection());
                     p.ApplySpellCosts();
                     yield return BoardChecking(); //?
-                }
+                //}
             }
         } else {
             uiCont.UpdateMoveText("Not enough AP to cast!");

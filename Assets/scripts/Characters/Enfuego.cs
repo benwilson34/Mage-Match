@@ -72,8 +72,6 @@ public class Enfuego : Character {
 
     public IEnumerator DragSample(TileSeq prereq) {
         yield return targeting.WaitForDragTarget(4);
-        if (targeting.WasCanceled())
-            yield return null;
 
         foreach (TileBehav tb in targeting.GetTargetTBs()) {
             mm.StartCoroutine(objFX.Ench_SetBurning(playerId, tb));
@@ -86,12 +84,10 @@ public class Enfuego : Character {
     // Signature
     public IEnumerator WhiteHotComboKick(TileSeq prereq) {
         yield return targeting.WaitForTileTarget(3);
-        if (targeting.WasCanceled())
-            yield break;
 
-        List<TileBehav> tTBs = targeting.GetTargetTBs();
+        List<TileBehav> tbs = targeting.GetTargetTBs();
 
-        foreach (TileBehav tb in tTBs) { // maybe for instead?
+        foreach (TileBehav tb in tbs) {
             mm.ActiveP().DealDamage(70);
 
             if (tb.tile.element.Equals(Tile.Element.Fire)) { // spread Burning to 4 nearby
@@ -178,8 +174,6 @@ public class Enfuego : Character {
     // TODO new effect
     public IEnumerator Incinerate(TileSeq prereq) {
         yield return targeting.WaitForDragTarget(6);
-        if (targeting.WasCanceled())
-            yield return null;
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {

@@ -38,14 +38,15 @@ public class ObjectEffects {
 
     public IEnumerator LightningPalm() {
         yield return targeting.WaitForTileTarget(1);
-        if (targeting.WasCanceled())
-            yield break;
+        List<TileBehav> tbs = targeting.GetTargetTBs();
+        if (tbs.Count != 1)
+            yield return null;
 
-        TileBehav tb = targeting.GetTargetTBs()[0]; // TODO elem
+        Tile.Element elem = tbs[0].tile.element;
         List<TileBehav> tileList = hexGrid.GetPlacedTiles();
         for (int i = 0; i < tileList.Count; i++) {
             Tile tile = tileList[i].tile;
-            if (tile.element.Equals(tb.tile.element)) {
+            if (tile.element.Equals(elem)) {
                 tileMan.RemoveTile(tile, true);
                 mm.ActiveP().DealDamage(15);
             }
@@ -54,8 +55,10 @@ public class ObjectEffects {
 
     public IEnumerator Cherrybomb(TileSeq prereq) {
         yield return targeting.WaitForTileTarget(1);
-        if (targeting.WasCanceled())
-            yield break;
+
+        List<TileBehav> tbs = targeting.GetTargetTBs();
+        if (tbs.Count != 1)
+            yield return null;
 
         TileBehav tb = targeting.GetTargetTBs()[0];
         Ench_SetCherrybomb(mm.ActiveP().id, tb); // right id?

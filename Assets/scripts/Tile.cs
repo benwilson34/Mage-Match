@@ -47,6 +47,13 @@ public class Tile {
         return ElementToChar(element);
 	}
 
+    public Tile Copy() {
+        Tile newT = new Tile(element);
+        newT.SetPos(col, row);
+        return newT;
+    }
+
+
 	public static Element CharToElement(char c){
 		c = char.ToUpper (c); //?
 		switch (c) {

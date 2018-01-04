@@ -198,16 +198,16 @@ public class SyncManager : PunBehaviour {
     //    mm.targeting.ClearTargets();
     //}
 
-    public void SendCancelTargeting() {
-        if (mm.MyTurn()) {
-            PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleCancelTargeting", PhotonTargets.Others);
-        }
-    }
-    [PunRPC]
-    public void HandleCancelTargeting() {
-        mm.targeting.CancelTargeting();
-    }
+    //public void SendCancelTargeting() {
+    //    if (mm.MyTurn()) {
+    //        PhotonView photonView = PhotonView.Get(this);
+    //        photonView.RPC("HandleCancelTargeting", PhotonTargets.Others);
+    //    }
+    //}
+    //[PunRPC]
+    //public void HandleCancelTargeting() {
+    //    mm.targeting.CancelTargeting();
+    //}
 
     public void SendTBSelection(TileBehav tb) {
         if (mm.MyTurn()) {

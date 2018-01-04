@@ -7,7 +7,7 @@ public class Targeting {
 
     public enum TargetMode { Tile, TileArea, Cell, Drag, Selection };
     public TargetMode currentTMode = TargetMode.Tile;
-    public bool targetingCanceled = false, selectionCanceled = false;
+    //public bool targetingCanceled = false;
 
     private MageMatch mm;
     private int targets, targetsLeft = 0;
@@ -17,7 +17,6 @@ public class Targeting {
     private bool largeAreaMode = false;
     private TileBehav lastDragTarget;
     //private List<GameObject> outlines;
-    private List<TileSeq> selections;
 
     //public delegate void TBTargetEffect(TileBehav tb);
     //public delegate void TBMultiTargetEffect(List<TileBehav> tbs);
@@ -189,7 +188,7 @@ public class Targeting {
     }
 
     IEnumerator TargetingScreen() {
-        targetingCanceled = false;
+        //targetingCanceled = false;
         Player p = mm.ActiveP();
         mm.EnterState(MageMatch.State.Targeting);
 
@@ -240,23 +239,29 @@ public class Targeting {
     //    mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
     //}
 
-    public void CancelTargeting() {
-        mm.syncManager.SendCancelTargeting();
+    //public void CancelTargeting() {
+    //    mm.syncManager.SendCancelTargeting();
 
-        targetingCanceled = true;
-        targetsLeft = 0;
-    }
+    //    targetingCanceled = true;
+    //    targetsLeft = 0;
+    //}
 
-    public bool WasCanceled() { return targetingCanceled; }
+    //public bool WasCanceled() { return targetingCanceled; }
 
     public bool TargetsRemain() { return targetsLeft > 0; }
 
 
     // -----------------  SPELL SELECTION  -----------------
 
+    public bool selectionCanceled = false;
+
+    private List<TileSeq> selections;
+    private bool selectionChosen = false;
+
     public IEnumerator SpellSelectScreen(List<TileSeq> seqs) {
         currentTMode = TargetMode.Selection;
         selectionCanceled = false;
+        selectionChosen = false;
         selections = new List<TileSeq>(seqs);
 
         mm.EnterState(MageMatch.State.Selecting);
@@ -266,7 +271,7 @@ public class Targeting {
 
         MMLog.Log_Targeting("Starting to show spell select screen, selections=" +         mm.boardCheck.PrintSeqList(selections));
 
-        yield return new WaitUntil(() => selections.Count == 1 || selectionCanceled);
+        yield return new WaitUntil(() => (selections.Count == 1 && selectionChosen) || selectionCanceled);
 
         MMLog.Log_Targeting("Chose prereq!");
 
@@ -295,11 +300,12 @@ public class Targeting {
 
         if (newSelections.Count != 0) {
             mm.syncManager.SendTBSelection(tb);
+            selectionChosen = true;
             selections = newSelections;
             mm.uiCont.HideSpellSeqs();
             mm.uiCont.ShowSpellSeqs(selections);
         } else
-            MMLog.Log_Targeting("Player clicked on am invalid tile: " + tb.PrintCoord());
+            MMLog.Log_Targeting("Player clicked on an invalid tile: " + tb.PrintCoord());
     }
 
     public TileSeq GetSelection() { return selections[0]; }

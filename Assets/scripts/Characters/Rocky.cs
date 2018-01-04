@@ -82,8 +82,6 @@ public class Rocky : Character {
 
     public IEnumerator Stalagmite(TileSeq prereq) {
         yield return targeting.WaitForCellTarget(1);
-        if (targeting.WasCanceled())
-            yield break;
 
         CellBehav cb = targeting.GetTargetCBs()[0];
         int col = cb.col;

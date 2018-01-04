@@ -135,8 +135,8 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void Targeting_OnCancelClick() {
-        MMLog.Log("BUTTONCONT", "black", "Spell canceled.");
-        mm.targeting.CancelTargeting();
+        MMLog.Log("BUTTONCONT", "black", "This currently does nothing. Thanks!");
+        //mm.targeting.CancelTargeting();
     }
 
     public void Targeting_OnClearButton() {
