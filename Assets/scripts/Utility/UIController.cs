@@ -96,7 +96,7 @@ public class UIController : MonoBehaviour {
         mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
         mm.eventCont.gameAction += OnGameAction;
-        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.LastStep);
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.LastStep, EventController.Status.Begin);
         mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
         mm.eventCont.playerMeterChange += OnPlayerMeterChange;

@@ -242,9 +242,10 @@ public class InputController : MonoBehaviour {
 
 			dragging = false; // TODO move into cases below for continuous dragging
             int dir = (int)Mathf.Floor(angle / 60);
+
             int c2, r2;
             mm.hexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
-            if (c2 == -1 || r2 == -1)
+            if (!mm.hexGrid.CanSwap(tile.col, tile.row, c2, r2))
                 return;
 
             if (mm.prompt.currentMode == Prompt.PromptMode.Swap) {

@@ -149,8 +149,8 @@ public class MageMatch : MonoBehaviour {
         EventContLoaded();
 
         eventCont.boardAction += OnBoardAction;
-        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction); // checking
-        eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction); // checking
+        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction, EventController.Status.Begin); // checking
+        eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction, EventController.Status.End); // checking
         eventCont.gameAction += OnGameAction;
         eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.GameAction); // checking
         eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.GameAction); // checking
@@ -438,6 +438,7 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void DropTile(int col, Hex hex) {
+        // remove from hand?
         StartCoroutine(_Drop(false, col, hex));
     }
 
@@ -451,9 +452,15 @@ public class MageMatch : MonoBehaviour {
         go.transform.SetParent(tilesOnBoard);
         TileBehav tb = hex.GetComponent<TileBehav>();
         tb.SetPlaced();
+
+        if (currentTurn == Turn.PlayerTurn) //kinda hacky
+            yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.tag, col);
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
+
+        audioCont.DropSound(hex.GetComponent<AudioSource>());
+
         if (currentTurn == Turn.PlayerTurn) { //kinda hacky
-            yield return eventCont.Drop(playerAction, hex.tag, col);
+            yield return eventCont.Drop(EventController.Status.End, playerAction, hex.tag, col);
         } else if (currentTurn == Turn.CommishTurn)
             eventCont.CommishDrop(tb.tile.element, col);
 
@@ -467,17 +474,20 @@ public class MageMatch : MonoBehaviour {
         StartCoroutine(_SwapTiles(true, c1, r1, c2, r2));
     }
 
-    // for spells and such?
-    public void SwapTiles(int c1, int r1, int c2, int r2) {
-        StartCoroutine(_SwapTiles(false, c1, r1, c2, r2));
-    }
-
     public IEnumerator _SwapTiles( bool playerAction, int c1, int r1, int c2, int r2) {
         MMLog.Log_MageMatch("   ---------- SWAP BEGIN ----------");
         actionsPerforming++;
-        if (hexGrid.Swap(c1, r1, c2, r2)) { // I feel like this check should be in InputCont
-            yield return eventCont.Swap(playerAction, c1, r1, c2, r2); 
-        }
+
+        yield return eventCont.Swap(EventController.Status.Begin, playerAction, c1, r1, c2, r2);
+
+        TileBehav tb1 = hexGrid.GetTileBehavAt(c1, r1);
+        TileBehav tb2 = hexGrid.GetTileBehavAt(c2, r2);
+        hexGrid.Swap(c1, r1, c2, r2);
+        tb1.ChangePos(c2, r2);
+        yield return tb2._ChangePos(r1, c1, r1, .15f);
+
+        yield return eventCont.Swap(EventController.Status.End, playerAction, c1, r1, c2, r2);
+         
         MMLog.Log_MageMatch("   ---------- SWAP END ----------");
         actionsPerforming--;
     }

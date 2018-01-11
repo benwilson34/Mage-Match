@@ -108,7 +108,7 @@ public class Prompt {
         swapTiles = new TileBehav[2];
         swapTiles[0] = mm.hexGrid.GetTileBehavAt(c1, r1);
         swapTiles[1] = mm.hexGrid.GetTileBehavAt(c2, r2);
-        MMDebug.MMLog.Log("PROMPT", "blue", "SWAPS are " + 
+        MMLog.Log("PROMPT", "blue", "SWAPS are " + 
             swapTiles[0].tag + " and " + swapTiles[1].tag);
 
         currentMode = PromptMode.None;

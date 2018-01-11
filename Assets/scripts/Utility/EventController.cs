@@ -7,6 +7,7 @@ using MMDebug;
 public class EventController {
 
     public enum Type { None = 0, LastStep, GameAction, Stats, EventEffects, Player, Audio, Network, FirstStep }
+    public enum Status { Begin, End }
     public bool handlingEvents = false; // worth it?
 
     private MageMatch mm;
@@ -22,7 +23,11 @@ public class EventController {
         discard = new List<EventPack>();
     }
 
-    struct EventPack { public System.Delegate ev; public Type type; }
+    struct EventPack {
+        public System.Delegate ev;
+        public Type type;
+        public Status status;
+    }
 
     List<EventPack> GetEventList(string type) {
         switch (type) {
@@ -47,7 +52,7 @@ public class EventController {
     }
 
     // ex. AddEvent("swap", SwapCallbackMethod, Type.EventEffects)
-    void AddEvent(string list, System.Delegate e, Type type) {
+    void AddEvent(string list, System.Delegate e, Type type, Status status = Status.End) {
         List<EventPack> evList = GetEventList(list);
 
         int i = 0;
@@ -55,7 +60,7 @@ public class EventController {
             if ((int)evList[i].type < (int)type)
                 break;
         }
-        evList.Insert(i, new EventPack { ev = e, type = type });
+        evList.Insert(i, new EventPack { ev = e, type = type, status = status });
     }
 
     void RemoveEvent(string type, System.Delegate e) {
@@ -150,47 +155,50 @@ public class EventController {
 
     public delegate IEnumerator DrawEvent(int id, string tag, bool playerAction, bool dealt);
     private List<EventPack> draw;
-    public IEnumerator Draw(int id, string tag, bool playerAction, bool dealt) {
+    public IEnumerator Draw(Status status, int id, string tag, bool playerAction, bool dealt) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in draw) {
             MMLog.Log_EventCont("going thru draw event with type " + pack.type);
-            yield return ((DrawEvent)pack.ev)(id, tag, playerAction, dealt); // OHYEAH
+            if (pack.status == status)
+                yield return ((DrawEvent)pack.ev)(id, tag, playerAction, dealt); // OHYEAH
         }
         MMLog.Log_EventCont("Just finished DRAW events...");
         handlingEvents = false; // worth it?
     }
-    public void AddDrawEvent(DrawEvent e, Type type) {
-        AddEvent("draw", e, type);
+    public void AddDrawEvent(DrawEvent e, Type type, Status status) {
+        AddEvent("draw", e, type, status);
     }
 
     public delegate IEnumerator DropEvent(int id, bool playerAction, string tag, int col);
     private List<EventPack> drop;
-    public IEnumerator Drop(bool playerAction, string tag, int col) {
+    public IEnumerator Drop(Status status, bool playerAction, string tag, int col) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in drop) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
-            yield return ((DropEvent)pack.ev)(mm.ActiveP().id, playerAction, tag, col); // OHYEAH
+            if (pack.status == status)
+                yield return ((DropEvent)pack.ev)(mm.ActiveP().id, playerAction, tag, col); // OHYEAH
         }
         MMLog.Log_EventCont("Just finished DROP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddDropEvent(DropEvent e, Type type) {
-        AddEvent("drop", e, type);
+    public void AddDropEvent(DropEvent e, Type type, Status status) {
+        AddEvent("drop", e, type, status);
     }
 
     public delegate IEnumerator SwapEvent(int id, bool playerAction, int c1, int r1, int c2, int r2);
     private List<EventPack> swap;
-    public IEnumerator Swap(bool playerAction, int c1, int r1, int c2, int r2) {
+    public IEnumerator Swap(Status status, bool playerAction, int c1, int r1, int c2, int r2) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in swap) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
-            yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, playerAction, c1, r1, c2, r2); // OH YEAH
+            if(pack.status == status)
+                yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, playerAction, c1, r1, c2, r2);
         }
         MMLog.Log_EventCont("Just finished SWAP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddSwapEvent(SwapEvent e, Type type) {
-        AddEvent("swap", e, type);
+    public void AddSwapEvent(SwapEvent e, Type type, Status status) {
+        AddEvent("swap", e, type, status);
     }
     // TODO similar method to convert for removing (if it's ever needed...)
 

@@ -102,43 +102,22 @@ public class AudioController {
     public void InitEvents(){
         //mm.eventCont.drop += onDrop;
         mm.eventCont.grabTile += OnGrab;
-        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Audio);
-        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Audio);
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Audio, EventController.Status.End);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Audio, EventController.Status.Begin);
         mm.eventCont.playerMeterChange += OnPlayerMeterChange;
         //mm.eventCont.match += onMatch;
     }
+
+    //public IEnumerator OnDrop(int id, string tag, int col) {
+    //    TileBehav tb = mm.hexGrid.
+    //    DropSound
+    //}
 
     public void DropSound(AudioSource source) {
         //source.clip = drop_Earth[Random.Range(0, drop_Earth.Length)]; //This should be its own event?
         source.clip = drop[Random.Range(0, drop.Length)];
         source.Play();
     }
-
-    //public void OnDrop(int id, Tile.Element elem, int col) {
-    //    AudioClip clip = null;
-    //    switch (elem) {
-    //        case Tile.Element.Fire:
-    //            clip = drop_Fire[Random.Range(0, drop_Fire.Length)];
-    //            break;
-    //        case Tile.Element.Water:
-    //            clip = drop_Water[Random.Range(0, drop_Water.Length)];
-    //            break;
-    //        case Tile.Element.Earth:
-    //            clip = drop_Earth[Random.Range(0, drop_Earth.Length)];
-    //            break;
-    //        case Tile.Element.Air:
-    //            clip = drop_Air[Random.Range(0, drop_Air.Length)];
-    //            break;
-    //        case Tile.Element.Muscle:
-    //            clip = drop_Muscle[Random.Range(0, drop_Muscle.Length)];
-    //            break;
-    //    }
-    //    GameObject go = mm.ActiveP().GetTileFromHand(elem);
-    //    AudioSource source = go.GetComponent<AudioSource>();
-
-    //    source.clip = clip;
-    //    source.Play();
-    //}
 
     public void OnGrab(int id, string tag) {
         AudioClip clip = null;

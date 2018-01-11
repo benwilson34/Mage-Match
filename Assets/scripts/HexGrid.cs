@@ -124,21 +124,29 @@ public class HexGrid {
 		return (1.5f - (0.5f * col)) + row; // TODO! somewhat magic num
 	}
 
+    public bool CanSwap(int c1, int r1, int c2, int r2) {
+        //adjacency check
+        if (c2 == -1 || r2 == -1)
+            return false;
+
+        if (IsCellFilled(c2, r2) &&
+            tileGrid[c1, r1].ableSwap &&
+            tileGrid[c2, r2].ableSwap)
+            return true;
+        else return false;
+    }
+
 	public bool Swap(int c1, int r1, int c2, int r2){
 //		Debug.Log("Swapping (" + c1 + ", " + r1 + ") to (" + c2 + ", " + r2 + ")");
-		if (IsCellFilled(c2, r2)) { // if there's something in the slot
-			if (!tileGrid [c1, r1].ableSwap || !tileGrid [c2, r2].ableSwap)
-				return false;
-			TileBehav temp = GetTileBehavAt(c2, r2);
-			SetTileBehavAt(GetTileBehavAt(c1, r1), c2, r2); // TODO look at TileBehav.ChangePos
-			GetTileBehavAt(c2, r2).ChangePos (c2, r2);
-			SetTileBehavAt (temp, c1, r1);
-			GetTileBehavAt(c1, r1).ChangePos (c1, r1);
-			//mm.BoardChanged ();
-			CheckGrav ();
-			return true;
-		}
-		return false;
+        // NOTE: this only swaps in the data structure!! the TBs animating happens in MageMatch
+		TileBehav temp = GetTileBehavAt(c2, r2);
+		SetTileBehavAt(GetTileBehavAt(c1, r1), c2, r2);
+		//GetTileBehavAt(c2, r2).ChangePos(c2, r2);
+		SetTileBehavAt (temp, c1, r1);
+		//GetTileBehavAt(c1, r1).ChangePos(c1, r1);
+		//mm.BoardChanged ();
+		CheckGrav ();
+		return true;
 	}
 
 	// TODO handle floating things, once they are implemented

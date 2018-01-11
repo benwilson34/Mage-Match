@@ -150,9 +150,12 @@ public class Player {
                 hex.Flip();
 
             hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
-            hand.Add(hex);
 
-            yield return mm.eventCont.Draw(id, hex.tag, playerAction, dealt);
+
+            yield return mm.eventCont.Draw(EventController.Status.Begin, id, hex.tag, playerAction, dealt);
+            hand.Add(hex);
+            yield return mm.eventCont.Draw(EventController.Status.End, id, hex.tag, playerAction, dealt);
+
             if (playerAction)
                 mm.eventCont.GameAction(true); //?
         }

@@ -43,9 +43,9 @@ public class Stats {
         mm.eventCont.commishDrop += OnCommishDrop;
         mm.eventCont.commishMatch += OnCommishMatch;
 
-        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats);
-        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats);
-        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats);
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.End);
+        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.End);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.End);
         mm.eventCont.spellCast += OnSpellCast;
         mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
