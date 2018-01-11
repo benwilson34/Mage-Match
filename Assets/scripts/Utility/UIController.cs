@@ -282,7 +282,7 @@ public class UIController : MonoBehaviour {
         //healthbar.GetComponent<Image>().color = new Color(r, g, 0);
 
         //yield return healthbar.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
-        yield return health.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic);
+        yield return health.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic).WaitForCompletion();
     }
 
     IEnumerator UpdateMeterbar(Player p) {
@@ -294,7 +294,7 @@ public class UIController : MonoBehaviour {
 
         float slideRatio = (float) p.character.meter / p.character.meterMax;
         //yield return meter.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
-        yield return sig.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic);
+        yield return sig.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic).WaitForCompletion();
     }
 
     IEnumerator DamageAnim(Player p, int amount) {

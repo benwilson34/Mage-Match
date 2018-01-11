@@ -49,7 +49,7 @@ public class TileBehav : Hex, Tooltipable {
                 break;
         }
 
-		mm.audioCont.DropSound(GetComponent<AudioSource>());
+		//mm.audioCont.DropSound(GetComponent<AudioSource>());
 		inPos = true;
 	}
 

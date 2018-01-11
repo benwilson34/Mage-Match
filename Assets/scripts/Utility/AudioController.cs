@@ -103,7 +103,7 @@ public class AudioController {
         //mm.eventCont.drop += onDrop;
         mm.eventCont.grabTile += OnGrab;
         mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Audio, EventController.Status.End);
-        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Audio, EventController.Status.Begin);
+        //mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Audio, EventController.Status.Begin);
         mm.eventCont.playerMeterChange += OnPlayerMeterChange;
         //mm.eventCont.match += onMatch;
     }
@@ -152,32 +152,37 @@ public class AudioController {
         yield return null;
     }
 
-    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
-        //Tile.Element elem = tb.tile.element;
-        //AudioClip clip = null;
-        //switch (elem) {
-        //    case Tile.Element.Fire:
-        //        clip = swap[Random.Range(0, swap.Length)];
-        //        break;
-        //    case Tile.Element.Water:
-        //        clip = swap_Water[Random.Range(0, swap_Water.Length)];
-        //        break;
-        //    case Tile.Element.Earth:
-        //        clip = swap_Earth[Random.Range(0, swap_Earth.Length)];
-        //        break;
-        //    case Tile.Element.Air:
-        //        clip = swap_Air[Random.Range(0, swap_Air.Length)];
-        //        break;
-        //    case Tile.Element.Muscle:
-        //        clip = swap_Muscle[Random.Range(0, swap_Muscle.Length)];
-        //        break;
-        //}
-        AudioSource source = tb.GetComponent<AudioSource>();
+    //public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
+    //    TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
+    //    //Tile.Element elem = tb.tile.element;
+    //    //AudioClip clip = null;
+    //    //switch (elem) {
+    //    //    case Tile.Element.Fire:
+    //    //        clip = swap[Random.Range(0, swap.Length)];
+    //    //        break;
+    //    //    case Tile.Element.Water:
+    //    //        clip = swap_Water[Random.Range(0, swap_Water.Length)];
+    //    //        break;
+    //    //    case Tile.Element.Earth:
+    //    //        clip = swap_Earth[Random.Range(0, swap_Earth.Length)];
+    //    //        break;
+    //    //    case Tile.Element.Air:
+    //    //        clip = swap_Air[Random.Range(0, swap_Air.Length)];
+    //    //        break;
+    //    //    case Tile.Element.Muscle:
+    //    //        clip = swap_Muscle[Random.Range(0, swap_Muscle.Length)];
+    //    //        break;
+    //    //}
+    //    AudioSource source = tb.GetComponent<AudioSource>();
 
+    //    source.clip = swap[Random.Range(0, swap.Length)]; ;
+    //    source.Play();
+    //    yield return null;
+    //}
+
+    public void SwapSound(AudioSource source) {
         source.clip = swap[Random.Range(0, swap.Length)]; ;
         source.Play();
-        yield return null;
     }
 
 	public void BreakSound(){

@@ -455,9 +455,8 @@ public class MageMatch : MonoBehaviour {
 
         if (currentTurn == Turn.PlayerTurn) //kinda hacky
             yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.tag, col);
-        tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
 
-        audioCont.DropSound(hex.GetComponent<AudioSource>());
+        tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
 
         if (currentTurn == Turn.PlayerTurn) { //kinda hacky
             yield return eventCont.Drop(EventController.Status.End, playerAction, hex.tag, col);
@@ -482,6 +481,8 @@ public class MageMatch : MonoBehaviour {
 
         TileBehav tb1 = hexGrid.GetTileBehavAt(c1, r1);
         TileBehav tb2 = hexGrid.GetTileBehavAt(c2, r2);
+        audioCont.SwapSound(tb1.GetComponent<AudioSource>());
+
         hexGrid.Swap(c1, r1, c2, r2);
         tb1.ChangePos(c2, r2);
         yield return tb2._ChangePos(r1, c1, r1, .15f);
