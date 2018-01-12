@@ -9,11 +9,13 @@ public abstract class Character {
     public Ch ch;
 
     public string characterName;
-    public int meter = 0, meterMax = 100; // protected?
+
+    public static int METER_MAX = 1000; // may need to be changed later
+    protected int meter = 0;
 
     protected int maxHealth;
     protected ObjectEffects objFX; // needed here?
-    protected int dfire, dwater, dearth, dair, dmuscle; // portions of 100 total
+    protected int dfire, dwater, dearth, dair, dmuscle; // portions of 50 total
     protected Spell[] spells;
     protected MageMatch mm;
     protected HexManager tileMan;
@@ -33,13 +35,20 @@ public abstract class Character {
     } //?
 
     public virtual void InitEvents() {
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Player, EventController.Status.Begin);
+        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Player, EventController.Status.Begin);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Player, EventController.Status.Begin);
+        mm.eventCont.spellCast += OnSpellCast;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+        mm.eventCont.tileRemove += OnTileRemove;
     }
 
+    // override to init character with event callbacks (for their passive, probably)
     public virtual void OnEventContLoad() {
         
     }
 
+    // override to init character with effect callbacks (for their passive, probably)
     public virtual void OnEffectContLoad() {
 
     }
@@ -53,11 +62,6 @@ public abstract class Character {
         }
     }
 
-    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
-        if (dealt && id != playerId) // if the other player was dealt dmg (not great)
-            ChangeMeter((-amount) / 3);
-    }
-
     public void SetDeckElements(int f, int w, int e, int a, int m) {
         dfire = f;
         dwater = w;
@@ -66,11 +70,53 @@ public abstract class Character {
         dmuscle = m;
     }
 
+
+    // ----------  METER  ----------
+
+    public int GetMeter() { return meter; }
+
     public void ChangeMeter(int amount) {
         meter += amount;
-        meter = Mathf.Clamp(meter, 0, meterMax); // TODO clamp amount before event
+        meter = Mathf.Clamp(meter, 0, METER_MAX); // TODO clamp amount before event
         mm.eventCont.PlayerMeterChange(playerId, amount);
     }
+
+    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
+        if(id == playerId && !dealt)
+            ChangeMeter(10);
+        yield return null;
+    }
+
+    public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
+        if(id == playerId)
+            ChangeMeter(10);
+        yield return null;
+    }
+
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
+        if(id == playerId)
+            ChangeMeter(10);
+        yield return null;
+    }
+
+    public void OnSpellCast(int id, Spell spell) {
+        if(id == playerId)
+            ChangeMeter(10);
+    }
+
+    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
+        if (dealt && id != playerId) // if the other player was dealt dmg (not great)
+            ChangeMeter(-amount);
+
+        if (amount > 0 && id == playerId) // healing
+            ChangeMeter(amount / 2);
+    }
+
+    public void OnTileRemove(int id, TileBehav tb) {
+        if (id == playerId)
+            ChangeMeter(5);
+    }
+
 
     public int GetMaxHealth() { return maxHealth; }
 

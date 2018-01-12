@@ -224,8 +224,8 @@ public class AudioController {
     //}
 
     public void OnPlayerMeterChange(int id, int amount) {
-        int meter = mm.GetPlayer(id).character.meter;
-        if (meter == 100) {
+        int meter = mm.GetPlayer(id).character.GetMeter();
+        if (meter == Character.METER_MAX) {
             source.clip = sigMeterFull;
             source.Play();
         }

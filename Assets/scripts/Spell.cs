@@ -100,7 +100,7 @@ public class SignatureSpell : Spell {
 
     public bool IsReadyToCast() {
         MMLog.Log("SIGSPELL", "black", "Checking " + mm.ActiveP().name + "'s sig spell.");
-        return mm.ActiveP().character.meter >= meterCost;
+        return mm.ActiveP().character.GetMeter() >= meterCost;
     }
 }
 

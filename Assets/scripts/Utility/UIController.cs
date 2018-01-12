@@ -290,9 +290,10 @@ public class UIController : MonoBehaviour {
         Image sig = pinfo.Find("i_sig").GetComponent<Image>();
         Text sigText = sig.transform.Find("t_sig").GetComponent<Text>();
 
-        TextNumTween(sigText, p.character.meter, "%");
+        int meter = p.character.GetMeter();
+        TextNumTween(sigText, meter / 10, "%"); // change if a character has meter of different amount 
 
-        float slideRatio = (float) p.character.meter / p.character.meterMax;
+        float slideRatio = (float) meter / Character.METER_MAX;
         //yield return meter.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
         yield return sig.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic).WaitForCompletion();
     }
