@@ -179,7 +179,7 @@ public class Stats {
         }
     }
 
-    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
+    public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         if (dealt) {
             GetPS(GetOpponentID(id)).dmgDealt -= amount;
             report.AppendLine("...p" + GetOpponentID(id) + " dealt " + (-amount) + " dmg...");

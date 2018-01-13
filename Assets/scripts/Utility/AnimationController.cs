@@ -40,14 +40,26 @@ public class AnimationController : MonoBehaviour {
         yield return tween.WaitForCompletion();
     }
 
-    public IEnumerator _RemoveTile(TileBehav tb) {
+    public IEnumerator _InvokeTile(TileBehav tb) {
         animating++;
         Tween swellTween = tb.transform.DOScale(new Vector3(1.25f, 1.25f), .15f);
         tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .15f);
         //Camera.main.DOShakePosition(.1f, 1.5f, 20, 90, false); // heh
-        mm.audioCont.BreakSound();
+        mm.audioCont.TileInvoke();
 
         yield return swellTween.WaitForCompletion();
+        animating--;
+    }
+
+    public IEnumerator _DestroyTile(TileBehav tb) {
+        animating++;
+        float yPos = tb.transform.position.y;
+        Tween tween = tb.transform.DOMoveY(yPos - 1, .25f);
+        tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .25f);
+        //Camera.main.DOShakePosition(.1f, 1.5f, 20, 90, false); // heh
+        mm.audioCont.TileDestroy();
+
+        yield return tween.WaitForCompletion();
         animating--;
     }
 
@@ -70,7 +82,7 @@ public class AnimationController : MonoBehaviour {
         float height = t.position.y - newPos.y;
 
         yield return t.DOMove(newPos, .04f * height).SetEase(Ease.InQuad).WaitForCompletion();
-        mm.audioCont.DropSound(t.GetComponent<AudioSource>());
+        mm.audioCont.TileGravityClick(t.GetComponent<AudioSource>());
 
         // bounce anim
         // TODO .SetLoops(2, LoopType.Yoyo);

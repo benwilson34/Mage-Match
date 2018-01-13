@@ -123,7 +123,7 @@ public class Player {
 
         health += amount;
         health = Mathf.Clamp(health, 0, character.GetMaxHealth()); // clamp amount before event
-        mm.eventCont.PlayerHealthChange(id, amount, dealt);
+        mm.eventCont.PlayerHealthChange(id, amount, health, dealt);
 
         if (health == 0)
             mm.EndTheGame();
@@ -174,6 +174,7 @@ public class Player {
     public IEnumerator Discard(Hex hex) {
         mm.eventCont.Discard(id, hex.tag);
 
+        mm.audioCont.HexDiscard();
         yield return mm.animCont._DiscardTile(hex.transform);
         hand.Remove(hex);
         GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan

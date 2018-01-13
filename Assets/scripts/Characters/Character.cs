@@ -13,6 +13,7 @@ public abstract class Character {
     public static int METER_MAX = 1000; // may need to be changed later
     protected int meter = 0;
 
+    public static int HEALTH_WARNING_AMT = 150; // audio/visual warning at 150 hp
     protected int maxHealth;
     protected ObjectEffects objFX; // needed here?
     protected int dfire, dwater, dearth, dair, dmuscle; // portions of 50 total
@@ -22,6 +23,8 @@ public abstract class Character {
     protected int playerId;
     protected List<string> runes;
     //protected string genHexTag;
+
+    protected bool playedFullMeterSound = false;
 
     public Character(MageMatch mm, Ch ch, int playerId) {
         this.mm = mm;
@@ -78,7 +81,12 @@ public abstract class Character {
     public void ChangeMeter(int amount) {
         meter += amount;
         meter = Mathf.Clamp(meter, 0, METER_MAX); // TODO clamp amount before event
-        mm.eventCont.PlayerMeterChange(playerId, amount);
+        mm.eventCont.PlayerMeterChange(playerId, amount, meter);
+
+        if (!playedFullMeterSound && meter == METER_MAX) {
+            mm.audioCont.FullMeter();
+            playedFullMeterSound = true;
+        }
     }
 
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
@@ -100,11 +108,15 @@ public abstract class Character {
     }
 
     public void OnSpellCast(int id, Spell spell) {
-        if(id == playerId)
-            ChangeMeter(10);
+        if (id == playerId) {
+            if (spell is SignatureSpell)
+                playedFullMeterSound = false;
+            else
+                ChangeMeter(10);    
+        }
     }
 
-    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
+    public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         if (dealt && id != playerId) // if the other player was dealt dmg (not great)
             ChangeMeter(-amount);
 

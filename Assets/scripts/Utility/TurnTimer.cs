@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class TurnTimer : MonoBehaviour {
 
+    public static float TIMER_DURATION = 20f, TIMER_WARNING = 5f;
+
     private float timeRemaining;
     private MageMatch mm;
-    private bool pause;
-
-    private const float TIMER_DURATION = 20f;
+    private bool pause = false, playedWarningSound = false;
 
 	void Start () {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
@@ -26,12 +26,19 @@ public class TurnTimer : MonoBehaviour {
 
     public void StartTimer() {
         pause = false;
+        playedWarningSound = false;
         timeRemaining = TIMER_DURATION;
     }
 
     void DecreaseTimeRemaining() {
         if (!pause && !mm.targeting.IsTargetMode()) {
             timeRemaining -= .1f;
+
+            if (!playedWarningSound && timeRemaining < TIMER_WARNING) {
+                mm.audioCont.TurnTimerWarning();
+                playedWarningSound = true;
+            }
+
             if (timeRemaining < .01f) {
                 Pause();
                 mm.eventCont.Timeout();

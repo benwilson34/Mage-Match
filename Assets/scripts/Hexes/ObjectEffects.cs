@@ -90,6 +90,7 @@ public class ObjectEffects {
         // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
         //		Debug.MMLog.Log_EnchantFx("SPELLEFFECTS: Setting burning...");
         yield return mm.animCont._Burning(tb);
+        mm.audioCont.EnchantBurning( tb.GetComponent<AudioSource>() );
 
         Enchantment ench = new Enchantment(id, 5, Enchantment.EnchType.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
         ench.TriggerEffectEveryTurn();
@@ -101,6 +102,7 @@ public class ObjectEffects {
     IEnumerator Ench_Burning_TEffect(int id, TileBehav tb) {
         MMLog.Log_EnchantFx("Burning TurnEffect at " + tb.PrintCoord());
         yield return mm.animCont._Burning_Turn(mm.GetOpponent(id), tb);
+        mm.audioCont.EnchantBurning( tb.GetComponent<AudioSource>() );
         mm.GetPlayer(id).DealDamage(3);
         //yield return null; // for now
     }
@@ -129,6 +131,7 @@ public class ObjectEffects {
     public IEnumerator Ench_SetZombify(int id, TileBehav tb, bool skip, bool anim = true) {
         if (anim)
             yield return mm.animCont._Zombify(tb);
+        mm.audioCont.EnchantZombie( tb.GetComponent<AudioSource>() );
 
         Enchantment ench = new Enchantment(id, Enchantment.EnchType.Zombify, Effect.Type.Enchant, Ench_Zombify_TEffect, null);
         if (skip)

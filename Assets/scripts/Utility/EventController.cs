@@ -245,18 +245,18 @@ public class EventController {
     }
 
     // NOTE: id is ALWAYS the receiver
-    public delegate void PlayerHealthChangeEvent(int id, int amount, bool dealt);
+    public delegate void PlayerHealthChangeEvent(int id, int amount, int newHealth, bool dealt);
     public event PlayerHealthChangeEvent playerHealthChange;
-    public void PlayerHealthChange(int id, int amount, bool dealt) {
+    public void PlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         if (playerHealthChange != null)
-            playerHealthChange.Invoke(id, amount, dealt);
+            playerHealthChange.Invoke(id, amount, newHealth, dealt);
     }
 
-    public delegate void PlayerMeterChangeEvent(int id, int amount);
+    public delegate void PlayerMeterChangeEvent(int id, int amount, int newMeter);
     public event PlayerMeterChangeEvent playerMeterChange;
-    public void PlayerMeterChange(int id, int amount) {
+    public void PlayerMeterChange(int id, int amount, int newMeter) {
         if (playerMeterChange != null)
-            playerMeterChange.Invoke(id, amount);
+            playerMeterChange.Invoke(id, amount, newMeter);
     }
 
     public delegate void GrabTileEvent(int id, string tag);

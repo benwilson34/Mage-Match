@@ -160,7 +160,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return hex;
     }
 
-    public void RemoveSeq(TileSeq seq) { // TODO messy stuff
+    public void RemoveInvokedSeq(TileSeq seq) { // TODO messy stuff
         //Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + boardCheck.PrintSeq(seq, true));
         Tile tile;
         for (int i = 0; i < seq.sequence.Count;) {
@@ -168,11 +168,15 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             if (hexGrid == null)
                 MMLog.LogError("TILEMAN: hexGrid is null");
             if (hexGrid.IsCellFilled(tile.col, tile.row))
-                RemoveTile(tile, true);
+                InvokeTile(tile);
             else
                 Debug.Log("RemoveSeq(): The tile at (" + tile.col + ", " + tile.row + ") is already gone.");
             seq.sequence.Remove(tile);
         }
+    }
+
+    void InvokeTile(Tile tile) {
+        mm.StartCoroutine(_RemoveTile(tile.col, tile.row, false, true));
     }
 
     // TODO should be IEnums? Then just start the anim at the end?
@@ -184,7 +188,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         mm.StartCoroutine(_RemoveTile(col, row, resolveEnchant));
     }
 
-    public IEnumerator _RemoveTile(int col, int row, bool resolveEnchant) {
+    public IEnumerator _RemoveTile(int col, int row, bool resolveEnchant, bool isInvoked = false) {
         //		Debug.Log ("Removing (" + col + ", " + row + ")");
         removing++;
 
@@ -211,7 +215,10 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
         hexGrid.ClearTileBehavAt(col, row); // move up?
 
-        yield return mm.animCont._RemoveTile(tb); // just start it, don't yield?
+        if(isInvoked)
+            yield return mm.animCont._InvokeTile(tb); // just start it, don't yield?
+        else
+            yield return mm.animCont._DestroyTile(tb); // just start it, don't yield?
         GameObject.Destroy(tb.gameObject);
         mm.eventCont.TileRemove(tb); //? not needed for checking but idk
 

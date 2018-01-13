@@ -481,7 +481,7 @@ public class MageMatch : MonoBehaviour {
 
         TileBehav tb1 = hexGrid.GetTileBehavAt(c1, r1);
         TileBehav tb2 = hexGrid.GetTileBehavAt(c2, r2);
-        audioCont.SwapSound(tb1.GetComponent<AudioSource>());
+        audioCont.TileSwap(tb1.GetComponent<AudioSource>());
 
         hexGrid.Swap(c1, r1, c2, r2);
         tb1.ChangePos(c2, r2);
@@ -516,7 +516,7 @@ public class MageMatch : MonoBehaviour {
 
                 TileSeq seq = targeting.GetSelection();
                 TileSeq seqCopy = seq.Copy();
-                tileMan.RemoveSeq(seq);
+                tileMan.RemoveInvokedSeq(seq);
 
                 yield return spell.Cast(seqCopy);
 
@@ -620,6 +620,7 @@ public class MageMatch : MonoBehaviour {
 
     public void EndTheGame() {
         endGame = true;
+        audioCont.GameEnd();
         uiCont.UpdateMoveText("Wow!! " + activep.name + " has won!!");
         uiCont.DeactivateAllSpellButtons();
         eventCont.boardAction -= OnBoardAction; //?

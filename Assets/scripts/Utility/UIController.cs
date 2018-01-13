@@ -164,12 +164,12 @@ public class UIController : MonoBehaviour {
         SendSlidingText("Wow, a cascade of " + chain + " matches!");
     }
 
-    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
+    public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         StartCoroutine(UpdateHealthbar(mm.GetPlayer(id)));
         StartCoroutine(DamageAnim(mm.GetPlayer(id), amount));
     }
 
-    public void OnPlayerMeterChange(int id, int amount) {
+    public void OnPlayerMeterChange(int id, int amount, int newMeter) {
         StartCoroutine(UpdateMeterbar(mm.GetPlayer(id)));
     }
     #endregion

@@ -56,6 +56,7 @@ public class Hand {
             if (!slot.IsFull()) {
                 slot.SetHex(hex);
                 mm.animCont.PlayAnim(mm.animCont._Move(hex, slot.transform.position));
+                mm.audioCont.HexDraw(hex.GetComponent<AudioSource>());
                 MMLog.Log("HAND", "black", "Added hex with tag " + hex.tag);
                 break;
             }
