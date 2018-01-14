@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DebugSettings : MonoBehaviour {
 
-    public bool applyAPcost = false, onePlayerMode = true;
+    public bool applyAPcost = false, onePlayerMode = true, midiMode = false;
 
     void Start () {
         DontDestroyOnLoad(this);

@@ -88,14 +88,17 @@
     <Reference Include="DOTween50">
       <HintPath>Assets\Demigiant\DOTween\DOTween50.dll</HintPath>
     </Reference>
+    <Reference Include="MMDebug">
+      <HintPath>Assets\Plugins\MMDebug.dll</HintPath>
+    </Reference>
     <Reference Include="Photon3Unity3D">
       <HintPath>Assets\Plugins\Photon3Unity3D.dll</HintPath>
     </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>Assets\Plugins\WebSocket\websocket-sharp.dll</HintPath>
     </Reference>
-    <Reference Include="MMDebug">
-      <HintPath>Assets\Plugins\MMDebug.dll</HintPath>
+    <Reference Include="Midi">
+      <HintPath>Assets\Plugins\Midi.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
