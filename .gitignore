@@ -1,4 +1,5 @@
 Library/
 obj/
+build/
 Assets/Photon Unity Networking/Demos
 MMDebug/MMDebug/bin/Debug/MMDebug.dll.mdb
