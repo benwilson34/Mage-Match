@@ -8,9 +8,7 @@ public class Rocky : Character {
     private HexGrid hexGrid;
     private Targeting targeting;
 
-    public Rocky(MageMatch mm, int id) : base(mm, Ch.Rocky) {
-        playerID = id;
-        this.mm = mm;
+    public Rocky(MageMatch mm, int id) : base(mm, Ch.Rocky, id) {
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
         objFX = mm.hexFX;
@@ -24,28 +22,26 @@ public class Rocky : Character {
 
     // TODO
     void RockyA() { // Rocky A - Tectonic Titan 
-        loadoutName = "Tectonic Titan";
         maxHealth = 1100;
 
         SetDeckElements(5, 0, 45, 30, 20);
 
-        spells[0] = new Spell(0, "NOTHING", "EEMEE", 1, Sinkhole); //
-        spells[1] = new Spell(1, "Sinkhole", "EAAE", 1, objFX.Deal496Dmg); //
-        spells[2] = new Spell(2, "Boulder Barrage", "MMEE", 1, objFX.Deal496Dmg); //
-        spells[3] = new Spell(3, "Stalagmite", "AEE", 1, Stalagmite);
+        spells[0] = new Spell(0, "NOTHING", "EEMEE", Sinkhole); //
+        spells[1] = new Spell(1, "Sinkhole", "EAAE", objFX.Deal496Dmg); //
+        spells[2] = new Spell(2, "Boulder Barrage", "MMEE", objFX.Deal496Dmg); //
+        spells[3] = new Spell(3, "Stalagmite", "AEE", Stalagmite);
     }
 
     // TODO
     void RockyB() { // Rocky B - Continental Champion
-        loadoutName = "Continental Champion";
         maxHealth = 1300;
 
         SetDeckElements(0, 25, 40, 10, 25);
 
-        spells[0] = new Spell(0, "NOTHING", "EEMEE", 1, Sinkhole); //
-        spells[1] = new Spell(1, "Living Flesh Armor", "EWWE", 1, objFX.Deal496Dmg); //
-        spells[2] = new Spell(2, "Figure-Four Leglock", "MEEM", 1, objFX.Deal496Dmg); //
-        spells[3] = new Spell(3, "Stalagmite", "AEE", 1, Stalagmite);
+        spells[0] = new Spell(0, "NOTHING", "EEMEE", Sinkhole); //
+        spells[1] = new Spell(1, "Living Flesh Armor", "EWWE", objFX.Deal496Dmg); //
+        spells[2] = new Spell(2, "Figure-Four Leglock", "MEEM", objFX.Deal496Dmg); //
+        spells[3] = new Spell(3, "Stalagmite", "AEE", Stalagmite);
     }
 
 
@@ -76,18 +72,16 @@ public class Rocky : Character {
     //    yield return null; // for now
     //}
 
-    public IEnumerator Sinkhole() {
+    public IEnumerator Sinkhole(TileSeq prereq) {
         yield return null;
     }
 
-    public void BoulderBarrage() {
+    public void BoulderBarrage(TileSeq prereq) {
 
     }
 
-    public IEnumerator Stalagmite() {
+    public IEnumerator Stalagmite(TileSeq prereq) {
         yield return targeting.WaitForCellTarget(1);
-        if (targeting.WasCanceled())
-            yield break;
 
         CellBehav cb = targeting.GetTargetCBs()[0];
         int col = cb.col;
@@ -95,17 +89,17 @@ public class Rocky : Character {
         // hardset bottom three cells of column
         TileBehav stone;
         for (int i = 0; i < 3; i++) {
-            stone = (TileBehav) tileMan.GenerateToken(playerID, "stone");
+            stone = (TileBehav) tileMan.GenerateToken(playerId, "stone");
             stone.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
             mm.PutTile(stone, col, bottomr + i);
         }
     }
 
-    public void LivingFleshArmor() {
+    public void LivingFleshArmor(TileSeq prereq) {
 
     }
 
-    public void FigureFourLeglock() {
+    public void FigureFourLeglock(TileSeq prereq) {
 
     }
 }

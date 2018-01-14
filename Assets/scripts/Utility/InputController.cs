@@ -11,6 +11,7 @@ public class InputController : MonoBehaviour {
 	private MageMatch mm;
     private Targeting targeting;
     private MonoBehaviour mouseObj;
+    private Reporter reporter;
 
     private bool holdingHex = false;
     private Hex heldHex;
@@ -23,12 +24,15 @@ public class InputController : MonoBehaviour {
  //   private CellBehav clickCB; // needed?
 	//private bool isClickHex = false;
 
-    private bool freshClick = true;
+    private bool validClick = true;
 
 	void Start() {
 		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
         targeting = mm.targeting;
         InitContexts();
+        GameObject reporterGO = GameObject.Find("Reporter");
+        if (reporterGO != null)
+            reporter = reporterGO.GetComponent<Reporter>();
     }
 
 	void Update(){
@@ -36,9 +40,6 @@ public class InputController : MonoBehaviour {
             nowClick = true;
             if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
                 nowClick = false;
-
-            //if (!IsFreshClick())
-            //    return;
 
             InputStatus status = InputStatus.Unhandled;
             MouseState state = GetMouseState();
@@ -48,12 +49,16 @@ public class InputController : MonoBehaviour {
             //if (mouseObj == null)
             //    return;
 
+            // return if the report overlay is showing, or if the newsfeed is open
+            if ((reporter != null && reporter.show) || mm.uiCont.newsfeed.isMenuOpen())
+                return;
+
             // LAYER 1 current context
-            if (mm.MyTurn() && IsFreshClick() && mouseObj != null)
+            if (mm.MyTurn() && IsValidClick() && mouseObj != null)
                 status = currentContext.TakeInput(state, mouseObj);
 
             if (state == MouseState.Down) {
-                if(!mm.uiCont.IsMenuOpen()) // i don't like this
+                if(!mm.uiCont.IsDebugMenuOpen()) // i don't like this
                     ((StandardContext)standardContext).SetTooltip(GetTooltipable()); // hoo
                 if (mouseObj != null && mouseObj is CellBehav) // only getObject if other context gets a CellBehav
                     mouseObj = GetObject(state, InputContext.ObjType.Hex);
@@ -64,8 +69,8 @@ public class InputController : MonoBehaviour {
                 standardContext.TakeInput(state, mouseObj, status);
 
             UpdateMouseState();
-        } else if (!freshClick) {
-            freshClick = true;
+        } else if (!validClick) {
+            validClick = true;
         }
 
 	}
@@ -84,7 +89,7 @@ public class InputController : MonoBehaviour {
     }
 
     void UpdateMouseState() {
-        switch (GetMouseState()) { // please make not global...
+        switch (GetMouseState()) {
             case MouseState.Down:
                 lastClick = true;
                 break;
@@ -96,15 +101,15 @@ public class InputController : MonoBehaviour {
 
     public void InvalidateClick() {
         if(mm.MyTurn() && nowClick)
-            freshClick = false;
+            validClick = false;
     }
 
-    public bool IsFreshClick() {
-        if (!freshClick) {  // if invalidated
+    public bool IsValidClick() {
+        if (!validClick) {
             //lastClick = true;
-            MMLog.Log_InputCont("Picked up input, but the click isn't fresh!");
+            MMLog.Log_InputCont("Picked up input, but the click isn't valid!");
             if (!nowClick) {
-                freshClick = true;
+                validClick = true;
                 //lastClick = false;
             }
             return false;
@@ -204,15 +209,14 @@ public class InputController : MonoBehaviour {
     }
 
     List<RaycastResult> GetUIRaycast() {
-        MMLog.Log_InputCont("calling UIRaycast");
+        //MMLog.Log_InputCont("calling UIRaycast");
         GraphicRaycaster gr = mm.uiCont.GetComponent<GraphicRaycaster>();
         //Create the PointerEventData with null for the EventSystem
         PointerEventData ped = new PointerEventData(null);
         //Set required parameters, in this case, mouse position
         ped.position = Input.mousePosition;
-        //Create list to receive all results
+
         List<RaycastResult> results = new List<RaycastResult>();
-        //Raycast it
         gr.Raycast(ped, results);
         return results;
     }
@@ -238,9 +242,10 @@ public class InputController : MonoBehaviour {
 
 			dragging = false; // TODO move into cases below for continuous dragging
             int dir = (int)Mathf.Floor(angle / 60);
+
             int c2, r2;
             mm.hexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
-            if (c2 == -1 || r2 == -1)
+            if (!mm.hexGrid.CanSwap(tile.col, tile.row, c2, r2))
                 return;
 
             if (mm.prompt.currentMode == Prompt.PromptMode.Swap) {
@@ -589,7 +594,11 @@ public class InputController : MonoBehaviour {
                 currentContext = selection;
                 break;
 
-            case MageMatch.State.Menu:
+            case MageMatch.State.NewsfeedMenu:
+                currentContext = block;
+                break;
+
+            case MageMatch.State.DebugMenu:
                 if (mm.IsDebugMode()) {
                     currentContext = debugMenu;
                     mm.debugTools.ValueChanged("insert");
@@ -611,12 +620,5 @@ public class InputController : MonoBehaviour {
 
         // TODO Invalidate click?
 
-
-        //       if (targeting.IsTargetMode()) {
-        //} else if (targeting.IsSelectionMode()) {
-        //} else if (mm.uiCont.IsMenuOpen()) {
-        //} else if (mm.MyTurn()) {
-        //} else  { // not my turn
-        //}
     }
 }

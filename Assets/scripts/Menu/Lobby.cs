@@ -90,7 +90,9 @@ public class Lobby : Photon.PunBehaviour {
 
         GameSettings settings = new GameObject("gameSettings").AddComponent<GameSettings>();
         settings.p1name = "GOD";
+        settings.p1char = (Character.Ch)(testSettingsMenu.transform.Find("dd_character").GetComponent<Dropdown>().value);
         settings.p2name = "Training dummy";
+        settings.p2char = Character.Ch.Test;
         settings.turnTimerOn = false;
 
         PhotonNetwork.Disconnect();

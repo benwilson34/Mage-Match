@@ -9,22 +9,27 @@ public abstract class Character {
     public Ch ch;
 
     public string characterName;
-    public string loadoutName;
-    public int meter = 0, meterMax = 100; // protected?
 
+    public static int METER_MAX = 1000; // may need to be changed later
+    protected int meter = 0;
+
+    public static int HEALTH_WARNING_AMT = 150; // audio/visual warning at 150 hp
     protected int maxHealth;
     protected ObjectEffects objFX; // needed here?
-    protected int dfire, dwater, dearth, dair, dmuscle; // portions of 100 total
+    protected int dfire, dwater, dearth, dair, dmuscle; // portions of 50 total
     protected Spell[] spells;
     protected MageMatch mm;
-    protected TileManager tileMan;
-    protected int playerID;
+    protected HexManager tileMan;
+    protected int playerId;
     protected List<string> runes;
     //protected string genHexTag;
 
-    public Character(MageMatch mm, Ch ch) {
+    protected bool playedFullMeterSound = false;
+
+    public Character(MageMatch mm, Ch ch, int playerId) {
         this.mm = mm;
         this.ch = ch;
+        this.playerId = playerId;
         tileMan = mm.tileMan;
         runes = new List<string>();
 
@@ -33,25 +38,31 @@ public abstract class Character {
     } //?
 
     public virtual void InitEvents() {
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Player, EventController.Status.Begin);
+        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Player, EventController.Status.Begin);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Player, EventController.Status.Begin);
+        mm.eventCont.spellCast += OnSpellCast;
         mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+        mm.eventCont.tileRemove += OnTileRemove;
     }
 
+    // override to init character with event callbacks (for their passive, probably)
     public virtual void OnEventContLoad() {
         
     }
 
+    // override to init character with effect callbacks (for their passive, probably)
     public virtual void OnEffectContLoad() {
 
     }
 
     public void InitSpells() {
-        foreach (Spell sp in spells)
+        Spell sp;
+        for (int i = 0; i < 5; i++) {
+            sp = spells[i];
             sp.Init(mm);
-    }
-
-    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
-        if (dealt && id != playerID) // if the other player was dealt dmg (not great)
-            ChangeMeter((-amount) / 3);
+            sp.info = CharacterInfo.GetSpellInfo(ch, i, true);
+        }
     }
 
     public void SetDeckElements(int f, int w, int e, int a, int m) {
@@ -62,11 +73,62 @@ public abstract class Character {
         dmuscle = m;
     }
 
+
+    // ----------  METER  ----------
+
+    public int GetMeter() { return meter; }
+
     public void ChangeMeter(int amount) {
         meter += amount;
-        meter = Mathf.Clamp(meter, 0, meterMax); // TODO clamp amount before event
-        mm.eventCont.PlayerMeterChange(playerID, amount);
+        meter = Mathf.Clamp(meter, 0, METER_MAX); // TODO clamp amount before event
+        mm.eventCont.PlayerMeterChange(playerId, amount, meter);
+
+        if (!playedFullMeterSound && meter == METER_MAX) {
+            mm.audioCont.FullMeter();
+            playedFullMeterSound = true;
+        }
     }
+
+    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
+        if(id == playerId && !dealt)
+            ChangeMeter(10);
+        yield return null;
+    }
+
+    public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
+        if(id == playerId)
+            ChangeMeter(10);
+        yield return null;
+    }
+
+    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
+        if(id == playerId)
+            ChangeMeter(10);
+        yield return null;
+    }
+
+    public void OnSpellCast(int id, Spell spell) {
+        if (id == playerId) {
+            if (spell is SignatureSpell)
+                playedFullMeterSound = false;
+            else
+                ChangeMeter(10);    
+        }
+    }
+
+    public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
+        if (dealt && id != playerId) // if the other player was dealt dmg (not great)
+            ChangeMeter(-amount);
+
+        if (amount > 0 && id == playerId) // healing
+            ChangeMeter(amount / 2);
+    }
+
+    public void OnTileRemove(int id, TileBehav tb) {
+        if (id == playerId)
+            ChangeMeter(5);
+    }
+
 
     public int GetMaxHealth() { return maxHealth; }
 
@@ -102,11 +164,15 @@ public abstract class Character {
         int rand = Random.Range(0, total);
 
         if (rand < 50)
-            return "p" + playerID + "-B-" + GetDeckBasicTile().ToString().Substring(0, 1); // + "-" ?
+            return "p" + playerId + "-B-" + GetDeckBasicTile().ToString().Substring(0, 1); // + "-" ?
         else {
             int index = Mathf.CeilToInt((rand - 50) / 10f); 
             return runes[index]; // + "-" ?
         }
+    }
+
+    public Player ThisPlayer() {
+        return mm.GetPlayer(playerId);
     }
 
     //public string GetHexTag() { return genHexTag; }
@@ -115,7 +181,7 @@ public abstract class Character {
         Ch myChar = mm.gameSettings.GetLocalChar(id);
         switch (myChar) {
             case Ch.Test:
-                return new CharTest(mm);
+                return new CharTest(mm, id);
             case Ch.Enfuego:
                 return new Enfuego(mm, id);
             case Ch.Gravekeeper:
@@ -131,20 +197,20 @@ public abstract class Character {
 
 
 public class CharTest : Character {
-    public CharTest(MageMatch mm) : base(mm, Ch.Test) {
+    public CharTest(MageMatch mm, int id) : base(mm, Ch.Test, id) {
         objFX = mm.hexFX;
-        spells = new Spell[4];
 
         characterName = "Sample";
-        loadoutName = "Test Loadout";
         maxHealth = 1000;
 
         SetDeckElements(20, 20, 20, 20, 20);
 
-        spells[0] = new Spell(0, "Cherrybomb", "FFA", 1, objFX.Cherrybomb);
-        spells[1] = new Spell(1, "Massive damage", "FFA", 1, objFX.Deal496Dmg);
-        spells[2] = new Spell(2, "Stone Test", "FAF", 1, objFX.Deal496Dmg);
-        spells[3] = new Spell(3, "Massive damage", "AFA", 1, objFX.Deal496Dmg);
+        spells = new Spell[5];
+        spells[0] = new Spell(0, "Cherrybomb", "FFA", objFX.Cherrybomb);
+        spells[1] = new Spell(1, "Massive damage", "FFA", objFX.Deal496Dmg);
+        spells[2] = new Spell(2, "Massive damage", "FAF", objFX.Deal496Dmg);
+        spells[3] = new Spell(3, "Massive damage", "AFA", objFX.Deal496Dmg);
+        spells[4] = new Spell(4, "Massive damage", "AFA", objFX.Deal496Dmg);
         InitSpells();
     }
 }

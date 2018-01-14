@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text;
 using System.IO;
 using System;
+using MMDebug;
 
 public class Stats {
 
@@ -16,7 +17,6 @@ public class Stats {
     private class PlayerStat {
         public string name;
         public string character;
-        public string loadout;
         public int draws, drops, swaps, matches, match3s, match4s, match5s, cascades, tilesRemoved, spellsCast, timeouts, discards;
         public int dmgDealt, dmgTaken, healingDone;
         public int longestCascade;
@@ -28,13 +28,11 @@ public class Stats {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         ps1 = new PlayerStat() {
             name = p1.name,
-            character = p1.character.characterName,
-            loadout = p1.character.loadoutName
+            character = p1.character.characterName
         };
         ps2 = new PlayerStat() {
             name = p2.name,
-            character = p2.character.characterName,
-            loadout = p2.character.loadoutName
+            character = p2.character.characterName
         };
 
         InitReport();
@@ -45,9 +43,9 @@ public class Stats {
         mm.eventCont.commishDrop += OnCommishDrop;
         mm.eventCont.commishMatch += OnCommishMatch;
 
-        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats);
-        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats);
-        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats);
+        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.End);
+        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.End);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.End);
         mm.eventCont.spellCast += OnSpellCast;
         mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
@@ -59,8 +57,8 @@ public class Stats {
 
     void InitReport() {
         report = new StringBuilder();
-        report.Append(ps1.name + " (" + ps1.character + " - " + ps1.loadout + ") vs ");
-        report.AppendLine(ps2.name + " (" + ps2.character + " - " + ps2.loadout + ")");
+        report.Append(ps1.name + " (" + ps1.character + ") vs ");
+        report.AppendLine(ps2.name + " (" + ps2.character + ")");
         int rand = UnityEngine.Random.state.GetHashCode(); //?
         report.AppendLine("random seed - " + rand);
         report.AppendLine("...setup - deal p1 4, deal p2 4"); //?
@@ -128,13 +126,13 @@ public class Stats {
         if (playerAction) {
             Report("Drop " + tag + " col" + col);
             GetPS(id).drops++;
-        } else if (mm.uiCont.IsMenuOpen()) //?
+        } else if (mm.uiCont.IsDebugMenuOpen()) //?
             Report("menu Drop col" + col);
         yield return null;
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        if (!mm.uiCont.IsMenuOpen()) { //?
+        if (!mm.uiCont.IsDebugMenuOpen()) { //?
             Report("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
             if(playerAction)
                 GetPS(id).swaps++;
@@ -174,14 +172,14 @@ public class Stats {
 
     public void OnTileRemove(int id, TileBehav tb) {
         if (!mm.IsCommishTurn()) {
-            if (!mm.uiCont.IsMenuOpen()) //?
+            if (!mm.uiCont.IsDebugMenuOpen()) //?
                 GetPS(id).tilesRemoved++;
             else
                 report.AppendLine("menu Remove (" + tb.tile.col + "," + tb.tile.row + ")");
         }
     }
 
-    public void OnPlayerHealthChange(int id, int amount, bool dealt) {
+    public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         if (dealt) {
             GetPS(GetOpponentID(id)).dmgDealt -= amount;
             report.AppendLine("...p" + GetOpponentID(id) + " dealt " + (-amount) + " dmg...");
@@ -194,11 +192,40 @@ public class Stats {
     }
 
 
-    public void SaveStatsCSV() {
+    void Report(string str) {
+        report.AppendLine(str);
+        mm.uiCont.newsfeed.UpdateNewsfeed(str);
+    }
+
+    public string GetReportText() { return report.ToString(); }
+
+
+    public void SaveFiles() {
         DateTime dt = DateTime.Now;
-        string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
-        filePath += dt.Hour + "-" + dt.Minute + "-" + dt.Second + "_Stats";
-        filePath = @"/" + filePath + ".csv";
+        string timestamp = dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
+        timestamp += dt.Hour + "-" + dt.Minute + "-" + dt.Second;
+
+        string dirPath = Application.dataPath;
+        MMLog.Log("Stats", "black", "dataPath is " + dirPath + "...");
+        dirPath = Directory.CreateDirectory(dirPath + "/" + timestamp).FullName;
+        MMLog.Log("Stats", "black", "saving files to " + dirPath + "...");
+
+        SaveReportTXT(dirPath, timestamp);
+        SaveStatsCSV(dirPath, timestamp);
+        MMLog.SaveReportTXT(dirPath, timestamp);
+    }
+
+    void SaveReportTXT(string path, string timestamp) {
+        string filename = "MageMatch_" + timestamp + "_Report";
+        filename = @"/" + filename + ".txt";
+
+        File.WriteAllText(path + filename, GetReportText());
+    }
+
+    public void SaveStatsCSV(string path, string timestamp) {
+        DateTime dt = DateTime.Now;
+        string filename = "MageMatch_" + timestamp + "_Stats";
+        filename = @"/" + filename + ".csv";
 
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("Turns complete," + turns);
@@ -207,7 +234,7 @@ public class Stats {
         for (int id = 1; id <= 2; id++) {
             PlayerStat ps = GetPS(id);
             sb.AppendLine("Player " + id);
-            sb.AppendLine(ps.name + "," + ps.character + "," + ps.loadout);
+            sb.AppendLine(ps.name + "," + ps.character);
             sb.AppendLine("Tiles drawn," + ps.draws);
             sb.AppendLine("Tiles dropped," + ps.drops);
             sb.AppendLine("Tiles swapped," + ps.swaps);
@@ -221,23 +248,6 @@ public class Stats {
         }
 
         // TODO write num of each spell cast from EffectCont.tagDict
-        File.WriteAllText(filePath, sb.ToString());
+        File.WriteAllText(path + filename, sb.ToString());
     }
-
-    void Report(string str) {
-        report.AppendLine(str);
-        mm.uiCont.UpdateNewsfeed(str);
-    }
-
-    public string GetReportText() { return report.ToString(); }
-
-    public void SaveReportTXT() {
-        DateTime dt = DateTime.Now;
-        string filePath = "MageMatch_" + dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
-        filePath += dt.Hour + "-" + dt.Minute + "-" + dt.Second + "_Report";
-        filePath = @"/" + filePath + ".txt";
-
-        File.WriteAllText(filePath, GetReportText());
-    }
-
 }

@@ -31,7 +31,7 @@ public class EffectController {
         mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.EventEffects);
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.EventEffects);
         mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.EventEffects);
-        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.EventEffects);
+        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.EventEffects, EventController.Status.End); // begin or end?
     }
 
     #region EventCont calls

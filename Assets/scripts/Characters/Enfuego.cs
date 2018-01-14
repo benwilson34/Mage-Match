@@ -10,8 +10,7 @@ public class Enfuego : Character {
 
     private int swapsThisTurn = 0;
 
-    public Enfuego(MageMatch mm, int id) : base(mm, Ch.Enfuego) {
-        playerID = id;
+    public Enfuego(MageMatch mm, int id) : base(mm, Ch.Enfuego, id) {
         objFX = mm.hexFX;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
@@ -21,11 +20,11 @@ public class Enfuego : Character {
         SetDeckElements(20, 0, 0, 15, 15);
 
         spells = new Spell[5];
-        spells[0] = new SignatureSpell(0, "White-Hot Combo Kick", "MFFM", 1, 40, WhiteHotComboKick);
-        spells[1] = new Spell(1, "¡Baila!", "FM", 1, Baila);
-        spells[2] = new Spell(2, "DRAG SAMPLE", "FM", 1, DragSample);
-        spells[3] = new Spell(3, "Hot Potatoes", "FFA", 1, HotPotatoes);
-        spells[4] = new CoreSpell(4, "Fiery Fandango", 1, FieryFandango);
+        spells[0] = new CoreSpell(0, "Fiery Fandango", FieryFandango);
+        spells[1] = new Spell(1, "¡Baila!", "FM", Baila);
+        spells[2] = new Spell(2, "Incinerate", "FAM", Incinerate);
+        spells[3] = new Spell(3, "Hot Potatoes", "FFA", HotPotatoes);
+        spells[4] = new SignatureSpell(4, "White-Hot Combo Kick", "MFFM", WhiteHotComboKick);
 
         InitSpells();
     }
@@ -48,7 +47,7 @@ public class Enfuego : Character {
 
     public IEnumerator Enf_Swap(int id, int c1, int r1, int c2, int r2) {
         if(swapsThisTurn > 0)
-            mm.GetPlayer(playerID).DealDamage(swapsThisTurn * 4);
+            ThisPlayer().DealDamage(swapsThisTurn * 4);
 
         swapsThisTurn++;
         MMLog.Log_Enfuego("Incrementing swaps to " + swapsThisTurn);
@@ -66,18 +65,16 @@ public class Enfuego : Character {
     //    return swapsThisTurn * 4;
     //}
 
-    public IEnumerator DoNothing() {
+    public IEnumerator DoNothing(TileSeq prereq) {
         mm.uiCont.SendSlidingText("This spell does nothing. Thanks!");
         yield return null;
     }
 
-    public IEnumerator DragSample() {
+    public IEnumerator DragSample(TileSeq prereq) {
         yield return targeting.WaitForDragTarget(4);
-        if (targeting.WasCanceled())
-            yield return null;
 
         foreach (TileBehav tb in targeting.GetTargetTBs()) {
-            mm.StartCoroutine(objFX.Ench_SetBurning(playerID, tb));
+            mm.StartCoroutine(objFX.Ench_SetBurning(playerId, tb));
         }
     }
     // TODO sample filter???
@@ -85,14 +82,12 @@ public class Enfuego : Character {
     // ----- spells -----
 
     // Signature
-    public IEnumerator WhiteHotComboKick() {
+    public IEnumerator WhiteHotComboKick(TileSeq prereq) {
         yield return targeting.WaitForTileTarget(3);
-        if (targeting.WasCanceled())
-            yield break;
 
-        List<TileBehav> tTBs = targeting.GetTargetTBs();
+        List<TileBehav> tbs = targeting.GetTargetTBs();
 
-        foreach (TileBehav tb in tTBs) { // maybe for instead?
+        foreach (TileBehav tb in tbs) {
             mm.ActiveP().DealDamage(70);
 
             if (tb.tile.element.Equals(Tile.Element.Fire)) { // spread Burning to 4 nearby
@@ -108,12 +103,12 @@ public class Enfuego : Character {
                 int burns = Mathf.Min(4, ctbs.Count);
                 for (int i = 0; i < burns; i++) {
                     MMLog.Log_Enfuego("WHCK count=" + burns);
-                    yield return mm.syncManager.SyncRand(playerID, Random.Range(0, ctbs.Count));
+                    yield return mm.syncManager.SyncRand(playerId, Random.Range(0, ctbs.Count));
                     int index = mm.syncManager.GetRand();
                     TileBehav ctb = ctbs[index];
                     ctbs.RemoveAt(index);
                     MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
-                    mm.StartCoroutine(objFX.Ench_SetBurning(playerID, ctb)); // yield return?
+                    mm.StartCoroutine(objFX.Ench_SetBurning(playerId, ctb)); // yield return?
                 }
             } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
                 yield return mm.InactiveP().DiscardRandom(1);
@@ -131,19 +126,19 @@ public class Enfuego : Character {
                 break;
             case 4:
                 dmg = 50;
-                mm.GetOpponent(playerID).DiscardRandom(1);
+                mm.GetOpponent(playerId).DiscardRandom(1);
                 burnNum = 4;
                 break;
             case 5:
                 dmg = 80;
-                mm.GetOpponent(playerID).DiscardRandom(2);
+                mm.GetOpponent(playerId).DiscardRandom(2);
                 burnNum = 7;
                 break;
         }
 
         if (seq.GetElementAt(0).Equals(Tile.Element.Fire)) // not safe for multi-element tiles
             dmg += 20;
-        mm.GetPlayer(playerID).DealDamage(dmg);
+        ThisPlayer().DealDamage(dmg);
 
         List<TileBehav> tbs = mm.hexGrid.GetPlacedTiles(seq);
         for (int i = 0; i < tbs.Count; i++) {
@@ -156,40 +151,39 @@ public class Enfuego : Character {
 
         burnNum = Mathf.Min(burnNum, tbs.Count);
         for (int i = 0; i < burnNum; i++) {
-            yield return mm.syncManager.SyncRand(playerID, Random.Range(0, tbs.Count));
+            yield return mm.syncManager.SyncRand(playerId, Random.Range(0, tbs.Count));
             int index = mm.syncManager.GetRand();
             TileBehav ctb = tbs[index];
             tbs.RemoveAt(index);
             MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
-            mm.StartCoroutine(objFX.Ench_SetBurning(playerID, ctb)); // yield return?
+            mm.StartCoroutine(objFX.Ench_SetBurning(playerId, ctb)); // yield return?
         }
 
         yield return null;
     }
 
-    public IEnumerator Baila() {
-        yield return mm.GetPlayer(playerID).DrawTiles(2, "", false, false); // my draw
-        yield return mm.GetOpponent(playerID).DrawTiles(2, "", false, false); // their draw
+    public IEnumerator Baila(TileSeq prereq) {
+        yield return ThisPlayer().DrawTiles(2, "", false, false); // my draw
+        yield return mm.GetOpponent(playerId).DrawTiles(2, "", false, false); // their draw
 
-        yield return mm.prompt.WaitForSwap();
-        mm.prompt.ContinueSwap();
+        yield return mm.prompt.WaitForSwap(prereq);
+        if(mm.prompt.WasSuccessful())
+            yield return mm.prompt.ContinueSwap();
     }
 
-    public IEnumerator Incinerate() {
+    // TODO new effect
+    public IEnumerator Incinerate(TileSeq prereq) {
         yield return targeting.WaitForDragTarget(6);
-        if (targeting.WasCanceled())
-            yield return null;
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
             MMLog.Log_Enfuego("Enchanting tile at " + tb.PrintCoord());
-            yield return objFX.Ench_SetBurning(playerID, tb);
+            yield return objFX.Ench_SetBurning(playerId, tb);
             //yield return new WaitForSeconds(.2f);
         }
 
         yield return mm.InactiveP().DiscardRandom(2); 
     }
-
     public List<TileBehav> Inc_Filter(List<TileBehav> tbs) {
         List<TileBehav> filterTBs = new List<TileBehav>();
         foreach(TileBehav tb in tbs) {
@@ -201,8 +195,8 @@ public class Enfuego : Character {
         return filterTBs;
     }
 
-    public IEnumerator HotPotatoes() {
-        HealthEffect he = new HealthEffect(mm.OpponentId(playerID), 3, HotPot_Buff, true, false);
+    public IEnumerator HotPotatoes(TileSeq prereq) {
+        HealthEffect he = new HealthEffect(mm.OpponentId(playerId), 3, HotPot_Buff, true, false);
         mm.effectCont.AddHealthEffect(he, "hotpo");
 
         yield return null;

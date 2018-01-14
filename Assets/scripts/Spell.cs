@@ -7,27 +7,28 @@ public class Spell {
 
 	public string name;
 	public int APcost;
+    public string info;
     public int index;
     public bool isSymmetric;
 
     protected MageMatch mm;
 	protected TileSeq seq;
 
-	public delegate IEnumerator MySpellEffect();
+	public delegate IEnumerator MySpellEffect(TileSeq prereq);
 	protected MySpellEffect effect;
 	
-	public Spell(int index, string name, string seq, int APcost, MySpellEffect effect) 
-        : this(index, name, APcost, effect) {
+	public Spell(int index, string name, string seq, MySpellEffect effect, int APcost = 1) 
+        : this(index, name, effect, APcost) {
         this.seq = new TileSeq (seq);
         SymmetryCheck(seq);
     }
 
-    public Spell(int index, string name, int APcost, MySpellEffect effect) {
+    public Spell(int index, string name, MySpellEffect effect, int APcost = 1) {
         //MageMatch mm = GameObject.Find("board").GetComponent<MageMatch>();
         this.index = index;
         this.name = name;
-        this.APcost = APcost;
         this.effect = effect;
+        this.APcost = APcost;
     }
 
     public void Init(MageMatch mm) {
@@ -43,8 +44,8 @@ public class Spell {
         isSymmetric = first.Equals(second);
     }
 
-    public virtual IEnumerator Cast(){
-		return effect (); //yield??
+    public virtual IEnumerator Cast(TileSeq prereq){
+		return effect (prereq); //yield??
 	}
 
 	public Tile.Element GetElementAt(int index){
@@ -67,16 +68,17 @@ public class CooldownSpell : Spell {
 
     private int cooldown;
 
-    public CooldownSpell(int index, string name, int cooldown, int APcost, MySpellEffect effect) : base(index, name, APcost, effect) { // core spell
+    public CooldownSpell(int index, string name, int cooldown, MySpellEffect effect, int APcost = 1) 
+        : base(index, name, effect, APcost) { // core spell
         this.cooldown = cooldown;
         this.seq = new TileSeq(); // empty seq...be wary of errors...
     }
 
-    public override IEnumerator Cast() {
+    public override IEnumerator Cast(TileSeq prereq) {
         TurnEffect te = new TurnEffect(cooldown, Effect.Type.Cooldown, null, null);
         effectTag = mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 5) + "-C");
 
-        return effect(); // yield??
+        return effect(prereq); // yield??
     }
 
     // TODO maybe override boardSeq stuff since it's not needed?
@@ -92,13 +94,13 @@ public class SignatureSpell : Spell {
 
     public int meterCost;
 
-    public SignatureSpell(int index, string name, string seq, int APcost, int meterCost, MySpellEffect effect) : base(index, name, seq, APcost, effect) {
+    public SignatureSpell(int index, string name, string seq, MySpellEffect effect, int APcost = 1, int meterCost = 100) : base(index, name, seq, effect, APcost) {
         this.meterCost = meterCost;
     }
 
     public bool IsReadyToCast() {
         MMLog.Log("SIGSPELL", "black", "Checking " + mm.ActiveP().name + "'s sig spell.");
-        return mm.ActiveP().character.meter >= meterCost;
+        return mm.ActiveP().character.GetMeter() >= meterCost;
     }
 }
 
@@ -106,20 +108,11 @@ public class SignatureSpell : Spell {
 
 public class CoreSpell : Spell {
 
-    public delegate IEnumerator CoreSpellEffect(TileSeq seq);
-
     public Tile.Element currentElem = Tile.Element.None;
 
-    private CoreSpellEffect coreEffect;
-
-    public CoreSpell(int index, string name, int APcost, CoreSpellEffect coreEffect) 
-        :base(index, name, APcost, null) {
-        this.coreEffect = coreEffect;
+    public CoreSpell(int index, string name, MySpellEffect effect, int APcost = 1) 
+        : base(index, name, effect, APcost) {
         seq = new TileSeq(); // empty seq...be wary of errors...
-    }
-
-    public IEnumerator CastCore(TileSeq seq) { // not a huge fan of this
-        return coreEffect(seq); // yield?
     }
 
     public override int GetLength() {

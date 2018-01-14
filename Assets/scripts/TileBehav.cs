@@ -32,12 +32,12 @@ public class TileBehav : Hex, Tooltipable {
 
     // startrow needed??
 	public void ChangePos(int startRow, int col, int row, float duration){
-		StartCoroutine(_ChangePos(startRow, col, row, duration, "x"));
+		StartCoroutine(_ChangePos(startRow, col, row, duration));
 	}
 
-	public IEnumerator _ChangePos(int startRow, int col, int row, float duration, string anim){
+	public IEnumerator _ChangePos(int startRow, int col, int row, float duration, string anim = ""){
 		tile.SetPos(col, row);
-		mm.hexGrid.SetTileBehavAt (this, col, row);
+		mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
 		inPos = false;
 
         switch (anim) { // not great, but simple...
@@ -49,7 +49,7 @@ public class TileBehav : Hex, Tooltipable {
                 break;
         }
 
-		mm.audioCont.DropSound(GetComponent<AudioSource>());
+		//mm.audioCont.DropSound(GetComponent<AudioSource>());
 		inPos = true;
 	}
 

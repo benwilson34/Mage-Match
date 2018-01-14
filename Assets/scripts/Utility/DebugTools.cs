@@ -15,7 +15,6 @@ public class DebugTools : MonoBehaviour {
     private InputField input;
     private Button b_healthMode, b_player, b_ok;
 
-    private int id;
     private int playerId = 1;
     private bool relativeDmgMode = true;
 
@@ -23,7 +22,6 @@ public class DebugTools : MonoBehaviour {
 
 	public void Init (MageMatch mm) {
         this.mm = mm;
-        this.id = mm.myID;
 
         toolsMenu = GameObject.Find("toolsMenu");
         Transform t = toolsMenu.transform;
@@ -199,7 +197,7 @@ public class DebugTools : MonoBehaviour {
     void InsertMode_OnClick(CellBehav cb) {
         TileBehav insertTB = (TileBehav) mm.tileMan.GenerateHex(mm.ActiveP().id, GetHexGenTag(1));
         mm.PutTile(insertTB, cb.col, cb.row);
-        insertTB.HardSetPos(cb.col, cb.row);
+        //insertTB.HardSetPos(cb.col, cb.row);
     }
 
     void DestroyMode_OnClick(TileBehav tb) {
@@ -211,7 +209,7 @@ public class DebugTools : MonoBehaviour {
         string option = dd_enchant.options[dd_enchant.value].text;
         switch (option) {
             case "Burning":
-                StartCoroutine(mm.hexFX.Ench_SetBurning(id, tb));
+                StartCoroutine(mm.hexFX.Ench_SetBurning(playerId, tb));
                 break;
             //case "Cherrybomb":
             //    StartCoroutine(mm.hexFX.Ench_SetCherrybomb(id, tb));
@@ -220,7 +218,8 @@ public class DebugTools : MonoBehaviour {
             //    mm.hexFX.Ench_SetStone(tb);
             //    break;
             case "Zombify":
-                StartCoroutine(mm.hexFX.Ench_SetZombify(id, tb, false));
+                MMLog.Log("DebugTools", "orange", "calling enchant, id=" + playerId);
+                StartCoroutine(mm.hexFX.Ench_SetZombify(playerId, tb, false));
                 break;
         }
     }

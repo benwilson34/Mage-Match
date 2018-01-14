@@ -123,7 +123,7 @@ public class Player {
 
         health += amount;
         health = Mathf.Clamp(health, 0, character.GetMaxHealth()); // clamp amount before event
-        mm.eventCont.PlayerHealthChange(id, amount, dealt);
+        mm.eventCont.PlayerHealthChange(id, amount, health, dealt);
 
         if (health == 0)
             mm.EndTheGame();
@@ -150,9 +150,12 @@ public class Player {
                 hex.Flip();
 
             hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
-            hand.Add(hex);
 
-            yield return mm.eventCont.Draw(id, hex.tag, playerAction, dealt);
+
+            yield return mm.eventCont.Draw(EventController.Status.Begin, id, hex.tag, playerAction, dealt);
+            hand.Add(hex);
+            yield return mm.eventCont.Draw(EventController.Status.End, id, hex.tag, playerAction, dealt);
+
             if (playerAction)
                 mm.eventCont.GameAction(true); //?
         }
@@ -171,6 +174,7 @@ public class Player {
     public IEnumerator Discard(Hex hex) {
         mm.eventCont.Discard(id, hex.tag);
 
+        mm.audioCont.HexDiscard();
         yield return mm.animCont._DiscardTile(hex.transform);
         hand.Remove(hex);
         GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan
@@ -195,13 +199,17 @@ public class Player {
     }
 
     public void ApplySpellCosts() {
-        MMLog.Log_Player("Applying AP cost...which is " + currentSpell.APcost);
-        AP -= currentSpell.APcost;
+        if (mm.IsDebugMode() && mm.debugSettings.applyAPcost) {
+            MMLog.Log_Player("Applying AP cost...which is " + currentSpell.APcost);
+            AP -= currentSpell.APcost;
+        }
+
         if (currentSpell is SignatureSpell) {
             int meterCost = ((SignatureSpell)currentSpell).meterCost;
             MMLog.Log_Player("Applying meter cost...which is " + meterCost);
             character.ChangeMeter(-meterCost);
         }
+
         mm.eventCont.GameAction(false);
     }
 }

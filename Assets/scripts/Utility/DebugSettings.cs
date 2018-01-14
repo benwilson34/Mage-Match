@@ -9,8 +9,5 @@ public class DebugSettings : MonoBehaviour {
     void Start () {
         DontDestroyOnLoad(this);
 	}
-	
-	void Update () {
-		
-	}
+
 }

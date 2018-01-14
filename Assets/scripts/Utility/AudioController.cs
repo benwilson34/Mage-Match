@@ -6,218 +6,169 @@ public class AudioController {
     private MageMatch mm;
 
     private AudioSource source;
-	private AudioClip[] grab, match, swap_Fire, swap_Water, swap_Earth, swap_Air, swap_Muscle,
-                        drop_Fire, drop_Water, drop_Earth, drop_Air, drop_Muscle;
+    private AudioClip gameStart, gameEnd, hexDraw, hexDiscard, hexPickup;
+    private AudioClip[] tileGravityClick, tileSwap, tileDestroy, tileInvoke;
+    private AudioClip enchantZombie, enchantBurning, apGain, lowHealthWarning;
+    private AudioClip fullMeter, turnTimerWarning, turnTimeout, uiButton;
+    private AudioClip chooseTarget, deselectTarget;
 
-	public AudioController(MageMatch mm){
-		source = GameObject.Find ("board").GetComponent<AudioSource> ();
+    public AudioController(MageMatch mm) {
+        source = GameObject.Find("board").GetComponent<AudioSource>();
         this.mm = mm;
 
-		AudioListener.volume = .6f;
+        AudioListener.volume = .6f;
 
-		grab = new AudioClip[5];
-		grab[0] = (AudioClip)Resources.Load ("sounds/grab_01");
-		grab[1] = (AudioClip)Resources.Load ("sounds/grab_02");
-		grab[2] = (AudioClip)Resources.Load ("sounds/grab_03");
-		grab[3] = (AudioClip)Resources.Load ("sounds/grab_04");
-		grab[4] = (AudioClip)Resources.Load ("sounds/grab_05");
+        gameStart = (AudioClip)Resources.Load("sounds/GameStart/Game Start 5");
+        gameEnd = (AudioClip)Resources.Load("sounds/GameEnd/Game WIn");
 
-		match = new AudioClip[5];
-		match[0] = (AudioClip)Resources.Load ("sounds/match_01");
-		match[1] = (AudioClip)Resources.Load ("sounds/match_02");
-		match[2] = (AudioClip)Resources.Load ("sounds/match_03");
-		match[3] = (AudioClip)Resources.Load ("sounds/match_04");
-		match[4] = (AudioClip)Resources.Load ("sounds/match_05");
+        hexDraw = (AudioClip)Resources.Load("sounds/HexDraw/Draw High-6");
+        hexDiscard = (AudioClip)Resources.Load("sounds/HexDiscard/Discard High-5");
+        hexPickup = (AudioClip)Resources.Load("sounds/HexPickup/BoardClickEdit2");
 
-        //TODO populate with new elemental soundfx ***Make sure to add files to resources folder!***
-        swap_Fire = new AudioClip[3];
-        swap_Fire[0] = (AudioClip)Resources.Load("sounds/swap_fire_01");
-        swap_Fire[1] = (AudioClip)Resources.Load("sounds/swap_fire_02");
-        swap_Fire[2] = (AudioClip)Resources.Load("sounds/swap_fire_03");
+        tileGravityClick = new AudioClip[3];
+        tileGravityClick[0] = (AudioClip)Resources.Load("sounds/TileGravityClick/BoardClickEdit1");
+        tileGravityClick[1] = (AudioClip)Resources.Load("sounds/TileGravityClick/BoardClickEdit2");
+        tileGravityClick[2] = (AudioClip)Resources.Load("sounds/TileGravityClick/BoardClickEdit3");
 
-        swap_Water = new AudioClip[3];
-        swap_Water[0] = (AudioClip)Resources.Load("sounds/swap_water_01");
-        swap_Water[1] = (AudioClip)Resources.Load("sounds/swap_water_02");
-        swap_Water[2] = (AudioClip)Resources.Load("sounds/swap_water_03");
+        tileSwap = new AudioClip[2];
+        tileSwap[0] = (AudioClip)Resources.Load("sounds/TileSwap/SwapWhoosh1");
+        tileSwap[1] = (AudioClip)Resources.Load("sounds/TileSwap/SwapWhoosh2");
 
-        swap_Earth = new AudioClip[3];
-        swap_Earth[0] = (AudioClip)Resources.Load("sounds/swap_earth_01");
-        swap_Earth[1] = (AudioClip)Resources.Load("sounds/swap_earth_02");
-        swap_Earth[2] = (AudioClip)Resources.Load("sounds/swap_earth_03");
+        tileDestroy = new AudioClip[2];
+        tileDestroy[0] = (AudioClip)Resources.Load("sounds/TileDestroy/TileDestroy1");
+        tileDestroy[1] = (AudioClip)Resources.Load("sounds/TileDestroy/TileDestroy2");
 
-        swap_Air = new AudioClip[4];
-        swap_Air[0] = (AudioClip)Resources.Load("sounds/air_01");
-        swap_Air[1] = (AudioClip)Resources.Load("sounds/air_02");
-        swap_Air[2] = (AudioClip)Resources.Load("sounds/air_03");
-        swap_Air[3] = (AudioClip)Resources.Load("sounds/air_04");
+        tileInvoke = new AudioClip[3];
+        tileInvoke[0] = (AudioClip)Resources.Load("sounds/TileInvoke/match_02");
+        tileInvoke[1] = (AudioClip)Resources.Load("sounds/TileInvoke/match_03");
+        tileInvoke[2] = (AudioClip)Resources.Load("sounds/TileInvoke/match_04");
 
-        swap_Muscle = new AudioClip[3];
-        swap_Muscle[0] = (AudioClip)Resources.Load("sounds/swap_muscle_01");
-        swap_Muscle[1] = (AudioClip)Resources.Load("sounds/swap_muscle_02");
-        swap_Muscle[2] = (AudioClip)Resources.Load("sounds/swap_muscle_03");
+        enchantZombie = (AudioClip)Resources.Load("sounds/Enchant/EnchantZombie");
+        enchantBurning = (AudioClip)Resources.Load("sounds/Enchant/EnchantBurning");
 
-        drop_Fire = new AudioClip[3];
-        drop_Fire[0] = (AudioClip)Resources.Load("sounds/drop_fire_01");
-        drop_Fire[1] = (AudioClip)Resources.Load("sounds/drop_fire_02");
-        drop_Fire[2] = (AudioClip)Resources.Load("sounds/drop_fire_03");
+        apGain = (AudioClip)Resources.Load("sounds/APGain/AP Gain Sound-4");
 
-        drop_Water = new AudioClip[3];
-        drop_Water[0] = (AudioClip)Resources.Load("sounds/drop_water_01");
-        drop_Water[1] = (AudioClip)Resources.Load("sounds/drop_water_02");
-        drop_Water[2] = (AudioClip)Resources.Load("sounds/drop_water_03");
+        lowHealthWarning = (AudioClip)Resources.Load("sounds/LowHealthWarning/LowHealthWarning");
 
-        drop_Earth = new AudioClip[3];
-        drop_Earth[0] = (AudioClip)Resources.Load("sounds/drop_earth_01");
-        drop_Earth[1] = (AudioClip)Resources.Load("sounds/drop_earth_02");
-        drop_Earth[2] = (AudioClip)Resources.Load("sounds/drop_earth_03");
+        fullMeter = (AudioClip)Resources.Load("sounds/FullMeter/Sig meter sound");
 
-        drop_Air = new AudioClip[4];
-        drop_Air[0] = (AudioClip)Resources.Load("sounds/air_01");
-        drop_Air[1] = (AudioClip)Resources.Load("sounds/air_02");
-        drop_Air[2] = (AudioClip)Resources.Load("sounds/air_03");
-        drop_Air[3] = (AudioClip)Resources.Load("sounds/air_04");
+        turnTimerWarning = (AudioClip)Resources.Load("sounds/TurnTimer/TurnTimerWarning");
+        turnTimeout = (AudioClip)Resources.Load("sounds/TurnTimer/TurnTimeout2");
 
-        drop_Muscle = new AudioClip[3];
-        drop_Muscle[0] = (AudioClip)Resources.Load("sounds/drop_muslce_01");
-        drop_Muscle[1] = (AudioClip)Resources.Load("sounds/drop_muscle_02");
-        drop_Muscle[2] = (AudioClip)Resources.Load("sounds/drop_muscle_03");
+        uiButton = (AudioClip)Resources.Load("sounds/UI/General Button sound C 2");
+        chooseTarget = (AudioClip)Resources.Load("sounds/UI/Electronic Open Close 4");
+        deselectTarget = (AudioClip)Resources.Load("sounds/UI/Electronic Open Close 4-1");
+
+
+        GameStart();
     }
 
     public void InitEvents(){
-        //mm.eventCont.drop += onDrop;
-        mm.eventCont.grabTile += OnGrab;
-        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Audio);
-        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Audio);
-        //mm.eventCont.match += onMatch;
+        mm.eventCont.grabTile += HexPickup;
+        mm.eventCont.playerHealthChange += LowHealthWarning;
+        mm.eventCont.timeout += TurnTimeout;
     }
 
-    public void DropSound(AudioSource source) {
-        source.clip = drop_Earth[Random.Range(0, drop_Earth.Length)]; //This should be its own event?
+
+    public void GameStart() {
+        source.clip = gameStart;
         source.Play();
     }
 
-    //public void OnDrop(int id, Tile.Element elem, int col) {
-    //    AudioClip clip = null;
-    //    switch (elem) {
-    //        case Tile.Element.Fire:
-    //            clip = drop_Fire[Random.Range(0, drop_Fire.Length)];
-    //            break;
-    //        case Tile.Element.Water:
-    //            clip = drop_Water[Random.Range(0, drop_Water.Length)];
-    //            break;
-    //        case Tile.Element.Earth:
-    //            clip = drop_Earth[Random.Range(0, drop_Earth.Length)];
-    //            break;
-    //        case Tile.Element.Air:
-    //            clip = drop_Air[Random.Range(0, drop_Air.Length)];
-    //            break;
-    //        case Tile.Element.Muscle:
-    //            clip = drop_Muscle[Random.Range(0, drop_Muscle.Length)];
-    //            break;
-    //    }
-    //    GameObject go = mm.ActiveP().GetTileFromHand(elem);
-    //    AudioSource source = go.GetComponent<AudioSource>();
+    public void GameEnd() {
+        source.clip = gameEnd;
+        source.Play();
+    }
 
-    //    source.clip = clip;
-    //    source.Play();
-    //}
+    public void HexDraw(AudioSource source) {
+        source.clip = hexDraw;
+        source.Play();
+    }
 
-    public void OnGrab(int id, string tag) {
-        AudioClip clip = null;
-        // TODO get sounds for "colorless" and consumables
-        string type = Hex.TagType(tag);
-        switch (type) {
-            case "F":
-                clip = grab[0];
-                break;
-            case "W":
-                clip = grab[1];
-                break;
-            case "E":
-                clip = grab[2];
-                break;
-            case "A":
-                clip = grab[3];
-                break;
-            case "M":
-                clip = grab[4];
-                break;
-        }
+    public void HexDiscard() {
+        source.clip = hexDiscard;
+        source.Play();
+    }
+
+    public void HexPickup(int id, string tag) {
         Hex hex = mm.GetPlayer(id).hand.GetHex(tag);
         AudioSource source = hex.GetComponent<AudioSource>();
-
-        source.clip = clip;
+        source.clip = hexPickup;
         source.Play();
     }
 
-    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
-        OnGrab(id, tag);
-        yield return null;
+    public void TileGravityClick(AudioSource source) {
+        source.clip = tileGravityClick[Random.Range(0, tileGravityClick.Length)];
+        source.Play();
     }
 
-    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        TileBehav tb = mm.hexGrid.GetTileBehavAt(c1, r1);
-        Tile.Element elem = tb.tile.element;
-        AudioClip clip = null;
-        switch (elem) {
-            case Tile.Element.Fire:
-                clip = swap_Fire[Random.Range(0, swap_Fire.Length)];
-                break;
-            case Tile.Element.Water:
-                clip = swap_Water[Random.Range(0, swap_Water.Length)];
-                break;
-            case Tile.Element.Earth:
-                clip = swap_Earth[Random.Range(0, swap_Earth.Length)];
-                break;
-            case Tile.Element.Air:
-                clip = swap_Air[Random.Range(0, swap_Air.Length)];
-                break;
-            case Tile.Element.Muscle:
-                clip = swap_Muscle[Random.Range(0, swap_Muscle.Length)];
-                break;
+    public void TileSwap(AudioSource source) {
+        source.clip = tileSwap[Random.Range(0, tileSwap.Length)]; ;
+        source.Play();
+    }
+
+    public void TileDestroy() {
+        source.clip = tileDestroy[Random.Range(0, tileDestroy.Length)];
+        source.Play();
+    }
+
+    public void TileInvoke() {
+        source.clip = tileInvoke[Random.Range(0, tileInvoke.Length)];
+        source.Play();
+    }
+
+    public void EnchantZombie(AudioSource source) {
+        source.clip = enchantZombie;
+        source.Play();
+    }
+
+    public void EnchantBurning(AudioSource source) {
+        source.clip = enchantBurning;
+        source.Play();
+    }
+
+    // not needed currently
+    public void APGain() {
+        source.clip = apGain;
+        source.Play();
+    }
+
+    public void LowHealthWarning(int id, int amount, int newHealth, bool dealt) {
+        if (amount < 0 &&
+                newHealth + (-amount) >= Character.HEALTH_WARNING_AMT &&
+                newHealth < Character.HEALTH_WARNING_AMT) {
+            source.clip = lowHealthWarning;
+            source.Play();
         }
-        AudioSource source = tb.GetComponent<AudioSource>();
-
-        source.clip = clip;
-        source.Play();
-        yield return null;
     }
 
-	public void BreakSound(){
-		source.clip = match [Random.Range (0, 5)];
-		source.Play ();
-	}
+    public void FullMeter() {
+        source.clip = fullMeter;
+        source.Play();
+    }
 
-    // still need a way of getting an audiosource...
-    public void OnMatch(int id, string[] seqs) {
-        AudioClip clip = null;
-        Tile.Element elem = Tile.CharToElement(seqs[0][0]); // get the first char of the first seq
+    public void TurnTimerWarning() {
+        source.clip = turnTimerWarning;
+        source.Play();
+    }
 
-        //switch (elem) {
-        //    case Tile.Element.Fire:
-        //        clip = match_Fire [Random.Range (0,match_Fire.Length)]
-        //        break;
-        //    case Tile.Element.Water:
-        //        clip = match_Water[Random.Range(0, match_Water.Length)]
-        //        break;
-        //    case Tile.Element.Earth:
-        //        clip = match_Earth[Random.Range(0, match_Earth.Length)]
-        //        break;
-        //    case Tile.Element.Air:
-        //        clip = match_Air[Random.Range(0, match_Air.Length)]
-        //        break;
-        //    case Tile.Element.Muscle:
-        //        clip = match_Muscle[Random.Range(0, match_Muscle.Length)]
-        //        break;
-        //}
+    public void TurnTimeout(int id) {
+        source.clip = turnTimeout;
+        source.Play();
+    }
 
+    public void UIClick() {
+        source.clip = uiButton;
+        source.Play();
+    }
 
-        // TODO this won't work...how to get the tile? maybe there should just be an audio object with a few AudioSources for everything to use?
-        GameObject go = mm.ActiveP().hand.GetTile(elem);
+    public void ChooseTargets() {
+        source.clip = chooseTarget;
+        source.Play();
+    }
 
-        AudioSource source = go.GetComponent<AudioSource>();
-
-        source.clip = clip;
+    public void TargetDeselectedSound() {
+        source.clip = deselectTarget;
         source.Play();
     }
 }

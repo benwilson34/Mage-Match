@@ -88,14 +88,14 @@
     <Reference Include="DOTween50">
       <HintPath>Assets\Demigiant\DOTween\DOTween50.dll</HintPath>
     </Reference>
-    <Reference Include="MMDebug">
-      <HintPath>Assets\Plugins\MMDebug.dll</HintPath>
-    </Reference>
     <Reference Include="Photon3Unity3D">
       <HintPath>Assets\Plugins\Photon3Unity3D.dll</HintPath>
     </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>Assets\Plugins\WebSocket\websocket-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MMDebug">
+      <HintPath>Assets\Plugins\MMDebug.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -199,13 +199,13 @@
     <Compile Include="Assets\scripts\Commish.cs" />
     <Compile Include="Assets\scripts\Db.cs" />
     <Compile Include="Assets\scripts\Effect.cs" />
-    <Compile Include="Assets\scripts\Hand Objects\Hex.cs" />
-    <Compile Include="Assets\scripts\Hand Objects\ObjectEffects.cs" />
-    <Compile Include="Assets\scripts\Hand Objects\StoneToken.cs" />
-    <Compile Include="Assets\scripts\Hand Objects\TombstoneToken.cs" />
     <Compile Include="Assets\scripts\Hand.cs" />
     <Compile Include="Assets\scripts\HandSlot.cs" />
     <Compile Include="Assets\scripts\HexGrid.cs" />
+    <Compile Include="Assets\scripts\Hexes\Hex.cs" />
+    <Compile Include="Assets\scripts\Hexes\ObjectEffects.cs" />
+    <Compile Include="Assets\scripts\Hexes\StoneToken.cs" />
+    <Compile Include="Assets\scripts\Hexes\TombstoneToken.cs" />
     <Compile Include="Assets\scripts\MageMatch.cs" />
     <Compile Include="Assets\scripts\Menu\CharacterInfo.cs" />
     <Compile Include="Assets\scripts\Menu\CharacterSelect.cs" />
@@ -214,6 +214,7 @@
     <Compile Include="Assets\scripts\Menu\Menu.cs" />
     <Compile Include="Assets\scripts\Menu\RoomSettings.cs" />
     <Compile Include="Assets\scripts\Menu\UpdateValue.cs" />
+    <Compile Include="Assets\scripts\Newsfeed.cs" />
     <Compile Include="Assets\scripts\PUN\GameManager.cs" />
     <Compile Include="Assets\scripts\PUN\GameSettings.cs" />
     <Compile Include="Assets\scripts\PUN\Launcher.cs" />
@@ -237,10 +238,10 @@
     <Compile Include="Assets\scripts\Utility\DebugTools.cs" />
     <Compile Include="Assets\scripts\Utility\EffectController.cs" />
     <Compile Include="Assets\scripts\Utility\EventController.cs" />
+    <Compile Include="Assets\scripts\Utility\HexManager.cs" />
     <Compile Include="Assets\scripts\Utility\InputController.cs" />
     <Compile Include="Assets\scripts\Utility\Prompt.cs" />
     <Compile Include="Assets\scripts\Utility\Targeting.cs" />
-    <Compile Include="Assets\scripts\Utility\TileManager.cs" />
     <Compile Include="Assets\scripts\Utility\TurnTimer.cs" />
     <Compile Include="Assets\scripts\Utility\UIController.cs" />
   </ItemGroup>
