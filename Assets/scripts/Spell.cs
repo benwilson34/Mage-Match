@@ -36,12 +36,14 @@ public class Spell {
     }
 
     void SymmetryCheck(string seq) {
-        string first = seq.Substring(0, seq.Length / 2);
         char[] arr = seq.ToCharArray();
         Array.Reverse(arr);
-        string temp = new string(arr);
-        string second = temp.Substring(0, temp.Length / 2);
-        isSymmetric = first.Equals(second);
+        string reverse = new string(arr);
+        isSymmetric = seq.Equals(reverse); // same forward and backward
+        MMLog.Log("SPELL", "green", "Spell " + index + "...checking "+seq+" and "+reverse);
+
+        if (isSymmetric)
+            MMLog.Log("SPELL", "green", "Spell " + index + " is symmetric!");
     }
 
     public virtual IEnumerator Cast(TileSeq prereq){
@@ -94,7 +96,7 @@ public class SignatureSpell : Spell {
 
     public int meterCost;
 
-    public SignatureSpell(int index, string name, string seq, MySpellEffect effect, int APcost = 1, int meterCost = 100) : base(index, name, seq, effect, APcost) {
+    public SignatureSpell(int index, string name, string seq, MySpellEffect effect, int APcost = 1, int meterCost = 1000) : base(index, name, seq, effect, APcost) {
         this.meterCost = meterCost;
     }
 

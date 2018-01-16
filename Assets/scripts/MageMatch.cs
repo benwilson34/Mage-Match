@@ -149,7 +149,7 @@ public class MageMatch : MonoBehaviour {
         EventContLoaded();
 
         eventCont.boardAction += OnBoardAction;
-        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction, EventController.Status.Begin); // checking
+        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction, EventController.Status.End); // checking
         eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction, EventController.Status.End); // checking
         eventCont.gameAction += OnGameAction;
         eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.GameAction); // checking
@@ -362,8 +362,8 @@ public class MageMatch : MonoBehaviour {
                     continue;
                 }
 
-                //for (int i = 0; i < spellsOnBoard.Length; i++) {
-                    //MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
+            //for (int i = 0; i < spellsOnBoard.Length; i++) {
+                    MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
                     if (spellsOnBoard[s].Count > 0)
                         uiCont.ActivateSpellButton(s);
                     else

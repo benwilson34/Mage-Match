@@ -47,7 +47,7 @@ public class Enfuego : Character {
 
     public IEnumerator Enf_Swap(int id, int c1, int r1, int c2, int r2) {
         if(swapsThisTurn > 0)
-            ThisPlayer().DealDamage(swapsThisTurn * 4);
+            ThisPlayer().DealDamage(swapsThisTurn * 5);
 
         swapsThisTurn++;
         MMLog.Log_Enfuego("Incrementing swaps to " + swapsThisTurn);
@@ -65,11 +65,6 @@ public class Enfuego : Character {
     //    return swapsThisTurn * 4;
     //}
 
-    public IEnumerator DoNothing(TileSeq prereq) {
-        mm.uiCont.SendSlidingText("This spell does nothing. Thanks!");
-        yield return null;
-    }
-
     public IEnumerator DragSample(TileSeq prereq) {
         yield return targeting.WaitForDragTarget(4);
 
@@ -79,44 +74,8 @@ public class Enfuego : Character {
     }
     // TODO sample filter???
 
-    // ----- spells -----
 
-    // Signature
-    public IEnumerator WhiteHotComboKick(TileSeq prereq) {
-        yield return targeting.WaitForTileTarget(3);
-
-        List<TileBehav> tbs = targeting.GetTargetTBs();
-
-        foreach (TileBehav tb in tbs) {
-            mm.ActiveP().DealDamage(70);
-
-            if (tb.tile.element.Equals(Tile.Element.Fire)) { // spread Burning to 4 nearby
-                List<TileBehav> ctbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-                for (int i = 0; i < ctbs.Count; i++) {
-                    TileBehav ctb = ctbs[i];
-                    if (!ctb.CanSetEnch(Enchantment.EnchType.Burning)) {
-                        ctbs.RemoveAt(i);
-                        i--;
-                    }
-                }
-
-                int burns = Mathf.Min(4, ctbs.Count);
-                for (int i = 0; i < burns; i++) {
-                    MMLog.Log_Enfuego("WHCK count=" + burns);
-                    yield return mm.syncManager.SyncRand(playerId, Random.Range(0, ctbs.Count));
-                    int index = mm.syncManager.GetRand();
-                    TileBehav ctb = ctbs[index];
-                    ctbs.RemoveAt(index);
-                    MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
-                    mm.StartCoroutine(objFX.Ench_SetBurning(playerId, ctb)); // yield return?
-                }
-            } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
-                yield return mm.InactiveP().DiscardRandom(1);
-            }
-
-            mm.tileMan.RemoveTile(tb.tile, true);
-        }
-    }
+    // -----  SPELLS  -----
 
     // Core
     public IEnumerator FieryFandango(TileSeq seq) {
@@ -171,18 +130,18 @@ public class Enfuego : Character {
             yield return mm.prompt.ContinueSwap();
     }
 
-    // TODO new effect
     public IEnumerator Incinerate(TileSeq prereq) {
-        yield return targeting.WaitForDragTarget(6);
+        yield return targeting.WaitForDragTarget(6, Inc_Filter);
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
+        int dmg = tbs.Count * 35;
         foreach (TileBehav tb in tbs) {
-            MMLog.Log_Enfuego("Enchanting tile at " + tb.PrintCoord());
-            yield return objFX.Ench_SetBurning(playerId, tb);
-            //yield return new WaitForSeconds(.2f);
+            MMLog.Log_Enfuego("Destroying tile at " + tb.PrintCoord());
+            mm.tileMan.RemoveTile(tb.tile, false);
+            yield return new WaitForSeconds(.15f);
         }
 
-        yield return mm.InactiveP().DiscardRandom(2); 
+        ThisPlayer().DealDamage(dmg);
     }
     public List<TileBehav> Inc_Filter(List<TileBehav> tbs) {
         List<TileBehav> filterTBs = new List<TileBehav>();
@@ -204,6 +163,52 @@ public class Enfuego : Character {
     public float HotPot_Buff(Player p, int dmg) {
         MMLog.Log_Enfuego("Hot Potato debuff on " + p.name + ", handcount=" + p.hand.Count());
         return p.hand.Count() * 3;
+    }
+
+
+    // Signature
+    public IEnumerator WhiteHotComboKick(TileSeq prereq) {
+        yield return targeting.WaitForTileTarget(3);
+
+        List<TileBehav> tbs = targeting.GetTargetTBs();
+
+        foreach (TileBehav tb in tbs) {
+            mm.ActiveP().DealDamage(70);
+
+            if (tb.tile.element.Equals(Tile.Element.Fire)) { // spread Burning to 4 nearby
+                List<TileBehav> ctbs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+                for (int i = 0; i < ctbs.Count; i++) {
+                    TileBehav ctb = ctbs[i];
+                    bool remove = false;
+                    for (int j = 0; j < tbs.Count; j++) { // don't try to enchant other targets
+                        if (ctb.tile.HasSamePos(tbs[j].tile)) {
+                            remove = true;
+                            break;
+                        }
+                    }
+
+                    if (remove || !ctb.CanSetEnch(Enchantment.EnchType.Burning)) {
+                        ctbs.RemoveAt(i);
+                        i--;
+                    }
+                }
+
+                int burns = Mathf.Min(4, ctbs.Count);
+                for (int i = 0; i < burns; i++) {
+                    MMLog.Log_Enfuego("WHCK count=" + burns);
+                    yield return mm.syncManager.SyncRand(playerId, Random.Range(0, ctbs.Count));
+                    int index = mm.syncManager.GetRand();
+                    TileBehav ctb = ctbs[index];
+                    ctbs.RemoveAt(index);
+                    MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
+                    mm.StartCoroutine(objFX.Ench_SetBurning(playerId, ctb)); // yield return?
+                }
+            } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
+                yield return mm.InactiveP().DiscardRandom(1);
+            }
+
+            mm.tileMan.RemoveTile(tb.tile, true);
+        }
     }
 
     //public IEnumerator Backburner() {
