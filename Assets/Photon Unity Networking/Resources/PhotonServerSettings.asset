@@ -78,4 +78,7 @@ MonoBehaviour:
   - HandleSwapSelection
   - SetChar
   - HandleCheckHandContents
+  - OpponentCharacterChosen
+  - OpponentLocked
+  - SyncSettings
   DisableAutoOpenWizard: 1

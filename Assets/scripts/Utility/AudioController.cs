@@ -20,8 +20,7 @@ public class AudioController {
     public AudioController(MageMatch mm) {
         source = GameObject.Find("board").GetComponent<AudioSource>();
         this.mm = mm;
-        isMidiMode = mm.debugSettings.midiMode;
-        if (isMidiMode)
+        if (mm.IsDebugMode() && mm.debugSettings.midiMode)
             InitMIDI();
 
         AudioListener.volume = .6f;

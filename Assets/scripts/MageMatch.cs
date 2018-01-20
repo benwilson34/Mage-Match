@@ -77,7 +77,7 @@ public class MageMatch : MonoBehaviour {
     public IEnumerator Reset() {
         tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
         gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
-        MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
+        MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name + ",p1 char=" + gameSettings.p1char + ",p2="+gameSettings.p2name+",p2 char=" + gameSettings.p2char+",timer=" +gameSettings.turnTimerOn);
 
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
