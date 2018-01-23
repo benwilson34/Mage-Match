@@ -174,7 +174,7 @@ public class EventController {
     public IEnumerator Drop(Status status, bool playerAction, string tag, int col) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in drop) {
-            //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
+            MMLog.Log_EventCont("EVENTCONT: going thru drop event with type " + pack.type);
             if (pack.status == status)
                 yield return ((DropEvent)pack.ev)(mm.ActiveP().id, playerAction, tag, col); // OHYEAH
         }

@@ -1067,16 +1067,6 @@ Prefab:
       propertyPath: m_Name
       value: gameSettings
       objectReference: {fileID: 0}
-    - target: {fileID: 114966316800126466, guid: fec87ec786eefb04aad755c6be1056af,
-        type: 2}
-      propertyPath: viewIdField
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114966316800126466, guid: fec87ec786eefb04aad755c6be1056af,
-        type: 2}
-      propertyPath: instantiationId
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fec87ec786eefb04aad755c6be1056af, type: 2}
   m_IsPrefabParent: 0
@@ -1527,6 +1517,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2129229101}
   - component: {fileID: 2129229100}
+  - component: {fileID: 2129229102}
   m_Layer: 0
   m_Name: Launcher
   m_TagString: Untagged
@@ -1559,3 +1550,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2129229102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2129229099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  OwnerShipWasTransfered: 0
+  prefixBackup: -1
+  synchronization: 0
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 0}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 2
+  instantiationId: 2
+  currentMasterID: -1
+  isRuntimeInstantiated: 0

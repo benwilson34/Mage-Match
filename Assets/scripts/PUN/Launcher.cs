@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -11,7 +12,9 @@ namespace Com.SoupSkull.MageMatch {
         private GameObject controlPanel, progressLabel, toggles;
         private Text progText;
         private RoomSettings rs;
-        private GameObject nameInput;
+        private InputField nameInput;
+
+        private bool nameSet = false;
 
         void Awake() {
             rs = GameObject.Find("roomSettings").GetComponent<RoomSettings>();
@@ -27,7 +30,7 @@ namespace Com.SoupSkull.MageMatch {
             progressLabel = GameObject.Find("Progress Label");
             toggles = GameObject.Find("Toggles");
             progText = progressLabel.GetComponent<Text>();
-            nameInput = GameObject.Find("input_Name");
+            nameInput = GameObject.Find("input_Name").GetComponent<InputField>();
         }
 
         void Start() {
@@ -120,12 +123,57 @@ namespace Com.SoupSkull.MageMatch {
         public override void OnPhotonPlayerConnected(PhotonPlayer other) {
             Debug.Log("OnPhotonPlayerConnected() " + other.NickName); // not seen if you're the player connecting
             if (PhotonNetwork.isMasterClient && PhotonNetwork.room.PlayerCount == 2) {
-                PhotonView view = GameObject.Find("GameSettings").GetComponent<PhotonView>();
-                view.RPC("PutSettings", PhotonTargets.All);
+                PhotonView view = PhotonView.Get(this);
+                view.RPC("SyncSettings", PhotonTargets.All);
 
                 //Debug.Log("OnPhotonPlayerConnected isMasterClient " + PhotonNetwork.isMasterClient); // called before OnPhotonPlayerDisconnected
                 //PhotonNetwork.LoadLevel("Game Screen (Landscape)");
             }
+        }
+
+        [PunRPC]
+        public void SyncSettings() { StartCoroutine(Settings()); }
+        public IEnumerator Settings() {
+            int id = PhotonNetwork.player.ID;
+            string pName = nameInput.text;
+            PhotonView photonView = PhotonView.Get(this);
+
+            GameSettings gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
+            Debug.Log("id=" + id + ", name=" + pName);
+
+            photonView.RPC("SetPlayerName", PhotonTargets.Others, id, pName);
+
+            if (id == 1) {
+                gameSettings.p1name = pName;
+
+                if (toggles != null)
+                    gameSettings.turnTimerOn = toggles.transform.Find("Toggle_TurnTimer").GetComponent<Toggle>().isOn;
+                else
+                    gameSettings.turnTimerOn = false; // not really needed?
+
+                photonView.RPC("SetToggles", PhotonTargets.Others, gameSettings.turnTimerOn);
+
+                // warn that the toggle RPC might outrun this "callback"...
+                yield return new WaitUntil(() => nameSet); // wait for RPC
+
+                LoadGameScreen();
+            } else {
+                gameSettings.p2name = pName;
+            }
+        }
+
+        [PunRPC]
+        public void SetPlayerName(int id, string pName) {
+            GameSettings gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
+            gameSettings.SetPlayerName(id, pName);
+            nameSet = true;
+        }
+
+        [PunRPC]
+        public void SetToggles(bool turnTimerOn) {
+            //Debug.Log("GAMESETTINGS: SetTurnTimer to " + b);
+            GameSettings gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
+            gameSettings.turnTimerOn = turnTimerOn;
         }
 
         public void LoadGameScreen() {

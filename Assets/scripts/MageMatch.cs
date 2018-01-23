@@ -77,7 +77,7 @@ public class MageMatch : MonoBehaviour {
     public IEnumerator Reset() {
         tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
         gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
-        MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name+",p2="+gameSettings.p2name+",timer="+gameSettings.turnTimerOn);
+        MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name + ",p1 char=" + gameSettings.p1char + ",p2="+gameSettings.p2name+",p2 char=" + gameSettings.p2char+",timer=" +gameSettings.turnTimerOn);
 
         uiCont = GameObject.Find("ui").GetComponent<UIController>();
         uiCont.Init();
@@ -149,7 +149,7 @@ public class MageMatch : MonoBehaviour {
         EventContLoaded();
 
         eventCont.boardAction += OnBoardAction;
-        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction, EventController.Status.Begin); // checking
+        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction, EventController.Status.End); // checking
         eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction, EventController.Status.End); // checking
         eventCont.gameAction += OnGameAction;
         eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.GameAction); // checking
@@ -362,8 +362,8 @@ public class MageMatch : MonoBehaviour {
                     continue;
                 }
 
-                //for (int i = 0; i < spellsOnBoard.Length; i++) {
-                    //MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
+            //for (int i = 0; i < spellsOnBoard.Length; i++) {
+                    MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
                     if (spellsOnBoard[s].Count > 0)
                         uiCont.ActivateSpellButton(s);
                     else

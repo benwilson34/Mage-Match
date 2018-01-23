@@ -198,7 +198,7 @@ public class BoardCheck {
                 if (skipCurrentSeq || !ctb.ableMatch) {
                     for (int i = 0; i < checkList.Count; i++) {
                         if (checkList[i] is CoreSpell && seqs[i].GetSeqLength() >= 3) {
-                            AddMatchSkips(seqs[i], dir);
+                            AddCoreSkips(seqs[i], dir);
                             returnList[checkList[i].index].Add(seqs[i]);
                         }
                     }
@@ -225,12 +225,14 @@ public class BoardCheck {
 
                         if (seqs[i].GetSeqLength() == s.GetLength()) { // complete seq!
                             returnList[checkList[i].index].Add(seqs[i]);
+                            if (s.isSymmetric)
+                                AddSymmetricSkips(seqs[i], dir);
                             remove = true;
                         }
                     } else { // it doesn't match...
                         //MMLog.Log_BoardCheck("Seq " + checkList[i].PrintSeq() + " was not found!", MMLog.LogLevel.Standard);
                         if (checkList[i] is CoreSpell && seqs[i].GetSeqLength() >= 3) {
-                            AddMatchSkips(seqs[i], dir);
+                            AddCoreSkips(seqs[i], dir);
                             returnList[checkList[i].index].Add(seqs[i]);
                         }
                         remove = true;
@@ -248,7 +250,7 @@ public class BoardCheck {
 		return returnList;
 	}
 
-	void AddMatchSkips(TileSeq seq, int dir){
+	void AddCoreSkips(TileSeq seq, int dir){
 		MMLog.Log_BoardCheck("Adding skips for " + PrintSeq (seq, true));
 		switch (seq.GetSeqLength ()) {
 		case 3:
@@ -269,7 +271,13 @@ public class BoardCheck {
 		}
 	}
 
-	int OppDir(int dir){
+    void AddSymmetricSkips(TileSeq seq, int dir) {
+        Tile lastT = seq.sequence[seq.GetSeqLength() - 1];
+		MMLog.Log_BoardCheck("Adding skip at (" + lastT.col + ", " + lastT.row + ") in dir "+dir, MMLog.LogLevel.Standard);
+        skips.Add (new SkipCheck (lastT, OppDir(dir)));
+    }
+
+    int OppDir(int dir){
 		return (dir + 3) % 6;
 	}
 

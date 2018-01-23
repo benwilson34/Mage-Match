@@ -67,9 +67,10 @@ public class AnimationController : MonoBehaviour {
         animating++;
         int col = tb.tile.col, row = startrow;
         Vector3 newPos = new Vector3(mm.hexGrid.GridColToPos(col), mm.hexGrid.GridRowToPos(col, row)); //?
+        MMLog.Log_MageMatch(">>>>>>>>>>>>>>>>>>>>>>>>>about to animate");
 
-        yield return tb.transform.DOMove(newPos, duration, false).WaitForCompletion();
-        //Debug.MMLog.Log_AnimCont("ANIMCONT: Tile moved, about to do grav. dur=" + duration);
+        yield return tb.transform.DOMove(newPos, duration).SetEase(Ease.Linear).WaitForCompletion();
+        MMLog.Log_AnimCont("ANIMCONT: Tile moved, about to do grav. dur=" + duration);
 
         if(tb.tile.row != row)
             yield return _Grav(tb.transform, col, tb.tile.row);
