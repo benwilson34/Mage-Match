@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 public abstract class Character {
 
-    // NOTE: keep in same order as JSON list!!
-    public enum Ch { Test = 0, Enfuego, Gravekeeper, Rocky };
+    public enum Ch { Sample = 0, Enfuego, Gravekeeper, Valeria };
     public Ch ch;
 
     public string characterName;
@@ -19,7 +18,7 @@ public abstract class Character {
     protected int dfire, dwater, dearth, dair, dmuscle; // portions of 50 total
     protected Spell[] spells;
     protected MageMatch mm;
-    protected HexManager tileMan;
+    protected HexManager hexMan;
     protected int playerId;
     protected List<string> runes;
     //protected string genHexTag;
@@ -30,12 +29,18 @@ public abstract class Character {
         this.mm = mm;
         this.ch = ch;
         this.playerId = playerId;
-        tileMan = mm.tileMan;
+        hexMan = mm.hexMan;
         runes = new List<string>();
 
         mm.onEffectContReady += OnEffectContLoad;
         mm.onEventContReady += OnEventContLoad;
-    } //?
+
+        CharacterInfo info = CharacterInfo.GetCharacterInfoObj(ch);
+        characterName = info.name;
+        maxHealth = info.health;
+        SetDeckElements(info.deck);
+        InitSpells(info);
+    }
 
     public virtual void InitEvents() {
         mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Player, EventController.Status.Begin);
@@ -47,31 +52,10 @@ public abstract class Character {
     }
 
     // override to init character with event callbacks (for their passive, probably)
-    public virtual void OnEventContLoad() {
-        
-    }
+    public virtual void OnEventContLoad() {}
 
     // override to init character with effect callbacks (for their passive, probably)
-    public virtual void OnEffectContLoad() {
-
-    }
-
-    public void InitSpells() {
-        Spell sp;
-        for (int i = 0; i < 5; i++) {
-            sp = spells[i];
-            sp.Init(mm);
-            sp.info = CharacterInfo.GetSpellInfo(ch, i, true);
-        }
-    }
-
-    public void SetDeckElements(int f, int w, int e, int a, int m) {
-        dfire = f;
-        dwater = w;
-        dearth = e;
-        dair = a;
-        dmuscle = m;
-    }
+    public virtual void OnEffectContLoad() {}
 
 
     // ----------  METER  ----------
@@ -132,6 +116,40 @@ public abstract class Character {
 
     public int GetMaxHealth() { return maxHealth; }
 
+    
+    // ----------  SPELLS  ----------
+
+    protected void InitSpells(CharacterInfo info) {
+        spells = new Spell[5];
+        Debug.Log("Core spell has a cost of " + info.core.cost);
+        spells[0] = new CoreSpell(0, info.core.title, CoreSpell, info.core.cost);
+        spells[0].Init(mm);
+        spells[0].info = CharacterInfo.GetSpellInfo(info.core, true);
+
+        spells[1] = new Spell(1, info.spell1.title, info.spell1.prereq, Spell1, info.spell1.cost);
+        spells[1].Init(mm);
+        spells[1].info = CharacterInfo.GetSpellInfo(info.spell1, true);
+
+        spells[2] = new Spell(2, info.spell2.title, info.spell2.prereq, Spell2, info.spell2.cost);
+        spells[2].Init(mm);
+        spells[2].info = CharacterInfo.GetSpellInfo(info.spell2, true);
+
+        spells[3] = new Spell(3, info.spell3.title, info.spell3.prereq, Spell3, info.spell3.cost);
+        spells[3].Init(mm);
+        spells[3].info = CharacterInfo.GetSpellInfo(info.spell3, true);
+
+        spells[4] = new SignatureSpell(4, info.signature.title, info.signature.prereq, SignatureSpell, info.signature.cost, info.signature.meterCost);
+        spells[4].Init(mm);
+        spells[4].info = CharacterInfo.GetSpellInfo(info.signature, true);
+
+    }
+
+    protected abstract IEnumerator CoreSpell(TileSeq seq);
+    protected abstract IEnumerator Spell1(TileSeq seq);
+    protected abstract IEnumerator Spell2(TileSeq seq);
+    protected abstract IEnumerator Spell3(TileSeq seq);
+    protected abstract IEnumerator SignatureSpell(TileSeq seq);
+
     public Spell GetSpell(int index) { return spells[index]; }
 
     public List<Spell> GetSpells() {
@@ -143,6 +161,17 @@ public abstract class Character {
         foreach (Spell s in spells)
             outlist.Add(s.GetTileSeq());
         return outlist;
+    }
+
+    
+    // ----------  DECK  ----------
+
+    protected void SetDeckElements(int[] fweam) {
+        dfire = fweam[0];
+        dwater = fweam[1];
+        dearth = fweam[2];
+        dair = fweam[3];
+        dmuscle = fweam[4];
     }
 
     public Tile.Element GetDeckBasicTile() {
@@ -180,15 +209,17 @@ public abstract class Character {
     public static Character Load(MageMatch mm, int id) {
         Ch myChar = mm.gameSettings.GetLocalChar(id);
         switch (myChar) {
-            case Ch.Test:
-                return new CharTest(mm, id);
+            case Ch.Sample:
+                return new SampleChar(mm, id);
             case Ch.Enfuego:
                 return new Enfuego(mm, id);
             case Ch.Gravekeeper:
                 return new Gravekeeper(mm, id);
+            case Ch.Valeria:
+                return new Valeria(mm, id);
 
             default:
-                Debug.LogError("Loadout number must be 1 through 6.");
+                Debug.LogError("That character is not currently implemented.");
                 return null;
         }
     }
@@ -196,21 +227,28 @@ public abstract class Character {
 
 
 
-public class CharTest : Character {
-    public CharTest(MageMatch mm, int id) : base(mm, Ch.Test, id) {
+public class SampleChar : Character {
+    public SampleChar(MageMatch mm, int id) : base(mm, Ch.Sample, id) {
         objFX = mm.hexFX;
+    }
 
-        characterName = "Sample";
-        maxHealth = 1000;
+    protected override IEnumerator CoreSpell(TileSeq seq) {
+        yield return null;
+    }
 
-        SetDeckElements(20, 20, 20, 20, 20);
+    protected override IEnumerator Spell1(TileSeq seq) {
+        yield return null;
+    }
 
-        spells = new Spell[5];
-        spells[0] = new Spell(0, "Cherrybomb", "FFA", objFX.Cherrybomb);
-        spells[1] = new Spell(1, "Massive damage", "FFA", objFX.Deal496Dmg);
-        spells[2] = new Spell(2, "Massive damage", "FAF", objFX.Deal496Dmg);
-        spells[3] = new Spell(3, "Massive damage", "AFA", objFX.Deal496Dmg);
-        spells[4] = new Spell(4, "Massive damage", "AFA", objFX.Deal496Dmg);
-        InitSpells();
+    protected override IEnumerator Spell2(TileSeq seq) {
+        yield return null;
+    }
+
+    protected override IEnumerator Spell3(TileSeq seq) {
+        yield return null;
+    }
+
+    protected override IEnumerator SignatureSpell(TileSeq seq) {
+        yield return null;
     }
 }

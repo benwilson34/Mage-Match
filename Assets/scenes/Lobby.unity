@@ -331,7 +331,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Gravekeeper
+  m_Text: Valeria
 --- !u!222 &116053701
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1812,7 +1812,7 @@ MonoBehaviour:
   m_CaptionImage: {fileID: 0}
   m_ItemText: {fileID: 2120425577}
   m_ItemImage: {fileID: 0}
-  m_Value: 2
+  m_Value: 3
   m_Options:
     m_Options:
     - m_Text: Test
@@ -1820,6 +1820,8 @@ MonoBehaviour:
     - m_Text: Enfuego
       m_Image: {fileID: 0}
     - m_Text: Gravekeeper
+      m_Image: {fileID: 0}
+    - m_Text: Valeria
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:

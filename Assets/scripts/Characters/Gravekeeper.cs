@@ -15,21 +15,9 @@ public class Gravekeeper : Character {
         targeting = mm.targeting;
         objFX = mm.hexFX;
 
-        characterName = "The Gravekeeper";
-        maxHealth = 1200;
-        SetDeckElements(0, 10, 20, 0, 20);
-
-        spells = new Spell[5];
-        spells[0] = new CoreSpell(0, "Business in the Front", BusinessInTheFront);
-        spells[1] = new Spell(1, "The Oogie Boogie", "ME", TheOogieBoogie);
-        spells[2] = new Spell(2, "Party Crashers", "MWE", PartyCrashers);
-        spells[3] = new Spell(3, "Undead Union", "WEM", UndeadUnion);
-        spells[4] = new SignatureSpell(4, "Tombstone", "EMEE", Tombstone);
-
         altCoreSpell = new CoreSpell(0, "Party in the Back", PartyInTheBack);
-        altCoreSpell.info = CharacterInfo.GetSpellInfo(ch, 5, true);
-
-        InitSpells();
+        CharacterInfo info = CharacterInfo.GetCharacterInfoObj(Ch.Gravekeeper);
+        altCoreSpell.info = CharacterInfo.GetSpellInfo(info.altSpell, true);
     }
 
     // ----- spells -----
@@ -43,7 +31,8 @@ public class Gravekeeper : Character {
         return filterTBs;
     }
 
-    public IEnumerator BusinessInTheFront(TileSeq seq) {
+    // Business in the Front
+    protected override IEnumerator CoreSpell(TileSeq seq) {
         int dmg = 0, zombs = 0;
         switch (seq.GetSeqLength()) {
             case 3: dmg = 10;
@@ -81,6 +70,7 @@ public class Gravekeeper : Character {
         yield return null;
     }
 
+    // alt core spell - Party in the Back
     public IEnumerator PartyInTheBack(TileSeq seq) {
         int dmg = 0;
         switch (seq.GetSeqLength()) {
@@ -125,8 +115,9 @@ public class Gravekeeper : Character {
         }
     }
 
+    // The Oogie Boogie
     // TODO handle 0 or 1 zombies on the board
-    public IEnumerator TheOogieBoogie(TileSeq prereq) {
+    protected override IEnumerator Spell1(TileSeq prereq) {
         if (Filter_Zombs(hexGrid.GetPlacedTiles()).Count < 2) // if not enough Zombies
             yield break; // TODO feedback for whiffs
 
@@ -145,14 +136,15 @@ public class Gravekeeper : Character {
         yield return null;
     }
 
-    public IEnumerator PartyCrashers(TileSeq prereq) {
+    // Party Crashers
+    protected override IEnumerator Spell2(TileSeq prereq) {
         for (int i = 0; i < 2; i++) {
             yield return mm.prompt.WaitForDrop();
             if (!mm.prompt.WasSuccessful())
                 break;
 
             TileBehav tb = mm.prompt.GetDropTile();
-            MMLog.Log_Gravekeeper("Player " + playerId + " dropped " + tb.tag);
+            MMLog.Log_Gravekeeper("Player " + playerId + " dropped " + tb.hextag);
             yield return objFX.Ench_SetZombify(playerId, tb, false);
             int col = mm.prompt.GetDropCol();
             int nextTBrow = mm.boardCheck.CheckColumn(col) - 1; // next TB under, if any
@@ -160,7 +152,7 @@ public class Gravekeeper : Character {
             yield return mm.prompt.ContinueDrop();
 
             if (nextTBrow >= mm.hexGrid.BottomOfColumn(col)) {
-                tileMan.RemoveTile(col, nextTBrow, false);
+                hexMan.RemoveTile(col, nextTBrow, false);
             }
 
             ThisPlayer().DealDamage(30);
@@ -196,7 +188,8 @@ public class Gravekeeper : Character {
     //    }
     //}
 
-    public IEnumerator UndeadUnion(TileSeq prereq) {
+    // Undead Union
+    protected override IEnumerator Spell3(TileSeq prereq) {
         List<TileBehav> tbs = mm.hexGrid.GetPlacedTiles();
         for (int i = 0; i < tbs.Count; i++) { // filter zombs
             TileBehav tb = tbs[i];
@@ -211,7 +204,6 @@ public class Gravekeeper : Character {
 
         yield return null;
     }
-
     void DealAdjZombDmg(List<TileBehav> tbs) {
         int count = 0;
         foreach (TileBehav tb in tbs) {
@@ -227,6 +219,30 @@ public class Gravekeeper : Character {
         MMLog.Log_Gravekeeper("DealAdjZombDmg has counted " + count + " adjacent zombs");
         if(count > 0)
             mm.ActiveP().DealDamage(count * 5);
+    }
+
+    // Tombstone
+    protected override IEnumerator SignatureSpell(TileSeq prereq) {
+        ThisPlayer().DealDamage(225);
+
+        yield return targeting.WaitForCellTarget(1);
+
+        CellBehav cb = targeting.GetTargetCBs()[0];
+        int col = cb.col;
+        Hex tomb = hexMan.GenerateToken(playerId, "tombstone");
+        tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
+
+        TombstoneToken ttb = (TombstoneToken)tomb;
+        mm.effectCont.AddEndTurnEffect(new TurnEffect(5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
+
+        // destroy tiles under token
+        for (int row = hexGrid.BottomOfColumn(col); row < hexGrid.TopOfColumn(col); row++)
+            if (hexGrid.IsCellFilled(col, row))
+                hexMan.RemoveTile(col, row, false);
+            else
+                break; // TODO handle floating tiles
+
+        mm.DropTile(col, ttb); // idk how to animate this one yet
     }
 
     //public IEnumerator CompanyLuncheon() {
@@ -283,27 +299,4 @@ public class Gravekeeper : Character {
     //    //mm.hexGrid.RaiseTileBehavIntoColumn(zomb.GetComponent<TileBehav>(), cb.col);
     //    Ench_SetZombify(playerID, tb, false);
     //}
-
-    public IEnumerator Tombstone(TileSeq prereq) {
-        ThisPlayer().DealDamage(225);
-
-        yield return targeting.WaitForCellTarget(1);
-
-        CellBehav cb = targeting.GetTargetCBs()[0];
-        int col = cb.col;
-        Hex tomb = tileMan.GenerateToken(playerId, "tombstone");
-        tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
-
-        TombstoneToken ttb = (TombstoneToken)tomb;
-        mm.effectCont.AddEndTurnEffect(new TurnEffect(5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
-
-        // destroy tiles under token
-        for (int row = hexGrid.BottomOfColumn(col); row < hexGrid.TopOfColumn(col); row++)
-            if (hexGrid.IsCellFilled(col, row))
-                tileMan.RemoveTile(col, row, false);
-            else
-                break; // TODO handle floating tiles
-
-        mm.DropTile(col, ttb); // idk how to animate this one yet
-    }
 }

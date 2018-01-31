@@ -126,12 +126,12 @@ public class ButtonController : MonoBehaviour {
 
 	void OnSpellButtonClick(){
         StartCoroutine(Transition_Cancel());
-		StartCoroutine(mm.CastSpell (spellNum));
+		StartCoroutine(mm._CastSpell (spellNum));
 	}
 
     public void OnSpellCancelClick() {
         StartCoroutine(Transition_MainView());
-        StartCoroutine(mm.CancelSpell());
+        StartCoroutine(mm._CancelSpell());
     }
 
     public void Targeting_OnCancelClick() {

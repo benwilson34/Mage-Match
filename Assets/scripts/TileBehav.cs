@@ -35,7 +35,7 @@ public class TileBehav : Hex, Tooltipable {
 		StartCoroutine(_ChangePos(startRow, col, row, duration));
 	}
 
-	public IEnumerator _ChangePos(int startRow, int col, int row, float duration, string anim = ""){
+	public IEnumerator _ChangePos(int startRow, int col, int row, float duration = .15f, string anim = ""){
 		tile.SetPos(col, row);
 		mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
 		inPos = false;

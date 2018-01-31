@@ -22,7 +22,7 @@ public class MageMatch : MonoBehaviour {
     public SyncManager syncManager;
     public HexGrid hexGrid;
     public BoardCheck boardCheck;
-    public HexManager tileMan;
+    public HexManager hexMan;
     public Commish commish;
     public TurnTimer timer;
     public Targeting targeting;
@@ -39,7 +39,7 @@ public class MageMatch : MonoBehaviour {
     private Player p1, p2, activep;
     private Transform tilesOnBoard;
     private bool endGame = false;
-    private int checking = 0, actionsPerforming = 0, matchesResolving = 0;
+    private int checking = 0, actionsPerforming = 0;
     private List<TileSeq>[] spellsOnBoard;
 
     public DebugSettings debugSettings;
@@ -52,7 +52,7 @@ public class MageMatch : MonoBehaviour {
 
     void Start() {
         MMLog.Init(debugLogLevel);
-        CharacterInfo.Init();
+        //CharacterInfo.Init();
 
         // set game to debug (single-client) mode if appropriate
         GameObject debugObj = GameObject.Find("debugSettings");
@@ -97,7 +97,7 @@ public class MageMatch : MonoBehaviour {
             myID = PhotonNetwork.player.ID;
 
         hexGrid = new HexGrid();
-        tileMan = new HexManager(this);
+        hexMan = new HexManager(this);
 
         uiCont.GetCellOverlays();
         boardCheck = new BoardCheck(this);
@@ -284,7 +284,7 @@ public class MageMatch : MonoBehaviour {
         switchingTurn = true;
         timer.Pause();
 
-        yield return new WaitUntil(() => actionsPerforming == 0 && tileMan.removing == 0); //?
+        yield return new WaitUntil(() => actionsPerforming == 0 && hexMan.removing == 0); //?
         yield return new WaitUntil(() => checking == 0); //?
         MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM START ----------</b>");
         yield return eventCont.TurnEnd();
@@ -311,12 +311,12 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator BoardChecking() {
         checking++; // prevents overcalling/retriggering
-        yield return new WaitUntil(() => tileMan.removing == 0); //?
+        yield return new WaitUntil(() => hexMan.removing == 0); //?
         MMLog.Log_MageMatch("About to check the board.");
 
         //cascade = 0;
         //while (true) {
-            yield return new WaitUntil(() => !animCont.IsAnimating() && tileMan.removing == 0); //?
+            yield return new WaitUntil(() => !animCont.IsAnimating() && hexMan.removing == 0); //?
             hexGrid.CheckGrav(); // TODO make IEnum
             yield return new WaitUntil(() => hexGrid.IsGridAtRest());
             //List<TileSeq> seqMatches = boardCheck.MatchCheck();
@@ -342,7 +342,7 @@ public class MageMatch : MonoBehaviour {
 
     void SpellCheck() { 
         Character c = activep.character;
-        List<TileSeq> spellSeqList = c.GetTileSeqList();
+        //List<TileSeq> spellSeqList = c.GetTileSeqList();
         spellsOnBoard = boardCheck.CheckBoard(c.GetSpells());
         
         for (int s = 0; s < spellsOnBoard.Length; s++) {
@@ -421,12 +421,14 @@ public class MageMatch : MonoBehaviour {
     public IEnumerator _Draw(int id, string genTag, bool playerAction) {
         MMLog.Log_MageMatch("   ---------- DRAW BEGIN ----------");
         actionsPerforming++;
+
         Player p = GetPlayer(id);
         if (p.hand.IsFull()) {
             MMLog.Log_MageMatch("Player " + id + "'s hand is full.");
         } else {
             yield return p.DrawTiles(1, genTag, playerAction, false);
         }
+
         MMLog.Log_MageMatch("   ---------- DRAW END ----------");
         actionsPerforming--;
         yield return null;
@@ -454,12 +456,12 @@ public class MageMatch : MonoBehaviour {
         tb.SetPlaced();
 
         if (currentTurn == Turn.PlayerTurn) //kinda hacky
-            yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.tag, col);
+            yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
 
         tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
 
         if (currentTurn == Turn.PlayerTurn) { //kinda hacky
-            yield return eventCont.Drop(EventController.Status.End, playerAction, hex.tag, col);
+            yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
         } else if (currentTurn == Turn.CommishTurn)
             eventCont.CommishDrop(tb.tile.element, col);
 
@@ -493,7 +495,7 @@ public class MageMatch : MonoBehaviour {
         actionsPerforming--;
     }
 
-    public IEnumerator CastSpell(int spellNum) {
+    public IEnumerator _CastSpell(int spellNum) {
         MMLog.Log_MageMatch("   ---------- CAST SPELL BEGIN ----------");
         actionsPerforming++;
         syncManager.SendSpellCast(spellNum);
@@ -512,22 +514,21 @@ public class MageMatch : MonoBehaviour {
 
                 //targeting.targetingCanceled = false;
                 uiCont.DeactivateAllSpellButtons(); // ?
-                p.SetCurrentSpell(spellNum);
 
                 TileSeq seq = targeting.GetSelection();
                 TileSeq seqCopy = seq.Copy();
-                tileMan.RemoveInvokedSeq(seq);
+                hexMan.RemoveInvokedSeq(seq);
 
                 yield return spell.Cast(seqCopy);
 
                 //if (!targeting.WasCanceled()) { // should be an event callback?
-                    eventCont.SpellCast(spell);
+                eventCont.SpellCast(spell);
 
-                    if(MyTurn()) // this doesn't seem right...
-                        StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
+                if(MyTurn()) // this doesn't seem right...
+                    StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
 
-                    p.ApplySpellCosts();
-                    yield return BoardChecking(); //?
+                p.ApplySpellCosts(spell);
+                yield return BoardChecking(); //?
                 //}
             }
         } else {
@@ -539,7 +540,7 @@ public class MageMatch : MonoBehaviour {
         actionsPerforming--;
     }
 
-    public IEnumerator CancelSpell() {
+    public IEnumerator _CancelSpell() {
         targeting.CancelSelection();
         for (int i = 0; i < spellsOnBoard.Length; i++) {
             if (spellsOnBoard[i].Count > 0)
@@ -555,7 +556,7 @@ public class MageMatch : MonoBehaviour {
 
     public void PutTile(TileBehav tb, int col, int row, bool checkGrav = false) {
         if (hexGrid.IsCellFilled(col, row))
-            tileMan.RemoveTile(col, row, false);
+            hexMan.RemoveTile(col, row, false);
         tb.HardSetPos(col, row);
         // TODO move to tilesOnBoard obj
         if(checkGrav)

@@ -148,7 +148,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleSpellCast(int spellNum) {
-        StartCoroutine(mm.CastSpell(spellNum));
+        StartCoroutine(mm._CastSpell(spellNum));
     }
 
     public void TurnTimeout() {
@@ -245,7 +245,7 @@ public class SyncManager : PunBehaviour {
     public void SendDropSelection(int col, TileBehav tb) {
         if (mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleDropSelection", PhotonTargets.Others, col, tb.tag);
+            photonView.RPC("HandleDropSelection", PhotonTargets.Others, col, tb.hextag);
         }
     }
     [PunRPC]

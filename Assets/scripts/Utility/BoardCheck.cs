@@ -7,7 +7,7 @@ using MMDebug;
 public class BoardCheck {
 
 	private List<Spell> checkList; // compare list
-    private MageMatch mm;
+    //private MageMatch mm;
     private HexGrid hexGrid;
     private List<SkipCheck> skips;
 
@@ -22,7 +22,7 @@ public class BoardCheck {
 	}
 
 	public BoardCheck(MageMatch mm){
-        this.mm = mm;
+        //this.mm = mm;
         hexGrid = mm.hexGrid;
 		skips = new List<SkipCheck> ();
 	}
@@ -72,7 +72,7 @@ public class BoardCheck {
 	}
 
     // note: the 8th element is the total number of empty cells
-    public int[] EmptyCount() {
+    int[] EmptyCount() {
         int[] counts = new int[8];
         counts[7] = HexGrid.numCells - hexGrid.GetPlacedTiles ().Count;
         for (int i = 0; i < HexGrid.numCols; i++) {
@@ -86,7 +86,34 @@ public class BoardCheck {
         return counts;
     }
 
-	public List<TileSeq>[] CheckBoard(List<Spell> spells){
+    // TODO I really don't think I need to send -1 signal...just make sure on
+    // impl. side it handles it dynamically (e.g. while(queue.Count > 0) )
+    public int[] GetRandomCols(int num) {
+        int[] counts = EmptyCount();
+        List<int> cs = new List<int>();
+        for (int i = 0; i < num; i++) {
+            if (counts[7] == 0)
+                break;
+
+            int val = Random.Range(0, counts[7]);
+            //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol val=" + val);
+            int sum = 0;
+            for (int c = 0; c < HexGrid.numCols; c++) {
+                sum += counts[c];
+                if (val < sum) {
+                    counts[c]--; // update column count
+                    counts[7]--; // update total count
+                    cs.Add(c);
+                    break;
+                }
+            }
+            //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol: shouldn't get to this point. val = " + val);
+        }
+        // syncing could be here?
+        return cs.ToArray();
+    }
+
+    public List<TileSeq>[] CheckBoard(List<Spell> spells){
 		skips.Clear();
 
 		List<TileSeq>[] returnList = new List<TileSeq>[5]; // list of all matching seqs to be returned
@@ -116,7 +143,7 @@ public class BoardCheck {
 			}	
 		} // --Ends checking loops
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < spells.Count; i++) {
             MMLog.Log_BoardCheck(spells[i].name + " --> " + PrintSeqList(returnList[i]));
         }
 

@@ -5,6 +5,8 @@ using MMDebug;
 
 public class Hand {
 
+    private const int MAX_HAND_SIZE = 7;
+
     private List<Hex> hexes = null;
     private Transform handPos = null;
     private HandSlot[] slots;
@@ -14,11 +16,9 @@ public class Hand {
     private Player p;
     private MageMatch mm;
 
-    private const int maxHandSize = 7;
-
     public Hand(MageMatch mm, Player p) {
         hexes = new List<Hex>();
-        slots = new HandSlot[maxHandSize];
+        slots = new HandSlot[MAX_HAND_SIZE];
         placeholderPF = Resources.Load("prefabs/ui/placeholder") as GameObject;
         this.mm = mm;
         this.p = p;
@@ -39,7 +39,7 @@ public class Hand {
         //    handPos.position = new Vector3(handPos.position.x + 5, handPos.position.y);
         //}
 
-        for (int i = 0; i < maxHandSize; i++) {
+        for (int i = 0; i < MAX_HAND_SIZE; i++) {
             slots[i] = handPos.Find("slot" + i).GetComponent<HandSlot>();
         }
     }
@@ -51,13 +51,13 @@ public class Hand {
         hexes.Add(hex);
 
         int i;
-        for (i = 0; i < maxHandSize; i++) {
+        for (i = 0; i < MAX_HAND_SIZE; i++) {
             HandSlot slot = slots[i];
             if (!slot.IsFull()) {
                 slot.SetHex(hex);
                 mm.animCont.PlayAnim(mm.animCont._Move(hex, slot.transform.position));
                 mm.audioCont.HexDraw(hex.GetComponent<AudioSource>());
-                MMLog.Log("HAND", "black", "Added hex with tag " + hex.tag);
+                MMLog.Log("HAND", "black", "Added hex with tag " + hex.hextag);
                 break;
             }
         } 
@@ -65,9 +65,9 @@ public class Hand {
 
     public void Remove(Hex hex) {
         // TODO iterate thru, then clear corresponding handSlot
-        for (int i = 0; i < maxHandSize; i++) {
+        for (int i = 0; i < MAX_HAND_SIZE; i++) {
             Hex slotHex = slots[i].GetHex();
-            if (slotHex != null && slotHex.tag.Equals(hex.tag)) {
+            if (slotHex != null && slotHex.hextag.Equals(hex.hextag)) {
                 slots[i].ClearHex();
                 break;
             }
@@ -95,7 +95,7 @@ public class Hand {
     public Hex GetHex(string tag) {
         foreach (Hex obj in hexes) {
             //MMLog.Log("HAND", "black", "Trying \"" + tag + "\" against \"" + obj.tag + "\"");
-            if (tag.Equals(obj.tag))
+            if (tag.Equals(obj.hextag))
                 return obj;
         }
         MMLog.LogError("HAND: Failed to find hex with tag \"" + tag + "\"");
@@ -105,7 +105,7 @@ public class Hand {
     public List<string> Debug_GetAllTags() {
         List<string> tags = new List<string>();
         foreach (Hex h in hexes) {
-            tags.Add(h.tag);
+            tags.Add(h.hextag);
         }
         tags.Sort();
         return tags;
@@ -126,7 +126,7 @@ public class Hand {
 
     public int Count() { return hexes.Count; }
 
-    public bool IsFull() { return hexes.Count == maxHandSize; }
+    public bool IsFull() { return hexes.Count == MAX_HAND_SIZE; }
 
     public HandSlot GetHandSlot(int ind) { return slots[ind]; }
 
@@ -155,7 +155,7 @@ public class Hand {
     // On MouseDown 
     public void GrabHex(Hex hex) {
         //NumFullSlots();
-        for (int i = 0; i < maxHandSize; i++) {
+        for (int i = 0; i < MAX_HAND_SIZE; i++) {
             HandSlot slot = slots[i];
             Hex slotHex = slot.GetHex();
             if (slotHex != null && hex.EqualsTag(slotHex)) {
@@ -183,7 +183,7 @@ public class Hand {
         HandSlot swapSlot = null;
         int newSlotInd = newSlot.handIndex;
         // downward
-        for (int i = newSlotInd; i < maxHandSize; i++) {
+        for (int i = newSlotInd; i < MAX_HAND_SIZE; i++) {
             if (!slots[i].IsFull() || i == placeholderSlot.handIndex) {
                 swapSlot = slots[i];
                 break;
@@ -217,7 +217,7 @@ public class Hand {
         }
 
         newSlot.SetHex(placeholder);
-        if (placeholderSlot.GetHex().tag.Equals("placeholder")) // i dislike this deeply
+        if (placeholderSlot.GetHex().hextag.Equals("placeholder")) // i dislike this deeply
             placeholderSlot.ClearHex();
         placeholderSlot = newSlot;
 

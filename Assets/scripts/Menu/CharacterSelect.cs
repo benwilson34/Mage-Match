@@ -13,7 +13,7 @@ public class CharacterSelect : MonoBehaviour {
 
     private GameSettings gameSettings;
     private int myID;
-    private Character.Ch localChar = Character.Ch.Test;
+    private Character.Ch localChar = Character.Ch.Sample;
     private bool thisPlayerLocked = false;
     private bool otherPlayerLocked = false;
     private bool otherCharacterSet = false;
@@ -21,16 +21,18 @@ public class CharacterSelect : MonoBehaviour {
     // TODO another turn timer
 
     void Start () {
-        CharacterInfo.Init();
+        //CharacterInfo.Init();
 
         localBlock = GameObject.Find("localBlock").transform;
         oppBlock = GameObject.Find("opponentBlock").transform;
         characterBlock = GameObject.Find("characterBlock").transform;
 
         localCharPortrait = localBlock.Find("i_charPortrait").GetComponent<Image>();
+        localCharPortrait.enabled = false;
         localCharName = localBlock.Find("t_charName").GetComponent<Text>();
         localCharName.text = "Choose your fighter!";
         oppCharPortrait = oppBlock.Find("i_charPortrait").GetComponent<Image>();
+        oppCharPortrait.enabled = false;
         oppCharName = oppBlock.Find("t_charName").GetComponent<Text>();
         oppCharName.text = "Choose your fighter!";
 
@@ -105,10 +107,16 @@ public class CharacterSelect : MonoBehaviour {
             LocalCharacterChosen(Character.Ch.Gravekeeper);
     }
 
+    public void OnChooseValeria() {
+        if (!thisPlayerLocked)
+            LocalCharacterChosen(Character.Ch.Valeria);
+    }
+
     void LocalCharacterChosen(Character.Ch ch) {
         Debug.Log("CharacterSelect: local char chosen is " + ch);
         localChar = ch;
-        localCharName.text = "" + ch;
+        localCharName.text = CharacterInfo.GetCharacterInfoObj(ch).name;
+        localCharPortrait.enabled = true;
         localCharPortrait.sprite = GetCharacterPortrait(ch);
         string info = CharacterInfo.GetCharacterInfo(ch);
         charT.text = info;
@@ -121,6 +129,7 @@ public class CharacterSelect : MonoBehaviour {
     [PunRPC]
     public void OpponentCharacterChosen(Character.Ch ch) {
         Debug.Log("CharacterSelect: opponent char chosen is " + ch);
+        oppCharPortrait.enabled = true;
         oppCharPortrait.sprite = GetCharacterPortrait(ch);
         oppCharName.text = "" + ch;
         gameSettings.SetOpponentChar(myID, ch);

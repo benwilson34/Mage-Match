@@ -93,7 +93,7 @@ public class Lobby : Photon.PunBehaviour {
         settings.p1name = "GOD";
         settings.p1char = (Character.Ch)(testSettingsMenu.transform.Find("dd_character").GetComponent<Dropdown>().value);
         settings.p2name = "Training dummy";
-        settings.p2char = Character.Ch.Test;
+        settings.p2char = Character.Ch.Sample;
         settings.turnTimerOn = false;
 
         PhotonNetwork.Disconnect();

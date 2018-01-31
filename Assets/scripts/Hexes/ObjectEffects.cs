@@ -13,7 +13,7 @@ public class ObjectEffects {
 
     public ObjectEffects(MageMatch mm) {
         this.mm = mm;
-        tileMan = mm.tileMan;
+        tileMan = mm.hexMan;
         targeting = mm.targeting;
         hexGrid = mm.hexGrid;
     }
@@ -182,8 +182,7 @@ public class ObjectEffects {
         yield return mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); //anim 1
 
         if (selectTB.tile.element == Tile.Element.Muscle) {
-            Tile t = selectTB.tile;
-            yield return tileMan._RemoveTile(t.col, t.row, true); // maybe?
+            yield return tileMan._RemoveTile(selectTB, true); // maybe?
 
             mm.GetPlayer(id).DealDamage(10);
             mm.GetPlayer(id).Heal(10);

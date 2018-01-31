@@ -18,12 +18,12 @@ public class TombstoneToken : TileBehav {
         else
             elem = Tile.Element.Muscle;
 
-        TileBehav tb = (TileBehav)mm.tileMan.GenerateTile(id, elem);
+        TileBehav tb = (TileBehav)mm.hexMan.GenerateTile(id, elem);
         yield return mm.hexFX.Ench_SetZombify(id, tb, true, false);
         mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
     }
 
     public IEnumerator Tombstone_TEnd(int id) {
-        yield return mm.tileMan._RemoveTile(tile.col, tile.row, false); // remove itself
+        yield return mm.hexMan._RemoveTile(this, false); // remove itself
     }
 }

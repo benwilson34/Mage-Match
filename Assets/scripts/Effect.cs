@@ -223,6 +223,52 @@ public class MatchEffect : Effect {
 
 
 
+public class DropEffect : Effect {
+
+    public delegate IEnumerator MyDropEffect(int id, bool playerAction, string tag, int col);
+    private MyDropEffect dropEffect, endEffect;
+    public int countLeft = -1;
+
+    public DropEffect(int turns, MyDropEffect dropEffect, MyDropEffect endEffect, int count = -1) {
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = mm.ActiveP().id; // NOT SAFE - could be adding effects to opponent!!
+        turnsLeft = turns;
+        this.countLeft = count;
+        this.dropEffect = dropEffect;
+        this.endEffect = endEffect;
+    }
+
+    public override IEnumerator TriggerEffect() {
+        throw new NotImplementedException(); // hmmm...should be virtual in Effect?
+    }
+
+    public IEnumerator TriggerEffect(bool playerAction, string tag, int col) {
+        if (dropEffect != null) { // would it ever be? maybe if like, your third swap does something
+            MMLog.Log("DROPEFFECT", "black", "About to trigger dropEffect!");
+            yield return dropEffect(mm.ActiveP().id, playerAction, tag, col);
+            countLeft--;
+        }
+        yield return null;
+    }
+
+    public override IEnumerator Turn() { //?
+        turnsLeft--;
+        if (turnsLeft == 0) {
+            yield return EndEffect(); //???
+        }
+    }
+
+    public IEnumerator EndEffect(bool playerAction, string tag, int col) { //?
+        if (endEffect != null)
+            yield return endEffect(mm.ActiveP().id, playerAction, tag, col);
+        yield return null;
+    }
+
+    public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
+}
+
+
+
 public class SwapEffect : Effect {
 
     public delegate IEnumerator MySwapEffect(int id, int c1, int r1, int c2, int r2);
@@ -231,7 +277,7 @@ public class SwapEffect : Effect {
 
     public SwapEffect(int turns, MySwapEffect swapEffect, MySwapEffect endEffect, int count = -1) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = mm.ActiveP().id;
+        playerID = mm.ActiveP().id; // NOT SAFE - could be adding effects to opponent!!
         turnsLeft = turns;
         this.countLeft = count;
         this.swapEffect = swapEffect;

@@ -10,7 +10,7 @@ public class Targeting {
     //public bool targetingCanceled = false;
 
     private MageMatch mm;
-    private int targets, targetsLeft = 0;
+    private int targetsLeft = 0;
     private List<TileBehav> targetTBs, validTBs;
     private List<CellBehav> targetCBs, validCBs;
     private Vector3 lastTCenter;
@@ -52,7 +52,7 @@ public class Targeting {
 
     public IEnumerator WaitForTileTarget(int count, TileFilterFunc filter = null) {
         currentTMode = TargetMode.Tile;
-        targets = targetsLeft = count;
+        targetsLeft = count;
         targetTBs = new List<TileBehav>();
         MMLog.Log_Targeting("targets = " + targetsLeft);
 
@@ -62,7 +62,7 @@ public class Targeting {
 
     public IEnumerator WaitForTileAreaTarget(bool largeArea, TileFilterFunc filter = null) {
         currentTMode = TargetMode.TileArea;
-        targets = targetsLeft = 1;
+        targetsLeft = 1;
         targetTBs = new List<TileBehav>();
         largeAreaMode = largeArea;
         MMLog.Log_Targeting("Waiting for TileArea target. Targets = " + targetsLeft);
@@ -73,7 +73,7 @@ public class Targeting {
 
     public IEnumerator WaitForDragTarget(int count, TileFilterFunc filter = null) {
         currentTMode = TargetMode.Drag;
-        targets = targetsLeft = count;
+        targetsLeft = count;
         targetTBs = new List<TileBehav>();
         MMLog.Log_Targeting("Waiting for Drag target. Targets = " + targetsLeft);
 
@@ -83,7 +83,7 @@ public class Targeting {
 
     public void OnTBTarget(TileBehav tb) {
         foreach (TileBehav ctb in targetTBs) // prevent targeting a tile that's already targeted
-            if (ctb.EqualsTag(tb.tag))
+            if (ctb.EqualsTag(tb.hextag))
                 return;
 
         // TODO these shouldn't be in the valid tiles in the first place
@@ -94,7 +94,7 @@ public class Targeting {
         bool valid = false;
         for(int i = 0; i < validTBs.Count; i++) {
             TileBehav ctb = validTBs[i];
-            if (ctb.EqualsTag(tb.tag)) {
+            if (ctb.EqualsTag(tb.hextag)) {
                 valid = true;
                 validTBs.RemoveAt(i);
                 break;
@@ -161,7 +161,7 @@ public class Targeting {
     // TODO
     public IEnumerator WaitForCellTarget(int count) {
         currentTMode = TargetMode.Cell;
-        targets = targetsLeft = count;
+        targetsLeft = count;
         targetCBs = new List<CellBehav>();
         //CBtargetEffect = targetEffect;
         //Debug.Log ("targets = " + targetsLeft);

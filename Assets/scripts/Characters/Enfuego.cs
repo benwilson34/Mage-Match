@@ -14,29 +14,16 @@ public class Enfuego : Character {
         objFX = mm.hexFX;
         hexGrid = mm.hexGrid;
         targeting = mm.targeting;
-
-        characterName = "Enfuego";
-        maxHealth = 1000;
-        SetDeckElements(20, 0, 0, 15, 15);
-
-        spells = new Spell[5];
-        spells[0] = new CoreSpell(0, "Fiery Fandango", FieryFandango);
-        spells[1] = new Spell(1, "¡Baila!", "FM", Baila);
-        spells[2] = new Spell(2, "Incinerate", "FAM", Incinerate);
-        spells[3] = new Spell(3, "Hot Potatoes", "FFA", HotPotatoes);
-        spells[4] = new SignatureSpell(4, "White-Hot Combo Kick", "MFFM", WhiteHotComboKick);
-
-        InitSpells();
     }
 
     public override void OnEffectContLoad() {
         MMLog.Log_Enfuego("Loading PASSIVE...");
         // SwapEffect for incrementing swapsThisTurn
-        SwapEffect se = new SwapEffect(-1, Enf_Swap, null);
+        SwapEffect se = new SwapEffect(-1, Passive_Swap, null);
         mm.effectCont.AddSwapEffect(se, "EnSwp");
 
         // TurnEffect for reseting the counter
-        TurnEffect te = new TurnEffect(-1, Effect.Type.None, Enf_ResetSwaps, null); // idk about type here
+        TurnEffect te = new TurnEffect(-1, Effect.Type.None, Passive_ResetSwaps, null); // idk about type here
         mm.effectCont.AddEndTurnEffect(te, "EnEnd");
 
         // when we have List<Buff>
@@ -45,7 +32,7 @@ public class Enfuego : Character {
         //mm.GetPlayer(playerID).AddBuff(b);
     }
 
-    public IEnumerator Enf_Swap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator Passive_Swap(int id, int c1, int r1, int c2, int r2) {
         if(swapsThisTurn > 0)
             ThisPlayer().DealDamage(swapsThisTurn * 5);
 
@@ -54,7 +41,7 @@ public class Enfuego : Character {
         yield return null;
     }
 
-    public IEnumerator Enf_ResetSwaps(int id) {
+    public IEnumerator Passive_ResetSwaps(int id) {
         swapsThisTurn = 0;
         MMLog.Log_Enfuego("Reseting swaps.");
         yield return null;
@@ -77,8 +64,8 @@ public class Enfuego : Character {
 
     // -----  SPELLS  -----
 
-    // Core
-    public IEnumerator FieryFandango(TileSeq seq) {
+    // Fiery Fandango
+    protected override IEnumerator CoreSpell(TileSeq seq) {
         int burnNum = 2, dmg = 30;
         switch (seq.GetSeqLength()) {
             case 3: // safe to remove?
@@ -121,7 +108,8 @@ public class Enfuego : Character {
         yield return null;
     }
 
-    public IEnumerator Baila(TileSeq prereq) {
+    // Baila!
+    protected override IEnumerator Spell1(TileSeq prereq) {
         yield return ThisPlayer().DrawTiles(2, "", false, false); // my draw
         yield return mm.GetOpponent(playerId).DrawTiles(2, "", false, false); // their draw
 
@@ -130,14 +118,15 @@ public class Enfuego : Character {
             yield return mm.prompt.ContinueSwap();
     }
 
-    public IEnumerator Incinerate(TileSeq prereq) {
+    // Incinerate
+    protected override IEnumerator Spell2(TileSeq prereq) {
         yield return targeting.WaitForDragTarget(6, Inc_Filter);
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
         int dmg = tbs.Count * 35;
         foreach (TileBehav tb in tbs) {
             MMLog.Log_Enfuego("Destroying tile at " + tb.PrintCoord());
-            mm.tileMan.RemoveTile(tb.tile, false);
+            mm.hexMan.RemoveTile(tb.tile, false);
             yield return new WaitForSeconds(.15f);
         }
 
@@ -154,7 +143,8 @@ public class Enfuego : Character {
         return filterTBs;
     }
 
-    public IEnumerator HotPotatoes(TileSeq prereq) {
+    // Hot Potatoes
+    protected override IEnumerator Spell3(TileSeq prereq) {
         HealthEffect he = new HealthEffect(mm.OpponentId(playerId), 3, HotPot_Buff, true, false);
         mm.effectCont.AddHealthEffect(he, "hotpo");
 
@@ -166,8 +156,8 @@ public class Enfuego : Character {
     }
 
 
-    // Signature
-    public IEnumerator WhiteHotComboKick(TileSeq prereq) {
+    // White-Hot Combo Kick
+    protected override IEnumerator SignatureSpell(TileSeq prereq) {
         yield return targeting.WaitForTileTarget(3);
 
         List<TileBehav> tbs = targeting.GetTargetTBs();
@@ -207,7 +197,7 @@ public class Enfuego : Character {
                 yield return mm.InactiveP().DiscardRandom(1);
             }
 
-            mm.tileMan.RemoveTile(tb.tile, true);
+            mm.hexMan.RemoveTile(tb.tile, true);
         }
     }
 

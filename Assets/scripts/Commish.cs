@@ -53,31 +53,32 @@ public class Commish  {
 	IEnumerator PlaceTiles(){
         MMLog.Log_Commish("   ---------- COMMISH TURN BEGIN ----------");
         int prevCount = 0;
-        Queue<int> cols = new Queue<int>();
+        Queue<int> colQ = new Queue<int>();
         Queue<Tile.Element> elems = new Queue<Tile.Element>();
         for (int i = 0; i < numTiles; i++) {
-            if (cols.Count == 0) {
-                cols = GetRandomCols(numTiles - prevCount); // can be i?
-                yield return mm.syncManager.SyncRands(mm.ActiveP().id, cols.ToArray());
-                cols = new Queue<int>( mm.syncManager.GetRands(cols.Count) );
+            if (colQ.Count == 0) {
+                int[] cols = mm.boardCheck.GetRandomCols(numTiles - prevCount); // can be i?
+                if (cols.Length == 0) {  // board is full
+                    MMLog.Log_Commish("The board is full. The Commissioner ends his turn early.");
+                    break;
+                }
+                yield return mm.syncManager.SyncRands(mm.ActiveP().id, cols);
+                colQ = new Queue<int>( mm.syncManager.GetRands(cols.Length) );
 
-                int[] rands = GetRandomInts(cols.Count);
+                int[] rands = GetRandomInts(colQ.Count);
                 yield return mm.syncManager.SyncRands(mm.ActiveP().id, rands);
                 elems = GetRandomElems( mm.syncManager.GetRands(rands.Length) );
                 prevCount = numTiles;
             }
-            if (cols.Peek() == -1) {
-                MMLog.Log_Commish("The board is full. The Commissioner ends his turn early.");
-                break;
-            }
+            
             if (i != 0) { // wait to drop next tile (anim purposes only)
                 yield return new WaitForSeconds(.15f);
             }
 
-            Hex tb = mm.tileMan.GenerateTile(3, elems.Dequeue()); // should get own func?
-            MMLog.Log_Commish("Dropping into col " + cols.Peek());
+            Hex tb = mm.hexMan.GenerateTile(3, elems.Dequeue()); // should get own func?
+            MMLog.Log_Commish("Dropping into col " + colQ.Peek());
 
-            int col = cols.Dequeue();
+            int col = colQ.Dequeue();
             if (mm.boardCheck.CheckColumn(col) >= 0)
                 mm.DropTile(col, tb);
             else {
@@ -137,32 +138,7 @@ public class Commish  {
 	//	return 6;
 	//}
 
-    Queue<int> GetRandomCols(int num) {
-        int[] counts = mm.boardCheck.EmptyCount();
-        Queue<int> cs = new Queue<int>();
-        for (int i = 0; i < num; i++) {
-            if (counts[7] == 0) {
-                cs.Enqueue(-1); // signal no more spots
-                break;
-            }
-
-            int val = Random.Range(0, counts[7]);
-            //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol val=" + val);
-            int sum = 0;
-            for (int c = 0; c < HexGrid.numCols; c++) {
-                sum += counts[c];
-                if (val < sum) {
-                    counts[c]--; // update column count
-                    counts[7]--; // update total count
-                    cs.Enqueue(c);
-                    break;
-                }
-            }
-            //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol: shouldn't get to this point. val = " + val);
-        }
-        // syncing could be here?
-        return cs;
-    }
+    
 
     public void ChangeMood(int amount){
 		mood += amount;

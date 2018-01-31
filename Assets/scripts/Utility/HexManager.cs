@@ -115,8 +115,8 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
 
         TileBehav tb = go.GetComponent<TileBehav>();
-        tb.tag = GenFullTag(id, "B", tag); // B for Basic tile
-        tb.gameObject.name = tb.tag;
+        tb.hextag = GenFullTag(id, "B", tag); // B for Basic tile
+        tb.gameObject.name = tb.hextag;
         return tb;
     }
 
@@ -140,8 +140,8 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
 
         TileBehav tb = go.GetComponent<TileBehav>();
-        tb.tag = GenFullTag(id, "T", tag); // T for Token
-        tb.gameObject.name = tb.tag;
+        tb.hextag = GenFullTag(id, "T", tag); // T for Token
+        tb.gameObject.name = tb.hextag;
         return tb;
     }
 
@@ -155,44 +155,52 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
 
         Hex hex = go.GetComponent<Hex>();
-        hex.tag = GenFullTag(id, "C", tag); // C for consumable
-        hex.gameObject.name = hex.tag;
+        hex.hextag = GenFullTag(id, "C", tag); // C for consumable
+        hex.gameObject.name = hex.hextag;
         return hex;
     }
 
+    public void RemoveTileSeq(TileSeq seq) {
+        RemoveSeq(seq, false);
+    }
+
     public void RemoveInvokedSeq(TileSeq seq) { // TODO messy stuff
+        RemoveSeq(seq, true);
+    }
+
+    void RemoveSeq(TileSeq seq, bool isInvoked) {
+        if (hexGrid == null) {
+            MMLog.LogError("HEXMAN: hexGrid is null");
+            return;
+        }
+
         //Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + boardCheck.PrintSeq(seq, true));
         Tile tile;
         for (int i = 0; i < seq.sequence.Count;) {
             tile = seq.sequence[0];
-            if (hexGrid == null)
-                MMLog.LogError("TILEMAN: hexGrid is null");
-            if (hexGrid.IsCellFilled(tile.col, tile.row))
-                InvokeTile(tile);
-            else
+            if (hexGrid.IsCellFilled(tile.col, tile.row)) {
+                TileBehav tb = hexGrid.GetTileBehavAt(tile.col, tile.row);
+                mm.StartCoroutine(_RemoveTile(tb, false, isInvoked));
+            } else
                 Debug.Log("RemoveSeq(): The tile at (" + tile.col + ", " + tile.row + ") is already gone.");
             seq.sequence.Remove(tile);
         }
     }
 
-    void InvokeTile(Tile tile) {
-        mm.StartCoroutine(_RemoveTile(tile.col, tile.row, false, true));
-    }
-
     // TODO should be IEnums? Then just start the anim at the end?
     public void RemoveTile(Tile tile, bool resolveEnchant) {
-        mm.StartCoroutine(_RemoveTile(tile.col, tile.row, resolveEnchant));
+        TileBehav tb = hexGrid.GetTileBehavAt(tile.col, tile.row);
+        mm.StartCoroutine(_RemoveTile(tb, resolveEnchant));
     }
 
     public void RemoveTile(int col, int row, bool resolveEnchant) {
-        mm.StartCoroutine(_RemoveTile(col, row, resolveEnchant));
+        TileBehav tb = hexGrid.GetTileBehavAt(col, row);
+        mm.StartCoroutine(_RemoveTile(tb, resolveEnchant));
     }
 
-    public IEnumerator _RemoveTile(int col, int row, bool resolveEnchant, bool isInvoked = false) {
+    public IEnumerator _RemoveTile(TileBehav tb, bool resolveEnchant, bool isInvoked = false) {
         //		Debug.Log ("Removing (" + col + ", " + row + ")");
         removing++;
-
-        TileBehav tb = hexGrid.GetTileBehavAt(col, row);
 
         if (tb == null) {
             MMLog.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
@@ -213,7 +221,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             tb.ClearEnchantment(); // TODO
             tb.ClearTileEffects(); //?
         }
-        hexGrid.ClearTileBehavAt(col, row); // move up?
+        hexGrid.ClearTileBehavAt(tb.tile.col, tb.tile.row); // move up?
 
         if(isInvoked)
             yield return mm.animCont._InvokeTile(tb); // just start it, don't yield?

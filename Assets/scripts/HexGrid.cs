@@ -18,7 +18,7 @@ public class HexGrid {
     }
 
     public void HardSetTileBehavAt(TileBehav tb, int col, int row){
-        MMDebug.MMLog.Log_HexGrid("setting (" + col + ", " + row + ") to " + tb.tag, MMDebug.MMLog.LogLevel.Standard);
+        MMDebug.MMLog.Log_HexGrid("setting (" + col + ", " + row + ") to " + tb.hextag, MMDebug.MMLog.LogLevel.Standard);
 		if (IsCellFilled (col, row))
             tileGrid[col, row] = null;
         SetTileBehavAt (tb, col, row);
@@ -38,7 +38,7 @@ public class HexGrid {
             if (IsCellFilled(col, r)) {
                 if (r == top) {
                     // handle top of column getting pushed out
-                    mm.tileMan.RemoveTile(col, r, false);
+                    mm.hexMan.RemoveTile(col, r, false);
                     continue;
                 }
                 tileGrid[col, r].ChangePos(col, r + 1);

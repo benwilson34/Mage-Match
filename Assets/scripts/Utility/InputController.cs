@@ -482,7 +482,7 @@ public class InputController : MonoBehaviour {
                     hex.GetComponent<SpriteRenderer>().sortingOrder = 1;
                     input.heldHex = hex;
                     mm.LocalP().hand.GrabHex(hex); //?
-                    mm.eventCont.GrabTile(mm.myID, hex.tag);
+                    mm.eventCont.GrabTile(mm.myID, hex.hextag);
                     return InputStatus.FullyHandled;
                 }
             }

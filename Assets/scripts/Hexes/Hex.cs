@@ -7,7 +7,7 @@ public class Hex : MonoBehaviour, Tooltipable {
 
 	public enum State { Hand, Placed, Removed };
 	public State currentState;
-    public string tag;
+    public string hextag;
 
     protected MageMatch mm;
     private Sprite flipSprite;
@@ -17,10 +17,11 @@ public class Hex : MonoBehaviour, Tooltipable {
 		mm = GameObject.Find("board").GetComponent<MageMatch>();
 	}
 
-    public bool EqualsTag(string tag) { return this.tag.Equals(tag); }
+    public bool EqualsTag(string tag) { return this.hextag.Equals(tag); }
 
-    public bool EqualsTag(Hex hex) { return this.tag.Equals(hex.tag); }
+    public bool EqualsTag(Hex hex) { return this.hextag.Equals(hex.hextag); }
 
+    // ex: p2-B-W-005 (player 2 created this Basic tile, type is Water, and its the fifth one)
     public static int TagPlayer(string tag) { return int.Parse(tag.Substring(1, 1)); }
 
     public static string TagCat(string tag) { return tag.Split(new char[] { '-' })[1]; }
@@ -34,7 +35,7 @@ public class Hex : MonoBehaviour, Tooltipable {
 
         Sprite newSprite;
         if (!flipped) {
-            newSprite = mm.tileMan.flipSprite;
+            newSprite = mm.hexMan.flipSprite;
         } else {
             newSprite = flipSprite;
         }
@@ -51,7 +52,7 @@ public class Hex : MonoBehaviour, Tooltipable {
 
     public virtual string GetTooltipInfo() {
         string str = "This is a <b>hex</b>.\n";
-        str += "Its <color=green>tag</color> is " + tag;
+        str += "Its <color=green>tag</color> is " + hextag;
         return str;
     }
 }

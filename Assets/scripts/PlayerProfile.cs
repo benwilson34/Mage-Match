@@ -9,7 +9,7 @@ public class PlayerProfile : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        Db db = GameObject.Find("test").GetComponent<Db>();
+        //Db db = GameObject.Find("test").GetComponent<Db>();
         //db.
 	}
 	

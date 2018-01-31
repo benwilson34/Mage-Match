@@ -9,6 +9,7 @@ public class EffectController {
     private MageMatch mm;
     private List<Effect> beginTurnEffects, endTurnEffects;
     private List<MatchEffect> matchEffects;
+    private List<DropEffect> dropEffects;
     private List<SwapEffect> swapEffects;
     private List<HealthEffect> healthEffects;
     private Dictionary<string, int> tagDict;
@@ -22,6 +23,7 @@ public class EffectController {
         beginTurnEffects = new List<Effect>();
         endTurnEffects = new List<Effect>();
         matchEffects = new List<MatchEffect>();
+        dropEffects = new List<DropEffect>();
         swapEffects = new List<SwapEffect>();
         healthEffects = new List<HealthEffect>();
         tagDict = new Dictionary<string, int>();
@@ -30,7 +32,8 @@ public class EffectController {
     public void InitEvents() {
         mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.EventEffects);
         mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.EventEffects);
-        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.EventEffects);
+        //mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.EventEffects);
+        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.EventEffects, EventController.Status.End);
         mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.EventEffects, EventController.Status.End); // begin or end?
     }
 
@@ -45,9 +48,14 @@ public class EffectController {
         MMLog.Log_EffectCont("Just finished resolving TURN END effects.");
     }
 
-    public IEnumerator OnMatch(int id, string[] seqs) {
-        yield return ResolveMatchEffects(id);
-        MMLog.Log_EffectCont("Just finished resolving MATCH effects.");
+    //public IEnumerator OnMatch(int id, string[] seqs) {
+    //    yield return ResolveMatchEffects(id);
+    //    MMLog.Log_EffectCont("Just finished resolving MATCH effects.");
+    //}
+
+    public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
+        yield return ResolveDropEffects(id, playerAction, tag, col);
+        MMLog.Log_EffectCont("Just finished resolving DROP effects.");
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
@@ -227,38 +235,72 @@ public class EffectController {
     #endregion
 
 
-    #region MatchEffects
-    public void AddMatchEffect(MatchEffect me, string tag) {
-        me.tag = GenFullTag("matc", tag);
-        matchEffects.Add(me);
+    //#region MatchEffects
+    //public void AddMatchEffect(MatchEffect me, string tag) {
+    //    me.tag = GenFullTag("matc", tag);
+    //    matchEffects.Add(me);
+    //}
+
+    //IEnumerator ResolveMatchEffects(int id) {
+    //    MatchEffect me;
+    //    for (int i = 0; i < matchEffects.Count; i++) { // foreach
+    //        me = matchEffects[i];
+    //        if (me.playerID == id) {
+    //            yield return me.TriggerEffect();
+
+    //            if (me.NeedRemove()) {
+    //                MMLog.Log_EffectCont("Removing " + me.tag + "...");
+    //                matchEffects.RemoveAt(i);
+    //                i--;
+    //            }
+    //        }
+    //    }
+    //}
+
+    ////public void RemoveMatchEffect(string tag) { // TODO test
+    ////    MatchEffect me = matchEffects[0];
+    ////    for (int i = 0; i < matchEffects.Count; i++, me = matchEffects[i]) {
+    ////        if (me.tag == tag)
+    ////            break;
+    ////    }
+    ////    matchEffects.Remove(me);
+    ////}
+    //#endregion
+
+    
+    #region DropEffects
+    public void AddDropEffect(DropEffect de, string tag) {
+        de.tag = GenFullTag("drop", tag);
+        dropEffects.Add(de);
     }
 
-    IEnumerator ResolveMatchEffects(int id) {
-        MatchEffect me;
-        for (int i = 0; i < matchEffects.Count; i++) { // foreach
-            me = matchEffects[i];
-            if (me.playerID == id) {
-                yield return me.TriggerEffect();
+    public IEnumerator ResolveDropEffects(int id, bool playerAction, string tag, int col) {
+        DropEffect de;
+        for (int i = 0; i < dropEffects.Count; i++) { // foreach
+            de = dropEffects[i];
+            if (de.playerID == id) {
+                MMLog.Log_EffectCont("Checking dropEff with tag " + de.tag + "; count=" + de.countLeft);
 
-                if (me.NeedRemove()) {
-                    MMLog.Log_EffectCont("Removing " + me.tag + "...");
-                    matchEffects.RemoveAt(i);
+                yield return de.TriggerEffect(playerAction, tag, col);
+
+                if (de.NeedRemove()) {
+                    MMLog.Log_EffectCont("Removing " + de.tag + "...");
+                    dropEffects.RemoveAt(i);
                     i--;
                 }
             }
         }
     }
 
-    //public void RemoveMatchEffect(string tag) { // TODO test
-    //    MatchEffect me = matchEffects[0];
-    //    for (int i = 0; i < matchEffects.Count; i++, me = matchEffects[i]) {
-    //        if (me.tag == tag)
+    //public void RemoveSwapEffect(string tag) { // TODO test
+    //    SwapEffect se = swapEffects[0];
+    //    for (int i = 0; i < swapEffects.Count; se = swapEffects[i], i++) {
+    //        if (se.tag == tag)
     //            break;
     //    }
-    //    matchEffects.Remove(me);
+    //    swapEffects.Remove(se);
     //}
     #endregion
-
 
     #region SwapEffects
     public void AddSwapEffect(SwapEffect se, string tag) {

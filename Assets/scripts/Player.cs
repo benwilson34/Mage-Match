@@ -11,9 +11,9 @@ public class Player {
     public int health;
     public int AP;
     public Hand hand;
-    public int handSize = 7;
 
-    private Spell currentSpell;
+    private const int MAX_AP = 4;
+
     private MageMatch mm;
     private MatchEffect matchEffect;
 
@@ -142,9 +142,9 @@ public class Player {
         for (int i = 0; i < numTiles && !hand.IsFull(); i++) {
             Hex hex;
             if (genTag.Equals("")) {
-                hex = mm.tileMan.GenerateRandomHex(this);
+                hex = mm.hexMan.GenerateRandomHex(this);
             } else
-                hex = mm.tileMan.GenerateHex(id, genTag);
+                hex = mm.hexMan.GenerateHex(id, genTag);
 
             if (!ThisIsLocal())
                 hex.Flip();
@@ -152,9 +152,9 @@ public class Player {
             hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
 
 
-            yield return mm.eventCont.Draw(EventController.Status.Begin, id, hex.tag, playerAction, dealt);
+            yield return mm.eventCont.Draw(EventController.Status.Begin, id, hex.hextag, playerAction, dealt);
             hand.Add(hex);
-            yield return mm.eventCont.Draw(EventController.Status.End, id, hex.tag, playerAction, dealt);
+            yield return mm.eventCont.Draw(EventController.Status.End, id, hex.hextag, playerAction, dealt);
 
             if (playerAction)
                 mm.eventCont.GameAction(true); //?
@@ -172,7 +172,7 @@ public class Player {
     }
 
     public IEnumerator Discard(Hex hex) {
-        mm.eventCont.Discard(id, hex.tag);
+        mm.eventCont.Discard(id, hex.hextag);
 
         mm.audioCont.HexDiscard();
         yield return mm.animCont._DiscardTile(hex.transform);
@@ -192,20 +192,21 @@ public class Player {
 
     public bool ThisIsLocal() { return mm.myID == id; }
 
-    public void InitAP() { AP = 4; }
+    public void InitAP() { AP = MAX_AP; }
 
-    public void SetCurrentSpell(int index) {
-        currentSpell = character.GetSpell(index);
-    }
-
-    public void ApplySpellCosts() {
-        if (mm.IsDebugMode() && mm.debugSettings.applyAPcost) {
-            MMLog.Log_Player("Applying AP cost...which is " + currentSpell.APcost);
-            AP -= currentSpell.APcost;
+    public void ApplySpellCosts(Spell spell) {
+        bool applyAPcost = true;
+        if (mm.IsDebugMode()) {
+            applyAPcost = mm.debugSettings.applyAPcost;
+        }
+        if (applyAPcost) {
+            MMLog.Log_Player("Applying AP cost...which is " + spell.APcost);
+            AP -= spell.APcost;
         }
 
-        if (currentSpell is SignatureSpell) {
-            int meterCost = ((SignatureSpell)currentSpell).meterCost;
+
+        if (spell is SignatureSpell) {
+            int meterCost = ((SignatureSpell)spell).meterCost;
             MMLog.Log_Player("Applying meter cost...which is " + meterCost);
             character.ChangeMeter(-meterCost);
         }

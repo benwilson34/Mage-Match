@@ -17,9 +17,8 @@ public class Stats {
     private class PlayerStat {
         public string name;
         public string character;
-        public int draws, drops, swaps, matches, match3s, match4s, match5s, cascades, tilesRemoved, spellsCast, timeouts, discards;
+        public int draws, drops, swaps, matches, match3s, match4s, match5s, tilesRemoved, spellsCast, timeouts, discards;
         public int dmgDealt, dmgTaken, healingDone;
-        public int longestCascade;
     }
 
     private PlayerStat ps1, ps2;
@@ -162,14 +161,6 @@ public class Stats {
         yield return null;
     }
 
-    //public void OnCascade(int id, int chain) {
-    //    report.AppendLine("...cascade of " + chain + " matches");
-    //    PlayerStat ps = GetPS(id);
-    //    ps.cascades++;
-    //    if (ps.longestCascade < chain)
-    //        ps.longestCascade = chain;
-    //}
-
     public void OnTileRemove(int id, TileBehav tb) {
         if (!mm.IsCommishTurn()) {
             if (!mm.uiCont.IsDebugMenuOpen()) //?
@@ -241,7 +232,6 @@ public class Stats {
             sb.AppendLine("Matches," + ps.matches + ",...match-3s," + ps.match3s);
             sb.AppendLine(",,...match-4s," + ps.match4s);
             sb.AppendLine(",,...match-5s," + ps.match5s);
-            sb.AppendLine("Cascades," + ps.cascades + ",...longest," + ps.longestCascade);
             sb.AppendLine("Tiles removed," + ps.tilesRemoved);
             sb.AppendLine("Spells cast," + ps.spellsCast);
             sb.AppendLine("Turns timed out," + ps.timeouts).AppendLine("");

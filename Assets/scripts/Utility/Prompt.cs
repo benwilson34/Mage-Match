@@ -54,7 +54,7 @@ public class Prompt {
     }
 
     public void SetDrop(int col, TileBehav tb) {
-        MMLog.Log("PROMPT", "blue", "DROP is " + tb.tag);
+        MMLog.Log("PROMPT", "blue", "DROP is " + tb.hextag);
         mm.syncManager.SendDropSelection(col, tb);
 
         dropTile = tb;
@@ -109,7 +109,7 @@ public class Prompt {
         swapTiles[0] = mm.hexGrid.GetTileBehavAt(c1, r1);
         swapTiles[1] = mm.hexGrid.GetTileBehavAt(c2, r2);
         MMLog.Log("PROMPT", "blue", "SWAPS are " + 
-            swapTiles[0].tag + " and " + swapTiles[1].tag);
+            swapTiles[0].hextag + " and " + swapTiles[1].hextag);
 
         currentMode = PromptMode.None;
         successful = true;

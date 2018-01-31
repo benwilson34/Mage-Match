@@ -195,14 +195,14 @@ public class DebugTools : MonoBehaviour {
 
 
     void InsertMode_OnClick(CellBehav cb) {
-        TileBehav insertTB = (TileBehav) mm.tileMan.GenerateHex(mm.ActiveP().id, GetHexGenTag(1));
+        TileBehav insertTB = (TileBehav) mm.hexMan.GenerateHex(mm.ActiveP().id, GetHexGenTag(1));
         mm.PutTile(insertTB, cb.col, cb.row);
         //insertTB.HardSetPos(cb.col, cb.row);
     }
 
     void DestroyMode_OnClick(TileBehav tb) {
         MMLog.Log("DebugTools", "orange", "calling destroy mode!"); 
-        mm.tileMan.RemoveTile(tb.tile, false);
+        mm.hexMan.RemoveTile(tb.tile, false);
     }
 
     void EnchantMode_OnClick(TileBehav tb) {
