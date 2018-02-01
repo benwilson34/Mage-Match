@@ -86,8 +86,6 @@ public class BoardCheck {
         return counts;
     }
 
-    // TODO I really don't think I need to send -1 signal...just make sure on
-    // impl. side it handles it dynamically (e.g. while(queue.Count > 0) )
     public int[] GetRandomCols(int num) {
         int[] counts = EmptyCount();
         List<int> cs = new List<int>();
@@ -144,7 +142,7 @@ public class BoardCheck {
 		} // --Ends checking loops
 
         for (int i = 0; i < spells.Count; i++) {
-            MMLog.Log_BoardCheck(spells[i].name + " --> " + PrintSeqList(returnList[i]));
+            MMLog.Log_BoardCheck(spells[i].name + " --> " + PrintSeqList(returnList[i]), MMLog.LogLevel.Standard);
         }
 
 		return returnList;
@@ -193,7 +191,7 @@ public class BoardCheck {
 			bool skip = false;
 			foreach (SkipCheck s in skips) {
 				if (s.col == c && s.row == r && s.dir == dir) {
-                    //MMLog.Log_BoardCheck("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir);
+                    MMLog.Log_BoardCheck("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir, MMLog.LogLevel.Standard);
 					skip = true;
 					break;
 				}
@@ -251,16 +249,18 @@ public class BoardCheck {
                         //MMLog.Log_BoardCheck("Next tile matches! " + checkList[i].PrintSeq() + " length=" + seqs[i].GetSeqLength(), MMLog.LogLevel.Standard);
 
                         if (seqs[i].GetSeqLength() == s.GetLength()) { // complete seq!
-                            returnList[checkList[i].index].Add(seqs[i]);
-                            if (s.isSymmetric)
+                            returnList[s.index].Add(seqs[i]);
+                            if (s is CoreSpell) // core of length 5
+                                AddCoreSkips(seqs[i], dir);
+                            else if (s.isSymmetric)
                                 AddSymmetricSkips(seqs[i], dir);
                             remove = true;
                         }
                     } else { // it doesn't match...
                         //MMLog.Log_BoardCheck("Seq " + checkList[i].PrintSeq() + " was not found!", MMLog.LogLevel.Standard);
-                        if (checkList[i] is CoreSpell && seqs[i].GetSeqLength() >= 3) {
+                        if (s is CoreSpell && seqs[i].GetSeqLength() >= 3) {
                             AddCoreSkips(seqs[i], dir);
-                            returnList[checkList[i].index].Add(seqs[i]);
+                            returnList[s.index].Add(seqs[i]);
                         }
                         remove = true;
                     }
@@ -278,7 +278,7 @@ public class BoardCheck {
 	}
 
 	void AddCoreSkips(TileSeq seq, int dir){
-		MMLog.Log_BoardCheck("Adding skips for " + PrintSeq (seq, true));
+		MMLog.Log_BoardCheck("Adding skips for " + PrintSeq (seq, true), MMLog.LogLevel.Standard);
 		switch (seq.GetSeqLength ()) {
 		case 3:
 			skips.Add (new SkipCheck (seq.sequence [2], OppDir(dir))); // 3
