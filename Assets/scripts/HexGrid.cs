@@ -45,7 +45,7 @@ public class HexGrid {
                 tileGrid[col, r] = null;
             }
         }
-        mm.StartCoroutine(tb._ChangePos(row, col, row, .15f, "raise")); //startRow param not needed here
+        mm.StartCoroutine(tb._ChangePos(col, row, .15f, "raise")); //startRow param not needed here
         //tb.ChangePos(col, row);
     }
 
@@ -329,7 +329,7 @@ public class HexGrid {
                             if (tileGrid[c, r2].ableGrav) {
                                 tileGrid[c, r] = tileGrid[c, r2];
                                 tileGrid[c, r2] = null;
-                                tileGrid[c, r].ChangePos(r2, c, r, .01f);
+                                tileGrid[c, r].ChangePosAndDrop(r2, c, r, .01f);
                                 break;
                             } else { // TODO test with a floating tile
                                 r = r2;

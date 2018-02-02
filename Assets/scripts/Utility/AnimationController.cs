@@ -63,9 +63,20 @@ public class AnimationController : MonoBehaviour {
         animating--;
     }
 
-    public IEnumerator _MoveTile(TileBehav tb, int startrow, float duration) {
+    public IEnumerator _MoveTile(TileBehav tb, float duration) {
         animating++;
-        int col = tb.tile.col, row = startrow;
+        int col = tb.tile.col, row = tb.tile.row;
+        Vector3 newPos = new Vector3(mm.hexGrid.GridColToPos(col), mm.hexGrid.GridRowToPos(col, row)); //?
+        MMLog.Log_MageMatch(">>>>>>>>>>>>>>>>>>>>>>>>>about to animate");
+
+        yield return tb.transform.DOMove(newPos, duration).SetEase(Ease.Linear).WaitForCompletion();
+
+        animating--;
+    }
+
+    public IEnumerator _MoveTileAndDrop(TileBehav tb, int startRow, float duration) {
+        animating++;
+        int col = tb.tile.col, row = startRow;
         Vector3 newPos = new Vector3(mm.hexGrid.GridColToPos(col), mm.hexGrid.GridRowToPos(col, row)); //?
         MMLog.Log_MageMatch(">>>>>>>>>>>>>>>>>>>>>>>>>about to animate");
 

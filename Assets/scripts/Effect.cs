@@ -82,7 +82,7 @@ public class TileEffect : Effect {
 
     public TileEffect(int id, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = id; // NO!!!
+        playerID = id;
         turnsLeft = -1;
         this.type = type;
         this.turnEffect = turnEffect;
@@ -226,20 +226,17 @@ public class MatchEffect : Effect {
 public class DropEffect : Effect {
 
     public delegate IEnumerator MyDropEffect(int id, bool playerAction, string tag, int col);
-    private MyDropEffect dropEffect, endEffect;
-    public int countLeft = -1;
+    private MyDropEffect dropEffect;
 
-    public DropEffect(int turns, MyDropEffect dropEffect, MyDropEffect endEffect, int count = -1) {
+    public int countLeft = -1;
+    public bool isGlobal = false;
+
+    public DropEffect(int id, MyDropEffect dropEffect, int turns = -1, int count = -1) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = mm.ActiveP().id; // NOT SAFE - could be adding effects to opponent!!
+        playerID = id;
         turnsLeft = turns;
         this.countLeft = count;
         this.dropEffect = dropEffect;
-        this.endEffect = endEffect;
-    }
-
-    public override IEnumerator TriggerEffect() {
-        throw new NotImplementedException(); // hmmm...should be virtual in Effect?
     }
 
     public IEnumerator TriggerEffect(bool playerAction, string tag, int col) {
@@ -253,14 +250,6 @@ public class DropEffect : Effect {
 
     public override IEnumerator Turn() { //?
         turnsLeft--;
-        if (turnsLeft == 0) {
-            yield return EndEffect(); //???
-        }
-    }
-
-    public IEnumerator EndEffect(bool playerAction, string tag, int col) { //?
-        if (endEffect != null)
-            yield return endEffect(mm.ActiveP().id, playerAction, tag, col);
         yield return null;
     }
 
@@ -272,41 +261,30 @@ public class DropEffect : Effect {
 public class SwapEffect : Effect {
 
     public delegate IEnumerator MySwapEffect(int id, int c1, int r1, int c2, int r2);
-    private MySwapEffect swapEffect, endEffect;
-    public int countLeft = -1;
+    private MySwapEffect swapEffect;
 
-    public SwapEffect(int turns, MySwapEffect swapEffect, MySwapEffect endEffect, int count = -1) {
+    public int countLeft = -1;
+    public bool isGlobal = false;
+
+    public SwapEffect(int id, MySwapEffect swapEffect, int turns = -1, int count = -1) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = mm.ActiveP().id; // NOT SAFE - could be adding effects to opponent!!
+        playerID = id;
         turnsLeft = turns;
         this.countLeft = count;
         this.swapEffect = swapEffect;
-        this.endEffect = endEffect;
-    }
-
-    public override IEnumerator TriggerEffect() {
-        throw new NotImplementedException(); // hmmm...should be virtual in Effect?
     }
 
     public IEnumerator TriggerEffect(int c1, int r1, int c2, int r2) {
         if (swapEffect != null) { // would it ever be? maybe if like, your third swap does something
             MMLog.Log("SWAPEFFECT", "black", "About to trigger swapEffect!");
-            yield return swapEffect(mm.ActiveP().id, c1, r1, c2, r2);
+            yield return swapEffect(mm.ActiveP().id, c1, r1, c2, r2); // should be playerID?
             countLeft--;
         }
         yield return null;
     }
 
-    public override IEnumerator Turn() { //?
+    public override IEnumerator Turn() { // this could just be the default in Effect...
         turnsLeft--;
-        if (turnsLeft == 0) {
-            yield return EndEffect(); //???
-        }
-    }
-
-    public IEnumerator EndEffect(int c1, int r1, int c2, int r2) { //?
-        if (endEffect != null)
-            yield return endEffect(mm.ActiveP().id, c1, r1, c2, r2);
         yield return null;
     }
 
@@ -318,14 +296,14 @@ public class SwapEffect : Effect {
 public class HealthEffect : Effect {
 
     public delegate float MyHealthEffect(Player p, int dmg);
-    public bool isAdditive; // simple enough for now, could be an enum in time
-    public bool isBuff = true;
+    public bool isAdditive;    // additive or multiplicative? could be an enum in time
+    public bool isBuff = true; // buff or debuff?
     public int countLeft = -1;
 
     private MyHealthEffect healthEffect;
 
     // TODO add infinite Constructor...or just pass in a negative for turns?
-    public HealthEffect(int id, int turns, MyHealthEffect healthEffect, bool isAdditive, bool isBuff = true, int count = -1) {
+    public HealthEffect(int id, MyHealthEffect healthEffect, bool isAdditive, bool isBuff = true, int turns = -1, int count = -1) {
         mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id;
         turnsLeft = turns;
@@ -343,7 +321,7 @@ public class HealthEffect : Effect {
 
     public float GetResult(Player p, int dmg) {
         countLeft--;
-        return healthEffect( p, dmg);
+        return healthEffect(p, dmg);
     }
 
     public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }

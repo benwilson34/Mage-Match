@@ -458,7 +458,7 @@ public class MageMatch : MonoBehaviour {
         if (currentTurn == Turn.PlayerTurn) //kinda hacky
             yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
 
-        tb.ChangePos(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
+        yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
 
         if (currentTurn == Turn.PlayerTurn) { //kinda hacky
             yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
@@ -487,7 +487,7 @@ public class MageMatch : MonoBehaviour {
 
         hexGrid.Swap(c1, r1, c2, r2);
         tb1.ChangePos(c2, r2);
-        yield return tb2._ChangePos(r1, c1, r1, .15f);
+        yield return tb2._ChangePos(c1, r1);
 
         yield return eventCont.Swap(EventController.Status.End, playerAction, c1, r1, c2, r2);
          

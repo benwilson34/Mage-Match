@@ -19,7 +19,7 @@ public class Enfuego : Character {
     public override void OnEffectContLoad() {
         MMLog.Log_Enfuego("Loading PASSIVE...");
         // SwapEffect for incrementing swapsThisTurn
-        SwapEffect se = new SwapEffect(-1, Passive_Swap, null);
+        SwapEffect se = new SwapEffect(playerId, Passive_Swap);
         mm.effectCont.AddSwapEffect(se, "EnSwp");
 
         // TurnEffect for reseting the counter
@@ -145,7 +145,7 @@ public class Enfuego : Character {
 
     // Hot Potatoes
     protected override IEnumerator Spell3(TileSeq prereq) {
-        HealthEffect he = new HealthEffect(mm.OpponentId(playerId), 3, HotPot_Buff, true, false);
+        HealthEffect he = new HealthEffect(mm.OpponentId(playerId), HotPot_Buff, true, false, 3);
         mm.effectCont.AddHealthEffect(he, "hotpo");
 
         yield return null;

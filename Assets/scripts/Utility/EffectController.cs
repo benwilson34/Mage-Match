@@ -278,7 +278,7 @@ public class EffectController {
         DropEffect de;
         for (int i = 0; i < dropEffects.Count; i++) { // foreach
             de = dropEffects[i];
-            if (de.playerID == id) {
+            if (de.isGlobal || de.playerID == id) {
                 MMLog.Log_EffectCont("Checking dropEff with tag " + de.tag + "; count=" + de.countLeft);
 
                 yield return de.TriggerEffect(playerAction, tag, col);
@@ -302,6 +302,7 @@ public class EffectController {
     //}
     #endregion
 
+
     #region SwapEffects
     public void AddSwapEffect(SwapEffect se, string tag) {
         se.tag = GenFullTag("swap", tag);
@@ -312,7 +313,7 @@ public class EffectController {
         SwapEffect se;
         for (int i = 0; i < swapEffects.Count; i++) { // foreach
             se = swapEffects[i];
-            if (se.playerID == id) {
+            if (se.isGlobal || se.playerID == id) {
                 MMLog.Log_EffectCont("Checking swapEff with tag " + se.tag + "; count=" + se.countLeft);
 
                 yield return se.TriggerEffect(c1, r1, c2, r2);

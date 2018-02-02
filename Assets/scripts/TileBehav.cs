@@ -27,15 +27,10 @@ public class TileBehav : Hex, Tooltipable {
     }
 
 	public void ChangePos(int col, int row){
-		ChangePos(row, col, row, .15f);
-	}
+        StartCoroutine(_ChangePos(col, row));
+    }
 
-    // startrow needed??
-	public void ChangePos(int startRow, int col, int row, float duration){
-		StartCoroutine(_ChangePos(startRow, col, row, duration));
-	}
-
-	public IEnumerator _ChangePos(int startRow, int col, int row, float duration = .15f, string anim = ""){
+	public IEnumerator _ChangePos(int col, int row, float duration = .15f, string anim = ""){
 		tile.SetPos(col, row);
 		mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
 		inPos = false;
@@ -45,13 +40,26 @@ public class TileBehav : Hex, Tooltipable {
                 yield return mm.animCont._UpwardInsert(this);
                 break;
             default:
-                yield return mm.animCont._MoveTile(this, startRow, duration);
+                yield return mm.animCont._MoveTile(this, duration);
                 break;
         }
 
-		//mm.audioCont.DropSound(GetComponent<AudioSource>());
 		inPos = true;
 	}
+
+    public void ChangePosAndDrop(int startRow, int col, int row, float duration) {
+        StartCoroutine(_ChangePosAndDrop(startRow, col, row, duration));
+    }
+
+    public IEnumerator _ChangePosAndDrop(int startRow, int col, int row, float duration = .15f) {
+        tile.SetPos(col, row);
+		mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
+		inPos = false;
+
+        yield return mm.animCont._MoveTileAndDrop(this, startRow, duration);
+
+		inPos = true;
+    }
 
 	public void HardSetPos(int col, int row){ // essentially a "teleport"
 		tile.SetPos(col, row);
@@ -63,18 +71,6 @@ public class TileBehav : Hex, Tooltipable {
 	public void SetPlaced(){
 		currentState = State.Placed;
 	}
-
-    // delete?
-	//public void FlipTile(){
-	//	SpriteRenderer rend = gameObject.GetComponent<SpriteRenderer> ();
-	//	Sprite temp = rend.sprite;
-	//	rend.sprite = flipSprite;
-	//	flipSprite = temp;
-	//	if (currentState == TileState.Hand)
-	//		currentState = TileState.Flipped;
-	//	else if (currentState == TileState.Flipped)
-	//		currentState = TileState.Hand;
-	//}
 
 	public void SetOutOfPosition(){
 		inPos = false;

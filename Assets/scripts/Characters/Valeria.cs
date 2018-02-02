@@ -16,7 +16,7 @@ public class Valeria : Character {
 
     public override void OnEffectContLoad() {
         MMLog.Log("Valeria","cyan","Loading PASSIVE...");
-        SwapEffect se = new SwapEffect(-1, Passive_Swap, null);
+        SwapEffect se = new SwapEffect(playerId, Passive_Swap);
         mm.effectCont.AddSwapEffect(se, "VlSwp");
 
         // when we have List<Buff>
@@ -90,12 +90,12 @@ public class Valeria : Character {
         // move first to second and destroy second
         int secCol = second.tile.col, secRow = second.tile.row;
         yield return hexMan._RemoveTile(second, false);
-        yield return first._ChangePos(first.tile.row, secCol, secRow, 0.3f);
+        yield return first._ChangePos(secCol, secRow, 0.3f);
 
         // put new water tile in first's place
         TileBehav waterTile = (TileBehav)hexMan.GenerateTile(playerId, Tile.Element.Water);
         waterTile.SetPlaced(); // this kinda sucks here
-        yield return waterTile._ChangePos(firstRow, firstCol, firstRow);
+        yield return waterTile._ChangePos(firstCol, firstRow);
 
         yield return null;
     }
@@ -146,10 +146,12 @@ public class Valeria : Character {
 
     // Balanco
     protected override IEnumerator Spell3(TileSeq prereq) {
-        DropEffect de = new DropEffect(3, Balanco_Drop, null);
+        DropEffect de = new DropEffect(playerId, Balanco_Drop, 3);
+        de.isGlobal = true;
         mm.effectCont.AddDropEffect(de, "balDp");
 
-        SwapEffect se = new SwapEffect(3, Balanco_Swap, null);
+        SwapEffect se = new SwapEffect(playerId, Balanco_Swap, 3);
+        se.isGlobal = true;
         mm.effectCont.AddSwapEffect(se, "balSw");
         yield return null;
     }
