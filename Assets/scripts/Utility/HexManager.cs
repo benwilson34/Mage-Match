@@ -161,29 +161,46 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     }
 
     public void RemoveTileSeq(TileSeq seq) {
-        RemoveSeq(seq, false);
+        mm.StartCoroutine(_RemoveSeq(seq, false));
     }
 
-    public void RemoveInvokedSeq(TileSeq seq) { // TODO messy stuff
-        RemoveSeq(seq, true);
+    public void SetInvokedSeq(TileSeq seq) {
+        TileBehav tb;
+        TileSeq seqCopy = seq.Copy();
+        for (int i = 0; i < seqCopy.sequence.Count;) {
+            Tile tile = seqCopy.sequence[0];
+            tb = hexGrid.GetTileBehavAt(tile.col, tile.row);
+            tb.wasInvoked = true;
+
+            mm.StartCoroutine(mm.animCont._InvokeTile(tb));
+
+            seqCopy.sequence.RemoveAt(0);
+        }
     }
 
-    void RemoveSeq(TileSeq seq, bool isInvoked) {
+    public void RemoveInvokedSeq(TileSeq seq) {
+        mm.StartCoroutine(_RemoveSeq(seq, true));
+    }
+
+    public IEnumerator _RemoveSeq(TileSeq seq, bool isInvoked) {
         if (hexGrid == null) {
             MMLog.LogError("HEXMAN: hexGrid is null");
-            return;
+            yield break;
         }
 
-        //Debug.Log ("MAGEMATCH: RemoveSeq() about to remove " + boardCheck.PrintSeq(seq, true));
+        Debug.Log("HEXMAN: RemoveSeq() about to remove " + mm.boardCheck.PrintSeq(seq, true));
         Tile tile;
         for (int i = 0; i < seq.sequence.Count;) {
             tile = seq.sequence[0];
-            if (hexGrid.IsCellFilled(tile.col, tile.row)) {
+            if (isInvoked || hexGrid.IsCellFilled(tile.col, tile.row)) {
                 TileBehav tb = hexGrid.GetTileBehavAt(tile.col, tile.row);
-                mm.StartCoroutine(_RemoveTile(tb, false, isInvoked));
+                if (seq.sequence.Count == 1) // if it's the last one, wait for it
+                    yield return _RemoveTile(tb, false, isInvoked);
+                else
+                    mm.StartCoroutine(_RemoveTile(tb, false, isInvoked));
             } else
                 Debug.Log("RemoveSeq(): The tile at (" + tile.col + ", " + tile.row + ") is already gone.");
-            seq.sequence.Remove(tile);
+            seq.sequence.RemoveAt(0);
         }
     }
 
@@ -223,8 +240,8 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
         hexGrid.ClearTileBehavAt(tb.tile.col, tb.tile.row); // move up?
 
-        if(isInvoked)
-            yield return mm.animCont._InvokeTile(tb); // just start it, don't yield?
+        if (isInvoked)
+            yield return mm.animCont._InvokeTileRemove(tb); // just start it, don't yield?
         else
             yield return mm.animCont._DestroyTile(tb); // just start it, don't yield?
         GameObject.Destroy(tb.gameObject);

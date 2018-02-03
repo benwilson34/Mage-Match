@@ -141,8 +141,12 @@ public class InputController : MonoBehaviour {
 	Hex GetMouseHex(RaycastHit2D[] hits){
 		foreach (RaycastHit2D hit in hits) {
 			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
-			if (tb != null)
-				return tb;
+            if (tb != null) {
+                if (tb.wasInvoked)
+                    return null;
+                else
+                    return tb;
+            }
             Hex hex = hit.collider.GetComponent<Hex>();
             if (hex != null)
                 return hex;

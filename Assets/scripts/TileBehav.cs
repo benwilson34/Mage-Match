@@ -10,6 +10,7 @@ public class TileBehav : Hex, Tooltipable {
 
 	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
 	public bool ablePrereq = true, ableTarget = true;
+    public bool wasInvoked = false;
 
 	private Enchantment enchantment;
     private List<TileEffect> tileEffects;

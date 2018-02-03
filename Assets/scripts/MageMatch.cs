@@ -309,33 +309,20 @@ public class MageMatch : MonoBehaviour {
         switchingTurn = false;
     }
 
-    public IEnumerator BoardChecking() {
+    public IEnumerator BoardChecking(bool spellCheck = true) {
         checking++; // prevents overcalling/retriggering
         yield return new WaitUntil(() => hexMan.removing == 0); //?
         MMLog.Log_MageMatch("About to check the board.");
 
-        //cascade = 0;
-        //while (true) {
-            yield return new WaitUntil(() => !animCont.IsAnimating() && hexMan.removing == 0); //?
-            hexGrid.CheckGrav(); // TODO make IEnum
-            yield return new WaitUntil(() => hexGrid.IsGridAtRest());
-            //List<TileSeq> seqMatches = boardCheck.MatchCheck();
-            //if (seqMatches.Count > 0) { // if there's at least one MATCH
-            //    MMLog.Log_MageMatch("Resolving matches...");
-            //    yield return ResolveMatches(seqMatches);
-            //    cascade++;
-            //} else {
-                if (currentTurn == Turn.PlayerTurn) {
-                    //if (cascade > 1) {
-                    //    eventCont.Cascade(cascade);
-                    //    cascade = 0;
-                    //}
-                    SpellCheck();
-                }
-                uiCont.UpdateDebugGrid();
-                //break;
-            //}
-        //}
+        yield return new WaitUntil(() => !animCont.IsAnimating() && hexMan.removing == 0); //?
+        hexGrid.CheckGrav(); // TODO make IEnum
+        yield return new WaitUntil(() => hexGrid.IsGridAtRest());
+
+        if (currentTurn == Turn.PlayerTurn && spellCheck)
+            SpellCheck();
+
+        uiCont.UpdateDebugGrid();
+
         MMLog.Log_MageMatch("Done checking.");
         checking--;
     }
@@ -466,6 +453,7 @@ public class MageMatch : MonoBehaviour {
             eventCont.CommishDrop(tb.tile.element, col);
 
         syncManager.CheckHandContents(activep.id);
+
         MMLog.Log_MageMatch("   ---------- DROP END ----------");
         actionsPerforming--;
         yield return null;
@@ -511,25 +499,22 @@ public class MageMatch : MonoBehaviour {
             yield return targeting.SpellSelectScreen(spellsOnBoard[spellNum]);
 
             if (!targeting.selectionCanceled) {
-
-                //targeting.targetingCanceled = false;
                 uiCont.DeactivateAllSpellButtons(); // ?
 
                 TileSeq seq = targeting.GetSelection();
-                TileSeq seqCopy = seq.Copy();
-                hexMan.RemoveInvokedSeq(seq);
+                //TileSeq seqCopy = seq.Copy(); //?
+                hexMan.SetInvokedSeq(seq);
 
-                yield return spell.Cast(seqCopy);
+                yield return spell.Cast(seq);
 
-                //if (!targeting.WasCanceled()) { // should be an event callback?
                 eventCont.SpellCast(spell);
 
                 if(MyTurn()) // this doesn't seem right...
                     StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
 
                 p.ApplySpellCosts(spell);
+                hexMan.RemoveInvokedSeq(seq);
                 yield return BoardChecking(); //?
-                //}
             }
         } else {
             uiCont.UpdateMoveText("Not enough AP to cast!");

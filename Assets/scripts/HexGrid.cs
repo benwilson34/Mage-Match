@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 public class HexGrid {
 
-	public const int numCols = 7, numRows = 7;
-	public const int numCells = 37;
+	public const int NUM_COLS = 7, NUM_ROWS = 7;
+	public const int NUM_CELLS = 37;
     public const float horiz = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 
 	private TileBehav[,] tileGrid;
@@ -13,12 +14,12 @@ public class HexGrid {
 	// TODO public static List<TileBehav> tilesOnBoard?
 
 	public HexGrid(){
-		tileGrid = new TileBehav[numCols, numRows];
+		tileGrid = new TileBehav[NUM_COLS, NUM_ROWS];
         mm = GameObject.Find("board").GetComponent<MageMatch>();
     }
 
     public void HardSetTileBehavAt(TileBehav tb, int col, int row){
-        MMDebug.MMLog.Log_HexGrid("setting (" + col + ", " + row + ") to " + tb.hextag, MMDebug.MMLog.LogLevel.Standard);
+        MMLog.Log_HexGrid("setting (" + col + ", " + row + ") to " + tb.hextag, MMLog.LogLevel.Standard);
 		if (IsCellFilled (col, row))
             tileGrid[col, row] = null;
         SetTileBehavAt (tb, col, row);
@@ -91,12 +92,20 @@ public class HexGrid {
 //		return TopOfColumn (col) - BottomOfColumn (col) + 1;
 //	}
 
+    public bool WasTileBehavInvoked(int col, int row) {
+        return tileGrid[col, row].wasInvoked;
+    }
+
 	public bool IsCellFilled(int col, int row){
-		return tileGrid [col, row] != null;
+		return tileGrid[col, row] != null;
 	}
 
+    public bool IsCellFilledButNotInvoked(int col, int row) {
+        return IsCellFilled(col, row) && !WasTileBehavInvoked(col, row);
+    }
+
 	public bool IsGridAtRest(){ // better with a List of placed tiles
-		for (int c = 0; c < numCols; c++) {
+		for (int c = 0; c < NUM_COLS; c++) {
 			for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) {
 				if (IsCellFilled(c, r)) {
 					if (!tileGrid [c, r].IsInPosition())
@@ -129,7 +138,7 @@ public class HexGrid {
         if (c2 == -1 || r2 == -1)
             return false;
 
-        if (IsCellFilled(c2, r2) &&
+        if (IsCellFilledButNotInvoked(c2, r2) &&
             tileGrid[c1, r1].ableSwap &&
             tileGrid[c2, r2].ableSwap)
             return true;
@@ -149,15 +158,12 @@ public class HexGrid {
 		return true;
 	}
 
-	// TODO handle floating things, once they are implemented
 	public List<TileBehav> GetPlacedTiles(TileSeq skip = null){
 		List<TileBehav> returnList = new List<TileBehav> ();
-		for(int c = 0; c < numCols; c++){ // for each col
-			for(int r = BottomOfColumn(c); r <= TopOfColumn(c); r++){ // for each row
-				if (IsCellFilled(c, r)) { // if there's a tile there
+		for(int c = 0; c < NUM_COLS; c++) { // for each col
+			for(int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) { // for each row
+				if (IsCellFilledButNotInvoked(c, r)) // if there's a tile there
 					returnList.Add(GetTileBehavAt(c, r));
-				} else
-					break; // breaks just inner loop
 			}	
 		}
 
@@ -180,11 +186,23 @@ public class HexGrid {
             }
         }
 
+        MMLog.Log_HexGrid("Total num of tiles on board=" + returnList.Count, MMLog.LogLevel.Standard);
 		return returnList;
 	}
+
+    public int GetEmptyCellCount() {
+        int count = 0;
+        for (int c = 0; c < NUM_COLS; c++) { // for each col
+            for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) { // for each row
+                if (IsCellFilled(c, r)) // if there's a tile there
+                    count++;
+            }
+        }
+        return NUM_CELLS - count;
+    }
 		
 	public bool CellExists(int col, int row){
-		bool bounds = (col >= 0 && col < numCols) && (row >= 0 && row < numRows);
+		bool bounds = (col >= 0 && col < NUM_COLS) && (row >= 0 && row < NUM_ROWS);
 		bool diag = (row <= TopOfColumn (col)) && (row >= BottomOfColumn(col));
 		return bounds && diag;
 	}
@@ -320,9 +338,10 @@ public class HexGrid {
 
 	// apply "gravity" to any tiles with empty space under them
 	public void CheckGrav(){ // TODO! eventually replace the grav built into TileBehav??????????
-		for (int c = 0; c < numCols; c++) { // for each column
+        MMLog.Log_BoardCheck("Checking the board...", MMLog.LogLevel.Standard);
+		for (int c = 0; c < NUM_COLS; c++) { // for each column
 			bool skip = false;
-			for (int r = BottomOfColumn(c); r < TopOfColumn(c) && !skip; r++) { // for each row in the col
+			for (int r = BottomOfColumn(c); r < TopOfColumn(c) && !skip; r++) { // for each cell
 				if (tileGrid [c, r] == null) { // if there's not something there...
 					for (int r2 = r + 1; r2 <= TopOfColumn(c); r2++) { // ...loop thru the cells above it until something is hit
                         if (tileGrid[c, r2] != null) {

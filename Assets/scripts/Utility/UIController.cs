@@ -526,13 +526,18 @@ public class UIController : MonoBehaviour {
 
     public void UpdateDebugGrid() {
         string grid = "   0  1  2  3  4  5  6 \n";
-        for (int r = HexGrid.numRows - 1; r >= 0; r--) {
+        for (int r = HexGrid.NUM_ROWS - 1; r >= 0; r--) {
             grid += r + " ";
-            for (int c = 0; c < HexGrid.numCols; c++) {
+            for (int c = 0; c < HexGrid.NUM_COLS; c++) {
                 if (r <= mm.hexGrid.TopOfColumn(c) && r >= mm.hexGrid.BottomOfColumn(c)) {
-                    if (mm.hexGrid.IsCellFilled(c, r))
-                        grid += "[" + mm.hexGrid.GetTileAt(c, r).ThisElementToChar() + "]";
-                    else
+                    if (mm.hexGrid.IsCellFilled(c, r)) {
+                        TileBehav tb = mm.hexGrid.GetTileBehavAt(c, r);
+                        if (tb.wasInvoked)
+                            grid += "[*]";
+                        else
+                            grid += "[" + tb.tile.ThisElementToChar() + "]";
+
+                    } else
                         grid += "[ ]";
                 } else
                     grid += " - ";

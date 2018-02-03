@@ -42,12 +42,28 @@ public class AnimationController : MonoBehaviour {
 
     public IEnumerator _InvokeTile(TileBehav tb) {
         animating++;
-        Tween swellTween = tb.transform.DOScale(new Vector3(1.25f, 1.25f), .15f);
-        tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .15f);
+        //Tween swellTween = tb.transform.DOScale(new Vector3(1.25f, 1.25f), .15f);
+        Tween colorTween = tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 0, 0, .4f), .15f);
         //Camera.main.DOShakePosition(.1f, 1.5f, 20, 90, false); // heh
         mm.audioCont.TileInvoke();
 
-        yield return swellTween.WaitForCompletion();
+        //yield return swellTween.WaitForCompletion();
+        yield return colorTween.WaitForCompletion();
+        animating--;
+    }
+
+    public IEnumerator _InvokeTileRemove(TileBehav tb) {
+
+        // TODO
+
+        animating++;
+        //Tween swellTween = tb.transform.DOScale(new Vector3(1.25f, 1.25f), .15f);
+        Tween colorTween = tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 0, 0, 0), .15f);
+        //Camera.main.DOShakePosition(.1f, 1.5f, 20, 90, false); // heh
+        mm.audioCont.TileInvoke();
+
+        //yield return swellTween.WaitForCompletion();
+        yield return colorTween.WaitForCompletion();
         animating--;
     }
 

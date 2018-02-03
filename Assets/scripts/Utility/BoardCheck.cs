@@ -27,24 +27,6 @@ public class BoardCheck {
 		skips = new List<SkipCheck> ();
 	}
 
-    //TileSeq GetCoreSeq(Tile t) {
-    //    switch (t.element) {
-    //        case Tile.Element.Fire:
-    //            return new TileSeq("fffff");
-    //        case Tile.Element.Water:
-    //            return new TileSeq("wwwww");
-    //        case Tile.Element.Earth:
-    //            return new TileSeq("eeeee");
-    //        case Tile.Element.Air:
-    //            return new TileSeq("aaaaa");
-    //        case Tile.Element.Muscle:
-    //            return new TileSeq("mmmmm");
-    //        default:
-    //            MMLog.Log_BoardCheck("bad element for Core Sequence at " + t.col + ", " + t.row);
-    //            return null;
-    //    }
-    //}
-
     public int CheckColumn(int c){
 		int r = hexGrid.TopOfColumn(c);
 		if (hexGrid.IsCellFilled (c, r))
@@ -53,36 +35,23 @@ public class BoardCheck {
 		int min = hexGrid.BottomOfColumn (c);
 		while (r > min && !hexGrid.IsCellFilled(c, r - 1))
 			r--;
-		return r;
-	}
 
-	public float[] EmptyCheck(){
-		float[] ratios = new float[7];
-        int[] counts = EmptyCount();
-        int total = counts[7];
-		for (int i = 0; i < HexGrid.numCols; i++) {
-			ratios [i] = (float)counts [i] / total;
-//			Debug.Log("     ratios[" + i + "] = " + ratios[i] + ": " + counts[i] + "/" + total);
-		}
-
-		float totalf = 0;
-		foreach(float f in ratios) totalf += f;
-        MMLog.Log_BoardCheck("EmptyCheck: totalf = ");
-		return ratios;
+        MMLog.Log_BoardCheck("Checking col " + c + " got r=" + r, MMLog.LogLevel.Standard);
+        return r;
 	}
 
     // note: the 8th element is the total number of empty cells
     int[] EmptyCount() {
         int[] counts = new int[8];
-        counts[7] = HexGrid.numCells - hexGrid.GetPlacedTiles ().Count;
-        for (int i = 0; i < HexGrid.numCols; i++) {
+        counts[7] = hexGrid.GetEmptyCellCount();
+        for (int i = 0; i < HexGrid.NUM_COLS; i++) {
             if (CheckColumn(i) >= 0)
                 counts[i] = hexGrid.TopOfColumn(i) - CheckColumn(i) + 1;
             else
                 counts[i] = 0;
-            //Debug.Log("HEXGRID: counts[" + i + "] = " + counts[i]);
+            MMLog.Log_BoardCheck("counts[" + i + "] = " + counts[i], MMLog.LogLevel.Standard);
         }
-        //Debug.Log("HEXGRID: counts total = " + counts[7]);
+        MMLog.Log_BoardCheck("counts total = " + counts[7], MMLog.LogLevel.Standard);
         return counts;
     }
 
@@ -96,7 +65,7 @@ public class BoardCheck {
             int val = Random.Range(0, counts[7]);
             //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol val=" + val);
             int sum = 0;
-            for (int c = 0; c < HexGrid.numCols; c++) {
+            for (int c = 0; c < HexGrid.NUM_COLS; c++) {
                 sum += counts[c];
                 if (val < sum) {
                     counts[c]--; // update column count
@@ -119,10 +88,10 @@ public class BoardCheck {
             returnList[i] = new List<TileSeq>();
         }
 
-		for(int c = 0; c < HexGrid.numCols; c++){ // for each col
+		for(int c = 0; c < HexGrid.NUM_COLS; c++){ // for each col
 			for(int r = hexGrid.BottomOfColumn(c); r <= hexGrid.TopOfColumn(c); r++){ // for each row
 
-				if (hexGrid.IsCellFilled(c, r)) { // if there's a tile there
+				if (hexGrid.IsCellFilledButNotInvoked(c, r)) { // if there's a tile there
 					List<TileSeq>[] playList = CheckTile (c, r, spells);
 
                     if (playList != null) {
@@ -136,8 +105,7 @@ public class BoardCheck {
                         }
                         //MMLog.Log_BoardCheck("Total for [" + c + "," + r + "]: " + total, MMLog.LogLevel.Standard);
                     }
-				} else
-					break; // breaks just inner loop...eventually won't because of floating tiles
+				}
 			}	
 		} // --Ends checking loops
 
@@ -215,7 +183,7 @@ public class BoardCheck {
                     hexGrid.GetOffset(dir, out dc, out dr);
                     dc *= seqIndex;
                     dr *= seqIndex;
-                    if (!hexGrid.IsCellFilled(c + dc, r + dr))
+                    if (!hexGrid.IsCellFilledButNotInvoked(c + dc, r + dr))
                         skipCurrentSeq = true;
                 }
 

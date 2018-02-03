@@ -110,13 +110,13 @@ public class Valeria : Character {
         yield return mm.syncManager.SyncRand(playerId, Random.Range(3, 6));
         int dropCount = mm.syncManager.GetRand();
 
-        // random cols (a little involved)
+        // random water drops
         yield return DropWaterIntoRandomCols(dropCount);
 
         // heal 15-25
         yield return mm.syncManager.SyncRand(playerId, Random.Range(15, 26));
-        int heal = mm.syncManager.GetRand();
-        ThisPlayer().Heal(heal);
+        int healing = mm.syncManager.GetRand();
+        ThisPlayer().Heal(healing);
 
         yield return null;
     }
@@ -174,14 +174,10 @@ public class Valeria : Character {
         yield return null;
     }
 
-    //public float HotPot_Buff(Player p, int dmg) {
-    //    MMLog.Log_Enfuego("Hot Potato debuff on " + p.name + ", handcount=" + p.hand.Count());
-    //    return p.hand.Count() * 3;
-    //}
-
-
     // Hurricane Cutter
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
+        yield return HandleMatchesOnBoard();
+
         const int numSwaps = 4;
         for (int i = 0; i < numSwaps; i++) {
             yield return mm.prompt.WaitForSwap(prereq);
@@ -190,41 +186,47 @@ public class Valeria : Character {
 
             yield return mm.prompt.ContinueSwap();
 
-            var spells = new List<Spell>();
-            spells.Add(new CoreSpell(0, "", null));
-
-            List<TileSeq> seqs = mm.boardCheck.CheckBoard(spells)[0];
-            while (seqs.Count > 0) {  // this is needed to handle cascades
-                for (int s = 0; s < seqs.Count; s++) {
-                    TileSeq seq = seqs[s];
-                    int dmg = 0, dropCount = 0;
-                    switch (seq.GetSeqLength()) {
-                        case 3:
-                            dmg = 30;
-                            dropCount = 2;
-                            break;
-                        case 4:
-                            dmg = 60;
-                            dropCount = 3;
-                            break;
-                        case 5:
-                            dmg = 100;
-                            dropCount = 4;
-                            break;
-                    }
-
-                    ThisPlayer().DealDamage(dmg);
-                    yield return DropWaterIntoRandomCols(dropCount);
-                    mm.hexMan.RemoveTileSeq(seq);
-                }
-
-                // wait for board to update...will this work?
-                yield return mm.BoardChecking();
-
-                seqs = mm.boardCheck.CheckBoard(spells)[0];
-            }
+            yield return HandleMatchesOnBoard();
         }
 
+        yield return null;
+    }
+
+    IEnumerator HandleMatchesOnBoard() {
+        var spells = new List<Spell>();
+        spells.Add(new CoreSpell(0, "", null));
+
+        List<TileSeq> seqs = mm.boardCheck.CheckBoard(spells)[0];
+        while (seqs.Count > 0) {  // this is needed to handle cascades
+            for (int s = 0; s < seqs.Count; s++) {
+                TileSeq seq = seqs[s];
+                int dmg = 0, dropCount = 0;
+                switch (seq.GetSeqLength()) {
+                    case 3:
+                        dmg = 30;
+                        dropCount = 2;
+                        break;
+                    case 4:
+                        dmg = 60;
+                        dropCount = 3;
+                        break;
+                    case 5:
+                        dmg = 100;
+                        dropCount = 4;
+                        break;
+                }
+
+                yield return mm.hexMan._RemoveSeq(seq, false);
+
+                ThisPlayer().DealDamage(dmg);
+                yield return DropWaterIntoRandomCols(dropCount);
+            }
+
+            // wait for board to update...will this work?
+            yield return mm.BoardChecking(false);
+
+            seqs = mm.boardCheck.CheckBoard(spells)[0];
+        }
         yield return null;
     }
 }

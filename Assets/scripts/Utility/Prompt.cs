@@ -42,7 +42,7 @@ public class Prompt {
         successful = false;
 
         if (mm.ActiveP().hand.Count() == 0 ||                      // if player hand is empty, or
-            mm.hexGrid.GetPlacedTiles().Count == HexGrid.numCells) { // the board is full
+            mm.hexGrid.GetPlacedTiles().Count == HexGrid.NUM_CELLS) { // the board is full
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted DROP!!");
             yield break;
         }
