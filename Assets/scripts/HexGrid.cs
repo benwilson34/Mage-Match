@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
+using DG.Tweening;
 
 public class HexGrid {
 
@@ -9,13 +10,22 @@ public class HexGrid {
 	public const int NUM_CELLS = 37;
     public const float horiz = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 
-	private TileBehav[,] tileGrid;
     private MageMatch mm;
+	private TileBehav[,] tileGrid;
+    private Vector3[,] cellPositions;
+    private float bbLeft, bbRight, bbBottom, bbBottomLeft, bbTop;
 	// TODO public static List<TileBehav> tilesOnBoard?
 
 	public HexGrid(){
 		tileGrid = new TileBehav[NUM_COLS, NUM_ROWS];
         mm = GameObject.Find("board").GetComponent<MageMatch>();
+
+        cellPositions = new Vector3[NUM_COLS, NUM_ROWS];
+        for (int c = 0; c < NUM_COLS; c++) {
+            for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) {
+                cellPositions[c, r] = GameObject.Find("cell" + c + r).transform.position; // maybe slow?
+            }
+        }
     }
 
     public void HardSetTileBehavAt(TileBehav tb, int col, int row){
@@ -117,21 +127,21 @@ public class HexGrid {
 		return true;
 	}
 
-    public Vector2 GridCoordToPos(Tile t) {
+    public Vector3 GridCoordToPos(Tile t) {
         return GridCoordToPos(t.col, t.row);
     }
 
-	public Vector2 GridCoordToPos(int col, int row){
-		return new Vector2 (GridColToPos (col), GridRowToPos (col, row));
+	public Vector3 GridCoordToPos(int col, int row){
+        return cellPositions[col, row];
 	}
 
 	public float GridColToPos(int col){
-		return -10f + (col * horiz); // TODO! somewhat magic num
+        return cellPositions[col, 3].x;
 	}
 
-	public float GridRowToPos(int col, int row){
-		return (1.5f - (0.5f * col)) + row; // TODO! somewhat magic num
-	}
+	public float GridRowToPos(int col, int row) {
+        return cellPositions[col, row].y;
+    }
 
     public bool CanSwap(int c1, int r1, int c2, int r2) {
         //adjacency check

@@ -394,7 +394,7 @@ public class EffectController {
         return new object[4] {
             beginTurnEffects,
             endTurnEffects,
-            matchEffects,
+            dropEffects,
             swapEffects
         };
     }

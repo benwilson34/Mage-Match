@@ -111,7 +111,7 @@ public class Gravekeeper : Character {
         // keep in mind here that only the LOCAL player needs this
         if (mm.myID == playerId) {
             MMLog.Log_Gravekeeper("GRAVEK: Switching core spell..." + spells[0].info);
-            mm.uiCont.GetButtonCont(0).SpellChanged();
+            mm.uiCont.GetButtonCont(playerId, 0).SpellChanged();
         }
     }
 

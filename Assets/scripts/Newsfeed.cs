@@ -24,11 +24,11 @@ public class Newsfeed : MonoBehaviour {
         Transform actionLogT = GameObject.Find("scr_actionLog").transform;
         actionLog = actionLogT.Find("Viewport").Find("Content");
 
-        turnTimerText = transform.Find("p_timer").Find("t_timer").GetComponent<Text>();
+        turnTimerText = transform.Find("Timer").Find("t_timer").GetComponent<Text>();
         UpdateTurnTimer(20f);
-        turnCounterText = transform.Find("p_turns").Find("t_turnCount").GetComponent<Text>();
+        turnCounterText = transform.Find("Turns").Find("t_turnCount").GetComponent<Text>();
         UpdateTurnCount(1);
-        newsText = transform.Find("p_news").Find("t_news").GetComponent<Text>();
+        newsText = transform.Find("News").Find("t_news").GetComponent<Text>();
         UpdateNewsfeed("!!! FIGHT !!!");
 
         newsfeedMenu.SetActive(false);

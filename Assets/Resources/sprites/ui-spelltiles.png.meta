@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: c132b7527a90ed34090eacdbca824bb3
-timeCreated: 1501527811
+timeCreated: 1517777535
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -10,6 +10,11 @@ TextureImporter:
     21300006: spelltile_water
     21300008: spelltile_muscle
     21300010: spelltile_air
+    21300012: ui-spelltiles_0
+    21300014: ui-spelltiles_1
+    21300016: ui-spelltiles_2
+    21300018: ui-spelltiles_3
+    21300020: ui-spelltiles_4
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -84,70 +89,70 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: spelltile_fire
+      name: ui-spelltiles_0
       rect:
         serializedVersion: 2
-        x: 60
-        y: 5
-        width: 50
-        height: 50
+        x: 20
+        y: 13
+        width: 100
+        height: 114
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      tessellationDetail: -1
+      tessellationDetail: 0
     - serializedVersion: 2
-      name: spelltile_earth
+      name: ui-spelltiles_1
       rect:
         serializedVersion: 2
-        x: 115
-        y: 5
-        width: 50
-        height: 50
+        x: 139
+        y: 13
+        width: 101
+        height: 114
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      tessellationDetail: -1
+      tessellationDetail: 0
     - serializedVersion: 2
-      name: spelltile_water
+      name: ui-spelltiles_2
       rect:
         serializedVersion: 2
-        x: 170
-        y: 5
-        width: 50
-        height: 50
+        x: 259
+        y: 13
+        width: 101
+        height: 114
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      tessellationDetail: -1
+      tessellationDetail: 0
     - serializedVersion: 2
-      name: spelltile_muscle
+      name: ui-spelltiles_3
       rect:
         serializedVersion: 2
-        x: 225
-        y: 5
-        width: 50
-        height: 50
+        x: 380
+        y: 12
+        width: 101
+        height: 112
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      tessellationDetail: -1
+      tessellationDetail: 0
     - serializedVersion: 2
-      name: spelltile_air
+      name: ui-spelltiles_4
       rect:
         serializedVersion: 2
-        x: 280
-        y: 5
-        width: 50
-        height: 50
+        x: 500
+        y: 14
+        width: 99
+        height: 111
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      tessellationDetail: -1
+      tessellationDetail: 0
     outline: []
   spritePackingTag: 
   userData: 

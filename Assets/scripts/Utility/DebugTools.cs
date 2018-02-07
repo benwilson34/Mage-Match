@@ -23,7 +23,7 @@ public class DebugTools : MonoBehaviour {
 	public void Init (MageMatch mm) {
         this.mm = mm;
 
-        toolsMenu = GameObject.Find("toolsMenu");
+        toolsMenu = GameObject.Find("ToolsMenu");
         Transform t = toolsMenu.transform;
         dd_hex = t.Find("dd_hex").GetComponent<Dropdown>();
         dd_enchant = t.Find("dd_enchant").GetComponent<Dropdown>();

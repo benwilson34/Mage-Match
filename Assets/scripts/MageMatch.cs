@@ -60,7 +60,7 @@ public class MageMatch : MonoBehaviour {
             debugSettings = debugObj.GetComponent<DebugSettings>();
             isDebugMode = true;
 
-            debugTools = GameObject.Find("toolsMenu").GetComponent<DebugTools>();
+            debugTools = GameObject.Find("ToolsMenu").GetComponent<DebugTools>();
             debugTools.Init(this);
 
             MMLog.LogWarning("This scene is in debug mode!!");
@@ -79,7 +79,12 @@ public class MageMatch : MonoBehaviour {
         gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
         MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name + ",p1 char=" + gameSettings.p1char + ",p2="+gameSettings.p2name+",p2 char=" + gameSettings.p2char+",timer=" +gameSettings.turnTimerOn);
 
-        uiCont = GameObject.Find("ui").GetComponent<UIController>();
+        if (IsDebugMode())
+            myID = 1;
+        else
+            myID = PhotonNetwork.player.ID;
+
+        uiCont = GameObject.Find("world ui").GetComponent<UIController>();
         uiCont.Init();
         timer = gameObject.GetComponent<TurnTimer>();
         
@@ -90,11 +95,6 @@ public class MageMatch : MonoBehaviour {
 
         syncManager = GetComponent<SyncManager>();
         syncManager.Init();
-
-        if (IsDebugMode())
-            myID = 1;
-        else
-            myID = PhotonNetwork.player.ID;
 
         hexGrid = new HexGrid();
         hexMan = new HexManager(this);
@@ -289,7 +289,7 @@ public class MageMatch : MonoBehaviour {
         MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM START ----------</b>");
         yield return eventCont.TurnEnd();
 
-        uiCont.DeactivateAllSpellButtons(); //? These should be part of any boardaction...
+        uiCont.DeactivateAllSpellButtons(activep.id); //? These should be part of any boardaction...
         uiCont.SetDrawButton(false);
 
         currentTurn = Turn.CommishTurn;
@@ -297,8 +297,10 @@ public class MageMatch : MonoBehaviour {
 
         currentTurn = Turn.PlayerTurn;
 
-        if(!Debug_OnePlayerMode())
+        if (!Debug_OnePlayerMode()) {
             activep = InactiveP();
+            yield return uiCont.ShiftScreen(activep.id);
+        }
 
         yield return eventCont.TurnBegin();
         SpellCheck();
@@ -329,6 +331,7 @@ public class MageMatch : MonoBehaviour {
 
     void SpellCheck() { 
         Character c = activep.character;
+        int id = activep.id;
         //List<TileSeq> spellSeqList = c.GetTileSeqList();
         spellsOnBoard = boardCheck.CheckBoard(c.GetSpells());
         
@@ -352,9 +355,9 @@ public class MageMatch : MonoBehaviour {
             //for (int i = 0; i < spellsOnBoard.Length; i++) {
                     MMLog.Log_MageMatch("spell[" + s + "] count=" + spellsOnBoard[s].Count);
                     if (spellsOnBoard[s].Count > 0)
-                        uiCont.ActivateSpellButton(s);
+                        uiCont.ActivateSpellButton(id, s);
                     else
-                        uiCont.DeactivateSpellButton(s); // needed?
+                        uiCont.DeactivateSpellButton(id, s); // needed?
 
                     // TODO boardseq stuff will be handled by the spell selection thing
 
@@ -445,7 +448,7 @@ public class MageMatch : MonoBehaviour {
         if (currentTurn == Turn.PlayerTurn) //kinda hacky
             yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
 
-        yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col) + 1, col, boardCheck.CheckColumn(col), .08f);
+        yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
 
         if (currentTurn == Turn.PlayerTurn) { //kinda hacky
             yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
@@ -499,7 +502,7 @@ public class MageMatch : MonoBehaviour {
             yield return targeting.SpellSelectScreen(spellsOnBoard[spellNum]);
 
             if (!targeting.selectionCanceled) {
-                uiCont.DeactivateAllSpellButtons(); // ?
+                uiCont.DeactivateAllSpellButtons(activep.id); // ?
 
                 TileSeq seq = targeting.GetSelection();
                 //TileSeq seqCopy = seq.Copy(); //?
@@ -509,8 +512,7 @@ public class MageMatch : MonoBehaviour {
 
                 eventCont.SpellCast(spell);
 
-                if(MyTurn()) // this doesn't seem right...
-                    StartCoroutine(uiCont.GetButtonCont(spellNum).Transition_MainView());
+                StartCoroutine(uiCont.GetButtonCont(activep.id, spellNum).Transition_MainView());
 
                 p.ApplySpellCosts(spell);
                 hexMan.RemoveInvokedSeq(seq);
@@ -529,7 +531,7 @@ public class MageMatch : MonoBehaviour {
         targeting.CancelSelection();
         for (int i = 0; i < spellsOnBoard.Length; i++) {
             if (spellsOnBoard[i].Count > 0)
-                uiCont.ActivateSpellButton(i);
+                uiCont.ActivateSpellButton(activep.id, i);
         }
         yield return null;
     }
@@ -608,7 +610,8 @@ public class MageMatch : MonoBehaviour {
         endGame = true;
         audioCont.GameEnd();
         uiCont.UpdateMoveText("Wow!! " + activep.name + " has won!!");
-        uiCont.DeactivateAllSpellButtons();
+        uiCont.DeactivateAllSpellButtons(1);
+        uiCont.DeactivateAllSpellButtons(2);
         eventCont.boardAction -= OnBoardAction; //?
         timer.Pause();
     }

@@ -21,10 +21,10 @@ public class UIController : MonoBehaviour {
     private GameObject debugReport;
     private Text debugReportText;
 
-    private Button localDrawButton;
+    private ButtonController localDrawButton;
     private MageMatch mm;
 	private Dropdown DD1, DD2;
-    private Transform leftPinfo, rightPinfo, leftPload, board;
+    private Transform leftPinfo, rightPinfo, leftPspells, rightPspells, board;
     private GameObject spellOutlineEnd, spellOutlineMid;
     private GameObject prereqPF, targetPF;
     private GameObject gradient, targetingBG;
@@ -32,43 +32,57 @@ public class UIController : MonoBehaviour {
     private GameObject menus; // ?
     private GameObject newsfeedMenu;
     private GameObject overlay;
+    private GameObject screenScroll;
     private List<GameObject> outlines, spellOutlines;
     private SpriteRenderer[,] cellOverlays;
     private Vector3 slidingTextStart;
+    private bool localOnRight = false;
 
     public void Init(){
         board = GameObject.Find("cells").transform;
-        mm = GameObject.Find("board").GetComponent<MageMatch> ();
+        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        screenScroll = GameObject.Find("scrolling");
 
-        slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
-        slidingTextStart = new Vector3(Screen.width, slidingText.rectTransform.position.y);
-        slidingText.rectTransform.position = slidingTextStart;
+        //slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
+        //slidingTextStart = new Vector3(Screen.width, slidingText.rectTransform.position.y);
+        //slidingText.rectTransform.position = slidingTextStart;
 
         leftPinfo = GameObject.Find("LeftPlayer_Info").transform;
         rightPinfo = GameObject.Find("RightPlayer_Info").transform;
-        leftPload = GameObject.Find("LeftPlayer_Loadout").transform;
+        leftPspells = GameObject.Find("LeftPlayer_Spells").transform;
+        rightPspells = GameObject.Find("RightPlayer_Spells").transform;
+
+
 
         // buttons
         InitSprites();
-        for (int i = 0; i < 5; i++) {
-            MMLog.Log_UICont("Init button " + i);
-            GetButtonCont(i).Init(mm);
+        for (int id = 1; id <= 2; id++) {
+            for (int i = 0; i < 5; i++) {
+                MMLog.Log_UICont("Init button " + i);
+                var button = GetButtonCont(id, i);
+                MMLog.Log_UICont("mm = " + mm.myID);
+                button.Init(mm, id);
+                button.Deactivate();
+                if (id == mm.myID) { // only make my buttons interactable for the match
+                    button.SetInteractable();
+                }
+            }
         }
-        localDrawButton = leftPinfo.Find("b_Draw").GetComponent<Button>();
-        localDrawButton.GetComponent<ButtonController>().Init(mm);
-        GameObject.Find("b_saveFiles").GetComponent<ButtonController>().Init(mm);
+        localDrawButton = GameObject.Find("b_draw").GetComponent<ButtonController>();
+        localDrawButton.Init(mm, mm.myID);
+        GameObject.Find("b_saveFiles").GetComponent<ButtonController>().Init(mm, mm.myID); // id not needed here
 
 
         // menus
-        menus = GameObject.Find("menus");
-        Transform scroll = menus.transform.Find("debugMenu").Find("scr_debugEffects");
+        menus = GameObject.Find("Menus");
+        Transform scroll = menus.transform.Find("DebugMenu").Find("scr_debugEffects");
         debugContent = scroll.transform.Find("Viewport").Find("Content");
 		debugGridText = GameObject.Find ("t_debugHex").GetComponent<Text>(); // UI debug grid
         debugReport = menus.transform.Find("scr_report").gameObject;
         debugReportText = debugReport.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>();
         debugReport.SetActive(false);
 
-        GameObject toolsMenu = menus.transform.Find("toolsMenu").gameObject;
+        GameObject toolsMenu = menus.transform.Find("ToolsMenu").gameObject;
         if (!mm.IsDebugMode())
             toolsMenu.SetActive(false);
 
@@ -81,8 +95,8 @@ public class UIController : MonoBehaviour {
 
 
         // other
-        overlay = GameObject.Find("Targeting Overlay");
-        overlay.SetActive(false);
+        //overlay = GameObject.Find("Targeting Overlay");
+        //overlay.SetActive(false);
         
         spellOutlines = new List<GameObject>();
         outlines = new List<GameObject>();
@@ -113,11 +127,11 @@ public class UIController : MonoBehaviour {
 
     void InitSprites() {
         Sprite[] minitiles = Resources.LoadAll<Sprite>("sprites/ui-spelltiles");
-        miniFire = minitiles[2];
-        miniWater = minitiles[4];
-        miniEarth = minitiles[1];
-        miniAir = minitiles[0];
-        miniMuscle = minitiles[3];
+        miniFire = minitiles[0];
+        miniWater = minitiles[1];
+        miniEarth = minitiles[2];
+        miniAir = minitiles[3];
+        miniMuscle = minitiles[4];
     }
 
     #region EventCont calls
@@ -131,7 +145,7 @@ public class UIController : MonoBehaviour {
         UpdateAP(mm.GetPlayer(id));
 
         //ChangePinfoColor(id, new Color(0, 1, 0, .4f));
-        PinfoColorTween(id, CorrectPinfoColor(id));
+        //PinfoColorTween(id, CorrectPinfoColor(id));
         UpdateEffTexts();
         yield return null;
     }
@@ -190,13 +204,13 @@ public class UIController : MonoBehaviour {
             if (id == mm.myID)
                 nameText.text += " (ME!)";
 
-            ShowLoadout();
-            DeactivateAllSpellButtons();
+            ShowAllSpellInfo(id);
+            DeactivateAllSpellButtons(id); // not needed now
             UpdateAP(p);
 
             // start health from zero so it animates
-            pinfo.Find("i_health").GetComponent<Image>().fillAmount = 0f;
-            pinfo.Find("i_health").Find("t_health").GetComponent<Text>().text = "0";
+            pinfo.Find("i_healthbar").GetComponent<Image>().fillAmount = 0f;
+            pinfo.Find("t_health").GetComponent<Text>().text = "0";
             StartCoroutine(UpdateHealthbar(p));
 
             // maybe just set it to empty?
@@ -204,20 +218,32 @@ public class UIController : MonoBehaviour {
         }
     }
 
+    public IEnumerator ShiftScreen(int id) {
+        RectTransform rect = screenScroll.GetComponent<RectTransform>();
+        if (id == mm.myID ^ localOnRight) {
+            Camera.main.transform.DOMoveX(-8.25f, .3f).WaitForCompletion();
+            yield return rect.DOMoveX(68, .3f).WaitForCompletion();
+        } else {
+            Camera.main.transform.DOMoveX(-5.85f, .3f).WaitForCompletion();
+            yield return rect.DOMoveX(-81, .3f).WaitForCompletion();
+        }
+    }
+
+    // delete
     public void SendSlidingText(string str) {
-        slidingText.text = str;
-        StartCoroutine(_SlidingText());
+        //slidingText.text = str;
+        //StartCoroutine(_SlidingText());
     }
 
     // TODO prevent retriggering
-    IEnumerator _SlidingText() {
-        RectTransform boxRect = slidingText.rectTransform;
-        Vector3 end = new Vector3(-boxRect.rect.width, slidingTextStart.y);
-        //Debug.Log("UICONT: _SlidingText: start=" + slidingTextStart.ToString() + ", end=" + end.ToString());
-        Tween t = slidingText.rectTransform.DOMoveX(end.x, 3f).SetEase(slidingEase);
-        yield return t.WaitForCompletion();
-        slidingText.rectTransform.position = slidingTextStart;
-    }
+    //IEnumerator _SlidingText() {
+    //    RectTransform boxRect = slidingText.rectTransform;
+    //    Vector3 end = new Vector3(-boxRect.rect.width, slidingTextStart.y);
+    //    //Debug.Log("UICONT: _SlidingText: start=" + slidingTextStart.ToString() + ", end=" + end.ToString());
+    //    Tween t = slidingText.rectTransform.DOMoveX(end.x, 3f).SetEase(slidingEase);
+    //    yield return t.WaitForCompletion();
+    //    slidingText.rectTransform.position = slidingTextStart;
+    //}
 
     // delete
     void FlipGradient() {
@@ -225,7 +251,6 @@ public class UIController : MonoBehaviour {
         //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
         //gradient.transform.Rotate(0, 0, 180);
     }
-
 
     // delete
     public void UpdateMoveText(string str){
@@ -235,7 +260,7 @@ public class UIController : MonoBehaviour {
 
     #region ----- PLAYER INFO -----
     public Transform GetPinfo(int id) {
-        if (id == mm.myID)
+        if (id == mm.myID ^ localOnRight)
             return leftPinfo;
         else
             return rightPinfo;
@@ -245,30 +270,31 @@ public class UIController : MonoBehaviour {
     //    GetPinfo(id).GetComponent<Image>().color = c; // idk why
     //}
 
-    Tween PinfoColorTween(int id, Color newColor) {
-        Transform pinfo = GetPinfo(id);
-        return pinfo.GetComponent<Image>().DOColor(newColor, 0.25f)
-            .SetEase(Ease.InOutQuad).SetLoops(7, LoopType.Yoyo);
-    } 
+    //Tween PinfoColorTween(int id, Color newColor) {
+    //    Transform pinfo = GetPinfo(id);
+    //    return pinfo.GetComponent<Image>().DOColor(newColor, 0.25f)
+    //        .SetEase(Ease.InOutQuad).SetLoops(7, LoopType.Yoyo);
+    //} 
 
+    // TODO re-enable once this is designed in again
     void UpdateAP(Player p) {
   //      Text APText = GetPinfo(p.id).Find ("Text_AP").GetComponent<Text>();
 		//APText.text = "AP left: " + p.AP;
-        Transform APblock = GetPinfo(p.id).Find("i_AP");
 
-        for (int i = 0; i < 6; i++) {
-            if (i < p.AP)
-                APblock.Find("AP" + i).GetComponent<Image>().enabled = true;
-            else
-                APblock.Find("AP" + i).GetComponent<Image>().enabled = false;
+        //Transform APblock = GetPinfo(p.id).Find("i_AP");
 
-        }        
+        //for (int i = 0; i < 6; i++) {
+        //    if (i < p.AP)
+        //        APblock.Find("AP" + i).GetComponent<Image>().enabled = true;
+        //    else
+        //        APblock.Find("AP" + i).GetComponent<Image>().enabled = false;
+        //}        
     }
 
     IEnumerator UpdateHealthbar(Player p) {
         Transform pinfo = GetPinfo(p.id);
-        Image health = pinfo.Find("i_health").GetComponent<Image>();
-        Text healthText = health.transform.Find("t_health").GetComponent<Text>();
+        Image health = pinfo.Find("i_healthbar").GetComponent<Image>();
+        Text healthText = pinfo.Find("t_health").GetComponent<Text>();
 
         TextNumTween(healthText, p.health);
 
@@ -287,8 +313,8 @@ public class UIController : MonoBehaviour {
 
     IEnumerator UpdateMeterbar(Player p) {
         Transform pinfo = GetPinfo(p.id);
-        Image sig = pinfo.Find("i_sig").GetComponent<Image>();
-        Text sigText = sig.transform.Find("t_sig").GetComponent<Text>();
+        Image sig = pinfo.Find("i_meterbar").GetComponent<Image>();
+        Text sigText = pinfo.Find("t_meter").GetComponent<Text>();
 
         int meter = p.character.GetMeter();
         TextNumTween(sigText, meter / 10, "%"); // change if a character has meter of different amount 
@@ -309,9 +335,9 @@ public class UIController : MonoBehaviour {
     }
 
     Color CorrectPinfoColor(int id) {
-        if (id == mm.ActiveP().id && mm.currentTurn != MageMatch.Turn.CommishTurn) {
-            return new Color(0, 1, 0);
-        } else
+        //if (id == mm.ActiveP().id && mm.currentTurn != MageMatch.Turn.CommishTurn) {
+        //    return new Color(0, 1, 0);
+        //} else
             return new Color(1, 1, 1);
     }
 
@@ -327,10 +353,10 @@ public class UIController : MonoBehaviour {
             .SetEase(Ease.OutCubic);
     }
 
-	void ShowLoadout(){
+	void ShowAllSpellInfo(int id){
         // for each spell
 		for (int i = 0; i < 5; i++)
-            GetButtonCont(i).ShowSpellInfo();
+            GetButtonCont(id, i).ShowSpellInfo();
 	}
     #endregion
 
@@ -378,7 +404,7 @@ public class UIController : MonoBehaviour {
     }
 
     void ActivateTargetingUI() {
-        overlay.SetActive(true);
+        //overlay.SetActive(true);
         //if (mm.MyTurn()) {
         //    tCancelB.SetActive(true);
         //    tClearB.SetActive(true);
@@ -419,7 +445,7 @@ public class UIController : MonoBehaviour {
     }
 
     public void DeactivateTargetingUI(){
-        overlay.SetActive(false);
+        //overlay.SetActive(false);
         //if (mm.MyTurn()) {
         //    tCancelB.SetActive(false);
         //    tClearB.SetActive(false);
@@ -474,36 +500,45 @@ public class UIController : MonoBehaviour {
 
     #region ----- BUTTONS -----
     public void SetDrawButton(bool interactable) {
-        if(mm.MyTurn())
-            localDrawButton.interactable = interactable;
+        if (mm.MyTurn()) {
+            if (interactable)
+                localDrawButton.Activate();
+            else
+                localDrawButton.Deactivate();
+        }
     }
 
-    public ButtonController GetButtonCont(int index) {
-        return leftPload.Find ("b_Spell" + index)
+    public Transform GetPspells(int id) {
+        if (id == mm.myID ^ localOnRight)
+            return leftPspells;
+        else
+            return rightPspells;
+    }
+
+    public ButtonController GetButtonCont(int id, int index) {
+        //Transform t = GetPspells(id).Find("b_Spell" + index);
+        //MMLog.Log_UICont("Found " + t.name + ", parent=" + t.parent.name);
+        return GetPspells(id).Find("b_Spell" + index)
             .GetComponent<ButtonController>();
     }
-
-    Button GetButton(int index){
-		return leftPload.Find ("b_Spell" + index).GetComponent<Button>();
-	}
     
-	public void ActivateSpellButton(int index){
+	public void ActivateSpellButton(int id, int index){
         if (mm.MyTurn()) {
-            Button button = GetButton(index); // TODO only one player it could be...
-            button.interactable = true;
+            var button = GetButtonCont(id, index);
+            button.Activate();
         }
 	}
 
-	public void DeactivateSpellButton(int index){
-		Button button = GetButton (index);
-		button.interactable = false;
+	public void DeactivateSpellButton(int id, int index){
+		var button = GetButtonCont(id, index);
+        button.Deactivate();
 	}
 
-	public void DeactivateAllSpellButtons(){
-		for (int i = 0; i < 5; i++) {
-			Button button = GetButton (i);
-			button.interactable = false;
-		}
+	public void DeactivateAllSpellButtons(int id){
+        for (int i = 0; i < 5; i++) {
+            var button = GetButtonCont(id, i);
+            button.Deactivate();
+        }
 	}
     #endregion
 
@@ -565,9 +600,9 @@ public class UIController : MonoBehaviour {
             debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
         }
 
-        List<MatchEffect> matchEff = (List<MatchEffect>)lists[2];
-        debugItems.Add(InstantiateDebugEntry("MatchEffs:", lightBlue));
-        foreach (MatchEffect e in matchEff) {
+        List<DropEffect> dropEff = (List<DropEffect>)lists[2];
+        debugItems.Add(InstantiateDebugEntry("DropEffs:", lightBlue));
+        foreach (DropEffect e in dropEff) {
             debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
         }
 

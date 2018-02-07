@@ -2,23 +2,31 @@
 using UnityEngine.UI;
 using System.Collections;
 using MMDebug;
+using DG.Tweening;
 
 public class ButtonController : MonoBehaviour {
 
-    public enum Type { Spell };
+    public enum Type { Spell, Draw };
     public delegate void ButtonClick();
     public Type type = Type.Spell;
 	public int spellNum;
 
 	private MageMatch mm;
+    private Button button;
     private GameObject simpleTextPF;
     private GameObject mainView, cancelView;
     private ButtonClick onClick, mainClick;
+    private int playerId;
     private bool newSpell = false;
+    private bool isActivated = false, interactable = false;
 
-    public void Init(MageMatch mm) {
-        MMLog.Log("ButtonCont", "black", "Init button " + spellNum);
+    public void Init(MageMatch mm, int id) {
+        MMLog.Log("ButtonCont", "black", "Init button " + spellNum + " with id="+id);
         this.mm = mm;
+        this.playerId = id;
+
+        button = this.GetComponent<Button>();
+
         if(spellNum >= 0)
             mainView = transform.Find("main").gameObject;
         simpleTextPF = Resources.Load<GameObject>("prefabs/ui/simpleTextView");
@@ -26,7 +34,10 @@ public class ButtonController : MonoBehaviour {
         switch (type) {
             case Type.Spell:
                 SetOnClick(OnSpellButtonClick);
-                //onClick = OnSpellButtonClick;
+                break;
+            case Type.Draw:
+                SetOnClick(OnDrawButtonClick);
+                SetInteractable();
                 break;
             default:
                 MMLog.LogError("BUTTONCONT: Tried to init a button with bad type!");
@@ -35,6 +46,49 @@ public class ButtonController : MonoBehaviour {
 
         if(onClick == null)
             MMLog.LogError("BUTTONCONT: Button onClick is somehow null!");
+    }
+
+    public void SetInteractable() {
+        button.interactable = true;
+        interactable = true;
+    }
+
+    //public bool IsInteractable() { return interactable && isActivated; }
+
+    public void Activate() {
+        isActivated = true; // maybe not needed?
+        StartCoroutine(_Activate());
+        if (interactable)
+            button.interactable = true;
+    }
+    IEnumerator _Activate() {
+        var bg = transform.Find("i_bg").GetComponent<Image>();
+        bg.DOColor(new Color(1, 1, 1, 1), .15f);
+        var glow = transform.Find("i_glow").GetComponent<Image>();
+        Tween t = glow.DOColor(new Color(1, 1, 1, 1), .15f);
+        yield return t.WaitForCompletion();
+    }
+
+    public void Deactivate() {
+        isActivated = false; // maybe not needed?
+        StartCoroutine(_Deactivate());
+        if (interactable)
+            button.interactable = false;
+    }
+    IEnumerator _Deactivate() {
+        var bg = transform.Find("i_bg").GetComponent<Image>();
+        bg.DOColor(new Color(.33f, .33f, .33f, 1), .15f); // medium-dark grey
+        var glow = transform.Find("i_glow").GetComponent<Image>();
+        Tween t = glow.DOColor(new Color(1, 1, 1, 0), .15f);
+        yield return t.WaitForCompletion();
+    }
+
+    public void TurnOffScreen() {
+        // TODO "turn off" TV screen but persist active state
+    }
+
+    public void TurnOnScreen() {
+        // TODO
     }
 
     void SetOnClick(ButtonClick click) {
@@ -51,7 +105,7 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void ShowSpellInfo() {
-        Spell currentSpell = mm.LocalP().character.GetSpell(spellNum);
+        Spell currentSpell = mm.GetPlayer(playerId).character.GetSpell(spellNum);
         Transform t = transform.Find("main");
 
         Text spellName = t.Find("t_spellName").GetComponent<Text>();
@@ -151,5 +205,9 @@ public class ButtonController : MonoBehaviour {
     public void OnFileButtonClick() {
         MMLog.Log("ButtonCont", "black", "Saving files...");
         mm.stats.SaveFiles();
+    }
+
+    public void DoAThing() {
+        MMLog.Log("ButtonCont", "green", "Doing a thing!");
     }
 }
