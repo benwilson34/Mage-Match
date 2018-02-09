@@ -299,7 +299,7 @@ public class MageMatch : MonoBehaviour {
 
         if (!Debug_OnePlayerMode()) {
             activep = InactiveP();
-            yield return uiCont.ShiftScreen(activep.id);
+            yield return uiCont.ShiftScreen();
         }
 
         yield return eventCont.TurnBegin();

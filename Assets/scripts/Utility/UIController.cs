@@ -216,17 +216,35 @@ public class UIController : MonoBehaviour {
             // maybe just set it to empty?
             StartCoroutine(UpdateMeterbar(p));
         }
+
+        // camera position relative to center of the board
+        camOffset = Camera.main.transform.position.x;
+        camOffset = GameObject.Find("s_board").transform.position.x - camOffset;
+        if (!mm.MyTurn() ^ localOnRight) // because it's currently relative, only do this if needed
+            StartCoroutine(ShiftScreen());
     }
 
-    public IEnumerator ShiftScreen(int id) {
-        RectTransform rect = screenScroll.GetComponent<RectTransform>();
-        if (id == mm.myID ^ localOnRight) {
-            Camera.main.transform.DOMoveX(-8.25f, .3f).WaitForCompletion();
-            yield return rect.DOMoveX(68, .3f).WaitForCompletion();
-        } else {
-            Camera.main.transform.DOMoveX(-5.85f, .3f).WaitForCompletion();
-            yield return rect.DOMoveX(-81, .3f).WaitForCompletion();
+    float camOffset;
+
+    public IEnumerator ShiftScreen() {
+        //RectTransform rect = screenScroll.GetComponent<RectTransform>();
+
+        Transform camPos = Camera.main.transform;
+        
+        if (mm.MyTurn() ^ localOnRight) { // left side
+            yield return camPos.DOMoveX(camPos.position.x - (2*camOffset), .3f).WaitForCompletion();
+            //yield return rect.DOMoveX(68, .3f).WaitForCompletion();
+            //float newPos = Camera.main.ScreenToWorldPoint(new Vector3(68, 0)).x;
+            //yield return rect.DOMoveX(newPos + 7, .3f).WaitForCompletion();
+        } else { // right side
+            yield return camPos.DOMoveX(camPos.position.x + (2*camOffset), .3f).WaitForCompletion();
+            //yield return rect.DOMoveX(-81, .3f).WaitForCompletion();
+            //float newPos = Camera.main.ScreenToWorldPoint(new Vector3(-78, 0)).x;
+            //yield return rect.DOMoveX(newPos + 9.1f, .3f).WaitForCompletion();
         }
+        //MMLog.Log_UICont("rect x screen pos=" + rect.position.x);
+        //MMLog.Log_UICont("rect x world pos=" + Camera.main.ScreenToWorldPoint(rect.position).x);
+        yield return null;
     }
 
     // delete
