@@ -499,6 +499,8 @@ public class MageMatch : MonoBehaviour {
 
             MMLog.Log_MageMatch("spell cast spellNum=" + spellNum + ", spell count=" + spellsOnBoard[spellNum].Count);
 
+            uiCont.TurnOffSpellButtonsDuringCast(activep.id, spellNum);
+
             yield return targeting.SpellSelectScreen(spellsOnBoard[spellNum]);
 
             if (!targeting.selectionCanceled) {
@@ -518,6 +520,8 @@ public class MageMatch : MonoBehaviour {
                 hexMan.RemoveInvokedSeq(seq);
                 yield return BoardChecking(); //?
             }
+
+            uiCont.TurnOnSpellButtonsAfterCast(activep.id, spellNum);
         } else {
             uiCont.UpdateMoveText("Not enough AP to cast!");
         }

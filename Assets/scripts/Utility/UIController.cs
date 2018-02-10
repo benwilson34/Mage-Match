@@ -558,6 +558,24 @@ public class UIController : MonoBehaviour {
             button.Deactivate();
         }
 	}
+
+    public void TurnOffSpellButtonsDuringCast(int id, int spellNum) {
+        for (int i = 0; i < 5; i++) {
+            if (i == spellNum)
+                continue;
+            var button = GetButtonCont(id, i);
+            button.TurnOffScreen();
+        }
+    }
+
+    public void TurnOnSpellButtonsAfterCast(int id, int spellNum) {
+        for (int i = 0; i < 5; i++) {
+            if (i == spellNum)
+                continue;
+            var button = GetButtonCont(id, i);
+            button.TurnOnScreen();
+        }
+    }
     #endregion
 
 

@@ -120,6 +120,14 @@ public class AnimationController : MonoBehaviour {
         //MMLog.Log_AnimCont(t.name + " is in position: (" + col + ", " + row + ")");
     }
 
+    public IEnumerator _Draw(Hex hex) {
+        var sr = hex.GetComponent<SpriteRenderer>();
+        sr.color = new Color(1,1,1,0);
+        sr.DOFade(1, .15f);
+        hex.transform.localScale = new Vector3(2, 2, 2);
+        yield return hex.transform.DOScale(Vector3.one, .15f).WaitForCompletion();
+    }
+
     public IEnumerator _Move(Hex hex, Vector3 newPos) {
         yield return hex.transform.DOMove(newPos, .1f).WaitForCompletion();
     }

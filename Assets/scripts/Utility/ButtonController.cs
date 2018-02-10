@@ -57,9 +57,9 @@ public class ButtonController : MonoBehaviour {
 
     public void Activate() {
         isActivated = true; // maybe not needed?
-        StartCoroutine(_Activate());
         if (interactable)
             button.interactable = true;
+        StartCoroutine(_Activate());
     }
     IEnumerator _Activate() {
         var bg = transform.Find("i_bg").GetComponent<Image>();
@@ -71,9 +71,9 @@ public class ButtonController : MonoBehaviour {
 
     public void Deactivate() {
         isActivated = false; // maybe not needed?
-        StartCoroutine(_Deactivate());
         if (interactable)
             button.interactable = false;
+        StartCoroutine(_Deactivate());
     }
     IEnumerator _Deactivate() {
         var bg = transform.Find("i_bg").GetComponent<Image>();
@@ -85,11 +85,30 @@ public class ButtonController : MonoBehaviour {
 
     public void TurnOffScreen() {
         // TODO "turn off" TV screen but persist active state
+        mainView.SetActive(false);
+        if (interactable)
+            button.interactable = false;
+        StartCoroutine(_TurnOffScreen());
+    }
+    IEnumerator _TurnOffScreen() {
+        var bg = transform.Find("i_bg").GetComponent<Image>();
+        bg.DOColor(new Color(.11f, .11f, .11f, 1), .15f); // dark grey
+        var glow = transform.Find("i_glow").GetComponent<Image>();
+        Tween t = glow.DOColor(new Color(1, 1, 1, 0), .15f);
+        yield return t.WaitForCompletion();
     }
 
     public void TurnOnScreen() {
-        // TODO
+        mainView.SetActive(true);
+        if (isActivated)
+            Activate();
+        else
+            Deactivate();
+        //StartCoroutine(_TurnOnScreen());
     }
+    //IEnumerator _TurnOnScreen() {
+        
+    //}
 
     void SetOnClick(ButtonClick click) {
         MMLog.Log("ButtonCont", "black","Setting onClick of spell" + spellNum + " to " + click.ToString());
