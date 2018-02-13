@@ -65,7 +65,7 @@ public class Hand {
     }
 
     public void Remove(Hex hex) {
-        // TODO iterate thru, then clear corresponding handSlot
+        // iterate thru, then clear corresponding handSlot
         for (int i = 0; i < MAX_HAND_SIZE; i++) {
             Hex slotHex = slots[i].GetHex();
             if (slotHex != null && slotHex.hextag.Equals(hex.hextag)) {

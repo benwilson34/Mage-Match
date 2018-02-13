@@ -29,7 +29,8 @@ public class TooltipManager : MonoBehaviour {
         if (obj == null)
             return;
 
-        currentTT = (RectTransform)Instantiate(tooltipPF, transform).transform;
+        Transform staticUI = GameObject.Find("static ui").transform;
+        currentTT = (RectTransform)Instantiate(tooltipPF, staticUI).transform;
         MMDebug.MMLog.Log("TooltipMan", "orange", "Setting tooltip: " + obj.GetTooltipInfo());
 
         RectTransform textRect = (RectTransform)currentTT.GetChild(0);
@@ -54,14 +55,18 @@ public class TooltipManager : MonoBehaviour {
 
         MonoBehaviour mb = (MonoBehaviour)obj;
 
+        // get screen pos of target
         Vector3 pos;
         if (mb.GetComponent<RectTransform>() != null) // if UI element
             pos = mb.transform.position;
-        else
+        else {
             pos = Camera.main.WorldToScreenPoint(mb.transform.position);
+        }
 
+        // displace so it appears vertically above target
         pos.y += 50;
 
+        // you have to do this so the TT can draw itself...
         yield return new WaitForEndOfFrame();
 
         Vector3[] corners = new Vector3[4];
@@ -70,15 +75,23 @@ public class TooltipManager : MonoBehaviour {
         float TTheight = corners[2].y - corners[0].y;
 
         //MMDebug.MMLog.Log("TooltipMan", "orange", "TT dims 1: " + TTwidth + ", " + TTheight);
+        // just a bit of breathing room on the margin (20 px)
         TTwidth += 20;
         TTheight += 20;
 
         //MMDebug.MMLog.Log("TooltipMan", "orange", "pos before=" + pos.ToString());
+        //MMDebug.MMLog.Log("TooltipMan", "orange", "screen dims: " + Screen.width + ", " + Screen.height);
+
+        //Vector3 worldDims = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height));
+        // center the TT
         pos.x -= TTwidth / 2;
+        //MMDebug.MMLog.Log("TooltipMan", "orange", "world dims=" + worldDims.ToString());
+
+        // keep the TT from being drawn off the screen
         pos.x = Mathf.Clamp(pos.x, 0, Screen.width - TTwidth);
         pos.y = Mathf.Clamp(pos.y, 0, Screen.height - TTheight);
-        //MMDebug.MMLog.Log("TooltipMan", "orange", "screen dims: " + Screen.width + ", " + Screen.height);
-        MMDebug.MMLog.Log("TooltipMan", "orange", "TT dims : " + TTwidth + ", " + TTheight);
+
+        //MMDebug.MMLog.Log("TooltipMan", "orange", "TT dims : (" + TTwidth + ", " + TTheight + ")");
 
         CanvasGroup cg = currentTT.GetComponent<CanvasGroup>();
         cg.alpha = 0;

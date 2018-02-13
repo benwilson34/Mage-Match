@@ -9,7 +9,8 @@ public class Newsfeed : MonoBehaviour {
     private GameObject newsfeedMenu;
     private GameObject actionLogItemPF;
     private Transform actionLog;
-    private Text turnTimerText, turnCounterText, newsText;
+    private Text turnCounterText, newsText;
+    private Image timerHourglass;
     private int turn;
     private bool isFirstAction = true;
 
@@ -24,11 +25,11 @@ public class Newsfeed : MonoBehaviour {
         Transform actionLogT = GameObject.Find("scr_actionLog").transform;
         actionLog = actionLogT.Find("Viewport").Find("Content");
 
-        turnTimerText = transform.Find("Timer").Find("t_timer").GetComponent<Text>();
-        UpdateTurnTimer(20f);
-        turnCounterText = transform.Find("Turns").Find("t_turnCount").GetComponent<Text>();
+        timerHourglass = transform.Find("i_hourglass").GetComponent<Image>();
+        UpdateTurnTimer(TurnTimer.TIMER_DURATION);
+        turnCounterText = transform.Find("t_turns").GetComponent<Text>();
         UpdateTurnCount(1);
-        newsText = transform.Find("News").Find("t_news").GetComponent<Text>();
+        newsText = transform.Find("t_news").GetComponent<Text>();
         UpdateNewsfeed("!!! FIGHT !!!");
 
         newsfeedMenu.SetActive(false);
@@ -44,7 +45,7 @@ public class Newsfeed : MonoBehaviour {
     }
 
     public void UpdateTurnTimer(float time) {
-        turnTimerText.text = time.ToString("0.0");
+        timerHourglass.fillAmount = time / TurnTimer.TIMER_DURATION;
     }
 
     public void UpdateNewsfeed(string str) {

@@ -149,11 +149,13 @@ public class Player {
             if (!ThisIsLocal())
                 hex.Flip();
 
-            hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
-
+            //hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
 
             yield return mm.eventCont.Draw(EventController.Status.Begin, id, hex.hextag, playerAction, dealt);
+
             hand.Add(hex);
+            // I feel like the draw anim should go here
+
             yield return mm.eventCont.Draw(EventController.Status.End, id, hex.hextag, playerAction, dealt);
 
             if (playerAction)

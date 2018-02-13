@@ -233,17 +233,9 @@ public class UIController : MonoBehaviour {
         
         if (mm.MyTurn() ^ localOnRight) { // left side
             yield return camPos.DOMoveX(camPos.position.x - (2*camOffset), .3f).WaitForCompletion();
-            //yield return rect.DOMoveX(68, .3f).WaitForCompletion();
-            //float newPos = Camera.main.ScreenToWorldPoint(new Vector3(68, 0)).x;
-            //yield return rect.DOMoveX(newPos + 7, .3f).WaitForCompletion();
         } else { // right side
             yield return camPos.DOMoveX(camPos.position.x + (2*camOffset), .3f).WaitForCompletion();
-            //yield return rect.DOMoveX(-81, .3f).WaitForCompletion();
-            //float newPos = Camera.main.ScreenToWorldPoint(new Vector3(-78, 0)).x;
-            //yield return rect.DOMoveX(newPos + 9.1f, .3f).WaitForCompletion();
         }
-        //MMLog.Log_UICont("rect x screen pos=" + rect.position.x);
-        //MMLog.Log_UICont("rect x world pos=" + Camera.main.ScreenToWorldPoint(rect.position).x);
         yield return null;
     }
 
