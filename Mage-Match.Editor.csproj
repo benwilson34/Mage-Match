@@ -130,6 +130,9 @@
     <Reference Include="DOTweenEditor">
       <HintPath>Assets\Demigiant\DOTween\Editor\DOTweenEditor.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Assets\JsonDotNet\Assemblies\Standalone\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Midi">
       <HintPath>Assets\Plugins\Midi.dll</HintPath>
     </Reference>
@@ -144,9 +147,6 @@
     </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>Assets\Plugins\WebSocket\websocket-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>Assets\JsonDotNet\Assemblies\Standalone\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

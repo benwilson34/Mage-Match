@@ -5,6 +5,8 @@ using MMDebug;
 
 public class Player {
 
+    public const int MAX_AP = 7;
+
     public int id;
     public string name;
     public Character character;
@@ -12,7 +14,7 @@ public class Player {
     public int AP;
     public Hand hand;
 
-    private const int MAX_AP = 4;
+    private const int INIT_AP = 4;
 
     private MageMatch mm;
     private MatchEffect matchEffect;
@@ -194,7 +196,7 @@ public class Player {
 
     public bool ThisIsLocal() { return mm.myID == id; }
 
-    public void InitAP() { AP = MAX_AP; }
+    public void InitAP() { AP = INIT_AP; }
 
     public void ApplySpellCosts(Spell spell) {
         bool applyAPcost = true;

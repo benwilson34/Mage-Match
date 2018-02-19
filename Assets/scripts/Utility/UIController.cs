@@ -288,8 +288,8 @@ public class UIController : MonoBehaviour {
 
     // TODO re-enable once this is designed in again
     void UpdateAP(Player p) {
-  //      Text APText = GetPinfo(p.id).Find ("Text_AP").GetComponent<Text>();
-		//APText.text = "AP left: " + p.AP;
+        //      Text APText = GetPinfo(p.id).Find ("Text_AP").GetComponent<Text>();
+        //APText.text = "AP left: " + p.AP;
 
         //Transform APblock = GetPinfo(p.id).Find("i_AP");
 
@@ -298,7 +298,10 @@ public class UIController : MonoBehaviour {
         //        APblock.Find("AP" + i).GetComponent<Image>().enabled = true;
         //    else
         //        APblock.Find("AP" + i).GetComponent<Image>().enabled = false;
-        //}        
+        //}      
+
+        var APimage = GetPinfo(p.id).Find("i_AP").GetComponent<Image>();
+        APimage.fillAmount = (float)p.AP / Player.MAX_AP;
     }
 
     IEnumerator UpdateHealthbar(Player p) {
