@@ -63,21 +63,21 @@ public class Newsfeed : MonoBehaviour {
     }
 
     public void AddActionLogItem(string msg) {
-        Transform item = Instantiate(actionLogItemPF).transform;
+        Transform item = Instantiate(actionLogItemPF, actionLog).transform;
 
         if (isFirstAction) { // only show turn if it's the first action
-            Transform turnT = item.Find("p_turns").Find("t_turnCount");
+            Transform turnT = item.Find("t_turnCount");
             turnT.GetComponent<Text>().text = turn + "";
             isFirstAction = false;
         } else {
-            item.Find("p_turns").gameObject.SetActive(false);
+            item.Find("t_turnLabel").gameObject.SetActive(false);
+            item.Find("t_turnCount").gameObject.SetActive(false);
             item.Find("i_rule").gameObject.SetActive(false);
         }
 
-        Transform msgT = item.Find("p_news").Find("t_news");
+        Transform msgT = item.Find("t_news");
         msgT.GetComponent<Text>().text = msg;
 
-        item.SetParent(actionLog);
         RevealPreviousNews();
         lastActionLog = item.gameObject;
         lastActionLog.SetActive(false);

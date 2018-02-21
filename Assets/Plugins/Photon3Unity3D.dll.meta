@@ -5,14 +5,11 @@ labels:
 - PUN
 - Photon
 - Networking
-timeCreated: 1491016379
-licenseType: Free
 PluginImporter:
   serializedVersion: 1
   iconMap: {}
   executionOrder: {}
   isPreloaded: 0
-  isOverridable: 0
   platformData:
     Android:
       enabled: 1
@@ -84,6 +81,11 @@ PluginImporter:
         SDK: AnySDK
         ScriptingBackend: Il2Cpp
     iOS:
+      enabled: 1
+      settings:
+        CompileFlags: 
+        FrameworkDependencies: 
+    tvOS:
       enabled: 1
       settings:
         CompileFlags: 

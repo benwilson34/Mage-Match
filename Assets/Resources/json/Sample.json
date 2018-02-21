@@ -1,47 +1,47 @@
 {
-    "name": "Test character",
-    "keyElements": "none",
-    "health": 1000,
-    "deck": [ 10, 10, 10, 10, 10 ],
-    "passive": {
-      "title": "none",
-      "desc": "no desc"
-    },
+  "name": "Test character",
+  "keyElements": "none",
+  "health": 1000,
+  "deck": [ 10, 10, 10, 10, 10 ],
+  "passive": {
+    "title": "none",
+    "desc": "no desc"
+  },
 
-    "core": {
-      "title": "none",
-      "cost": 1,
-      "cooldown": 0,
-      "type": "none",
-      "desc": "no desc"
-    },
-    "spell1": {
-      "title": "none",
-      "prereq": "F",
-      "cost": 1,
-      "type": "none",
-      "desc": "no desc"
-    },
-    "spell2": {
-      "title": "none",
-      "prereq": "FF",
-      "cost": 1,
-      "type": "none",
-      "desc": "no desc"
-    },
-    "spell3": {
-      "title": "none",
-      "prereq": "FFF",
-      "cost": 1,
-      "type": "none",
-      "desc": "no desc"
-    },
-    "signature": {
-      "title": "none",
-      "prereq": "FFFF",
-      "cost": 1,
-      "meterCost": 1000,
-      "type": "none",
-      "desc": "no desc"
-    }
+  "core": {
+    "title": "none",
+    "cost": 1,
+    "cooldown": 0,
+    "type": "none",
+    "desc": "no desc"
+  },
+  "spell1": {
+    "title": "none",
+    "prereq": "F",
+    "cost": 1,
+    "type": "none",
+    "desc": "no desc"
+  },
+  "spell2": {
+    "title": "none",
+    "prereq": "FF",
+    "cost": 1,
+    "type": "none",
+    "desc": "no desc"
+  },
+  "spell3": {
+    "title": "none",
+    "prereq": "FFF",
+    "cost": 1,
+    "type": "none",
+    "desc": "no desc"
+  },
+  "signature": {
+    "title": "none",
+    "prereq": "FFFF",
+    "cost": 1,
+    "meterCost": 1000,
+    "type": "none",
+    "desc": "no desc"
   }
+}

@@ -226,7 +226,18 @@ public class CharacterInfo {
         //CharacterInfo info = new CharacterInfo();
         //CharacterInfo info = JsonUtility.FromJson<CharacterInfo>(json);
 
-        string json = Resources.Load<TextAsset>("json/" + ch.ToString()).text;
+
+        Debug.Log("Loading json for " + ch.ToString());
+
+        TextAsset ta = Resources.Load("json/" + ch.ToString()) as TextAsset;
+        if(ta != null)
+            Debug.Log("NOT NULL: " + ta.bytes.Length);
+
+        string json = ta.text;
+        //string json = Resources.Load<TextAsset>("json/nothing").text;
+        //json = "{core:{title:\'Some name\'}}";
+        Debug.Log("Got json: " + json);
+        //CharacterInfo info = JsonUtility.FromJson<CharacterInfo>(json);
         CharacterInfo info = new CharacterInfo();
         JsonConvert.PopulateObject(json, info);
         Debug.Log("Got info for " + info.name + " from " + ch.ToString() + ".json");
