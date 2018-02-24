@@ -6,16 +6,16 @@ using MMDebug;
 
 public class SyncManager : PunBehaviour {
 
-    private MageMatch mm;
-    private Queue<int> rands;
-    private bool checkpoint = false;
+    private MageMatch _mm;
+    private Queue<int> _rands;
+    private bool _checkpoint = false;
 
     public void Init() {
-        rands = new Queue<int>();
+        _rands = new Queue<int>();
     }
 
     public void InitEvents(MageMatch mm, EventController eventCont) {
-        this.mm = mm;
+        this._mm = mm;
         eventCont.AddDrawEvent(OnDrawLocal, EventController.Type.Network, EventController.Status.Begin);
         eventCont.AddDropEvent(OnDropLocal, EventController.Type.Network, EventController.Status.Begin);
         eventCont.AddSwapEvent(OnSwapLocal, EventController.Type.Network, EventController.Status.Begin);
@@ -32,11 +32,11 @@ public class SyncManager : PunBehaviour {
 
     public IEnumerator SyncRands(int id, int[] values) {
         PhotonView photonView = PhotonView.Get(this);
-        if (id == mm.myID) { // send/enqueue
+        if (id == _mm.myID) { // send/enqueue
             photonView.RPC("HandleSyncRands", PhotonTargets.All, values);
         } else {             // wait for rands in queue
             MMLog.Log_SyncMan("Wating for " + values.Length + " values...");
-            yield return new WaitUntil(() => rands.Count >= values.Length); // will the amount always be the same??
+            yield return new WaitUntil(() => _rands.Count >= values.Length); // will the amount always be the same??
         }
         yield return null;
     }
@@ -44,7 +44,7 @@ public class SyncManager : PunBehaviour {
     public void HandleSyncRands(int[] values) {
         for (int i = 0; i < values.Length; i++) {
             //Debug.MMLog.Log_SyncMan("SYNCMANAGER: Just synced random["+i+"]=" + values[i]);
-            rands.Enqueue(values[i]);
+            _rands.Enqueue(values[i]);
         }
     }
 
@@ -55,7 +55,7 @@ public class SyncManager : PunBehaviour {
     public int[] GetRands(int count) {
         int[] r = new int[count];
         for (int i = 0; i < count; i++) {
-            r[i] = rands.Dequeue();
+            r[i] = _rands.Dequeue();
             //Debug.MMLog.Log_SyncMan("SYNCMANAGER: Just read random["+i+"]=" + r[i]);
         }
         return r;
@@ -66,20 +66,20 @@ public class SyncManager : PunBehaviour {
         PhotonView photonView = PhotonView.Get(this);
         photonView.RPC("HandleCheckpoint", PhotonTargets.Others, true);
 
-        yield return new WaitUntil(() => checkpoint);
-        checkpoint = false;
+        yield return new WaitUntil(() => _checkpoint);
+        _checkpoint = false;
     }
     [PunRPC]
     public void HandleCheckpoint(bool checkpoint) {
         MMLog.Log_SyncMan("Received checkpoint");
-        this.checkpoint = checkpoint;
+        this._checkpoint = checkpoint;
     }
 
     public void CheckHandContents(int id) {
-        if (id != mm.myID)
+        if (id != _mm.myID)
             return;
 
-        List<string> tags = mm.GetPlayer(id).hand.Debug_GetAllTags();
+        List<string> tags = _mm.GetPlayer(id).hand.Debug_GetAllTags();
 
         PhotonView photonView = PhotonView.Get(this);
         photonView.RPC("HandleCheckHandContents", PhotonTargets.Others, id, tags.ToArray());
@@ -89,9 +89,9 @@ public class SyncManager : PunBehaviour {
         MMLog.Log_SyncMan("About to check player"+id+"'s hand...");
         List<string> theirTags = new List<string>(theirTagArray);
 
-        bool match = mm.GetPlayer(id).hand.Debug_CheckTags(theirTags);
+        bool match = _mm.GetPlayer(id).hand.Debug_CheckTags(theirTags);
         if (!match) {
-            List<string> myTags = mm.GetPlayer(id).hand.Debug_GetAllTags();
+            List<string> myTags = _mm.GetPlayer(id).hand.Debug_GetAllTags();
             MMLog.LogError("Hand desync!!\nmine =" + myTags.ToString() + 
                 "\ntheirs=" + theirTags.ToString());
         }
@@ -100,7 +100,7 @@ public class SyncManager : PunBehaviour {
 
     public IEnumerator OnDrawLocal(int id, string tag, bool playerAction, bool dealt) {
         //Debug.MMLog.Log_SyncMan("TURNMANAGER: id=" + id + " myID=" + mm.myID);
-        if ((playerAction || dealt) && id == mm.myID) { // if local, send to remote
+        if ((playerAction || dealt) && id == _mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDraw", PhotonTargets.Others, id, tag, playerAction, dealt);
         }
@@ -110,13 +110,13 @@ public class SyncManager : PunBehaviour {
     public void HandleDraw(int id, string tag, bool playerAction, bool dealt) {
         MMLog.Log_SyncMan("Received draw with tag=" + tag);
         if (dealt)
-            StartCoroutine(mm.GetPlayer(id).DealTile(tag));
+            StartCoroutine(_mm.GetPlayer(id).DealTile(tag));
         else
-            StartCoroutine(mm._Draw(id, tag, playerAction));
+            StartCoroutine(_mm._Draw(id, tag, playerAction));
     }
 
     public IEnumerator OnDropLocal(int id, bool playerAction, string tag, int col) {
-        if (playerAction && id == mm.myID) { // if local, send to remote
+        if (playerAction && id == _mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDrop", PhotonTargets.Others, id, tag, col);
         }
@@ -124,12 +124,12 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleDrop(int id, string tag, int col) {
-        Hex hex = mm.GetPlayer(id).hand.GetHex(tag);
-        mm.PlayerDropTile(col, hex);
+        Hex hex = _mm.GetPlayer(id).hand.GetHex(tag);
+        _mm.PlayerDropTile(col, hex);
     }
 
     public IEnumerator OnSwapLocal(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        if (playerAction && id == mm.myID) { // if local, send to remote
+        if (playerAction && id == _mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleSwap", PhotonTargets.Others, id, c1, r1, c2, r2);
         }
@@ -137,53 +137,53 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleSwap(int id, int c1, int r1, int c2, int r2) {
-        mm.PlayerSwapTiles(c1, r1, c2, r2);
+        _mm.PlayerSwapTiles(c1, r1, c2, r2);
     }
 
     public void SendSpellCast(int spellNum) {
-        if (mm.MyTurn()) { // not totally necessary...
+        if (_mm.MyTurn()) { // not totally necessary...
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleSpellCast", PhotonTargets.Others, spellNum);
         }
     }
     [PunRPC]
     public void HandleSpellCast(int spellNum) {
-        StartCoroutine(mm._CastSpell(spellNum));
+        StartCoroutine(_mm._CastSpell(spellNum));
     }
 
     public void TurnTimeout() {
-        if (mm.MyTurn()) { // not totally necessary...
+        if (_mm.MyTurn()) { // not totally necessary...
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleTimeout", PhotonTargets.All);
         }
     }
     [PunRPC]
     public void HandleTimeout() {
-        mm.TurnTimeout();
+        _mm.TurnTimeout();
     }
 
     // --------------- Targeting ----------------
 
     public void SendTBTarget(TileBehav tb) {
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleTBTarget", PhotonTargets.Others, tb.tile.col, tb.tile.row);
         }
     }
     [PunRPC]
     public void HandleTBTarget(int col, int row) {
-        mm.targeting.OnTBTarget(mm.hexGrid.GetTileBehavAt(col, row));
+        _mm.targeting.OnTBTarget(_mm.hexGrid.GetTileBehavAt(col, row));
     }
 
     public void SendCBTarget(CellBehav cb) {
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleCBTarget", PhotonTargets.Others, cb.col, cb.row);
         }
     }
     [PunRPC]
     public void HandleCBTarget(int col, int row) {
-        mm.targeting.OnCBTarget(mm.hexGrid.GetCellBehavAt(col, row));
+        _mm.targeting.OnCBTarget(_mm.hexGrid.GetCellBehavAt(col, row));
     }
 
     // TODO merge into SendTargetingMessage
@@ -210,57 +210,57 @@ public class SyncManager : PunBehaviour {
     //}
 
     public void SendTBSelection(TileBehav tb) {
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleTBSelection", PhotonTargets.Others, tb.tile.col, tb.tile.row);
         }
     }
     [PunRPC]
     public void HandleTBSelection(int col, int row) {
-        mm.targeting.OnSelection(mm.hexGrid.GetTileBehavAt(col, row));
+        _mm.targeting.OnSelection(_mm.hexGrid.GetTileBehavAt(col, row));
     }
 
     public void SendCancelSelection() {
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleCancelSelection", PhotonTargets.Others);
         }
     }
     [PunRPC]
     public void HandleCancelSelection() {
-        mm.targeting.CancelSelection();
+        _mm.targeting.CancelSelection();
     }
 
     public void SendEndDragTarget() {
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleEndDragTarget", PhotonTargets.Others);
         }
     }
     [PunRPC]
     public void HandleEndDragTarget() {
-        mm.targeting.EndDragTarget();
+        _mm.targeting.EndDragTarget();
     }
 
     public void SendDropSelection(int col, TileBehav tb) {
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDropSelection", PhotonTargets.Others, col, tb.hextag);
         }
     }
     [PunRPC]
     public void HandleDropSelection(int col, string tag) {
-        mm.prompt.SetDrop(col, (TileBehav)mm.ActiveP().hand.GetHex(tag));
+        _mm.prompt.SetDrop(col, (TileBehav)_mm.ActiveP().hand.GetHex(tag));
     }
 
     public void SendSwapSelection(int c1, int r1, int c2, int r2) {
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleSwapSelection", PhotonTargets.Others, c1, r1, c2, r2);
         }
     }
     [PunRPC]
     public void HandleSwapSelection(int c1, int r1, int c2, int r2) {
-        mm.prompt.SetSwaps(c1, r1, c2, r2);
+        _mm.prompt.SetSwaps(c1, r1, c2, r2);
     }
 }

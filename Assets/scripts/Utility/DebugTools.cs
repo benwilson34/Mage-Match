@@ -9,11 +9,11 @@ public class DebugTools : MonoBehaviour {
     public enum ToolMode { Insert, Destroy, Enchant, Properties, Clear, AddToHand, Discard, ChangeHealth, ChangeMeter };
     public ToolMode mode = ToolMode.Insert;
 
-    private MageMatch mm;
-    private GameObject toolsMenu;
-    private Dropdown dd_hex, dd_enchant, dd_property;
-    private InputField input;
-    private Button b_healthMode, b_player, b_ok;
+    private MageMatch _mm;
+    private GameObject _toolsMenu;
+    private Dropdown _dd_hex, _dd_enchant, _dd_property;
+    private InputField _input;
+    private Button _b_healthMode, _b_player, _b_ok;
 
     private int playerId = 1;
     private bool relativeDmgMode = true;
@@ -21,17 +21,17 @@ public class DebugTools : MonoBehaviour {
     private string oldFunc;
 
 	public void Init (MageMatch mm) {
-        this.mm = mm;
+        this._mm = mm;
 
-        toolsMenu = GameObject.Find("ToolsMenu");
-        Transform t = toolsMenu.transform;
-        dd_hex = t.Find("dd_hex").GetComponent<Dropdown>();
-        dd_enchant = t.Find("dd_enchant").GetComponent<Dropdown>();
-        dd_property = t.Find("dd_prop").GetComponent<Dropdown>();
-        input = t.Find("input_dmg").GetComponent<InputField>();
-        b_healthMode = t.Find("b_healthMode").GetComponent<Button>();
-        b_player = t.Find("b_player").GetComponent<Button>();
-        b_ok = t.Find("b_ok").GetComponent<Button>();
+        _toolsMenu = GameObject.Find("ToolsMenu");
+        Transform t = _toolsMenu.transform;
+        _dd_hex = t.Find("dd_hex").GetComponent<Dropdown>();
+        _dd_enchant = t.Find("dd_enchant").GetComponent<Dropdown>();
+        _dd_property = t.Find("dd_prop").GetComponent<Dropdown>();
+        _input = t.Find("input_dmg").GetComponent<InputField>();
+        _b_healthMode = t.Find("b_healthMode").GetComponent<Button>();
+        _b_player = t.Find("b_player").GetComponent<Button>();
+        _b_ok = t.Find("b_ok").GetComponent<Button>();
     }
 
     //void Update () {
@@ -49,64 +49,64 @@ public class DebugTools : MonoBehaviour {
         switch (func) {
             case "insert":
                 mode = ToolMode.Insert;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Cell);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Cell);
                 SetInputs(true, false, false, false, false);
                 break;
             case "destroy":
                 mode = ToolMode.Destroy;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(false, false, false, false, false);
                 break;
             case "enchant":
                 mode = ToolMode.Enchant;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(false, false, true, false, false);
                 break;
             case "properties":
                 mode = ToolMode.Properties;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(false, true, false, false, false);
                 break;
             case "clear":
                 mode = ToolMode.Clear;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(false, false, false, false, false);
                 break;
             case "addToHand":
                 mode = ToolMode.AddToHand;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
                 SetInputs(true, false, false, false, true, "ADD");
                 break;
             case "discard":
                 mode = ToolMode.Discard;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(false, false, false, false, false);
                 break;
             case "changeHealth":
                 mode = ToolMode.ChangeHealth;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
                 SetInputs(false, false, false, true, true, "APPLY");
                 break;
             case "changeMeter":
                 mode = ToolMode.ChangeMeter;
-                mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
                 SetInputs(false, false, false, true, true, "APPLY");
                 break;
         }
     }
 
     public void SetInputs(bool hex, bool prop, bool ench, bool health, bool player, string buttonText = "") {
-        dd_hex.interactable = hex;
-        dd_property.interactable = prop;
-        dd_enchant.interactable = ench;
-        input.interactable = health;
-        b_healthMode.interactable = health;
-        b_player.interactable = player;
+        _dd_hex.interactable = hex;
+        _dd_property.interactable = prop;
+        _dd_enchant.interactable = ench;
+        _input.interactable = health;
+        _b_healthMode.interactable = health;
+        _b_player.interactable = player;
         if (buttonText == "")
-            b_ok.interactable = false;
+            _b_ok.interactable = false;
         else {
-            b_ok.interactable = true;
-            b_ok.transform.GetChild(0).GetComponent<Text>().text = buttonText;
+            _b_ok.interactable = true;
+            _b_ok.transform.GetChild(0).GetComponent<Text>().text = buttonText;
         }
     }
 
@@ -115,7 +115,7 @@ public class DebugTools : MonoBehaviour {
     }
 
     string GetHexGenTag(int id) {
-        string selection = dd_hex.options[dd_hex.value].text;
+        string selection = _dd_hex.options[_dd_hex.value].text;
         switch (selection) {
             case "Fire":
                 return "p" + id + "-B-F";
@@ -139,7 +139,7 @@ public class DebugTools : MonoBehaviour {
         else
             playerId = 1;
 
-        b_player.transform.GetChild(0).GetComponent<Text>().text = "P" + playerId;
+        _b_player.transform.GetChild(0).GetComponent<Text>().text = "P" + playerId;
     }
 
     int GetPlayerId() {
@@ -149,9 +149,9 @@ public class DebugTools : MonoBehaviour {
     public void ToggleDmgMode() {
         relativeDmgMode = !relativeDmgMode;
         if(relativeDmgMode)
-            b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "relative";
+            _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "relative";
         else
-            b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "absolute";
+            _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "absolute";
     }
 
     public void HandleInput(MonoBehaviour obj) {
@@ -195,21 +195,21 @@ public class DebugTools : MonoBehaviour {
 
 
     void InsertMode_OnClick(CellBehav cb) {
-        TileBehav insertTB = (TileBehav) mm.hexMan.GenerateHex(mm.ActiveP().id, GetHexGenTag(1));
-        mm.PutTile(insertTB, cb.col, cb.row);
+        TileBehav insertTB = (TileBehav) _mm.hexMan.GenerateHex(_mm.ActiveP().id, GetHexGenTag(1));
+        _mm.PutTile(insertTB, cb.col, cb.row);
         //insertTB.HardSetPos(cb.col, cb.row);
     }
 
     void DestroyMode_OnClick(TileBehav tb) {
         MMLog.Log("DebugTools", "orange", "calling destroy mode!"); 
-        mm.hexMan.RemoveTile(tb.tile, false);
+        _mm.hexMan.RemoveTile(tb.tile, false);
     }
 
     void EnchantMode_OnClick(TileBehav tb) {
-        string option = dd_enchant.options[dd_enchant.value].text;
+        string option = _dd_enchant.options[_dd_enchant.value].text;
         switch (option) {
             case "Burning":
-                StartCoroutine(mm.hexFX.Ench_SetBurning(playerId, tb));
+                StartCoroutine(_mm.hexFX.Ench_SetBurning(playerId, tb));
                 break;
             //case "Cherrybomb":
             //    StartCoroutine(mm.hexFX.Ench_SetCherrybomb(id, tb));
@@ -219,7 +219,7 @@ public class DebugTools : MonoBehaviour {
             //    break;
             case "Zombify":
                 MMLog.Log("DebugTools", "orange", "calling enchant, id=" + playerId);
-                StartCoroutine(mm.hexFX.Ench_SetZombify(playerId, tb, false));
+                StartCoroutine(_mm.hexFX.Ench_SetZombify(playerId, tb, false));
                 break;
         }
     }
@@ -234,30 +234,30 @@ public class DebugTools : MonoBehaviour {
     }
 
     void AddToHandMode_OnClick() {
-        StartCoroutine(mm._Draw(GetPlayerId(), GetHexGenTag(), false));
+        StartCoroutine(_mm._Draw(GetPlayerId(), GetHexGenTag(), false));
     }
 
     void DiscardMode_OnClick(Hex h) {
-        if (mm.GetPlayer(1).IsHexMine(h)) {
-            mm.GetPlayer(1).Discard(h);
-        } else if (mm.GetPlayer(2).IsHexMine(h)) {
-            mm.GetPlayer(2).Discard(h);
+        if (_mm.GetPlayer(1).IsHexMine(h)) {
+            _mm.GetPlayer(1).Discard(h);
+        } else if (_mm.GetPlayer(2).IsHexMine(h)) {
+            _mm.GetPlayer(2).Discard(h);
         } else
             MMLog.LogWarning("DebugTools: user clicked on a non-hand hex! Naughty!");
     }
 
     void ChangeHealthMode_OnClick() {
         // TODO relative vs absolute
-        int amt = int.Parse(input.text);
+        int amt = int.Parse(_input.text);
         int pid = GetPlayerId();
         if (amt < 0)
-            mm.GetOpponent(pid).DealDamage(-amt);
+            _mm.GetOpponent(pid).DealDamage(-amt);
         else
-            mm.GetPlayer(pid).Heal(amt);
+            _mm.GetPlayer(pid).Heal(amt);
     }
 
     void ChangeMeterMode_OnClick() {
-        int amt = int.Parse(input.text);
-        mm.GetPlayer(GetPlayerId()).character.ChangeMeter(amt);
+        int amt = int.Parse(_input.text);
+        _mm.GetPlayer(GetPlayerId()).character.ChangeMeter(amt);
     }
 }

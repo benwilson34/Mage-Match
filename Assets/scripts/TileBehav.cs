@@ -8,17 +8,18 @@ public class TileBehav : Hex, Tooltipable {
 	public Tile tile;
 	public Tile.Element initElement;
 
+    // all these should be auto?
 	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
 	public bool ablePrereq = true, ableTarget = true;
     public bool wasInvoked = false;
 
-	private Enchantment enchantment;
-    private List<TileEffect> tileEffects;
-	private bool inPos = true;
+	private Enchantment _enchantment;
+    private List<TileEffect> _tileEffects;
+	private bool _inPos = true; // auto?
 
     void Awake(){
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
-        tileEffects = new List<TileEffect>(); // move to Init?
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _tileEffects = new List<TileEffect>(); // move to Init?
         Init();
 	}
 
@@ -33,19 +34,19 @@ public class TileBehav : Hex, Tooltipable {
 
 	public IEnumerator _ChangePos(int col, int row, float duration = .15f, string anim = ""){
 		tile.SetPos(col, row);
-		mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
-		inPos = false;
+		_mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
+		_inPos = false;
 
         switch (anim) { // not great, but simple...
             case "raise":
-                yield return mm.animCont._UpwardInsert(this);
+                yield return _mm.animCont._UpwardInsert(this);
                 break;
             default:
-                yield return mm.animCont._MoveTile(this, duration);
+                yield return _mm.animCont._MoveTile(this, duration);
                 break;
         }
 
-		inPos = true;
+		_inPos = true;
 	}
 
     public void ChangePosAndDrop(int startRow, int col, int row, float duration) {
@@ -54,18 +55,18 @@ public class TileBehav : Hex, Tooltipable {
 
     public IEnumerator _ChangePosAndDrop(int startRow, int col, int row, float duration = .15f) {
         tile.SetPos(col, row);
-		mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
-		inPos = false;
+		_mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
+		_inPos = false;
 
-        yield return mm.animCont._MoveTileAndDrop(this, startRow, duration);
+        yield return _mm.animCont._MoveTileAndDrop(this, startRow, duration);
 
-		inPos = true;
+		_inPos = true;
     }
 
 	public void HardSetPos(int col, int row){ // essentially a "teleport"
 		tile.SetPos(col, row);
-        mm.hexGrid.HardSetTileBehavAt (this, col, row);
-		transform.position = mm.hexGrid.GridCoordToPos (col, row);
+        _mm.hexGrid.HardSetTileBehavAt (this, col, row);
+		transform.position = _mm.hexGrid.GridCoordToPos (col, row);
         SetPlaced();
 	}
 
@@ -74,11 +75,11 @@ public class TileBehav : Hex, Tooltipable {
 	}
 
 	public void SetOutOfPosition(){
-		inPos = false;
+		_inPos = false;
 	}
 
 	public bool IsInPosition(){
-		return inPos;
+		return _inPos;
 	}
 
     public bool CanSetEnch(Enchantment.EnchType type) {
@@ -91,12 +92,12 @@ public class TileBehav : Hex, Tooltipable {
     }
 
 	public bool HasEnchantment(){ // just use GetEnchType?
-		return enchantment != null;
+		return _enchantment != null;
 	}
 
     public Enchantment.EnchType GetEnchType() {
         if (HasEnchantment())
-            return enchantment.enchType;
+            return _enchantment.enchType;
         else
             return Enchantment.EnchType.None;
     }
@@ -107,16 +108,16 @@ public class TileBehav : Hex, Tooltipable {
 
     public IEnumerator TriggerEnchantment() {
         MMLog.Log_TileBehav("Triggering enchantment at " + tile.col + ", " + tile.row);
-        yield return enchantment.TriggerEffect();
+        yield return _enchantment.TriggerEffect();
     }
 
 	public void ClearEnchantment(bool removeFromList = true){
         MMLog.Log_TileBehav("About to remove enchantment...");
         if (HasEnchantment()) {
-            MMLog.Log_TileBehav("About to remove enchantment with tag " + enchantment.tag);
+            MMLog.Log_TileBehav("About to remove enchantment with tag " + _enchantment.tag);
             if(removeFromList)
-                mm.effectCont.RemoveTurnEffect(enchantment);
-            enchantment = null;
+                _mm.effectCont.RemoveTurnEffect(_enchantment);
+            _enchantment = null;
             this.GetComponent<SpriteRenderer>().color = Color.white;
         }
 	}
@@ -131,7 +132,7 @@ public class TileBehav : Hex, Tooltipable {
 
         MMLog.Log_TileBehav("About to set ench with tag="+ench.tag);
 		ench.SetEnchantee(this);
-		enchantment = ench; 
+		_enchantment = ench; 
 		return true;
 	}
 
@@ -141,19 +142,19 @@ public class TileBehav : Hex, Tooltipable {
 //			resolved = true;
 			currentState = State.Removed;
 //			this.enchantEffect (this);
-			enchantment.CancelEffect();
+			_enchantment.CancelEffect();
 			return true;
 		}
 		return false;
 	}
 
-    public void AddTileEffect(TileEffect te) { tileEffects.Add(te); }
+    public void AddTileEffect(TileEffect te) { _tileEffects.Add(te); }
 
-    public void RemoveTileEffect(TileEffect te) { tileEffects.Remove(te); }
+    public void RemoveTileEffect(TileEffect te) { _tileEffects.Remove(te); }
 
     public void ClearTileEffects() {
-        foreach (TileEffect te in tileEffects) {
-            mm.effectCont.RemoveTurnEffect(te);
+        foreach (TileEffect te in _tileEffects) {
+            _mm.effectCont.RemoveTurnEffect(te);
         }
     }
 

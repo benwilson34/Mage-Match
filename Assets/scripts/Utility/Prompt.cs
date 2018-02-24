@@ -9,18 +9,18 @@ public class Prompt {
     public enum PromptMode { None, Swap, Drop };
     public PromptMode currentMode = PromptMode.None;
 
-    private MageMatch mm;
+    private MageMatch _mm;
 
     // TODO make/support dropping hexes (i.e. you could drop a consumable)
     // perhaps the Wait func should take a filter like targeting...
-    private TileBehav dropTile;
-    private int dropCol;
+    private TileBehav _dropTile;
+    private int _dropCol;
 
-    private TileBehav[] swapTiles;
-    private bool successful = false;
+    private TileBehav[] _swapTiles;
+    private bool _successful = false;
 
     public Prompt(MageMatch mm) {
-        this.mm = mm;
+        this._mm = mm;
     }
 
     //public void Cancel() {
@@ -31,23 +31,23 @@ public class Prompt {
     //public bool WasCanceled() { return canceled; }
 
     public bool WasSuccessful() {
-        MMLog.Log("PROMPT", "blue", "prompt was" + (successful ? "" : " not") + " successful");
-        return successful;
+        MMLog.Log("PROMPT", "blue", "prompt was" + (_successful ? "" : " not") + " successful");
+        return _successful;
     }
 
     // ----- DROP -----
 
     public IEnumerator WaitForDrop() {
         MMLog.Log("PROMPT", "blue", "Waiting for DROP...");
-        successful = false;
+        _successful = false;
 
-        if (mm.ActiveP().hand.Count() == 0 ||                      // if player hand is empty, or
-            mm.hexGrid.GetPlacedTiles().Count == HexGrid.NUM_CELLS) { // the board is full
+        if (_mm.ActiveP().hand.Count() == 0 ||                      // if player hand is empty, or
+            _mm.hexGrid.GetPlacedTiles().Count == HexGrid.NUM_CELLS) { // the board is full
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted DROP!!");
             yield break;
         }
 
-        mm.uiCont.SendSlidingText("Drop a tile into the board!");
+        _mm.uiCont.SendSlidingText("Drop a tile into the board!");
         currentMode = PromptMode.Drop;
 
         yield return new WaitUntil(() => currentMode == PromptMode.None);
@@ -55,70 +55,70 @@ public class Prompt {
 
     public void SetDrop(int col, TileBehav tb) {
         MMLog.Log("PROMPT", "blue", "DROP is " + tb.hextag);
-        mm.syncManager.SendDropSelection(col, tb);
+        _mm.syncManager.SendDropSelection(col, tb);
 
-        dropTile = tb;
-        dropCol = col;
+        _dropTile = tb;
+        _dropCol = col;
 
         currentMode = PromptMode.None;
-        successful = true;
+        _successful = true;
     }
 
-    public TileBehav GetDropTile() { return dropTile; }
+    public TileBehav GetDropTile() { return _dropTile; }
 
-    public int GetDropCol() { return dropCol; }
+    public int GetDropCol() { return _dropCol; }
 
     public IEnumerator ContinueDrop() {
-        mm.ActiveP().hand.Remove(dropTile);
-        yield return mm._Drop(false, dropCol, dropTile);
+        _mm.ActiveP().hand.Remove(_dropTile);
+        yield return _mm._Drop(false, _dropCol, _dropTile);
     }
 
     // ----- SWAP -----
 
     public IEnumerator WaitForSwap(TileSeq seq) {
         MMLog.Log("PROMPT", "blue", "Waiting for SWAP...");
-        successful = false;
+        _successful = false;
 
-        if (mm.hexGrid.GetPlacedTiles().Count == 0 || // if board is empty, break
+        if (_mm.hexGrid.GetPlacedTiles().Count == 0 || // if board is empty, break
             !SwapIsPossible(seq)) {
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted SWAP!!");
             yield break;
         }
 
-        mm.uiCont.SendSlidingText("Swap two tiles on the board!");
+        _mm.uiCont.SendSlidingText("Swap two tiles on the board!");
         currentMode = PromptMode.Swap;
-        mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", swap two adjacent tiles!");
+        _mm.uiCont.UpdateMoveText(_mm.ActiveP().name + ", swap two adjacent tiles!");
 
         yield return new WaitUntil(() => currentMode == PromptMode.None);
     }
 
     // if needed elsewhere, move to HexGrid
     public bool SwapIsPossible(TileSeq seq) {
-        List<TileBehav> tbs = mm.hexGrid.GetPlacedTiles(seq);
+        List<TileBehav> tbs = _mm.hexGrid.GetPlacedTiles(seq);
         foreach (TileBehav tb in tbs) {
-            if (mm.hexGrid.HasAdjacentNonprereqTile(tb.tile, seq))
+            if (_mm.hexGrid.HasAdjacentNonprereqTile(tb.tile, seq))
                 return true;
         }
         return false;
     }
 
     public void SetSwaps(int c1, int r1, int c2, int r2) {
-        mm.syncManager.SendSwapSelection(c1, r1, c2, r2);
+        _mm.syncManager.SendSwapSelection(c1, r1, c2, r2);
 
-        swapTiles = new TileBehav[2];
-        swapTiles[0] = mm.hexGrid.GetTileBehavAt(c1, r1);
-        swapTiles[1] = mm.hexGrid.GetTileBehavAt(c2, r2);
+        _swapTiles = new TileBehav[2];
+        _swapTiles[0] = _mm.hexGrid.GetTileBehavAt(c1, r1);
+        _swapTiles[1] = _mm.hexGrid.GetTileBehavAt(c2, r2);
         MMLog.Log("PROMPT", "blue", "SWAPS are " + 
-            swapTiles[0].hextag + " and " + swapTiles[1].hextag);
+            _swapTiles[0].hextag + " and " + _swapTiles[1].hextag);
 
         currentMode = PromptMode.None;
-        successful = true;
+        _successful = true;
     }
 
-    public TileBehav[] GetSwapTBs() { return swapTiles; }
+    public TileBehav[] GetSwapTBs() { return _swapTiles; }
 
     public IEnumerator ContinueSwap() {
-        Tile f = swapTiles[0].tile, s = swapTiles[1].tile;
-        yield return mm._SwapTiles(false, f.col, f.row, s.col, s.row);
+        Tile f = _swapTiles[0].tile, s = _swapTiles[1].tile;
+        yield return _mm._SwapTiles(false, f.col, f.row, s.col, s.row);
     }
 }

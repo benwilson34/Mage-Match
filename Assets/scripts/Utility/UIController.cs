@@ -12,45 +12,46 @@ public class UIController : MonoBehaviour {
     public AnimationCurve slidingEase;
     [HideInInspector]
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
+    [HideInInspector]
     public TooltipManager tooltipMan;
+    [HideInInspector]
     public Newsfeed newsfeed;
 
-	private Text debugGridText, slidingText;
-    private GameObject debugItemPF;
-    private Transform debugContent;
-    private GameObject debugReport;
-    private Text debugReportText;
+	private Text _debugGridText, _slidingText;
+    private GameObject _debugItemPF;
+    private Transform _debugContent;
+    private GameObject _debugReport;
+    private Text _debugReportText;
 
-    private ButtonController localDrawButton;
-    private MageMatch mm;
-	private Dropdown DD1, DD2;
-    private Transform leftPinfo, rightPinfo, leftPspells, rightPspells, board;
-    private GameObject spellOutlineEnd, spellOutlineMid;
-    private GameObject prereqPF, targetPF;
-    private GameObject gradient, targetingBG;
-    private GameObject tCancelB, tClearB;
-    private GameObject menus; // ?
-    private GameObject newsfeedMenu;
-    private GameObject overlay;
-    private GameObject screenScroll;
-    private List<GameObject> outlines, spellOutlines;
-    private SpriteRenderer[,] cellOverlays;
-    private Vector3 slidingTextStart;
-    private bool localOnRight = false;
+    private ButtonController _localDrawButton;
+    private MageMatch _mm;
+    private Transform _leftPinfo, _rightPinfo, _leftPspells, _rightPspells, _board;
+    private GameObject _spellOutlineEnd, _spellOutlineMid;
+    private GameObject _prereqPF, _targetPF;
+    private GameObject _gradient, _targetingBG;
+    private GameObject _tCancelB, _tClearB;
+    private GameObject _menus; // ?
+    private GameObject _newsfeedMenu;
+    private GameObject _overlay;
+    private GameObject _screenScroll;
+    private List<GameObject> _outlines, _spellOutlines;
+    private SpriteRenderer[,] _cellOverlays;
+    private Vector3 _slidingTextStart;
+    private bool _localOnRight = false;
 
     public void Init(){
-        board = GameObject.Find("cells").transform;
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
-        screenScroll = GameObject.Find("scrolling");
+        _board = GameObject.Find("cells").transform;
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _screenScroll = GameObject.Find("scrolling");
 
         //slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
         //slidingTextStart = new Vector3(Screen.width, slidingText.rectTransform.position.y);
         //slidingText.rectTransform.position = slidingTextStart;
 
-        leftPinfo = GameObject.Find("LeftPlayer_Info").transform;
-        rightPinfo = GameObject.Find("RightPlayer_Info").transform;
-        leftPspells = GameObject.Find("LeftPlayer_Spells").transform;
-        rightPspells = GameObject.Find("RightPlayer_Spells").transform;
+        _leftPinfo = GameObject.Find("LeftPlayer_Info").transform;
+        _rightPinfo = GameObject.Find("RightPlayer_Info").transform;
+        _leftPspells = GameObject.Find("LeftPlayer_Spells").transform;
+        _rightPspells = GameObject.Find("RightPlayer_Spells").transform;
 
 
 
@@ -60,46 +61,46 @@ public class UIController : MonoBehaviour {
             for (int i = 0; i < 5; i++) {
                 MMLog.Log_UICont("Init button " + i);
                 var button = GetButtonCont(id, i);
-                MMLog.Log_UICont("mm = " + mm.myID);
-                button.Init(mm, id);
+                MMLog.Log_UICont("mm = " + _mm.myID);
+                button.Init(_mm, id);
                 button.Deactivate();
-                if (id == mm.myID) { // only make my buttons interactable for the match
+                if (id == _mm.myID) { // only make my buttons interactable for the match
                     button.SetInteractable();
                 }
             }
         }
-        localDrawButton = GameObject.Find("b_draw").GetComponent<ButtonController>();
-        localDrawButton.Init(mm, mm.myID);
-        GameObject.Find("b_saveFiles").GetComponent<ButtonController>().Init(mm, mm.myID); // id not needed here
+        _localDrawButton = GameObject.Find("b_draw").GetComponent<ButtonController>();
+        _localDrawButton.Init(_mm, _mm.myID);
+        GameObject.Find("b_saveFiles").GetComponent<ButtonController>().Init(_mm, _mm.myID); // id not needed here
 
 
         // menus
-        menus = GameObject.Find("Menus");
-        Transform scroll = menus.transform.Find("DebugMenu").Find("scr_debugEffects");
-        debugContent = scroll.transform.Find("Viewport").Find("Content");
-		debugGridText = GameObject.Find ("t_debugHex").GetComponent<Text>(); // UI debug grid
-        debugReport = menus.transform.Find("scr_report").gameObject;
-        debugReportText = debugReport.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>();
-        debugReport.SetActive(false);
+        _menus = GameObject.Find("Menus");
+        Transform scroll = _menus.transform.Find("DebugMenu").Find("scr_debugEffects");
+        _debugContent = scroll.transform.Find("Viewport").Find("Content");
+		_debugGridText = GameObject.Find ("t_debugHex").GetComponent<Text>(); // UI debug grid
+        _debugReport = _menus.transform.Find("scr_report").gameObject;
+        _debugReportText = _debugReport.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>();
+        _debugReport.SetActive(false);
 
-        GameObject toolsMenu = menus.transform.Find("ToolsMenu").gameObject;
-        if (!mm.IsDebugMode())
+        GameObject toolsMenu = _menus.transform.Find("ToolsMenu").gameObject;
+        if (!_mm.IsDebugMode())
             toolsMenu.SetActive(false);
 
-        menus.SetActive(false);
+        _menus.SetActive(false);
 
 
         // newsfeed
         newsfeed = GameObject.Find("Newsfeed").GetComponent<Newsfeed>();
-        newsfeed.Init(mm);
+        newsfeed.Init(_mm);
 
 
         // other
         //overlay = GameObject.Find("Targeting Overlay");
         //overlay.SetActive(false);
         
-        spellOutlines = new List<GameObject>();
-        outlines = new List<GameObject>();
+        _spellOutlines = new List<GameObject>();
+        _outlines = new List<GameObject>();
 
         LoadPrefabs();
 
@@ -107,22 +108,22 @@ public class UIController : MonoBehaviour {
     }
 
     public void InitEvents() {
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
-        mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
-        mm.eventCont.gameAction += OnGameAction;
-        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.LastStep, EventController.Status.Begin);
-        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
-        mm.eventCont.playerHealthChange += OnPlayerHealthChange;
-        mm.eventCont.playerMeterChange += OnPlayerMeterChange;
+        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
+        _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
+        _mm.eventCont.gameAction += OnGameAction;
+        _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.LastStep, EventController.Status.Begin);
+        _mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
+        _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+        _mm.eventCont.playerMeterChange += OnPlayerMeterChange;
     }
 
     void LoadPrefabs() {
-        spellOutlineEnd = Resources.Load<GameObject>("prefabs/ui/spell-outline_end");
-        spellOutlineMid = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
-        prereqPF = Resources.Load("prefabs/outline_prereq") as GameObject;
-        targetPF = Resources.Load("prefabs/outline_target") as GameObject;
+        _spellOutlineEnd = Resources.Load<GameObject>("prefabs/ui/spell-outline_end");
+        _spellOutlineMid = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
+        _prereqPF = Resources.Load("prefabs/outline_prereq") as GameObject;
+        _targetPF = Resources.Load("prefabs/outline_target") as GameObject;
 
-        debugItemPF = Resources.Load("prefabs/ui/debug_statusItem") as GameObject;
+        _debugItemPF = Resources.Load("prefabs/ui/debug_statusItem") as GameObject;
     }
 
     void InitSprites() {
@@ -136,13 +137,13 @@ public class UIController : MonoBehaviour {
 
     #region EventCont calls
     public IEnumerator OnTurnBegin(int id) {
-        if (mm.MyTurn())
-            SendSlidingText(mm.ActiveP().name + ", make your move!");
+        if (_mm.MyTurn())
+            SendSlidingText(_mm.ActiveP().name + ", make your move!");
         //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
 
         SetDrawButton(true);
         FlipGradient(); // ugly
-        UpdateAP(mm.GetPlayer(id));
+        UpdateAP(_mm.GetPlayer(id));
 
         //ChangePinfoColor(id, new Color(0, 1, 0, .4f));
         //PinfoColorTween(id, CorrectPinfoColor(id));
@@ -152,13 +153,13 @@ public class UIController : MonoBehaviour {
 
     public IEnumerator OnTurnEnd(int id) {
         UpdateEffTexts();
-        newsfeed.UpdateTurnCount(mm.stats.turns);
+        newsfeed.UpdateTurnCount(_mm.stats.turns);
         //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
         yield return null;
     }
 
     public void OnGameAction(int id, bool costsAP) {
-        UpdateAP(mm.GetPlayer(id));
+        UpdateAP(_mm.GetPlayer(id));
         UpdateEffTexts(); // could be considerable overhead...
     }
 
@@ -179,12 +180,12 @@ public class UIController : MonoBehaviour {
     }
 
     public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
-        StartCoroutine(UpdateHealthbar(mm.GetPlayer(id)));
-        StartCoroutine(DamageAnim(mm.GetPlayer(id), amount));
+        StartCoroutine(UpdateHealthbar(_mm.GetPlayer(id)));
+        StartCoroutine(DamageAnim(_mm.GetPlayer(id), amount));
     }
 
     public void OnPlayerMeterChange(int id, int amount, int newMeter) {
-        StartCoroutine(UpdateMeterbar(mm.GetPlayer(id)));
+        StartCoroutine(UpdateMeterbar(_mm.GetPlayer(id)));
     }
     #endregion
 
@@ -192,16 +193,16 @@ public class UIController : MonoBehaviour {
         UpdateDebugGrid();
         UpdateMoveText("Fight!!");
 
-        if (!mm.MyTurn())
+        if (!_mm.MyTurn())
             FlipGradient();
 
         for (int id = 1; id <= 2; id++) {
-            Player p = mm.GetPlayer(id);
+            Player p = _mm.GetPlayer(id);
             Transform pinfo = GetPinfo(id);
 
             Text nameText = pinfo.Find("t_name").GetComponent<Text>();
             nameText.text = "P"+id+": " + p.name;
-            if (id == mm.myID)
+            if (id == _mm.myID)
                 nameText.text += " (ME!)";
 
             ShowAllSpellInfo(id);
@@ -220,7 +221,7 @@ public class UIController : MonoBehaviour {
         // camera position relative to center of the board
         camOffset = Camera.main.transform.position.x;
         camOffset = GameObject.Find("s_board").transform.position.x - camOffset;
-        if (!mm.MyTurn() ^ localOnRight) // because it's currently relative, only do this if needed
+        if (!_mm.MyTurn() ^ _localOnRight) // because it's currently relative, only do this if needed
             StartCoroutine(ShiftScreen());
     }
 
@@ -231,7 +232,7 @@ public class UIController : MonoBehaviour {
 
         Transform camPos = Camera.main.transform;
         
-        if (mm.MyTurn() ^ localOnRight) { // left side
+        if (_mm.MyTurn() ^ _localOnRight) { // left side
             yield return camPos.DOMoveX(camPos.position.x - (2*camOffset), .3f).WaitForCompletion();
         } else { // right side
             yield return camPos.DOMoveX(camPos.position.x + (2*camOffset), .3f).WaitForCompletion();
@@ -270,10 +271,10 @@ public class UIController : MonoBehaviour {
 
     #region ----- PLAYER INFO -----
     public Transform GetPinfo(int id) {
-        if (id == mm.myID ^ localOnRight)
-            return leftPinfo;
+        if (id == _mm.myID ^ _localOnRight)
+            return _leftPinfo;
         else
-            return rightPinfo;
+            return _rightPinfo;
     }
 
     //void ChangePinfoColor(int id, Color c) {
@@ -378,40 +379,40 @@ public class UIController : MonoBehaviour {
     public void ShowSpellSeqs(List<TileSeq> seqs) {
         foreach (TileSeq seq in seqs) {
             MMLog.Log_UICont("showing " + seqs.Count + " seqs");
-            GameObject start = Instantiate(spellOutlineEnd);
+            GameObject start = Instantiate(_spellOutlineEnd);
             int length = seq.GetSeqLength();
             for (int i = 1; i < length; i++) {
                 GameObject piece;
                 if (i == length - 1)
-                    piece = Instantiate(spellOutlineEnd, start.transform);
+                    piece = Instantiate(_spellOutlineEnd, start.transform);
                 else
-                    piece = Instantiate(spellOutlineMid, start.transform);
+                    piece = Instantiate(_spellOutlineMid, start.transform);
                 piece.transform.position = new Vector3(0, i);
                 piece.transform.rotation = Quaternion.Euler(0, 0, -90);
             }
 
-            Vector2 tilePos = mm.hexGrid.GridCoordToPos(seq.sequence[0]);
+            Vector2 tilePos = _mm.hexGrid.GridCoordToPos(seq.sequence[0]);
             start.transform.position = new Vector3(tilePos.x, tilePos.y);
-            start.transform.Rotate(0, 0, mm.hexGrid.GetDirection(seq) * -60);
+            start.transform.Rotate(0, 0, _mm.hexGrid.GetDirection(seq) * -60);
 
-            spellOutlines.Add(start);
+            _spellOutlines.Add(start);
         }
     }
 
     public void HideSpellSeqs() {
-        for (int i = 0; i < spellOutlines.Count;) {
-            Destroy(spellOutlines[0]);
-            spellOutlines.RemoveAt(0);
+        for (int i = 0; i < _spellOutlines.Count;) {
+            Destroy(_spellOutlines[0]);
+            _spellOutlines.RemoveAt(0);
         }
     }
 
     public void GetCellOverlays() {
-        cellOverlays = new SpriteRenderer[7,7];
+        _cellOverlays = new SpriteRenderer[7,7];
         for(int i = 0; i < 7; i++) {
-            Transform col = board.GetChild(i);
-            for(int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
+            Transform col = _board.GetChild(i);
+            for(int j = _mm.hexGrid.BottomOfColumn(i); j <= _mm.hexGrid.TopOfColumn(i); j++) {
                 //Debug.Log(">>>2nd for of getCellOverlays at " + (i) + (j));
-                cellOverlays[i,j] = col.Find("cell" + (i) + (j)).GetComponent<SpriteRenderer>();
+                _cellOverlays[i,j] = col.Find("cell" + (i) + (j)).GetComponent<SpriteRenderer>();
             }
         } 
     }
@@ -424,15 +425,15 @@ public class UIController : MonoBehaviour {
         //}
 
         for(int i = 0; i < 7; i++) {
-            for(int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
-                Color c = cellOverlays[i,j].color;
+            for(int j = _mm.hexGrid.BottomOfColumn(i); j <= _mm.hexGrid.TopOfColumn(i); j++) {
+                Color c = _cellOverlays[i,j].color;
                 c.a = 0.6f;
-                cellOverlays[i,j].color = c;
+                _cellOverlays[i,j].color = c;
                 //Debug.Log("Color = " + cellOverlays[i,j].color);
             }
         }
 
-        OutlinePrereq(mm.targeting.GetSelection());
+        OutlinePrereq(_mm.targeting.GetSelection());
 
         //gradient.SetActive(!gradient.activeSelf);
         //targetingBG.SetActive(!targetingBG.activeSelf);
@@ -443,9 +444,9 @@ public class UIController : MonoBehaviour {
 
         foreach(TileBehav tb in tbs) {
             Tile t = tb.tile;
-            Color c = cellOverlays[t.col,t.row].color;
+            Color c = _cellOverlays[t.col,t.row].color;
             c.a = 0.0f;
-            cellOverlays[t.col,t.row].color = c;
+            _cellOverlays[t.col,t.row].color = c;
         }
     }
 
@@ -465,10 +466,10 @@ public class UIController : MonoBehaviour {
         //}
 
         for (int i = 0; i < 7; i++) {
-            for (int j = mm.hexGrid.BottomOfColumn(i); j <= mm.hexGrid.TopOfColumn(i); j++) {
-                Color c = cellOverlays[i,j].color;
+            for (int j = _mm.hexGrid.BottomOfColumn(i); j <= _mm.hexGrid.TopOfColumn(i); j++) {
+                Color c = _cellOverlays[i,j].color;
                 c.a = 0.0f;
-                cellOverlays[i,j].color = c;
+                _cellOverlays[i,j].color = c;
             }
         }
 
@@ -476,35 +477,35 @@ public class UIController : MonoBehaviour {
     }
 
     void OutlinePrereq(TileSeq seq) {
-        outlines = new List<GameObject>(); // move to Init?
+        _outlines = new List<GameObject>(); // move to Init?
         GameObject go;
         foreach (Tile t in seq.sequence) {
-            go = Instantiate(prereqPF);
-            go.transform.position = mm.hexGrid.GridCoordToPos(t.col, t.row);
-            outlines.Add(go);
+            go = Instantiate(_prereqPF);
+            go.transform.position = _mm.hexGrid.GridCoordToPos(t.col, t.row);
+            _outlines.Add(go);
         }
     }
 
     public void OutlineTarget(int col, int row) {
-        GameObject go = Instantiate(targetPF);
-        go.transform.position = mm.hexGrid.GridCoordToPos(col, row);
-        outlines.Add(go);
+        GameObject go = Instantiate(_targetPF);
+        go.transform.position = _mm.hexGrid.GridCoordToPos(col, row);
+        _outlines.Add(go);
     }
 
     public void ClearTargets() {
-        int prereqs = mm.targeting.GetSelection().sequence.Count;
-        for (int i = 0; i < outlines.Count - prereqs;) { // clear just the target outlines
-            GameObject go = outlines[prereqs];
+        int prereqs = _mm.targeting.GetSelection().sequence.Count;
+        for (int i = 0; i < _outlines.Count - prereqs;) { // clear just the target outlines
+            GameObject go = _outlines[prereqs];
             GameObject.Destroy(go);
-            outlines.Remove(go);
+            _outlines.Remove(go);
         }
     }
 
     void ClearOutlines() {
-        for (int i = 0; i < outlines.Count;) {
-            GameObject go = outlines[0];
+        for (int i = 0; i < _outlines.Count;) {
+            GameObject go = _outlines[0];
             GameObject.Destroy(go);
-            outlines.Remove(go);
+            _outlines.Remove(go);
         }
     }
 
@@ -513,19 +514,19 @@ public class UIController : MonoBehaviour {
 
     #region ----- BUTTONS -----
     public void SetDrawButton(bool interactable) {
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             if (interactable)
-                localDrawButton.Activate();
+                _localDrawButton.Activate();
             else
-                localDrawButton.Deactivate();
+                _localDrawButton.Deactivate();
         }
     }
 
     public Transform GetPspells(int id) {
-        if (id == mm.myID ^ localOnRight)
-            return leftPspells;
+        if (id == _mm.myID ^ _localOnRight)
+            return _leftPspells;
         else
-            return rightPspells;
+            return _rightPspells;
     }
 
     public ButtonController GetButtonCont(int id, int index) {
@@ -536,7 +537,7 @@ public class UIController : MonoBehaviour {
     }
     
 	public void ActivateSpellButton(int id, int index){
-        if (mm.MyTurn()) {
+        if (_mm.MyTurn()) {
             var button = GetButtonCont(id, index);
             button.Activate();
         }
@@ -576,28 +577,28 @@ public class UIController : MonoBehaviour {
 
     #region ----- DEBUG MENU -----
     public void ToggleDebugMenu() {
-        bool menuOpen = !menus.GetActive();
+        bool menuOpen = !_menus.GetActive();
         Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
         if (menuOpen) {
             menuButtonText.text = "Close Menu";
-            mm.EnterState(MageMatch.State.DebugMenu);
+            _mm.EnterState(MageMatch.State.DebugMenu);
         } else {
             menuButtonText.text = "Menu";
-            mm.ExitState();
+            _mm.ExitState();
         }
-        menus.SetActive(menuOpen);
+        _menus.SetActive(menuOpen);
     }
 
-    public bool IsDebugMenuOpen() { return menus.GetActive(); }
+    public bool IsDebugMenuOpen() { return _menus.GetActive(); }
 
     public void UpdateDebugGrid() {
         string grid = "   0  1  2  3  4  5  6 \n";
         for (int r = HexGrid.NUM_ROWS - 1; r >= 0; r--) {
             grid += r + " ";
             for (int c = 0; c < HexGrid.NUM_COLS; c++) {
-                if (r <= mm.hexGrid.TopOfColumn(c) && r >= mm.hexGrid.BottomOfColumn(c)) {
-                    if (mm.hexGrid.IsCellFilled(c, r)) {
-                        TileBehav tb = mm.hexGrid.GetTileBehavAt(c, r);
+                if (r <= _mm.hexGrid.TopOfColumn(c) && r >= _mm.hexGrid.BottomOfColumn(c)) {
+                    if (_mm.hexGrid.IsCellFilled(c, r)) {
+                        TileBehav tb = _mm.hexGrid.GetTileBehavAt(c, r);
                         if (tb.wasInvoked)
                             grid += "[*]";
                         else
@@ -610,11 +611,11 @@ public class UIController : MonoBehaviour {
             }
             grid += '\n';
         }
-        debugGridText.text = grid;
+        _debugGridText.text = grid;
     }
 
     public void UpdateEffTexts() {
-        object[] lists = mm.effectCont.GetLists();
+        object[] lists = _mm.effectCont.GetLists();
         List<GameObject> debugItems = new List<GameObject>();
 
         Color lightBlue = new Color(.07f, .89f, .93f, .8f);
@@ -643,16 +644,16 @@ public class UIController : MonoBehaviour {
             debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
         }
 
-        foreach (Transform child in debugContent) {
+        foreach (Transform child in _debugContent) {
             Destroy(child.gameObject);
         }
         foreach (GameObject go in debugItems) {
-            go.transform.SetParent(debugContent);
+            go.transform.SetParent(_debugContent);
         }
     }
 
     public GameObject InstantiateDebugEntry(string t, Color c) {
-        GameObject item = Instantiate(debugItemPF);
+        GameObject item = Instantiate(_debugItemPF);
         item.GetComponent<Image>().color = c;
         item.transform.Find("Text").GetComponent<Text>().text = t;
         return item;
@@ -660,9 +661,9 @@ public class UIController : MonoBehaviour {
 
     public void ToggleReport(bool b) {
         if (b)
-            debugReportText.text = mm.stats.GetReportText();
+            _debugReportText.text = _mm.stats.GetReportText();
 
-        debugReport.SetActive(b);
+        _debugReport.SetActive(b);
     }
     #endregion
 }

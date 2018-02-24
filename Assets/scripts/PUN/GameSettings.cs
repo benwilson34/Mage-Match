@@ -11,7 +11,6 @@ public class GameSettings : PunBehaviour {
     public Character.Ch p2char = Character.Ch.Gravekeeper;
     public bool turnTimerOn;
 
-
     void Start () {
         DontDestroyOnLoad(this);
     }

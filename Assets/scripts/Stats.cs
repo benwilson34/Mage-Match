@@ -9,10 +9,9 @@ public class Stats {
 
     public int turns = 1;
 
-    private int commishMatches, commishDrops;
-
-    private MageMatch mm;
-    private StringBuilder report;
+    private MageMatch _mm;
+    private StringBuilder _report;
+    private int _commishMatches, _commishDrops;
 
     private class PlayerStat {
         public string name;
@@ -21,54 +20,54 @@ public class Stats {
         public int dmgDealt, dmgTaken, healingDone;
     }
 
-    private PlayerStat ps1, ps2;
+    private PlayerStat _ps1, _ps2;
 
     public Stats(Player p1, Player p2) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
-        ps1 = new PlayerStat() {
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _ps1 = new PlayerStat() {
             name = p1.name,
             character = p1.character.characterName
         };
-        ps2 = new PlayerStat() {
+        _ps2 = new PlayerStat() {
             name = p2.name,
             character = p2.character.characterName
         };
 
         InitReport();
 
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Stats);
-        mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
-        mm.eventCont.timeout += OnTimeout;
-        mm.eventCont.commishDrop += OnCommishDrop;
-        mm.eventCont.commishMatch += OnCommishMatch;
+        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Stats);
+        _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
+        _mm.eventCont.timeout += OnTimeout;
+        _mm.eventCont.commishDrop += OnCommishDrop;
+        _mm.eventCont.commishMatch += OnCommishMatch;
 
-        mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.End);
-        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.End);
-        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.End);
-        mm.eventCont.spellCast += OnSpellCast;
-        mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
+        _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.End);
+        _mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.End);
+        _mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.End);
+        _mm.eventCont.spellCast += OnSpellCast;
+        _mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
-        mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
+        _mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
         //mm.eventCont.cascade += OnCascade;
-        mm.eventCont.tileRemove += OnTileRemove;
-        mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+        _mm.eventCont.tileRemove += OnTileRemove;
+        _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
     }
 
     void InitReport() {
-        report = new StringBuilder();
-        report.Append(ps1.name + " (" + ps1.character + ") vs ");
-        report.AppendLine(ps2.name + " (" + ps2.character + ")");
+        _report = new StringBuilder();
+        _report.Append(_ps1.name + " (" + _ps1.character + ") vs ");
+        _report.AppendLine(_ps2.name + " (" + _ps2.character + ")");
         int rand = UnityEngine.Random.state.GetHashCode(); //?
-        report.AppendLine("random seed - " + rand);
-        report.AppendLine("...setup - deal p1 4, deal p2 4"); //?
-        report.AppendLine("T1 - ");
+        _report.AppendLine("random seed - " + rand);
+        _report.AppendLine("...setup - deal p1 4, deal p2 4"); //?
+        _report.AppendLine("T1 - ");
     }
 
     PlayerStat GetPS(int id) {
         if (id == 1)
-            return ps1;
+            return _ps1;
         else
-            return ps2;
+            return _ps2;
     }
 
     int GetOpponentID(int id) {
@@ -79,29 +78,29 @@ public class Stats {
     }
 
     public IEnumerator OnTurnBegin(int id) {
-        report.Append("\nT" + turns + " - ");
+        _report.Append("\nT" + turns + " - ");
         yield return null;
     }
 
     public IEnumerator OnTurnEnd(int id) {
-        report.AppendLine("\nC" + turns + " - ");
+        _report.AppendLine("\nC" + turns + " - ");
         turns++;
         yield return null;
     }
 
     public void OnTimeout(int id) {
-        report.AppendLine("...the turn timer timed out!");
+        _report.AppendLine("...the turn timer timed out!");
         GetPS(id).timeouts++;
     }
 
     public void OnCommishDrop(Tile.Element elem, int col) {
-        commishDrops++;
-        report.AppendLine("C-drop " + Tile.ElementToChar(elem) + " col" + col);
+        _commishDrops++;
+        _report.AppendLine("C-drop " + Tile.ElementToChar(elem) + " col" + col);
     }
 
     public void OnCommishMatch(string[] seqs) {
-        commishMatches += seqs.Length;
-        report.AppendLine("...Commish made "+seqs.Length+" match(es)");
+        _commishMatches += seqs.Length;
+        _report.AppendLine("...Commish made "+seqs.Length+" match(es)");
     }
 
     #region GameAction subscriptions
@@ -125,13 +124,13 @@ public class Stats {
         if (playerAction) {
             Report("Drop " + tag + " col" + col);
             GetPS(id).drops++;
-        } else if (mm.uiCont.IsDebugMenuOpen()) //?
+        } else if (_mm.uiCont.IsDebugMenuOpen()) //?
             Report("menu Drop col" + col);
         yield return null;
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        if (!mm.uiCont.IsDebugMenuOpen()) { //?
+        if (!_mm.uiCont.IsDebugMenuOpen()) { //?
             Report("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
             if(playerAction)
                 GetPS(id).swaps++;
@@ -147,7 +146,7 @@ public class Stats {
     #endregion
 
     public IEnumerator OnMatch(int id, string[] seqs) {
-        report.AppendLine("...made " + seqs.Length + " match(es)");
+        _report.AppendLine("...made " + seqs.Length + " match(es)");
         GetPS(id).matches += seqs.Length;
         foreach (string seq in seqs) {
             int len = seq.Length;
@@ -162,33 +161,33 @@ public class Stats {
     }
 
     public void OnTileRemove(int id, TileBehav tb) {
-        if (!mm.IsCommishTurn()) {
-            if (!mm.uiCont.IsDebugMenuOpen()) //?
+        if (!_mm.IsCommishTurn()) {
+            if (!_mm.uiCont.IsDebugMenuOpen()) //?
                 GetPS(id).tilesRemoved++;
             else
-                report.AppendLine("menu Remove (" + tb.tile.col + "," + tb.tile.row + ")");
+                _report.AppendLine("menu Remove (" + tb.tile.col + "," + tb.tile.row + ")");
         }
     }
 
     public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         if (dealt) {
             GetPS(GetOpponentID(id)).dmgDealt -= amount;
-            report.AppendLine("...p" + GetOpponentID(id) + " dealt " + (-amount) + " dmg...");
+            _report.AppendLine("...p" + GetOpponentID(id) + " dealt " + (-amount) + " dmg...");
         }
         if (amount < 0)
             GetPS(id).dmgTaken -= amount;
         else
             GetPS(id).healingDone += amount;
-        report.AppendLine("...p"+id+" changes health by " + amount);
+        _report.AppendLine("...p"+id+" changes health by " + amount);
     }
 
 
     void Report(string str) {
-        report.AppendLine(str);
-        mm.uiCont.newsfeed.UpdateNewsfeed(str);
+        _report.AppendLine(str);
+        _mm.uiCont.newsfeed.UpdateNewsfeed(str);
     }
 
-    public string GetReportText() { return report.ToString(); }
+    public string GetReportText() { return _report.ToString(); }
 
 
     public void SaveFiles() {
@@ -220,8 +219,8 @@ public class Stats {
 
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("Turns complete," + turns);
-        sb.AppendLine("Commish drops," + commishDrops).AppendLine("");
-        sb.AppendLine("Commish matches," + commishMatches).AppendLine("");
+        sb.AppendLine("Commish drops," + _commishDrops).AppendLine("");
+        sb.AppendLine("Commish matches," + _commishMatches).AppendLine("");
         for (int id = 1; id <= 2; id++) {
             PlayerStat ps = GetPS(id);
             sb.AppendLine("Player " + id);

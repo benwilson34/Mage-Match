@@ -10,20 +10,20 @@ public class HexGrid {
 	public const int NUM_CELLS = 37;
     public const float horiz = 0.866025f; // sqrt(3) / 2 ... it's the height of an equilateral triangle, used to offset the horiz position on the board
 
-    private MageMatch mm;
-	private TileBehav[,] tileGrid;
-    private Vector3[,] cellPositions;
-    private float bbLeft, bbRight, bbBottom, bbBottomLeft, bbTop;
+    private MageMatch _mm;
+	private TileBehav[,] _tileGrid;
+    private Vector3[,] _cellPositions;
+    private float _bbLeft, _bbRight, _bbBottom, _bbBottomLeft, _bbTop;
 	// TODO public static List<TileBehav> tilesOnBoard?
 
 	public HexGrid(){
-		tileGrid = new TileBehav[NUM_COLS, NUM_ROWS];
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
+		_tileGrid = new TileBehav[NUM_COLS, NUM_ROWS];
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
 
-        cellPositions = new Vector3[NUM_COLS, NUM_ROWS];
+        _cellPositions = new Vector3[NUM_COLS, NUM_ROWS];
         for (int c = 0; c < NUM_COLS; c++) {
             for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) {
-                cellPositions[c, r] = GameObject.Find("cell" + c + r).transform.position; // maybe slow?
+                _cellPositions[c, r] = GameObject.Find("cell" + c + r).transform.position; // maybe slow?
             }
         }
     }
@@ -31,7 +31,7 @@ public class HexGrid {
     public void HardSetTileBehavAt(TileBehav tb, int col, int row){
         MMLog.Log_HexGrid("setting (" + col + ", " + row + ") to " + tb.hextag, MMLog.LogLevel.Standard);
 		if (IsCellFilled (col, row))
-            tileGrid[col, row] = null;
+            _tileGrid[col, row] = null;
         SetTileBehavAt (tb, col, row);
 	}
 
@@ -49,32 +49,32 @@ public class HexGrid {
             if (IsCellFilled(col, r)) {
                 if (r == top) {
                     // handle top of column getting pushed out
-                    mm.hexMan.RemoveTile(col, r, false);
+                    _mm.hexMan.RemoveTile(col, r, false);
                     continue;
                 }
-                tileGrid[col, r].ChangePos(col, r + 1);
-                tileGrid[col, r] = null;
+                _tileGrid[col, r].ChangePos(col, r + 1);
+                _tileGrid[col, r] = null;
             }
         }
-        mm.StartCoroutine(tb._ChangePos(col, row, .15f, "raise")); //startRow param not needed here
+        _mm.StartCoroutine(tb._ChangePos(col, row, .15f, "raise")); //startRow param not needed here
         //tb.ChangePos(col, row);
     }
 
     public void SetTileBehavAt(TileBehav tb, int col, int row){
-		tileGrid [col, row] = tb;
+		_tileGrid [col, row] = tb;
 	}
 
 	public void ClearTileBehavAt(int col, int row){
-		tileGrid [col, row] = null;
+		_tileGrid [col, row] = null;
 	}
 
 	public TileBehav GetTileBehavAt(int col, int row){
-		return tileGrid [col, row];
+		return _tileGrid [col, row];
 	}
 
 	public Tile GetTileAt(int col, int row){
-		if (tileGrid [col, row] != null)
-			return tileGrid [col, row].tile;
+		if (_tileGrid [col, row] != null)
+			return _tileGrid [col, row].tile;
 		else
 			return null;
 	}
@@ -103,11 +103,11 @@ public class HexGrid {
 //	}
 
     public bool WasTileBehavInvoked(int col, int row) {
-        return tileGrid[col, row].wasInvoked;
+        return _tileGrid[col, row].wasInvoked;
     }
 
 	public bool IsCellFilled(int col, int row){
-		return tileGrid[col, row] != null;
+		return _tileGrid[col, row] != null;
 	}
 
     public bool IsCellFilledButNotInvoked(int col, int row) {
@@ -118,7 +118,7 @@ public class HexGrid {
 		for (int c = 0; c < NUM_COLS; c++) {
 			for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) {
 				if (IsCellFilled(c, r)) {
-					if (!tileGrid [c, r].IsInPosition())
+					if (!_tileGrid [c, r].IsInPosition())
 						return false;
 				} else
 					break;
@@ -132,15 +132,15 @@ public class HexGrid {
     }
 
 	public Vector3 GridCoordToPos(int col, int row){
-        return cellPositions[col, row];
+        return _cellPositions[col, row];
 	}
 
 	public float GridColToPos(int col){
-        return cellPositions[col, 3].x;
+        return _cellPositions[col, 3].x;
 	}
 
 	public float GridRowToPos(int col, int row) {
-        return cellPositions[col, row].y;
+        return _cellPositions[col, row].y;
     }
 
     public bool CanSwap(int c1, int r1, int c2, int r2) {
@@ -149,8 +149,8 @@ public class HexGrid {
             return false;
 
         if (IsCellFilledButNotInvoked(c2, r2) &&
-            tileGrid[c1, r1].ableSwap &&
-            tileGrid[c2, r2].ableSwap)
+            _tileGrid[c1, r1].ableSwap &&
+            _tileGrid[c2, r2].ableSwap)
             return true;
         else return false;
     }
@@ -316,7 +316,7 @@ public class HexGrid {
 			GetOffset (dir, out dc, out dr);
 			if (CellExists (col + dc, row + dr)) {
 				if (IsCellFilled (col + dc, row + dr))
-					tbs.Add (tileGrid [col + dc, row + dr]);
+					tbs.Add (_tileGrid [col + dc, row + dr]);
 			}
 		}
         //Debug.Log("HEXGRID: " + tbs.Count + " tiles around (" + col + "," + row + ")");
@@ -333,14 +333,14 @@ public class HexGrid {
 			
 			if (CellExists(col + dc, row + dr))
 			if (IsCellFilled (col + dc, row + dr))
-				tbs.Add (tileGrid [col + dc, row + dr]);
+				tbs.Add (_tileGrid [col + dc, row + dr]);
 			
 			if (HasAdjacentCell (col + dc, row + dr, (dir + 2) % 6)) {
 				int dc2, dr2;
 				GetOffset ((dir + 2) % 6, out dc2, out dr2);
 				//				Debug.Log ("Dir = " + dir + ", new dir = " + ((dir+2)%6) + ", dc2 = " + dc2 + ", dr2 = " + dr2);
 				if (IsCellFilled (col + dc + dc2, row + dr + dr2))
-					tbs.Add (tileGrid [col + dc + dc2, row + dr + dr2]);
+					tbs.Add (_tileGrid [col + dc + dc2, row + dr + dr2]);
 			}
 		}
 		return tbs;
@@ -352,13 +352,13 @@ public class HexGrid {
 		for (int c = 0; c < NUM_COLS; c++) { // for each column
 			bool skip = false;
 			for (int r = BottomOfColumn(c); r < TopOfColumn(c) && !skip; r++) { // for each cell
-				if (tileGrid [c, r] == null) { // if there's not something there...
+				if (_tileGrid [c, r] == null) { // if there's not something there...
 					for (int r2 = r + 1; r2 <= TopOfColumn(c); r2++) { // ...loop thru the cells above it until something is hit
-                        if (tileGrid[c, r2] != null) {
-                            if (tileGrid[c, r2].ableGrav) {
-                                tileGrid[c, r] = tileGrid[c, r2];
-                                tileGrid[c, r2] = null;
-                                tileGrid[c, r].ChangePosAndDrop(r2, c, r, .01f);
+                        if (_tileGrid[c, r2] != null) {
+                            if (_tileGrid[c, r2].ableGrav) {
+                                _tileGrid[c, r] = _tileGrid[c, r2];
+                                _tileGrid[c, r2] = null;
+                                _tileGrid[c, r].ChangePosAndDrop(r2, c, r, .01f);
                                 break;
                             } else { // TODO test with a floating tile
                                 r = r2;

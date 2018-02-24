@@ -9,40 +9,41 @@ public abstract class Effect {
     // rename to EffType?
     public enum Type { None = 0, Cooldown, Damage, Healing, Buff, Destruct, Subtract, Add, Enchant, Movement }
 
-    protected MageMatch mm;
-    protected int turnsLeft;
     public int playerID;
     public Type type; // protected eventually?
     public string tag;
+
+    protected MageMatch _mm;
+    protected int _turnsLeft;
 
     public virtual IEnumerator TriggerEffect() { yield return null; }
     public virtual IEnumerator Turn() { yield return null; }
     public virtual IEnumerator EndEffect() { yield return null; }
     public virtual void CancelEffect() { } // IEnumerator??
-    public int TurnsLeft() { return turnsLeft; }
-    public virtual bool NeedRemove() { return turnsLeft == 0; }
+    public int TurnsLeft() { return _turnsLeft; }
+    public virtual bool NeedRemove() { return _turnsLeft == 0; }
 }
 
 
 
 public class TurnEffect : Effect {
 
-    private MyEffect turnEffect, endEffect, cancelEffect;
+    private MyEffect _turnEffect, _endEffect, _cancelEffect;
 
     // TODO add infinite Constructor...or just pass in a negative for turns?
     public TurnEffect(int turns, Type t, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect = null) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = mm.ActiveP().id;
-        turnsLeft = turns;
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+        playerID = _mm.ActiveP().id;
+        _turnsLeft = turns;
         this.type = t;
-        this.turnEffect = turnEffect;
-        this.endEffect = endEffect;
-        this.cancelEffect = cancelEffect;
+        this._turnEffect = turnEffect;
+        this._endEffect = endEffect;
+        this._cancelEffect = cancelEffect;
     }
 
     public override IEnumerator Turn() {
-        turnsLeft--;
-        if (turnsLeft != 0) {
+        _turnsLeft--;
+        if (_turnsLeft != 0) {
             yield return TriggerEffect();
         } else {
             yield return EndEffect();
@@ -50,18 +51,18 @@ public class TurnEffect : Effect {
     }
 
     public override IEnumerator TriggerEffect() {
-        if(turnEffect != null)
-            yield return turnEffect(playerID);
+        if(_turnEffect != null)
+            yield return _turnEffect(playerID);
     }
 
     public override IEnumerator EndEffect() {
-        if (endEffect != null)
-            yield return endEffect(playerID);
+        if (_endEffect != null)
+            yield return _endEffect(playerID);
     }
 
     public override void CancelEffect() {
-        if (cancelEffect != null)
-            cancelEffect(playerID);
+        if (_cancelEffect != null)
+            _cancelEffect(playerID);
     }
 }
 
@@ -71,44 +72,44 @@ public class TileEffect : Effect {
 
     public delegate IEnumerator MyTileEffect(int id, TileBehav tb);
 
-    private MyTileEffect turnEffect, endEffect, cancelEffect;
-    private TileBehav enchantee;
-    private ObjectEffects objFX; //?
-    protected bool skip = false;
+    private MyTileEffect _turnEffect, _endEffect, _cancelEffect;
+    private TileBehav _enchantee;
+    private ObjectEffects _objFX; //?
+    protected bool _skip = false;
 
     public TileEffect(int id, int turns, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) : this(id, type, turnEffect, endEffect, cancelEffect) {
-        turnsLeft = turns;
+        _turnsLeft = turns;
     }
 
     public TileEffect(int id, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id;
-        turnsLeft = -1;
+        _turnsLeft = -1;
         this.type = type;
-        this.turnEffect = turnEffect;
-        this.endEffect = endEffect;
-        this.cancelEffect = cancelEffect;
+        this._turnEffect = turnEffect;
+        this._endEffect = endEffect;
+        this._cancelEffect = cancelEffect;
     }
 
     public void SetEnchantee(TileBehav tb) {
-        enchantee = tb;
+        _enchantee = tb;
     }
 
     public TileBehav GetEnchantee() {
-        return enchantee;
+        return _enchantee;
     }
 
     public void SkipCurrent() {
-        skip = true;
+        _skip = true;
     }
 
     public override IEnumerator Turn() {
-        turnsLeft--;
-        if (skip) {
-            skip = false;
+        _turnsLeft--;
+        if (_skip) {
+            _skip = false;
             yield break;
         }
-        if (turnsLeft != 0) {
+        if (_turnsLeft != 0) {
             yield return TriggerEffect();
         } else {
             yield return EndEffect();
@@ -116,18 +117,18 @@ public class TileEffect : Effect {
     }
 
     public override IEnumerator TriggerEffect() {
-        if (turnEffect != null)
-            yield return turnEffect(playerID, enchantee);
+        if (_turnEffect != null)
+            yield return _turnEffect(playerID, _enchantee);
     }
 
     public override IEnumerator EndEffect() {
-        if (endEffect != null)
-            yield return endEffect(playerID, enchantee);
+        if (_endEffect != null)
+            yield return _endEffect(playerID, _enchantee);
     }
 
     public override void CancelEffect() {
-        if (cancelEffect != null)
-            cancelEffect(playerID, enchantee);
+        if (_cancelEffect != null)
+            _cancelEffect(playerID, _enchantee);
     }
 
 }
@@ -139,31 +140,31 @@ public class Enchantment : TileEffect {
     public enum EnchType { None = 0, Burning, Zombify, Cherrybomb, ZombieTok, StoneTok }
     public EnchType enchType; // private?
 
-    private MyTileEffect turnEffect, endEffect, cancelEffect;
-    private TileBehav enchantee;
-    private ObjectEffects objFX; //?
-    private bool hasTurnEffect = false;
+    private MyTileEffect _turnEffect, _endEffect, _cancelEffect;
+    private TileBehav _enchantee;
+    private ObjectEffects _objFX; //?
+    private bool _hasTurnEffect = false;
 
     public Enchantment(int id, int turns, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
-        turnsLeft = turns;
+        _turnsLeft = turns;
     }
 
     public Enchantment(int id, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :base(id, type, turnEffect, endEffect) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id; // NO!!!
-        turnsLeft = -1;
+        _turnsLeft = -1;
         this.enchType = enchType;
     }
 
-    public void TriggerEffectEveryTurn() { hasTurnEffect = true; }
+    public void TriggerEffectEveryTurn() { _hasTurnEffect = true; }
 
     public override IEnumerator Turn() {
-        turnsLeft--;
-        if (skip) {
-            skip = false;
+        _turnsLeft--;
+        if (_skip) {
+            _skip = false;
             yield break;
         }
-        if (turnsLeft != 0 && hasTurnEffect) { // important difference here
+        if (_turnsLeft != 0 && _hasTurnEffect) { // important difference here
             yield return TriggerEffect();
         } else {
             yield return EndEffect();
@@ -183,77 +184,77 @@ public class Enchantment : TileEffect {
 
 
 
-public class MatchEffect : Effect {
+//public class MatchEffect : Effect {
 
-    // own delegate? if more params are needed
-    private MyEffect matchEffect, endEffect; // needs endEffect?
-    public int countLeft = -1;
+//    // own delegate? if more params are needed
+//    private MyEffect matchEffect, endEffect; // needs endEffect?
+//    public int countLeft = -1;
 
-    public MatchEffect(int turns, MyEffect matchEffect, MyEffect endEffect, int count = -1) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = mm.ActiveP().id; // is this ok? pass in?
-        turnsLeft = turns;
-        this.countLeft = count;
-        this.matchEffect = matchEffect;
-        this.endEffect = endEffect;
-    }
+//    public MatchEffect(int turns, MyEffect matchEffect, MyEffect endEffect, int count = -1) {
+//        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+//        playerID = _mm.ActiveP().id; // is this ok? pass in?
+//        _turnsLeft = turns;
+//        this.countLeft = count;
+//        this.matchEffect = matchEffect;
+//        this.endEffect = endEffect;
+//    }
 
-    public override IEnumerator TriggerEffect() {
-        if (matchEffect != null) {
-            yield return matchEffect(playerID);
-            countLeft--;
-        }
-        yield return null;
-    }
+//    public override IEnumerator TriggerEffect() {
+//        if (matchEffect != null) {
+//            yield return matchEffect(playerID);
+//            countLeft--;
+//        }
+//        yield return null;
+//    }
 
-    public override IEnumerator Turn() {
-        turnsLeft--;
-        if (turnsLeft == 0) {
-            yield return EndEffect(); //???
-        }
-    }
+//    public override IEnumerator Turn() {
+//        _turnsLeft--;
+//        if (_turnsLeft == 0) {
+//            yield return EndEffect(); //???
+//        }
+//    }
 
-    public override IEnumerator EndEffect() {
-        if (endEffect != null)
-            yield return endEffect(playerID);
-    }
+//    public override IEnumerator EndEffect() {
+//        if (endEffect != null)
+//            yield return endEffect(playerID);
+//    }
 
-    public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
-}
+//    public override bool NeedRemove() { return _turnsLeft == 0 || countLeft == 0; }
+//}
 
 
 
 public class DropEffect : Effect {
 
     public delegate IEnumerator MyDropEffect(int id, bool playerAction, string tag, int col);
-    private MyDropEffect dropEffect;
+    private MyDropEffect _dropEffect;
 
     public int countLeft = -1;
     public bool isGlobal = false;
 
     public DropEffect(int id, MyDropEffect dropEffect, int turns = -1, int count = -1) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id;
-        turnsLeft = turns;
+        _turnsLeft = turns;
         this.countLeft = count;
-        this.dropEffect = dropEffect;
+        this._dropEffect = dropEffect;
     }
 
     public IEnumerator TriggerEffect(bool playerAction, string tag, int col) {
-        if (dropEffect != null) { // would it ever be? maybe if like, your third swap does something
+        if (_dropEffect != null) { // would it ever be? maybe if like, your third swap does something
             MMLog.Log("DROPEFFECT", "black", "About to trigger dropEffect!");
-            yield return dropEffect(mm.ActiveP().id, playerAction, tag, col);
+            yield return _dropEffect(_mm.ActiveP().id, playerAction, tag, col);
             countLeft--;
         }
         yield return null;
     }
 
     public override IEnumerator Turn() { //?
-        turnsLeft--;
+        _turnsLeft--;
         yield return null;
     }
 
-    public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
+    public override bool NeedRemove() { return _turnsLeft == 0 || countLeft == 0; }
 }
 
 
@@ -261,34 +262,34 @@ public class DropEffect : Effect {
 public class SwapEffect : Effect {
 
     public delegate IEnumerator MySwapEffect(int id, int c1, int r1, int c2, int r2);
-    private MySwapEffect swapEffect;
+    private MySwapEffect _swapEffect;
 
     public int countLeft = -1;
     public bool isGlobal = false;
 
     public SwapEffect(int id, MySwapEffect swapEffect, int turns = -1, int count = -1) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id;
-        turnsLeft = turns;
+        _turnsLeft = turns;
         this.countLeft = count;
-        this.swapEffect = swapEffect;
+        this._swapEffect = swapEffect;
     }
 
     public IEnumerator TriggerEffect(int c1, int r1, int c2, int r2) {
-        if (swapEffect != null) { // would it ever be? maybe if like, your third swap does something
+        if (_swapEffect != null) { // would it ever be? maybe if like, your third swap does something
             MMLog.Log("SWAPEFFECT", "black", "About to trigger swapEffect!");
-            yield return swapEffect(mm.ActiveP().id, c1, r1, c2, r2); // should be playerID?
+            yield return _swapEffect(_mm.ActiveP().id, c1, r1, c2, r2); // should be playerID?
             countLeft--;
         }
         yield return null;
     }
 
     public override IEnumerator Turn() { // this could just be the default in Effect...
-        turnsLeft--;
+        _turnsLeft--;
         yield return null;
     }
 
-    public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
+    public override bool NeedRemove() { return _turnsLeft == 0 || countLeft == 0; }
 }
 
 
@@ -297,33 +298,33 @@ public class HealthEffect : Effect {
 
     public delegate float MyHealthEffect(Player p, int dmg);
     public bool isAdditive;    // additive or multiplicative? could be an enum in time
-    public bool isBuff = true; // buff or debuff?
+    public bool isBuff = true; // TODO this could safely be refactored to isDealing?
     public int countLeft = -1;
 
-    private MyHealthEffect healthEffect;
+    private MyHealthEffect _healthEffect;
 
     // TODO add infinite Constructor...or just pass in a negative for turns?
     public HealthEffect(int id, MyHealthEffect healthEffect, bool isAdditive, bool isBuff = true, int turns = -1, int count = -1) {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id;
-        turnsLeft = turns;
+        _turnsLeft = turns;
         this.type = Type.Buff; //?
-        this.healthEffect = healthEffect;
+        this._healthEffect = healthEffect;
         this.isAdditive = isAdditive;
         this.isBuff = isBuff;
         countLeft = count;
     }
 
     public override IEnumerator Turn() {
-        turnsLeft--;
+        _turnsLeft--;
         yield return null;
     }
 
     public float GetResult(Player p, int dmg) {
         countLeft--;
-        return healthEffect(p, dmg);
+        return _healthEffect(p, dmg);
     }
 
-    public override bool NeedRemove() { return turnsLeft == 0 || countLeft == 0; }
+    public override bool NeedRemove() { return _turnsLeft == 0 || countLeft == 0; }
 
 }

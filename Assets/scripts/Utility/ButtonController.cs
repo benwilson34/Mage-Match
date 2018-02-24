@@ -11,25 +11,25 @@ public class ButtonController : MonoBehaviour {
     public Type type = Type.Spell;
 	public int spellNum;
 
-	private MageMatch mm;
-    private Button button;
-    private GameObject simpleTextPF;
-    private GameObject mainView, cancelView;
-    private ButtonClick onClick, mainClick;
-    private int playerId;
-    private bool newSpell = false;
-    private bool isActivated = false, interactable = false;
+	private MageMatch _mm;
+    private Button _button;
+    private GameObject _simpleTextPF;
+    private GameObject _mainView, _cancelView;
+    private ButtonClick _onClick, _mainClick;
+    private int _playerId;
+    private bool _newSpell = false;
+    private bool _isActivated = false, _interactable = false;
 
     public void Init(MageMatch mm, int id) {
         MMLog.Log("ButtonCont", "black", "Init button " + spellNum + " with id="+id);
-        this.mm = mm;
-        this.playerId = id;
+        this._mm = mm;
+        this._playerId = id;
 
-        button = this.GetComponent<Button>();
+        _button = this.GetComponent<Button>();
 
         if(spellNum >= 0)
-            mainView = transform.Find("main").gameObject;
-        simpleTextPF = Resources.Load<GameObject>("prefabs/ui/simpleTextView");
+            _mainView = transform.Find("main").gameObject;
+        _simpleTextPF = Resources.Load<GameObject>("prefabs/ui/simpleTextView");
 
         switch (type) {
             case Type.Spell:
@@ -44,21 +44,21 @@ public class ButtonController : MonoBehaviour {
                 break;
         }
 
-        if(onClick == null)
+        if(_onClick == null)
             MMLog.LogError("BUTTONCONT: Button onClick is somehow null!");
     }
 
     public void SetInteractable() {
-        button.interactable = true;
-        interactable = true;
+        _button.interactable = true;
+        _interactable = true;
     }
 
     //public bool IsInteractable() { return interactable && isActivated; }
 
     public void Activate() {
-        isActivated = true; // maybe not needed?
-        if (interactable)
-            button.interactable = true;
+        _isActivated = true; // maybe not needed?
+        if (_interactable)
+            _button.interactable = true;
         StartCoroutine(_Activate());
     }
     IEnumerator _Activate() {
@@ -70,9 +70,9 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void Deactivate() {
-        isActivated = false; // maybe not needed?
-        if (interactable)
-            button.interactable = false;
+        _isActivated = false; // maybe not needed?
+        if (_interactable)
+            _button.interactable = false;
         StartCoroutine(_Deactivate());
     }
     IEnumerator _Deactivate() {
@@ -85,9 +85,9 @@ public class ButtonController : MonoBehaviour {
 
     public void TurnOffScreen() {
         // TODO "turn off" TV screen but persist active state
-        mainView.SetActive(false);
-        if (interactable)
-            button.interactable = false;
+        _mainView.SetActive(false);
+        if (_interactable)
+            _button.interactable = false;
         StartCoroutine(_TurnOffScreen());
     }
     IEnumerator _TurnOffScreen() {
@@ -99,8 +99,8 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void TurnOnScreen() {
-        mainView.SetActive(true);
-        if (isActivated)
+        _mainView.SetActive(true);
+        if (_isActivated)
             Activate();
         else
             Deactivate();
@@ -112,19 +112,19 @@ public class ButtonController : MonoBehaviour {
 
     void SetOnClick(ButtonClick click) {
         MMLog.Log("ButtonCont", "black","Setting onClick of spell" + spellNum + " to " + click.ToString());
-        onClick = click;
+        _onClick = click;
     }
 
     public void OnClick() {
         MMLog.Log("ButtonCont","black","Button " + spellNum + " clicked...");
-        if (onClick != null)
-            onClick();
+        if (_onClick != null)
+            _onClick();
         else
             MMLog.LogError("BUTTONCONT: Button was clicked and onClick is somehow null!");
     }
 
     public void ShowSpellInfo() {
-        Spell currentSpell = mm.GetPlayer(playerId).character.GetSpell(spellNum);
+        Spell currentSpell = _mm.GetPlayer(_playerId).character.GetSpell(spellNum);
         Transform t = transform.Find("main");
 
         Text spellName = t.Find("t_spellName").GetComponent<Text>();
@@ -140,19 +140,19 @@ public class ButtonController : MonoBehaviour {
             //				Debug.Log (currentEl);
             switch (currentEl) {
                 case Tile.Element.Fire:
-                    minitile.sprite = mm.uiCont.miniFire;
+                    minitile.sprite = _mm.uiCont.miniFire;
                     break;
                 case Tile.Element.Water:
-                    minitile.sprite = mm.uiCont.miniWater;
+                    minitile.sprite = _mm.uiCont.miniWater;
                     break;
                 case Tile.Element.Earth:
-                    minitile.sprite = mm.uiCont.miniEarth;
+                    minitile.sprite = _mm.uiCont.miniEarth;
                     break;
                 case Tile.Element.Air:
-                    minitile.sprite = mm.uiCont.miniAir;
+                    minitile.sprite = _mm.uiCont.miniAir;
                     break;
                 case Tile.Element.Muscle:
-                    minitile.sprite = mm.uiCont.miniMuscle;
+                    minitile.sprite = _mm.uiCont.miniMuscle;
                     break;
                 case Tile.Element.None:
                     minitile.gameObject.SetActive(false);
@@ -164,12 +164,12 @@ public class ButtonController : MonoBehaviour {
     }
 
     IEnumerator Transition_Cancel() {
-        cancelView = Instantiate(simpleTextPF, this.transform, false);
-        mainView.SetActive(false);
+        _cancelView = Instantiate(_simpleTextPF, this.transform, false);
+        _mainView.SetActive(false);
 
-        cancelView.transform.Find("t").GetComponent<Text>().text = "Cancel";
+        _cancelView.transform.Find("t").GetComponent<Text>().text = "Cancel";
 
-        mainClick = onClick;
+        _mainClick = _onClick;
         SetOnClick(OnSpellCancelClick);
         //onClick = OnSpellCancelClick;
 
@@ -177,34 +177,34 @@ public class ButtonController : MonoBehaviour {
     }
 
     public IEnumerator Transition_MainView() {
-        if (newSpell) {
+        if (_newSpell) {
             MMLog.Log("BUTTONCONT", "black", "button" + spellNum + " showing new spell info");
-            mainView.SetActive(true);
+            _mainView.SetActive(true);
             ShowSpellInfo();
-            mainView.SetActive(false);
-            newSpell = false;
+            _mainView.SetActive(false);
+            _newSpell = false;
         }
 
-        if(cancelView != null)
-            Destroy(cancelView.gameObject);
-        mainView.SetActive(true);
+        if(_cancelView != null)
+            Destroy(_cancelView.gameObject);
+        _mainView.SetActive(true);
 
-        SetOnClick(mainClick);
+        SetOnClick(_mainClick);
         //onClick = mainClick;
 
         yield return null;
     }
 
-    public void SpellChanged() { newSpell = true; }
+    public void SpellChanged() { _newSpell = true; }
 
 	void OnSpellButtonClick(){
         StartCoroutine(Transition_Cancel());
-		StartCoroutine(mm._CastSpell (spellNum));
+		StartCoroutine(_mm._CastSpell (spellNum));
 	}
 
     public void OnSpellCancelClick() {
         StartCoroutine(Transition_MainView());
-        StartCoroutine(mm._CancelSpell());
+        StartCoroutine(_mm._CancelSpell());
     }
 
     public void Targeting_OnCancelClick() {
@@ -218,12 +218,12 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void OnDrawButtonClick() {
-        mm.PlayerDrawTile();
+        _mm.PlayerDrawTile();
     }
 
     public void OnFileButtonClick() {
         MMLog.Log("ButtonCont", "black", "Saving files...");
-        mm.stats.SaveFiles();
+        _mm.stats.SaveFiles();
     }
 
     public void DoAThing() {

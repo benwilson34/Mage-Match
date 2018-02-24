@@ -8,6 +8,6 @@ public class StoneToken : TileBehav {
         ableTarget = ableDestroy = ableSwap = ablePrereq = ableTarget = false;
         tile = new Tile(initElement);
 
-        mm.hexFX.Ench_SetStone(this);
+        _mm.hexFX.Ench_SetStone(this);
     }
 }

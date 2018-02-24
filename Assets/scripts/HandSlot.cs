@@ -6,14 +6,14 @@ public class HandSlot : MonoBehaviour {
 
     public int handPosition = 1, handIndex = 0;
 
-    private Hex hex = null;
+    private Hex _hex = null;
 
-    public void SetHex(Hex hex) { this.hex = hex; }
+    public void SetHex(Hex hex) { this._hex = hex; }
 
-    public Hex GetHex() { return hex; }
+    public Hex GetHex() { return _hex; }
 
-    public void ClearHex() { hex = null; }
+    public void ClearHex() { _hex = null; }
 
-    public bool IsFull() { return hex != null; }
+    public bool IsFull() { return _hex != null; }
 
 }

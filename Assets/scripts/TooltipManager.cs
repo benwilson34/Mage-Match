@@ -6,18 +6,18 @@ using DG.Tweening;
 
 public class TooltipManager : MonoBehaviour {
 
-    GameObject tooltipPF;
-    RectTransform currentTT;
-    Tooltipable obj;
-    bool tooltipShowing = false; // can just use currentTT.gameObject.IsActive();
+    private GameObject _tooltipPF;
+    private RectTransform _currentTT;
+    private Tooltipable _obj;
+    private bool _tooltipShowing = false; // can just use currentTT.gameObject.IsActive();
 
-    const float TOOLTIP_SHOW_DELAY = .65f; // in seconds
-    const float TOOLTIP_ANIM_DUR = .1f; // in seconds
+    private const float TOOLTIP_SHOW_DELAY = .65f; // in seconds
+    private const float TOOLTIP_ANIM_DUR = .1f; // in seconds
 
 
     // Use this for initialization
     void Start () {
-        tooltipPF = Resources.Load("prefabs/ui/tooltip") as GameObject;
+        _tooltipPF = Resources.Load("prefabs/ui/tooltip") as GameObject;
 	}
 	
 	// Update is called once per frame
@@ -30,30 +30,30 @@ public class TooltipManager : MonoBehaviour {
             return;
 
         Transform staticUI = GameObject.Find("static ui").transform;
-        currentTT = (RectTransform)Instantiate(tooltipPF, staticUI).transform;
+        _currentTT = (RectTransform)Instantiate(_tooltipPF, staticUI).transform;
         MMDebug.MMLog.Log("TooltipMan", "orange", "Setting tooltip: " + obj.GetTooltipInfo());
 
-        RectTransform textRect = (RectTransform)currentTT.GetChild(0);
+        RectTransform textRect = (RectTransform)_currentTT.GetChild(0);
         textRect.GetComponent<Text>().text = obj.GetTooltipInfo();
 
 
-        currentTT.gameObject.SetActive(false);
-        this.obj = obj;
+        _currentTT.gameObject.SetActive(false);
+        _obj = obj;
 
         StartCoroutine(ShowTooltipAfterDelay());
     }
 
     IEnumerator ShowTooltipAfterDelay() {
             yield return new WaitForSeconds(TOOLTIP_SHOW_DELAY);
-            if (obj != null) {
+            if (_obj != null) {
                 StartCoroutine(ShowTooltip());
             }
         }
 
     public IEnumerator ShowTooltip() {
-        currentTT.gameObject.SetActive(true);
+        _currentTT.gameObject.SetActive(true);
 
-        MonoBehaviour mb = (MonoBehaviour)obj;
+        MonoBehaviour mb = (MonoBehaviour)_obj;
 
         // get screen pos of target
         Vector3 pos;
@@ -70,7 +70,7 @@ public class TooltipManager : MonoBehaviour {
         yield return new WaitForEndOfFrame();
 
         Vector3[] corners = new Vector3[4];
-        currentTT.GetWorldCorners(corners);
+        _currentTT.GetWorldCorners(corners);
         float TTwidth  = corners[2].x - corners[0].x;
         float TTheight = corners[2].y - corners[0].y;
 
@@ -93,27 +93,27 @@ public class TooltipManager : MonoBehaviour {
 
         //MMDebug.MMLog.Log("TooltipMan", "orange", "TT dims : (" + TTwidth + ", " + TTheight + ")");
 
-        CanvasGroup cg = currentTT.GetComponent<CanvasGroup>();
+        CanvasGroup cg = _currentTT.GetComponent<CanvasGroup>();
         cg.alpha = 0;
 
         //MMDebug.MMLog.Log("TooltipMan", "orange", "pos  after=" + pos.ToString());
-        currentTT.SetPositionAndRotation(pos, Quaternion.identity);
+        _currentTT.SetPositionAndRotation(pos, Quaternion.identity);
 
         yield return cg.DOFade(1, TOOLTIP_ANIM_DUR); 
 
-        tooltipShowing = true;
+        _tooltipShowing = true;
     }
 
     public void HideOrCancelTooltip() {
         MMDebug.MMLog.Log("TooltipMan", "orange", ">>>Hiding/canceling the tooltip<<<");
-        if (obj != null) {
-            if (tooltipShowing) {
-                tooltipShowing = false;
+        if (_obj != null) {
+            if (_tooltipShowing) {
+                _tooltipShowing = false;
                 // animate out?
             }
-            Destroy(currentTT.gameObject);
-            currentTT = null;
-            obj = null;
+            Destroy(_currentTT.gameObject);
+            _currentTT = null;
+            _obj = null;
         }
     }
 }

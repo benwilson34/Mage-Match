@@ -6,35 +6,35 @@ using MMDebug;
 // TODO events for beginning-of-turn effects and for passive/trigger effects
 public class EffectController {
 
-    private MageMatch mm;
-    private List<Effect> beginTurnEffects, endTurnEffects;
-    private List<MatchEffect> matchEffects;
-    private List<DropEffect> dropEffects;
-    private List<SwapEffect> swapEffects;
-    private List<HealthEffect> healthEffects;
-    private Dictionary<string, int> tagDict;
-    private int effectsResolving = 0, beginTurnRes = 0, endTurnRes = 0; // TODO match+swap effs
+    private MageMatch _mm;
+    private List<Effect> _beginTurnEffects, _endTurnEffects;
+    //private List<MatchEffect> _matchEffects;
+    private List<DropEffect> _dropEffects;
+    private List<SwapEffect> _swapEffects;
+    private List<HealthEffect> _healthEffects;
+    private Dictionary<string, int> _tagDict;
+    private int _effectsResolving = 0, _beginTurnRes = 0, _endTurnRes = 0; // TODO match+swap effs
 
     private int c = 0;
     private Effect.Type currentType = Effect.Type.None;
 
     public EffectController(MageMatch mm) {
-        this.mm = mm;
-        beginTurnEffects = new List<Effect>();
-        endTurnEffects = new List<Effect>();
-        matchEffects = new List<MatchEffect>();
-        dropEffects = new List<DropEffect>();
-        swapEffects = new List<SwapEffect>();
-        healthEffects = new List<HealthEffect>();
-        tagDict = new Dictionary<string, int>();
+        this._mm = mm;
+        _beginTurnEffects = new List<Effect>();
+        _endTurnEffects = new List<Effect>();
+        //_matchEffects = new List<MatchEffect>();
+        _dropEffects = new List<DropEffect>();
+        _swapEffects = new List<SwapEffect>();
+        _healthEffects = new List<HealthEffect>();
+        _tagDict = new Dictionary<string, int>();
     }
 
     public void InitEvents() {
-        mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.EventEffects);
-        mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.EventEffects);
+        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.EventEffects);
+        _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.EventEffects);
         //mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.EventEffects);
-        mm.eventCont.AddDropEvent(OnDrop, EventController.Type.EventEffects, EventController.Status.End);
-        mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.EventEffects, EventController.Status.End); // begin or end?
+        _mm.eventCont.AddDropEvent(OnDrop, EventController.Type.EventEffects, EventController.Status.End);
+        _mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.EventEffects, EventController.Status.End); // begin or end?
     }
 
     #region EventCont calls
@@ -66,11 +66,11 @@ public class EffectController {
 
     public string GenFullTag(string effType, string tag) {
         string fullTag = effType + "-";
-        if (tagDict.ContainsKey(tag)) {
-            tagDict[tag]++;
-            fullTag += tag + "-" + tagDict[tag].ToString("D3");
+        if (_tagDict.ContainsKey(tag)) {
+            _tagDict[tag]++;
+            fullTag += tag + "-" + _tagDict[tag].ToString("D3");
         } else {
-            tagDict.Add(tag, 1);
+            _tagDict.Add(tag, 1);
             fullTag += tag + "-001";
         }
         MMLog.Log_EffectCont("...adding effect with tag " + fullTag);
@@ -82,13 +82,13 @@ public class EffectController {
         // TODO insert at correct position for priority
         e.tag = GenFullTag("begt", tag);
         int i;
-        for (i = 0; i < beginTurnEffects.Count; i++) {
-            Effect listE = beginTurnEffects[i];
+        for (i = 0; i < _beginTurnEffects.Count; i++) {
+            Effect listE = _beginTurnEffects[i];
             if ((int)listE.type < (int)e.type)
                 break;
         }
-        beginTurnEffects.Insert(i, e);
-        if ((int)e.type > (int)currentType && beginTurnRes > 0)
+        _beginTurnEffects.Insert(i, e);
+        if ((int)e.type > (int)currentType && _beginTurnRes > 0)
             c++; // correct list if this effect is getting put in the front
         return e.tag;
     }
@@ -97,13 +97,13 @@ public class EffectController {
         // TODO test somehow?
         e.tag = GenFullTag("endt", tag);
         int i;
-        for (i = 0; i < endTurnEffects.Count; i++) {
-            Effect listE = endTurnEffects[i];
+        for (i = 0; i < _endTurnEffects.Count; i++) {
+            Effect listE = _endTurnEffects[i];
             if ((int)listE.type < (int)e.type)
                 break;    
         }
-        endTurnEffects.Insert(i, e);
-        if ((int)e.type > (int)currentType && endTurnRes > 0)
+        _endTurnEffects.Insert(i, e);
+        if ((int)e.type > (int)currentType && _endTurnRes > 0)
             c++; // correct list if this effect is getting put in the front
         return e.tag;
     }
@@ -111,9 +111,9 @@ public class EffectController {
     public void RemoveTurnEffect(Effect e) {
         List<Effect> list;
         if (e.tag.Substring(0, 4) == "begt")
-            list = beginTurnEffects;
+            list = _beginTurnEffects;
         else
-            list = endTurnEffects;
+            list = _endTurnEffects;
 
         int i;
         for (i = 0; i < list.Count; i++) {
@@ -134,9 +134,9 @@ public class EffectController {
 
         List<Effect> list;
         if (tag.Substring(0, 4) == "begt")
-            list = beginTurnEffects;
+            list = _beginTurnEffects;
         else
-            list = endTurnEffects;
+            list = _endTurnEffects;
 
         int i;
         Effect e;
@@ -152,36 +152,36 @@ public class EffectController {
     }
 
     public IEnumerator ResolveBeginTurnEffects() {
-        beginTurnRes++;
-        for (c = 0; c < beginTurnEffects.Count; c++) { //foreach
-            Effect e = beginTurnEffects[c];
+        _beginTurnRes++;
+        for (c = 0; c < _beginTurnEffects.Count; c++) { //foreach
+            Effect e = _beginTurnEffects[c];
             Effect.Type t = currentType = e.type;
             MMLog.Log_EffectCont(e.tag + " (type " + t + ", p" + (int)t + ") has " + e.TurnsLeft() + " turns left (including this one).");
             yield return e.Turn();
 
             if (e.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
                 MMLog.Log_EffectCont("Removing " + e.tag + "...");
-                beginTurnEffects.RemoveAt(c);
+                _beginTurnEffects.RemoveAt(c);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment(false);
                 c--;
             }
         }
-        beginTurnRes--;
+        _beginTurnRes--;
     }
 
     public IEnumerator ResolveEndTurnEffects() {
-        endTurnRes++;
+        _endTurnRes++;
         Effect e;
-        for (c = 0; c < endTurnEffects.Count; c++) { // foreach
-            e = endTurnEffects[c];
+        for (c = 0; c < _endTurnEffects.Count; c++) { // foreach
+            e = _endTurnEffects[c];
             Effect.Type t = currentType = e.type;
             MMLog.Log_EffectCont(e.tag + " (type " + t + ", p" + (int)t + ") has " + e.TurnsLeft() + " turns left (including this one).");
             yield return e.Turn();
 
             if (e.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
                 MMLog.Log_EffectCont("Removing " + e.tag + "...");
-                endTurnEffects.RemoveAt(c);
+                _endTurnEffects.RemoveAt(c);
                 if (e is Enchantment)
                     ((Enchantment)e).GetEnchantee().ClearEnchantment(false);
                 else if (e is TileEffect) {
@@ -193,44 +193,57 @@ public class EffectController {
         }
 
         // TODO generalize somehow?
-        for (int i = 0; i < matchEffects.Count; i++) { // foreach
-            MatchEffect me = matchEffects[i];
-            Effect.Type t = me.type;
-            MMLog.Log_EffectCont(me.tag + " (type " + t + ", p" + (int)t + ") has " + me.TurnsLeft() + " turns left (including this one).");
-            yield return me.Turn();
+        //for (int i = 0; i < _matchEffects.Count; i++) { // foreach
+        //    MatchEffect me = _matchEffects[i];
+        //    Effect.Type t = me.type;
+        //    MMLog.Log_EffectCont(me.tag + " (type " + t + ", p" + (int)t + ") has " + me.TurnsLeft() + " turns left (including this one).");
+        //    yield return me.Turn();
 
-            if (me.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
-                MMLog.Log_EffectCont("Removing " + me.tag + "...");
-                matchEffects.RemoveAt(i);
+        //    if (me.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
+        //        MMLog.Log_EffectCont("Removing " + me.tag + "...");
+        //        _matchEffects.RemoveAt(i);
+        //        i--;
+        //    }
+        //}
+
+        for (int i = 0; i < _dropEffects.Count; i++) { // foreach
+            DropEffect de = _dropEffects[i];
+            Effect.Type t = de.type;
+            MMLog.Log_EffectCont(de.tag + " (type " + t + ", p" + (int)t + ") has " + de.TurnsLeft() + " turns left (including this one).");
+            yield return de.Turn();
+
+            if (de.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
+                MMLog.Log_EffectCont("Removing " + de.tag + "...");
+                _dropEffects.RemoveAt(i);
                 i--;
             }
         }
-        for (int i = 0; i < swapEffects.Count; i++) { // foreach
-            SwapEffect se = swapEffects[i];
+        for (int i = 0; i < _swapEffects.Count; i++) { // foreach
+            SwapEffect se = _swapEffects[i];
             Effect.Type t = se.type;
             MMLog.Log_EffectCont(se.tag + " (type " + t + ", p" + (int)t + ") has " + se.TurnsLeft() + " turns left (including this one).");
             yield return se.Turn();
 
             if (se.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
                 MMLog.Log_EffectCont("Removing " + se.tag + "...");
-                swapEffects.RemoveAt(i);
+                _swapEffects.RemoveAt(i);
                 i--;
             }
         }
-        for (int i = 0; i < healthEffects.Count; i++) { // foreach
-            HealthEffect he = healthEffects[i];
+        for (int i = 0; i < _healthEffects.Count; i++) { // foreach
+            HealthEffect he = _healthEffects[i];
             Effect.Type t = he.type;
             MMLog.Log_EffectCont(he.tag + " (type " + t + ", p" + (int)t + ") has " + he.TurnsLeft() + " turns left (including this one).");
             yield return he.Turn();
 
             if (he.NeedRemove()) { // if it's the last pass of the effect (turnsLeft == 0)
                 MMLog.Log_EffectCont("Removing " + he.tag + "...");
-                healthEffects.RemoveAt(i);
+                _healthEffects.RemoveAt(i);
                 i--;
             }
         }
 
-        endTurnRes--;
+        _endTurnRes--;
     }
     #endregion
 
@@ -271,13 +284,13 @@ public class EffectController {
     #region DropEffects
     public void AddDropEffect(DropEffect de, string tag) {
         de.tag = GenFullTag("drop", tag);
-        dropEffects.Add(de);
+        _dropEffects.Add(de);
     }
 
     public IEnumerator ResolveDropEffects(int id, bool playerAction, string tag, int col) {
         DropEffect de;
-        for (int i = 0; i < dropEffects.Count; i++) { // foreach
-            de = dropEffects[i];
+        for (int i = 0; i < _dropEffects.Count; i++) { // foreach
+            de = _dropEffects[i];
             if (de.isGlobal || de.playerID == id) {
                 MMLog.Log_EffectCont("Checking dropEff with tag " + de.tag + "; count=" + de.countLeft);
 
@@ -285,7 +298,7 @@ public class EffectController {
 
                 if (de.NeedRemove()) {
                     MMLog.Log_EffectCont("Removing " + de.tag + "...");
-                    dropEffects.RemoveAt(i);
+                    _dropEffects.RemoveAt(i);
                     i--;
                 }
             }
@@ -306,13 +319,13 @@ public class EffectController {
     #region SwapEffects
     public void AddSwapEffect(SwapEffect se, string tag) {
         se.tag = GenFullTag("swap", tag);
-        swapEffects.Add(se);
+        _swapEffects.Add(se);
     }
 
     public IEnumerator ResolveSwapEffects(int id, int c1, int r1, int c2, int r2) {
         SwapEffect se;
-        for (int i = 0; i < swapEffects.Count; i++) { // foreach
-            se = swapEffects[i];
+        for (int i = 0; i < _swapEffects.Count; i++) { // foreach
+            se = _swapEffects[i];
             if (se.isGlobal || se.playerID == id) {
                 MMLog.Log_EffectCont("Checking swapEff with tag " + se.tag + "; count=" + se.countLeft);
 
@@ -320,7 +333,7 @@ public class EffectController {
 
                 if (se.NeedRemove()) {
                     MMLog.Log_EffectCont("Removing " + se.tag + "...");
-                    swapEffects.RemoveAt(i);
+                    _swapEffects.RemoveAt(i);
                     i--;
                 }
             }
@@ -341,7 +354,7 @@ public class EffectController {
     #region HealthEffects
     public void AddHealthEffect(HealthEffect he, string tag) {
         he.tag = GenFullTag("hlth", tag);
-        healthEffects.Add(he);
+        _healthEffects.Add(he);
     }
 
     private int healthResult_add = 0;
@@ -352,10 +365,10 @@ public class EffectController {
         healthResult_add = 0;
         healthResult_mult = 1;
 
-        Player p = mm.GetPlayer(id);
+        Player p = _mm.GetPlayer(id);
 
-        for (int i = 0; i < healthEffects.Count; i++) { // foreach
-            he = healthEffects[i];
+        for (int i = 0; i < _healthEffects.Count; i++) { // foreach
+            he = _healthEffects[i];
             if (he.playerID == id && he.isBuff == dealing) {
                 MMLog.Log_EffectCont("Checking healthEff with tag " + he.tag + "; count=" + he.countLeft);
 
@@ -366,7 +379,7 @@ public class EffectController {
 
                 if (he.NeedRemove()) {
                     MMLog.Log_EffectCont("Removing " + he.tag + "...");
-                    healthEffects.RemoveAt(i);
+                    _healthEffects.RemoveAt(i);
                     i--;
                 }
             }
@@ -388,14 +401,14 @@ public class EffectController {
     //}
     #endregion
 
-    public bool IsResolving() { return effectsResolving + beginTurnRes + endTurnRes > 0; }
+    public bool IsResolving() { return _effectsResolving + _beginTurnRes + _endTurnRes > 0; }
 
     public object[] GetLists() {
         return new object[4] {
-            beginTurnEffects,
-            endTurnEffects,
-            dropEffects,
-            swapEffects
+            _beginTurnEffects,
+            _endTurnEffects,
+            _dropEffects,
+            _swapEffects
         };
     }
 

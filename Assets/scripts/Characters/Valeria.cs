@@ -5,19 +5,19 @@ using MMDebug;
 
 public class Valeria : Character {
 
-    private HexGrid hexGrid; // eventually these will be static again?
-    private Targeting targeting; // ''
+    private HexGrid _hexGrid; // eventually these will be static again?
+    private Targeting _targeting; // ''
 
     public Valeria(MageMatch mm, int id) : base(mm, Ch.Valeria, id) {
-        objFX = mm.hexFX;
-        hexGrid = mm.hexGrid;
-        targeting = mm.targeting;
+        _objFX = mm.hexFX;
+        _hexGrid = mm.hexGrid;
+        _targeting = mm.targeting;
     }
 
     public override void OnEffectContLoad() {
         MMLog.Log("Valeria","cyan","Loading PASSIVE...");
-        SwapEffect se = new SwapEffect(playerId, Passive_Swap);
-        mm.effectCont.AddSwapEffect(se, "VlSwp");
+        SwapEffect se = new SwapEffect(_playerId, Passive_Swap);
+        _mm.effectCont.AddSwapEffect(se, "VlSwp");
 
         // when we have List<Buff>
         //Buff b = new Buff();
@@ -63,9 +63,9 @@ public class Valeria : Character {
         MMLog.Log("Valeria", "magenta", "swaps="+swaps);
         for (int i = 0; i < swaps; i++) {
             MMLog.Log("Valeria", "pink", "Waiting for swap " + (i+1) + " of " + swaps);
-            yield return mm.prompt.WaitForSwap(seq);
-            if (mm.prompt.WasSuccessful())
-                yield return mm.prompt.ContinueSwap();
+            yield return _mm.prompt.WaitForSwap(seq);
+            if (_mm.prompt.WasSuccessful())
+                yield return _mm.prompt.ContinueSwap();
         }
 
         yield return null;
@@ -74,13 +74,13 @@ public class Valeria : Character {
     // Mariposa
     protected override IEnumerator Spell1(TileSeq prereq) {
         // deal 30-60 dmg
-        yield return mm.syncManager.SyncRand(playerId, Random.Range(30, 61));
-        int dmg = mm.syncManager.GetRand();
+        yield return _mm.syncManager.SyncRand(_playerId, Random.Range(30, 61));
+        int dmg = _mm.syncManager.GetRand();
         ThisPlayer().DealDamage(dmg);
 
         // get targets
-        yield return targeting.WaitForTileTarget(2);
-        List<TileBehav> tbs = targeting.GetTargetTBs();
+        yield return _targeting.WaitForTileTarget(2);
+        List<TileBehav> tbs = _targeting.GetTargetTBs();
         if (tbs.Count < 2)
             yield break;
 
@@ -89,11 +89,11 @@ public class Valeria : Character {
 
         // move first to second and destroy second
         int secCol = second.tile.col, secRow = second.tile.row;
-        yield return hexMan._RemoveTile(second, false);
+        yield return _hexMan._RemoveTile(second, false);
         yield return first._ChangePos(secCol, secRow, 0.3f);
 
         // put new water tile in first's place
-        TileBehav waterTile = (TileBehav)hexMan.GenerateTile(playerId, Tile.Element.Water);
+        TileBehav waterTile = (TileBehav)_hexMan.GenerateTile(_playerId, Tile.Element.Water);
         waterTile.SetPlaced(); // this kinda sucks here
         yield return waterTile._ChangePos(firstCol, firstRow);
 
@@ -103,28 +103,28 @@ public class Valeria : Character {
     // Rain Dance
     protected override IEnumerator Spell2(TileSeq prereq) {
         TurnEffect te = new TurnEffect(5, Effect.Type.Add, RainDance_T, null);
-        mm.effectCont.AddBeginTurnEffect(te, "rainD");
+        _mm.effectCont.AddBeginTurnEffect(te, "rainD");
         yield return null;
     }
     public IEnumerator RainDance_T(int id) {
-        yield return mm.syncManager.SyncRand(playerId, Random.Range(3, 6));
-        int dropCount = mm.syncManager.GetRand();
+        yield return _mm.syncManager.SyncRand(_playerId, Random.Range(3, 6));
+        int dropCount = _mm.syncManager.GetRand();
 
         // random water drops
         yield return DropWaterIntoRandomCols(dropCount);
 
         // heal 15-25
-        yield return mm.syncManager.SyncRand(playerId, Random.Range(15, 26));
-        int healing = mm.syncManager.GetRand();
+        yield return _mm.syncManager.SyncRand(_playerId, Random.Range(15, 26));
+        int healing = _mm.syncManager.GetRand();
         ThisPlayer().Heal(healing);
 
         yield return null;
     }
 
     IEnumerator DropWaterIntoRandomCols(int count) {
-        int[] cols = mm.boardCheck.GetRandomCols(count);
-        yield return mm.syncManager.SyncRands(playerId, cols);
-        cols = mm.syncManager.GetRands(cols.Length);
+        int[] cols = _mm.boardCheck.GetRandomCols(count);
+        yield return _mm.syncManager.SyncRands(_playerId, cols);
+        cols = _mm.syncManager.GetRands(cols.Length);
 
         string s = "";
         for (int i = 0; i < cols.Length; i++) {
@@ -139,20 +139,20 @@ public class Valeria : Character {
         int col;
         while (colQ.Count > 0) {
             col = colQ.Dequeue();
-            TileBehav newWater = (TileBehav)hexMan.GenerateTile(playerId, Tile.Element.Water);
-            mm.DropTile(col, newWater);
+            TileBehav newWater = (TileBehav)_hexMan.GenerateTile(_playerId, Tile.Element.Water);
+            _mm.DropTile(col, newWater);
         }
     }
 
     // Balanco
     protected override IEnumerator Spell3(TileSeq prereq) {
-        DropEffect de = new DropEffect(playerId, Balanco_Drop, 3);
+        DropEffect de = new DropEffect(_playerId, Balanco_Drop, 3);
         de.isGlobal = true;
-        mm.effectCont.AddDropEffect(de, "balDp");
+        _mm.effectCont.AddDropEffect(de, "balDp");
 
-        SwapEffect se = new SwapEffect(playerId, Balanco_Swap, 3);
+        SwapEffect se = new SwapEffect(_playerId, Balanco_Swap, 3);
         se.isGlobal = true;
-        mm.effectCont.AddSwapEffect(se, "balSw");
+        _mm.effectCont.AddSwapEffect(se, "balSw");
         yield return null;
     }
     public IEnumerator Balanco_Drop(int id, bool playerAction, string tag, int col) {
@@ -161,8 +161,8 @@ public class Valeria : Character {
         yield return null;    
     }
     public IEnumerator Balanco_Swap(int id, int c1, int r1, int c2, int r2) {
-        Tile.Element elem1 = mm.hexGrid.GetTileAt(c1, r1).element;
-        Tile.Element elem2 = mm.hexGrid.GetTileAt(c2, r2).element;
+        Tile.Element elem1 = _mm.hexGrid.GetTileAt(c1, r1).element;
+        Tile.Element elem2 = _mm.hexGrid.GetTileAt(c2, r2).element;
         int dmg = 0;
         if (elem1 == Tile.Element.Water)
             dmg += 7;
@@ -180,11 +180,11 @@ public class Valeria : Character {
 
         const int numSwaps = 4;
         for (int i = 0; i < numSwaps; i++) {
-            yield return mm.prompt.WaitForSwap(prereq);
-            if (!mm.prompt.WasSuccessful())
+            yield return _mm.prompt.WaitForSwap(prereq);
+            if (!_mm.prompt.WasSuccessful())
                 break;
 
-            yield return mm.prompt.ContinueSwap();
+            yield return _mm.prompt.ContinueSwap();
 
             yield return HandleMatchesOnBoard();
         }
@@ -196,7 +196,7 @@ public class Valeria : Character {
         var spells = new List<Spell>();
         spells.Add(new CoreSpell(0, "", null));
 
-        List<TileSeq> seqs = mm.boardCheck.CheckBoard(spells)[0];
+        List<TileSeq> seqs = _mm.boardCheck.CheckBoard(spells)[0];
         while (seqs.Count > 0) {  // this is needed to handle cascades
             for (int s = 0; s < seqs.Count; s++) {
                 TileSeq seq = seqs[s];
@@ -216,16 +216,16 @@ public class Valeria : Character {
                         break;
                 }
 
-                yield return mm.hexMan._RemoveSeq(seq, false);
+                yield return _mm.hexMan._RemoveSeq(seq, false);
 
                 ThisPlayer().DealDamage(dmg);
                 yield return DropWaterIntoRandomCols(dropCount);
             }
 
             // wait for board to update...will this work?
-            yield return mm.BoardChecking(false);
+            yield return _mm.BoardChecking(false);
 
-            seqs = mm.boardCheck.CheckBoard(spells)[0];
+            seqs = _mm.boardCheck.CheckBoard(spells)[0];
         }
         yield return null;
     }

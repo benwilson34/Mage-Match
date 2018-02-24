@@ -5,59 +5,54 @@ using MMDebug;
 
 public class Hand {
 
-    private const int MAX_HAND_SIZE = 7;
+    public const int MAX_HAND_SIZE = 7;
 
-    private List<Hex> hexes = null;
-    private Transform handPos = null;
-    private HandSlot[] slots;
-    private GameObject placeholderPF;
-    private TileBehav placeholder = null;
-    private HandSlot placeholderSlot;
-    private Player p;
-    private MageMatch mm;
+    private List<Hex> _hexes = null;
+    private Transform _handPos = null;
+    private HandSlot[] _slots;
+    private GameObject _placeholderPF;
+    private TileBehav _placeholder = null;
+    private HandSlot _placeholderSlot;
+    private Player _p;
+    private MageMatch _mm;
 
     public Hand(MageMatch mm, Player p) {
-        hexes = new List<Hex>();
-        slots = new HandSlot[MAX_HAND_SIZE];
-        placeholderPF = Resources.Load("prefabs/ui/placeholder") as GameObject;
-        this.mm = mm;
-        this.p = p;
+        _hexes = new List<Hex>();
+        _slots = new HandSlot[MAX_HAND_SIZE];
+        _placeholderPF = Resources.Load("prefabs/ui/placeholder") as GameObject;
+        this._mm = mm;
+        this._p = p;
         SetHandPos();
     }
 
-    void SetHandPos() {
+    void SetHandPos() { // TODO this needs to check which side of the screen the player is on
         int place = 0;
-        if (p.id == mm.myID)
+        if (_p.id == _mm.myID)
             place = 1;
         else
             place = 2;
 
-        handPos = GameObject.Find("handslot" + place).transform;
-
-        //if (mm.gameSettings.hideOpponentHand && p.id != mm.myID) {
-        //    //MMDebug.MMLog.Log("HAND", "black", "hiding opponent hand..........");
-        //    handPos.position = new Vector3(handPos.position.x + 5, handPos.position.y);
-        //}
+        _handPos = GameObject.Find("handslot" + place).transform;
 
         for (int i = 0; i < MAX_HAND_SIZE; i++) {
-            slots[i] = handPos.Find("slot" + i).GetComponent<HandSlot>();
+            _slots[i] = _handPos.Find("slot" + i).GetComponent<HandSlot>();
         }
     }
 
-    public Vector3 GetHandPos() { return handPos.position; }
+    public Vector3 GetHandPos() { return _handPos.position; }
 
     public void Add(Hex hex) {
-        hex.transform.SetParent(handPos); // , false)?
-        hexes.Add(hex);
+        hex.transform.SetParent(_handPos); // , false)?
+        _hexes.Add(hex);
 
         int i;
         for (i = 0; i < MAX_HAND_SIZE; i++) {
-            HandSlot slot = slots[i];
+            HandSlot slot = _slots[i];
             if (!slot.IsFull()) {
                 slot.SetHex(hex);
                 hex.transform.position = slot.transform.position;
-                mm.animCont.PlayAnim(mm.animCont._Draw(hex));
-                mm.audioCont.HexDraw(hex.GetComponent<AudioSource>());
+                _mm.animCont.PlayAnim(_mm.animCont._Draw(hex));
+                _mm.audioCont.HexDraw(hex.GetComponent<AudioSource>());
                 MMLog.Log("HAND", "black", "Added hex with tag " + hex.hextag);
                 break;
             }
@@ -67,34 +62,34 @@ public class Hand {
     public void Remove(Hex hex) {
         // iterate thru, then clear corresponding handSlot
         for (int i = 0; i < MAX_HAND_SIZE; i++) {
-            Hex slotHex = slots[i].GetHex();
+            Hex slotHex = _slots[i].GetHex();
             if (slotHex != null && slotHex.hextag.Equals(hex.hextag)) {
-                slots[i].ClearHex();
+                _slots[i].ClearHex();
                 break;
             }
         }
-        hexes.Remove(hex);
+        _hexes.Remove(hex);
     }
 
     public void Empty() {
-        while (hexes.Count > 0) {
-            GameObject.Destroy(hexes[0].gameObject);
-            hexes.RemoveAt(0);
+        while (_hexes.Count > 0) {
+            GameObject.Destroy(_hexes[0].gameObject);
+            _hexes.RemoveAt(0);
         }
     }
 
-    public TileBehav GetTile(int i) { return (TileBehav)hexes[i]; }
+    public TileBehav GetTile(int i) { return (TileBehav)_hexes[i]; }
 
     public GameObject GetTile(Tile.Element elem) {
-        for (int i = 0; i < hexes.Count; i++) {
-            if (((TileBehav)hexes[i]).tile.element == elem)
-                return hexes[i].gameObject;
+        for (int i = 0; i < _hexes.Count; i++) {
+            if (((TileBehav)_hexes[i]).tile.element == elem)
+                return _hexes[i].gameObject;
         }
         return null;
     }
 
     public Hex GetHex(string tag) {
-        foreach (Hex obj in hexes) {
+        foreach (Hex obj in _hexes) {
             //MMLog.Log("HAND", "black", "Trying \"" + tag + "\" against \"" + obj.tag + "\"");
             if (tag.Equals(obj.hextag))
                 return obj;
@@ -105,7 +100,7 @@ public class Hand {
 
     public List<string> Debug_GetAllTags() {
         List<string> tags = new List<string>();
-        foreach (Hex h in hexes) {
+        foreach (Hex h in _hexes) {
             tags.Add(h.hextag);
         }
         tags.Sort();
@@ -125,16 +120,16 @@ public class Hand {
         return true;
     }
 
-    public int Count() { return hexes.Count; }
+    public int Count() { return _hexes.Count; }
 
-    public bool IsFull() { return hexes.Count == MAX_HAND_SIZE; }
+    public bool IsFull() { return _hexes.Count == MAX_HAND_SIZE; }
 
-    public HandSlot GetHandSlot(int ind) { return slots[ind]; }
+    public HandSlot GetHandSlot(int ind) { return _slots[ind]; }
 
     public int NumFullSlots() {
         string str = "";
         int total = 0;
-        foreach (HandSlot slot in slots) {
+        foreach (HandSlot slot in _slots) {
             if (slot.IsFull()) {
                 total++;
                 Hex hex = slot.GetHex();
@@ -157,16 +152,16 @@ public class Hand {
     public void GrabHex(Hex hex) {
         //NumFullSlots();
         for (int i = 0; i < MAX_HAND_SIZE; i++) {
-            HandSlot slot = slots[i];
+            HandSlot slot = _slots[i];
             Hex slotHex = slot.GetHex();
             if (slotHex != null && hex.EqualsTag(slotHex)) {
                 //MMDebug.MMLog.Log("HAND", "black", "Found it at index=" + i);
 
-                placeholder = GameObject.Instantiate(placeholderPF).GetComponent<TileBehav>();
-                placeholder.transform.position = slot.transform.position;
+                _placeholder = GameObject.Instantiate(_placeholderPF).GetComponent<TileBehav>();
+                _placeholder.transform.position = slot.transform.position;
 
-                slot.SetHex(placeholder);
-                placeholderSlot = slot;
+                slot.SetHex(_placeholder);
+                _placeholderSlot = slot;
                 break;
             }
         }
@@ -174,7 +169,7 @@ public class Hand {
 
     // called from OnMouseDrag
     public void Rearrange(HandSlot newSlot) {
-        if (newSlot.handIndex == placeholderSlot.handIndex)
+        if (newSlot.handIndex == _placeholderSlot.handIndex)
             return;
 
         //MMDebug.MMLog.Log("HAND", "black", "Before:");
@@ -185,16 +180,16 @@ public class Hand {
         int newSlotInd = newSlot.handIndex;
         // downward
         for (int i = newSlotInd; i < MAX_HAND_SIZE; i++) {
-            if (!slots[i].IsFull() || i == placeholderSlot.handIndex) {
-                swapSlot = slots[i];
+            if (!_slots[i].IsFull() || i == _placeholderSlot.handIndex) {
+                swapSlot = _slots[i];
                 break;
             }
         }
         if (swapSlot == null) {
             // upward
             for (int i = newSlotInd; i >= 0; i--) {
-                if (!slots[i].IsFull() || i == placeholderSlot.handIndex) {
-                    swapSlot = slots[i];
+                if (!_slots[i].IsFull() || i == _placeholderSlot.handIndex) {
+                    swapSlot = _slots[i];
                     break;
                 }
             }
@@ -205,22 +200,22 @@ public class Hand {
         // downward swap
         if (swapSlot.handIndex > newSlotInd) {
             for (int s = swapSlot.handIndex; s > newSlotInd; s--) {
-                Hex hex = slots[s - 1].GetHex();
-                slots[s].SetHex(hex);
-                mm.animCont.PlayAnim(mm.animCont._Move(hex, slots[s].transform.position));
+                Hex hex = _slots[s - 1].GetHex();
+                _slots[s].SetHex(hex);
+                _mm.animCont.PlayAnim(_mm.animCont._Move(hex, _slots[s].transform.position));
             }
         } else { // upward
             for (int s = swapSlot.handIndex; s < newSlotInd; s++) {
-                Hex hex = slots[s + 1].GetHex();
-                slots[s].SetHex(hex);
-                mm.animCont.PlayAnim(mm.animCont._Move(hex, slots[s].transform.position));
+                Hex hex = _slots[s + 1].GetHex();
+                _slots[s].SetHex(hex);
+                _mm.animCont.PlayAnim(_mm.animCont._Move(hex, _slots[s].transform.position));
             }
         }
 
-        newSlot.SetHex(placeholder);
-        if (placeholderSlot.GetHex().hextag.Equals("placeholder")) // i dislike this deeply
-            placeholderSlot.ClearHex();
-        placeholderSlot = newSlot;
+        newSlot.SetHex(_placeholder);
+        if (_placeholderSlot.GetHex().hextag.Equals("placeholder")) // i dislike this deeply
+            _placeholderSlot.ClearHex();
+        _placeholderSlot = newSlot;
 
         //MMDebug.MMLog.Log("HAND", "black", "After:");
         //NumFullSlots();
@@ -229,15 +224,15 @@ public class Hand {
     // On MouseUp
     public void ReleaseTile(Hex hex) {
         //MMDebug.MMLog.Log("HAND", "black", "ReleaseTile called! PlaceholderSlot="+placeholderSlot.handIndex);
-        mm.animCont.PlayAnim(mm.animCont._Move(hex, placeholderSlot.transform.position));
+        _mm.animCont.PlayAnim(_mm.animCont._Move(hex, _placeholderSlot.transform.position));
 
-        placeholderSlot.SetHex(hex);
+        _placeholderSlot.SetHex(hex);
         ClearPlaceholder();
         //NumFullSlots();
     }
 
     public void ClearPlaceholder() {
-        GameObject.Destroy(placeholder.gameObject);
-        placeholder = null; //?
+        GameObject.Destroy(_placeholder.gameObject);
+        _placeholder = null; //?
     }
 }

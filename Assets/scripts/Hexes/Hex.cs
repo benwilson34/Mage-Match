@@ -9,12 +9,12 @@ public class Hex : MonoBehaviour, Tooltipable {
 	public State currentState;
     public string hextag;
 
-    protected MageMatch mm;
-    private Sprite flipSprite;
-    private bool flipped = false;
+    protected MageMatch _mm;
+    private Sprite _flipSprite;
+    private bool _flipped = false;
 
 	void Awake () {
-		mm = GameObject.Find("board").GetComponent<MageMatch>();
+		_mm = GameObject.Find("board").GetComponent<MageMatch>();
 	}
 
     public bool EqualsTag(string tag) { return this.hextag.Equals(tag); }
@@ -34,19 +34,19 @@ public class Hex : MonoBehaviour, Tooltipable {
         SpriteRenderer rend = GetComponent<SpriteRenderer>();
 
         Sprite newSprite;
-        if (!flipped) {
-            newSprite = mm.hexMan.flipSprite;
+        if (!_flipped) {
+            newSprite = _mm.hexMan.flipSprite;
         } else {
-            newSprite = flipSprite;
+            newSprite = _flipSprite;
         }
 
-        flipSprite = rend.sprite;
+        _flipSprite = rend.sprite;
         rend.sprite = newSprite;
-        flipped = !flipped;
+        _flipped = !_flipped;
     }
 
     public void Reveal() {
-        if (flipped)
+        if (_flipped)
             Flip();
     }
 

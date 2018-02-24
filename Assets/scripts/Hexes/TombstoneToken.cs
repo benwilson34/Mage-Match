@@ -11,19 +11,19 @@ public class TombstoneToken : TileBehav {
     }
 
     public IEnumerator Tombstone_Turn(int id) {
-        yield return mm.syncManager.SyncRand(id, Random.Range(0, 2));
+        yield return _mm.syncManager.SyncRand(id, Random.Range(0, 2));
         Tile.Element elem = Tile.Element.None;
-        if (mm.syncManager.GetRand() == 0)
+        if (_mm.syncManager.GetRand() == 0)
             elem = Tile.Element.Earth;
         else
             elem = Tile.Element.Muscle;
 
-        TileBehav tb = (TileBehav)mm.hexMan.GenerateTile(id, elem);
-        yield return mm.hexFX.Ench_SetZombify(id, tb, true, false);
-        mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
+        TileBehav tb = (TileBehav)_mm.hexMan.GenerateTile(id, elem);
+        yield return _mm.hexFX.Ench_SetZombify(id, tb, true, false);
+        _mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
     }
 
     public IEnumerator Tombstone_TEnd(int id) {
-        yield return mm.hexMan._RemoveTile(this, false); // remove itself
+        yield return _mm.hexMan._RemoveTile(this, false); // remove itself
     }
 }

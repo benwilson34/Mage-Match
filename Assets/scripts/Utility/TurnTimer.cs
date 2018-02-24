@@ -6,13 +6,13 @@ public class TurnTimer : MonoBehaviour {
 
     public static float TIMER_DURATION = 20f, TIMER_WARNING = 5f;
 
-    private float timeRemaining;
-    private MageMatch mm;
-    private bool pause = false, playedWarningSound = false;
+    private MageMatch _mm;
+    private float _timeRemaining;
+    private bool _pause = false, _playedWarningSound = false;
 
 	void Start () {
-        mm = GameObject.Find("board").GetComponent<MageMatch>();
-        pause = true;
+        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _pause = true;
         InvokeRepeating("DecreaseTimeRemaining", .1f, .1f);
 	}
 
@@ -21,29 +21,29 @@ public class TurnTimer : MonoBehaviour {
 	//}
 
     public void Pause() {
-        pause = true;
+        _pause = true;
     }
 
     public void StartTimer() {
-        pause = false;
-        playedWarningSound = false;
-        timeRemaining = TIMER_DURATION;
+        _pause = false;
+        _playedWarningSound = false;
+        _timeRemaining = TIMER_DURATION;
     }
 
     void DecreaseTimeRemaining() {
-        if (!pause && !mm.targeting.IsTargetMode()) {
-            timeRemaining -= .1f;
+        if (!_pause && !_mm.targeting.IsTargetMode()) {
+            _timeRemaining -= .1f;
 
-            if (!playedWarningSound && timeRemaining < TIMER_WARNING) {
-                mm.audioCont.TurnTimerWarning();
-                playedWarningSound = true;
+            if (!_playedWarningSound && _timeRemaining < TIMER_WARNING) {
+                _mm.audioCont.TurnTimerWarning();
+                _playedWarningSound = true;
             }
 
-            if (timeRemaining < .01f) {
+            if (_timeRemaining < .01f) {
                 Pause();
-                mm.eventCont.Timeout();
+                _mm.eventCont.Timeout();
             }
-            mm.uiCont.newsfeed.UpdateTurnTimer(timeRemaining);
+            _mm.uiCont.newsfeed.UpdateTurnTimer(_timeRemaining);
         }
     }
 }

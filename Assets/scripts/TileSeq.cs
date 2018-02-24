@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class TileSeq {
 
-	public List<Tile> sequence; // TODO private? probably
+	public List<Tile> sequence; // TODO auto property?
 
 	public TileSeq(){
 		sequence = new List<Tile> ();

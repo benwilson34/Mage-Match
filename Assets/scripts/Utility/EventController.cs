@@ -10,17 +10,17 @@ public class EventController {
     public enum Status { Begin, End }
     public bool handlingEvents = false; // worth it?
 
-    private MageMatch mm;
+    private MageMatch _mm;
 
     public EventController(MageMatch mm) {
-        this.mm = mm;
-        swap = new List<EventPack>();
-        turnBegin = new List<EventPack>();
-        turnEnd = new List<EventPack>();
-        match = new List<EventPack>();
-        drop = new List<EventPack>();
-        draw = new List<EventPack>();
-        discard = new List<EventPack>();
+        _mm = mm;
+        _swap = new List<EventPack>();
+        _turnBegin = new List<EventPack>();
+        _turnEnd = new List<EventPack>();
+        _match = new List<EventPack>();
+        _drop = new List<EventPack>();
+        _draw = new List<EventPack>();
+        _discard = new List<EventPack>();
     }
 
     struct EventPack {
@@ -29,22 +29,22 @@ public class EventController {
         public Status status;
     }
 
-    List<EventPack> GetEventList(string type) {
+    List<EventPack> GetEventList(string type) { // TODO this could be done with an enum
         switch (type) {
             case "swap":
-                return swap;
+                return _swap;
             case "turnBegin":
-                return turnBegin;
+                return _turnBegin;
             case "turnEnd":
-                return turnEnd;
+                return _turnEnd;
             case "match":
-                return match;
+                return _match;
             case "draw":
-                return draw;
+                return _draw;
             case "drop":
-                return drop;
+                return _drop;
             case "discard":
-                return discard;
+                return _discard;
             default:
                 MMLog.LogError("EVENTCONT: Bad type name!!");
                 return null;
@@ -86,11 +86,11 @@ public class EventController {
     }
 
     public delegate IEnumerator TurnBeginEvent(int id);
-    private List<EventPack> turnBegin;
+    private List<EventPack> _turnBegin;
     public IEnumerator TurnBegin() {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in turnBegin) {
-            yield return ((TurnBeginEvent)pack.ev)(mm.ActiveP().id); // OH YEAH
+        foreach (EventPack pack in _turnBegin) {
+            yield return ((TurnBeginEvent)pack.ev)(_mm.ActiveP().id); // OH YEAH
         }
         MMLog.Log_EventCont("Just finished TURN BEGIN events...");
         handlingEvents = false; // worth it?
@@ -100,11 +100,11 @@ public class EventController {
     }
 
     public delegate IEnumerator TurnEndEvent(int id);
-    private List<EventPack> turnEnd;
+    private List<EventPack> _turnEnd;
     public IEnumerator TurnEnd() {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in turnEnd) {
-            yield return ((TurnEndEvent)pack.ev)(mm.ActiveP().id); // OH YEAH
+        foreach (EventPack pack in _turnEnd) {
+            yield return ((TurnEndEvent)pack.ev)(_mm.ActiveP().id); // OH YEAH
         }
         MMLog.Log_EventCont("Just finished TURN END events...");
         handlingEvents = false; // worth it?
@@ -118,7 +118,7 @@ public class EventController {
     public void Timeout() {
         MMLog.Log_EventCont("Timeout event raised.");
         if (timeout != null) // never will be due to Stats
-            timeout.Invoke(mm.ActiveP().id);
+            timeout.Invoke(_mm.ActiveP().id);
     }
 
     public delegate void CommishDropEvent(Tile.Element elem, int col);
@@ -150,14 +150,14 @@ public class EventController {
     public void GameAction(bool costsAP) {
         //Debug.MMLog.Log_EventCont("EVENTCONTROLLER: GameAction called.");
         if (gameAction != null)
-            gameAction.Invoke(mm.ActiveP().id, costsAP);
+            gameAction.Invoke(_mm.ActiveP().id, costsAP);
     }
 
     public delegate IEnumerator DrawEvent(int id, string tag, bool playerAction, bool dealt);
-    private List<EventPack> draw;
+    private List<EventPack> _draw;
     public IEnumerator Draw(Status status, int id, string tag, bool playerAction, bool dealt) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in draw) {
+        foreach (EventPack pack in _draw) {
             MMLog.Log_EventCont("going thru draw event with type " + pack.type);
             if (pack.status == status)
                 yield return ((DrawEvent)pack.ev)(id, tag, playerAction, dealt); // OHYEAH
@@ -170,13 +170,13 @@ public class EventController {
     }
 
     public delegate IEnumerator DropEvent(int id, bool playerAction, string tag, int col);
-    private List<EventPack> drop;
+    private List<EventPack> _drop;
     public IEnumerator Drop(Status status, bool playerAction, string tag, int col) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in drop) {
+        foreach (EventPack pack in _drop) {
             MMLog.Log_EventCont("EVENTCONT: going thru drop event with type " + pack.type);
             if (pack.status == status)
-                yield return ((DropEvent)pack.ev)(mm.ActiveP().id, playerAction, tag, col); // OHYEAH
+                yield return ((DropEvent)pack.ev)(_mm.ActiveP().id, playerAction, tag, col); // OHYEAH
         }
         MMLog.Log_EventCont("Just finished DROP events...");
         handlingEvents = false; // worth it?
@@ -186,13 +186,13 @@ public class EventController {
     }
 
     public delegate IEnumerator SwapEvent(int id, bool playerAction, int c1, int r1, int c2, int r2);
-    private List<EventPack> swap;
+    private List<EventPack> _swap;
     public IEnumerator Swap(Status status, bool playerAction, int c1, int r1, int c2, int r2) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in swap) {
+        foreach (EventPack pack in _swap) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
             if(pack.status == status)
-                yield return ((SwapEvent)pack.ev)(mm.ActiveP().id, playerAction, c1, r1, c2, r2);
+                yield return ((SwapEvent)pack.ev)(_mm.ActiveP().id, playerAction, c1, r1, c2, r2);
         }
         MMLog.Log_EventCont("Just finished SWAP events...");
         handlingEvents = false; // worth it?
@@ -206,19 +206,19 @@ public class EventController {
     public event SpellCastEvent spellCast;
     public void SpellCast(Spell spell) {
         if (spellCast != null) {
-            spellCast.Invoke(mm.ActiveP().id, spell);
+            spellCast.Invoke(_mm.ActiveP().id, spell);
         }
     }
     #endregion
 
 
     public delegate IEnumerator MatchEvent(int id, string[] seqs);
-    private List<EventPack> match;
+    private List<EventPack> _match;
     public IEnumerator Match(string[] seqs) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in match) {
+        foreach (EventPack pack in _match) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: Resolving matchEvent with p="+pack.priority);
-            yield return ((MatchEvent)pack.ev)(mm.ActiveP().id, seqs); // OH YEAH
+            yield return ((MatchEvent)pack.ev)(_mm.ActiveP().id, seqs); // OH YEAH
         }
         MMLog.Log_EventCont("Just finished MATCH events...");
         handlingEvents = false; // worth it?
@@ -241,7 +241,7 @@ public class EventController {
     public event TileRemoveEvent tileRemove;
     public void TileRemove(TileBehav tb) {
         if (tileRemove != null)
-            tileRemove.Invoke(mm.ActiveP().id, tb);
+            tileRemove.Invoke(_mm.ActiveP().id, tb);
     }
 
     // NOTE: id is ALWAYS the receiver
@@ -267,10 +267,10 @@ public class EventController {
     }
 
     public delegate IEnumerator DiscardEvent(int id, string tag);
-    private List<EventPack> discard;
+    private List<EventPack> _discard;
     public IEnumerator Discard(int id, string tag) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in discard) {
+        foreach (EventPack pack in _discard) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: Resolving matchEvent with p="+pack.priority);
             yield return ((DiscardEvent)pack.ev)(id, tag); // OH YEAH
         }

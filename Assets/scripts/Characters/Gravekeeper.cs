@@ -5,19 +5,19 @@ using MMDebug;
 
 public class Gravekeeper : Character {
 
-    private HexGrid hexGrid; // eventually these will be static again?
-    private Targeting targeting; // ''
+    private HexGrid _hexGrid; // eventually these will be static again?
+    private Targeting _targeting; // ''
 
-    private Spell altCoreSpell;
+    private Spell _altCoreSpell;
 
     public Gravekeeper(MageMatch mm, int id) : base(mm, Ch.Gravekeeper, id) {
-        hexGrid = mm.hexGrid;
-        targeting = mm.targeting;
-        objFX = mm.hexFX;
+        _hexGrid = mm.hexGrid;
+        _targeting = mm.targeting;
+        _objFX = mm.hexFX;
 
-        altCoreSpell = new CoreSpell(0, "Party in the Back", PartyInTheBack);
+        _altCoreSpell = new CoreSpell(0, "Party in the Back", PartyInTheBack);
         CharacterInfo info = CharacterInfo.GetCharacterInfoObj(Ch.Gravekeeper);
-        altCoreSpell.info = CharacterInfo.GetSpellInfo(info.altSpell, true);
+        _altCoreSpell.info = CharacterInfo.GetSpellInfo(info.altSpell, true);
     }
 
     // ----- spells -----
@@ -50,7 +50,7 @@ public class Gravekeeper : Character {
         if (seq.GetElementAt(0) == Tile.Element.Earth) // not safe if there are multi-color tiles
             zombs++;
 
-        List<TileBehav> tbs = hexGrid.GetPlacedTiles(seq);
+        List<TileBehav> tbs = _hexGrid.GetPlacedTiles(seq);
         for (int i = 0; i < tbs.Count; i++) {
             if (tbs[i].GetEnchType() == Enchantment.EnchType.Zombify) {
                 tbs.RemoveAt(i);
@@ -59,9 +59,9 @@ public class Gravekeeper : Character {
         }
 
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
-            yield return mm.syncManager.SyncRand(playerId, Random.Range(0, tbs.Count));
-            int rand = mm.syncManager.GetRand();
-            yield return objFX.Ench_SetZombify(playerId, tbs[rand], false); // skip?
+            yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, tbs.Count));
+            int rand = _mm.syncManager.GetRand();
+            yield return _objFX.Ench_SetZombify(_playerId, tbs[rand], false); // skip?
             tbs.RemoveAt(rand);
         }
 
@@ -76,23 +76,23 @@ public class Gravekeeper : Character {
         switch (seq.GetSeqLength()) {
             case 3:
                 dmg = 20;
-                yield return targeting.WaitForTileTarget(1);
+                yield return _targeting.WaitForTileTarget(1);
                 break;
             case 4:
                 dmg = 50;
-                yield return targeting.WaitForTileAreaTarget(false);
+                yield return _targeting.WaitForTileAreaTarget(false);
                 break;
             case 5:
                 dmg = 90;
-                yield return targeting.WaitForTileAreaTarget(true);
+                yield return _targeting.WaitForTileAreaTarget(true);
                 break;
         }
 
         if (seq.GetElementAt(0) == Tile.Element.Muscle) // not safe if there are multi-color tiles
             dmg += 20;
-        mm.ActiveP().DealDamage(dmg);
+        _mm.ActiveP().DealDamage(dmg);
 
-        List<TileBehav> tbs = targeting.GetTargetTBs();
+        List<TileBehav> tbs = _targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
             if(tb.GetEnchType() == Enchantment.EnchType.Zombify)
                 yield return tb.TriggerEnchantment(); // that easy?
@@ -104,31 +104,31 @@ public class Gravekeeper : Character {
     }
 
     void SwitchCoreSpell() {
-        Spell newSpell = altCoreSpell;
-        altCoreSpell = spells[0];
-        spells[0] = newSpell;
+        Spell newSpell = _altCoreSpell;
+        _altCoreSpell = _spells[0];
+        _spells[0] = newSpell;
 
         // keep in mind here that only the LOCAL player needs this
-        if (mm.myID == playerId) {
-            MMLog.Log_Gravekeeper("GRAVEK: Switching core spell..." + spells[0].info);
-            mm.uiCont.GetButtonCont(playerId, 0).SpellChanged();
+        if (_mm.myID == _playerId) {
+            MMLog.Log_Gravekeeper("GRAVEK: Switching core spell..." + _spells[0].info);
+            _mm.uiCont.GetButtonCont(_playerId, 0).SpellChanged();
         }
     }
 
     // The Oogie Boogie
     // TODO handle 0 or 1 zombies on the board
     protected override IEnumerator Spell1(TileSeq prereq) {
-        if (Filter_Zombs(hexGrid.GetPlacedTiles()).Count < 2) // if not enough Zombies
+        if (Filter_Zombs(_hexGrid.GetPlacedTiles()).Count < 2) // if not enough Zombies
             yield break; // TODO feedback for whiffs
 
-        yield return targeting.WaitForTileTarget(2, Filter_Zombs);
+        yield return _targeting.WaitForTileTarget(2, Filter_Zombs);
 
-        List<TileBehav> tbs = targeting.GetTargetTBs();
+        List<TileBehav> tbs = _targeting.GetTargetTBs();
         if (tbs.Count < 2)
             yield return null;
 
         Tile a = tbs[0].tile, b = tbs[1].tile;
-        yield return mm._SwapTiles(false, a.col, a.row, b.col, b.row);
+        yield return _mm._SwapTiles(false, a.col, a.row, b.col, b.row);
 
         foreach (TileBehav tb in tbs)
             yield return tb.TriggerEnchantment(); // that easy?
@@ -139,20 +139,20 @@ public class Gravekeeper : Character {
     // Party Crashers
     protected override IEnumerator Spell2(TileSeq prereq) {
         for (int i = 0; i < 2; i++) {
-            yield return mm.prompt.WaitForDrop();
-            if (!mm.prompt.WasSuccessful())
+            yield return _mm.prompt.WaitForDrop();
+            if (!_mm.prompt.WasSuccessful())
                 break;
 
-            TileBehav tb = mm.prompt.GetDropTile();
-            MMLog.Log_Gravekeeper("Player " + playerId + " dropped " + tb.hextag);
-            yield return objFX.Ench_SetZombify(playerId, tb, false);
-            int col = mm.prompt.GetDropCol();
-            int nextTBrow = mm.boardCheck.CheckColumn(col) - 1; // next TB under, if any
+            TileBehav tb = _mm.prompt.GetDropTile();
+            MMLog.Log_Gravekeeper("Player " + _playerId + " dropped " + tb.hextag);
+            yield return _objFX.Ench_SetZombify(_playerId, tb, false);
+            int col = _mm.prompt.GetDropCol();
+            int nextTBrow = _mm.boardCheck.CheckColumn(col) - 1; // next TB under, if any
 
-            yield return mm.prompt.ContinueDrop();
+            yield return _mm.prompt.ContinueDrop();
 
-            if (nextTBrow >= mm.hexGrid.BottomOfColumn(col)) {
-                hexMan.RemoveTile(col, nextTBrow, false);
+            if (nextTBrow >= _mm.hexGrid.BottomOfColumn(col)) {
+                _hexMan.RemoveTile(col, nextTBrow, false);
             }
 
             ThisPlayer().DealDamage(30);
@@ -190,7 +190,7 @@ public class Gravekeeper : Character {
 
     // Undead Union
     protected override IEnumerator Spell3(TileSeq prereq) {
-        List<TileBehav> tbs = mm.hexGrid.GetPlacedTiles();
+        List<TileBehav> tbs = _mm.hexGrid.GetPlacedTiles();
         for (int i = 0; i < tbs.Count; i++) { // filter zombs
             TileBehav tb = tbs[i];
             if (tb.GetEnchType() != Enchantment.EnchType.Zombify) {
@@ -208,7 +208,7 @@ public class Gravekeeper : Character {
         int count = 0;
         foreach (TileBehav tb in tbs) {
             if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
-                List<TileBehav> adjTBs = hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+                List<TileBehav> adjTBs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 foreach (TileBehav adjTB in adjTBs) {
                     if (adjTB.GetEnchType() == Enchantment.EnchType.Zombify) {
                         count++;
@@ -218,31 +218,31 @@ public class Gravekeeper : Character {
         }
         MMLog.Log_Gravekeeper("DealAdjZombDmg has counted " + count + " adjacent zombs");
         if(count > 0)
-            mm.ActiveP().DealDamage(count * 5);
+            _mm.ActiveP().DealDamage(count * 5);
     }
 
     // Tombstone
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
         ThisPlayer().DealDamage(225);
 
-        yield return targeting.WaitForCellTarget(1);
+        yield return _targeting.WaitForCellTarget(1);
 
-        CellBehav cb = targeting.GetTargetCBs()[0];
+        CellBehav cb = _targeting.GetTargetCBs()[0];
         int col = cb.col;
-        Hex tomb = hexMan.GenerateToken(playerId, "tombstone");
+        Hex tomb = _hexMan.GenerateToken(_playerId, "tombstone");
         tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
 
         TombstoneToken ttb = (TombstoneToken)tomb;
-        mm.effectCont.AddEndTurnEffect(new TurnEffect(5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
+        _mm.effectCont.AddEndTurnEffect(new TurnEffect(5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
 
         // destroy tiles under token
-        for (int row = hexGrid.BottomOfColumn(col); row < hexGrid.TopOfColumn(col); row++)
-            if (hexGrid.IsCellFilled(col, row))
-                hexMan.RemoveTile(col, row, false);
+        for (int row = _hexGrid.BottomOfColumn(col); row < _hexGrid.TopOfColumn(col); row++)
+            if (_hexGrid.IsCellFilled(col, row))
+                _hexMan.RemoveTile(col, row, false);
             else
                 break; // TODO handle floating tiles
 
-        mm.DropTile(col, ttb); // idk how to animate this one yet
+        _mm.DropTile(col, ttb); // idk how to animate this one yet
     }
 
     //public IEnumerator CompanyLuncheon() {

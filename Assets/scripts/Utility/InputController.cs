@@ -8,69 +8,69 @@ using System.Collections;
 // TODO eventually handle mobile tap input instead of clicking
 public class InputController : MonoBehaviour {
 
-	private MageMatch mm;
-    private Targeting targeting;
-    private MonoBehaviour mouseObj;
-    private Reporter reporter;
+	private MageMatch _mm;
+    private Targeting _targeting;
+    private MonoBehaviour _mouseObj;
+    private Reporter _reporter;
 
-    private bool holdingHex = false;
-    private Hex heldHex;
+    private bool _holdingHex = false;
+    private Hex _heldHex;
 
-	private bool dragging = false;
-    private Vector3 dragHexPos;
+	private bool _dragging = false;
+    private Vector3 _dragHexPos;
 
-	private bool lastClick = false, nowClick = false;
+	private bool _lastClick = false, _nowClick = false;
 	//private Hex clickHex; // needed?
  //   private CellBehav clickCB; // needed?
 	//private bool isClickHex = false;
 
-    private bool validClick = true;
+    private bool _validClick = true;
 
 	void Start() {
-		mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-        targeting = mm.targeting;
+		_mm = GameObject.Find ("board").GetComponent<MageMatch> ();
+        _targeting = _mm.targeting;
         InitContexts();
         GameObject reporterGO = GameObject.Find("Reporter");
         if (reporterGO != null)
-            reporter = reporterGO.GetComponent<Reporter>();
+            _reporter = reporterGO.GetComponent<Reporter>();
     }
 
 	void Update(){
-        if (Input.GetMouseButton(0) || lastClick) { // if left mouse is down
-            nowClick = true;
+        if (Input.GetMouseButton(0) || _lastClick) { // if left mouse is down
+            _nowClick = true;
             if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
-                nowClick = false;
+                _nowClick = false;
 
             InputStatus status = InputStatus.Unhandled;
             MouseState state = GetMouseState();
             if (state == MouseState.Down)
-                mouseObj = GetObject(state, currentContext.type);
+                _mouseObj = GetObject(state, _currentContext.type);
 
             //if (mouseObj == null)
             //    return;
 
             // return if the report overlay is showing, or if the newsfeed is open
-            if ((reporter != null && reporter.show) || mm.uiCont.newsfeed.isMenuOpen())
+            if ((_reporter != null && _reporter.show) || _mm.uiCont.newsfeed.isMenuOpen())
                 return;
 
             // LAYER 1 current context
-            if (mm.MyTurn() && IsValidClick() && mouseObj != null)
-                status = currentContext.TakeInput(state, mouseObj);
+            if (_mm.MyTurn() && IsValidClick() && _mouseObj != null)
+                status = _currentContext.TakeInput(state, _mouseObj);
 
             if (state == MouseState.Down) {
-                if(!mm.uiCont.IsDebugMenuOpen()) // i don't like this
-                    ((StandardContext)standardContext).SetTooltip(GetTooltipable()); // hoo
-                if (mouseObj != null && mouseObj is CellBehav) // only getObject if other context gets a CellBehav
-                    mouseObj = GetObject(state, InputContext.ObjType.Hex);
+                if(!_mm.uiCont.IsDebugMenuOpen()) // i don't like this
+                    ((StandardContext)_standardContext).SetTooltip(GetTooltipable()); // hoo
+                if (_mouseObj != null && _mouseObj is CellBehav) // only getObject if other context gets a CellBehav
+                    _mouseObj = GetObject(state, InputContext.ObjType.Hex);
             }
 
             // LAYER 2 standard context
             if (status != InputStatus.FullyHandled)
-                standardContext.TakeInput(state, mouseObj, status);
+                _standardContext.TakeInput(state, _mouseObj, status);
 
             UpdateMouseState();
-        } else if (!validClick) {
-            validClick = true;
+        } else if (!_validClick) {
+            _validClick = true;
         }
 
 	}
@@ -78,11 +78,11 @@ public class InputController : MonoBehaviour {
     public enum MouseState { None, Down, Drag, Up };
 
     MouseState GetMouseState() { // only get once
-        if (!lastClick && nowClick) { // MouseDown
+        if (!_lastClick && _nowClick) { // MouseDown
             return MouseState.Down;
-        } else if (lastClick && nowClick) { // MouseDrag
+        } else if (_lastClick && _nowClick) { // MouseDrag
             return MouseState.Drag;
-        } else if (lastClick && !nowClick) { // MouseUp
+        } else if (_lastClick && !_nowClick) { // MouseUp
             return MouseState.Up;
         } else
             return MouseState.None; // shouldn't be needed?
@@ -91,25 +91,25 @@ public class InputController : MonoBehaviour {
     void UpdateMouseState() {
         switch (GetMouseState()) {
             case MouseState.Down:
-                lastClick = true;
+                _lastClick = true;
                 break;
             case MouseState.Up:
-                lastClick = false;
+                _lastClick = false;
                 break;
         }
     }
 
     public void InvalidateClick() {
-        if(mm.MyTurn() && nowClick)
-            validClick = false;
+        if(_mm.MyTurn() && _nowClick)
+            _validClick = false;
     }
 
     public bool IsValidClick() {
-        if (!validClick) {
+        if (!_validClick) {
             //lastClick = true;
             MMLog.Log_InputCont("Picked up input, but the click isn't valid!");
-            if (!nowClick) {
-                validClick = true;
+            if (!_nowClick) {
+                _validClick = true;
                 //lastClick = false;
             }
             return false;
@@ -123,7 +123,7 @@ public class InputController : MonoBehaviour {
                 // if type == none, break?
             if (type == InputContext.ObjType.Hex) {
                 obj = GetMouseHex();
-            } else if (currentContext.type == InputContext.ObjType.Cell) {
+            } else if (_currentContext.type == InputContext.ObjType.Cell) {
                 obj = GetMouseCell();
             }
             return obj;
@@ -214,7 +214,7 @@ public class InputController : MonoBehaviour {
 
     List<RaycastResult> GetUIRaycast() {
         //MMLog.Log_InputCont("calling UIRaycast");
-        GraphicRaycaster gr = mm.uiCont.GetComponent<GraphicRaycaster>();
+        GraphicRaycaster gr = _mm.uiCont.GetComponent<GraphicRaycaster>();
         //Create the PointerEventData with null for the EventSystem
         PointerEventData ped = new PointerEventData(null);
         //Set required parameters, in this case, mouse position
@@ -228,8 +228,8 @@ public class InputController : MonoBehaviour {
 	void SwapCheck(TileBehav tb){
 		Tile tile = tb.tile;
 		Vector3 mouse = Input.mousePosition;
-		if(Vector3.Distance(mouse, dragHexPos) > 50 && dragging){ // if dragged more than 50 px away
-			mouse -= dragHexPos;
+		if(Vector3.Distance(mouse, _dragHexPos) > 50 && _dragging){ // if dragged more than 50 px away
+			mouse -= _dragHexPos;
 			mouse.z = 0;
             Transform t = new GameObject().transform;
             t.position = mouse;
@@ -244,30 +244,33 @@ public class InputController : MonoBehaviour {
 
             //MMLog.Log_InputCont("mouse = " + t.position.ToString() + "; angle = " + angle);
 
-			dragging = false; // TODO move into cases below for continuous dragging
+			_dragging = false; // TODO move into cases below for continuous dragging
             int dir = (int)Mathf.Floor(angle / 60);
 
             int c2, r2;
-            mm.hexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
-            if (!mm.hexGrid.CanSwap(tile.col, tile.row, c2, r2))
+            _mm.hexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
+            if (!_mm.hexGrid.CanSwap(tile.col, tile.row, c2, r2))
                 return;
 
-            if (mm.prompt.currentMode == Prompt.PromptMode.Swap) {
+            if (_mm.prompt.currentMode == Prompt.PromptMode.Swap) {
                 // intercept swaps for Prompt
-                mm.prompt.SetSwaps(tile.col, tile.row, c2, r2);
+                _mm.prompt.SetSwaps(tile.col, tile.row, c2, r2);
             } else
-                mm.PlayerSwapTiles(tile.col, tile.row, c2, r2);
+                _mm.PlayerSwapTiles(tile.col, tile.row, c2, r2);
 
 		}
 	}
 
     bool DropCheck(int col) {
-        return mm.boardCheck.CheckColumn(col) >= 0;
+        return _mm.boardCheck.CheckColumn(col) >= 0;
     }
 
-    bool PromptedDrop() { return mm.MyTurn() && mm.prompt.currentMode == Prompt.PromptMode.Drop; }
+    bool PromptedDrop() { return _mm.MyTurn() && _mm.prompt.currentMode == Prompt.PromptMode.Drop; }
 
-    bool PromptedSwap() { return mm.MyTurn() && mm.prompt.currentMode == Prompt.PromptMode.Swap; }
+    bool PromptedSwap() { return _mm.MyTurn() && _mm.prompt.currentMode == Prompt.PromptMode.Swap; }
+
+
+
 
 
     // --------------------------------- CONTEXTS ------------------------------------
@@ -278,12 +281,12 @@ public class InputController : MonoBehaviour {
         public enum ObjType { None, Hex, Cell };
         public ObjType type = ObjType.None;
 
-        protected MageMatch mm;
-        protected InputController input;
+        protected MageMatch _mm;
+        protected InputController _input;
 
         public InputContext(MageMatch mm, InputController input, ObjType type = ObjType.None) {
-            this.mm = mm;
-            this.input = input;
+            this._mm = mm;
+            this._input = input;
             this.type = type;
         }
 
@@ -324,7 +327,7 @@ public class InputController : MonoBehaviour {
                 return InputStatus.Unhandled;
 
             TileBehav tb = (TileBehav)obj;
-            mm.targeting.OnTBTarget(tb);
+            _mm.targeting.OnTBTarget(tb);
             return InputStatus.FullyHandled;
         }
     }
@@ -334,47 +337,47 @@ public class InputController : MonoBehaviour {
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
             CellBehav cb = (CellBehav)obj;
-            mm.targeting.OnCBTarget(cb);
+            _mm.targeting.OnCBTarget(cb);
             return InputStatus.FullyHandled;
         }
     }
 
     private class Target_DragContext : InputContext {
 
-        private Vector3 dragClick;
+        private Vector3 _dragClick;
 
         public Target_DragContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
             TileBehav tb = null;
-            tb = input.GetDragTarget();
+            tb = _input.GetDragTarget();
             if (tb == null)
                 return InputStatus.Unhandled;
-            mm.targeting.OnTBTarget(tb);
-            dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+            _mm.targeting.OnTBTarget(tb);
+            _dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
             return InputStatus.FullyHandled;
         }
 
         public override InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
             TileBehav tb = null;
             Vector3 mouse = Input.mousePosition;
-            MMLog.Log_InputCont("drag=" + dragClick + ", mouse=" + mouse);
-            if (Vector3.Distance(dragClick, mouse) > 50) {
+            MMLog.Log_InputCont("drag=" + _dragClick + ", mouse=" + mouse);
+            if (Vector3.Distance(_dragClick, mouse) > 50) {
                 MMLog.Log_InputCont("Drag more than 50px.");
-                tb = input.GetDragTarget();
+                tb = _input.GetDragTarget();
                 if (tb == null)
-                    mm.targeting.EndDragTarget();
-                mm.targeting.OnTBTarget(tb);
-                if (!mm.targeting.TargetsRemain())
-                    mm.targeting.EndDragTarget();
-                dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
+                    _mm.targeting.EndDragTarget();
+                _mm.targeting.OnTBTarget(tb);
+                if (!_mm.targeting.TargetsRemain())
+                    _mm.targeting.EndDragTarget();
+                _dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
                 return InputStatus.FullyHandled;
             }
             return InputStatus.Unhandled; //?
         }
 
         public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
-            mm.targeting.EndDragTarget();
+            _mm.targeting.EndDragTarget();
             return InputStatus.FullyHandled;
         }
 
@@ -389,7 +392,7 @@ public class InputController : MonoBehaviour {
                 return InputStatus.Unhandled;
 
             TileBehav tb = (TileBehav)obj;
-            mm.targeting.OnSelection(tb);
+            _mm.targeting.OnSelection(tb);
             return InputStatus.FullyHandled;
         }
     }
@@ -398,7 +401,7 @@ public class InputController : MonoBehaviour {
         public DebugToolsContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
-            mm.debugTools.HandleInput(obj);
+            _mm.debugTools.HandleInput(obj);
             return InputStatus.FullyHandled;
         }
     }
@@ -410,8 +413,8 @@ public class InputController : MonoBehaviour {
             Hex hex = (Hex)obj;
             //MMLog.Log_InputCont("MyTurn mouse down, hex state="+hex.currentState);
             if (hex.currentState == Hex.State.Placed) {
-                    input.dragging = true;
-                    input.dragHexPos = Camera.main.WorldToScreenPoint(hex.transform.position);
+                    _input._dragging = true;
+                    _input._dragHexPos = Camera.main.WorldToScreenPoint(hex.transform.position);
                     return InputStatus.PartiallyHandled;
 
             }
@@ -421,8 +424,8 @@ public class InputController : MonoBehaviour {
         public override InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
             Hex hex = (Hex)obj;
             if (hex.currentState == Hex.State.Placed) {
-                if (!mm.IsPerformingAction() || input.PromptedSwap()) // i want to change this check now since there's more uniform game states
-                    input.SwapCheck((TileBehav)hex); // move here?
+                if (!_mm.IsPerformingAction() || _input.PromptedSwap()) // i want to change this check now since there's more uniform game states
+                    _input.SwapCheck((TileBehav)hex); // move here?
                 return InputStatus.FullyHandled;
             }
             return InputStatus.Unhandled;
@@ -433,18 +436,18 @@ public class InputController : MonoBehaviour {
 
             Hex hex = (Hex)obj;
             if (hex.currentState == Hex.State.Hand) {
-                if (input.holdingHex) {
-                    input.heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
+                if (_input._holdingHex) {
+                    _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
                     Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
-                    CellBehav cb = input.GetMouseCell(hits); // get cell underneath
+                    CellBehav cb = _input.GetMouseCell(hits); // get cell underneath
 
-                    if ((!mm.IsPerformingAction() || input.PromptedDrop()) && cb != null) {
-                        if (input.DropCheck(cb.col)) {
-                            if (input.PromptedDrop())
-                                mm.prompt.SetDrop(cb.col, (TileBehav)input.heldHex);
+                    if ((!_mm.IsPerformingAction() || _input.PromptedDrop()) && cb != null) {
+                        if (_input.DropCheck(cb.col)) {
+                            if (_input.PromptedDrop())
+                                _mm.prompt.SetDrop(cb.col, (TileBehav)_input._heldHex);
                             else
-                                mm.PlayerDropTile(cb.col, input.heldHex);
+                                _mm.PlayerDropTile(cb.col, _input._heldHex);
                             return InputStatus.PartiallyHandled;
                         }
                     }
@@ -456,20 +459,20 @@ public class InputController : MonoBehaviour {
 
     private class StandardContext : InputContext {
 
-        private Tooltipable tooltip;
-        private Vector3 mouseDownPos;
+        private Tooltipable _tooltip;
+        private Vector3 _mouseDownPos;
 
         private const int TOOLTIP_MOUSE_RADIUS = 40;   // in pixels
 
         public StandardContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
 
         public void SetTooltip(Tooltipable tooltip) {
-            this.tooltip = tooltip;
+            this._tooltip = tooltip;
         }
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
-            mouseDownPos = Input.mousePosition;
-            mm.uiCont.tooltipMan.SetTooltip(tooltip); // where to check for null?
+            _mouseDownPos = Input.mousePosition;
+            _mm.uiCont.tooltipMan.SetTooltip(_tooltip); // where to check for null?
 
             if (obj == null)
                 return InputStatus.FullyHandled;
@@ -478,15 +481,15 @@ public class InputController : MonoBehaviour {
             MMLog.Log_InputCont("Standard mouse ; hex state="+hex.currentState);
 
             if (hex.currentState == Hex.State.Hand) {
-                if (mm.LocalP().IsHexMine(hex)) {
+                if (_mm.LocalP().IsHexMine(hex)) {
                     MMLog.Log_InputCont("Standard mouse down");
 
-                    input.holdingHex = true;
+                    _input._holdingHex = true;
 
                     hex.GetComponent<SpriteRenderer>().sortingOrder = 1;
-                    input.heldHex = hex;
-                    mm.LocalP().hand.GrabHex(hex); //?
-                    mm.eventCont.GrabTile(mm.myID, hex.hextag);
+                    _input._heldHex = hex;
+                    _mm.LocalP().hand.GrabHex(hex); //?
+                    _mm.eventCont.GrabTile(_mm.myID, hex.hextag);
                     return InputStatus.FullyHandled;
                 }
             }
@@ -497,25 +500,25 @@ public class InputController : MonoBehaviour {
         public override InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
             //MMLog.Log_InputCont("Standard mouse drag, holdingHex="+input.holdingHex);
 
-            if (tooltip != null) { // if there's a tooltip
+            if (_tooltip != null) { // if there's a tooltip
                 //MMLog.Log_InputCont(">>>Tooltip is not null<<< ");
-                if (Vector3.Distance(mouseDownPos, Input.mousePosition) > TOOLTIP_MOUSE_RADIUS) {
-                    mm.uiCont.tooltipMan.HideOrCancelTooltip();
-                    tooltip = null;
+                if (Vector3.Distance(_mouseDownPos, Input.mousePosition) > TOOLTIP_MOUSE_RADIUS) {
+                    _mm.uiCont.tooltipMan.HideOrCancelTooltip();
+                    _tooltip = null;
                 }
             }
 
             //Hex hex = (Hex)obj;
             //if (hex.currentState == Hex.State.Hand) {
-            if (input.holdingHex) {
+            if (_input._holdingHex) {
                 Vector3 cursor = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 cursor.z = 0;
-                input.heldHex.transform.position = cursor;
+                _input._heldHex.transform.position = cursor;
 
                 RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
-                HandSlot slot = input.GetHandSlot(hits);
+                HandSlot slot = _input.GetHandSlot(hits);
                 if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
-                    mm.LocalP().hand.Rearrange(slot);
+                    _mm.LocalP().hand.Rearrange(slot);
                 return InputStatus.FullyHandled;
             }
             //}
@@ -525,17 +528,17 @@ public class InputController : MonoBehaviour {
         // doesn't need obj passed...
         public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
 
-            if (tooltip != null) {
-                mm.uiCont.tooltipMan.HideOrCancelTooltip();
-                tooltip = null;
+            if (_tooltip != null) {
+                _mm.uiCont.tooltipMan.HideOrCancelTooltip();
+                _tooltip = null;
             }
 
             MMLog.Log_InputCont("Standard mouse up");
 
             //Hex hex = (Hex)obj;
             //if (hex.currentState == Hex.State.Hand) {
-                if (input.holdingHex) {
-                    input.heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
+                if (_input._holdingHex) {
+                    _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
                     //Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     //RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
                     //CellBehav cb = input.GetMouseCell(hits); // get cell underneath
@@ -548,11 +551,11 @@ public class InputController : MonoBehaviour {
                     //            mm.PlayerDropTile(cb.col, input.heldHex);
                     //    }
                     if(status == InputStatus.Unhandled)
-                        mm.LocalP().hand.ReleaseTile(input.heldHex); //?
+                        _mm.LocalP().hand.ReleaseTile(_input._heldHex); //?
                     else
-                        mm.LocalP().hand.ClearPlaceholder();
+                        _mm.LocalP().hand.ClearPlaceholder();
 
-                    input.holdingHex = false;
+                    _input._holdingHex = false;
                     return InputStatus.FullyHandled;
                 }
         //}
@@ -560,64 +563,64 @@ public class InputController : MonoBehaviour {
         }
     }
 
-    private InputContext currentContext, standardContext;
-    private InputContext target_tile, target_cell, target_drag;
-    private InputContext selection, debugMenu, myTurn, block;
+    private InputContext _currentContext, _standardContext;
+    private InputContext _target_tile, _target_cell, _target_drag;
+    private InputContext _selection, _debugMenu, _myTurn, _block;
 
     void InitContexts() {
-        block = new InputContext(mm, this);
-        target_tile = new Target_TileContext(mm, this);
-        target_cell = new Target_CellContext(mm, this);
-        target_drag = new Target_DragContext(mm, this);
-        selection = new Target_SelectionContext(mm, this);
-        debugMenu = new DebugToolsContext(mm, this);
-        myTurn = new MyTurnContext(mm, this);
+        _block = new InputContext(_mm, this);
+        _target_tile = new Target_TileContext(_mm, this);
+        _target_cell = new Target_CellContext(_mm, this);
+        _target_drag = new Target_DragContext(_mm, this);
+        _selection = new Target_SelectionContext(_mm, this);
+        _debugMenu = new DebugToolsContext(_mm, this);
+        _myTurn = new MyTurnContext(_mm, this);
 
-        standardContext = new StandardContext(mm, this);
+        _standardContext = new StandardContext(_mm, this);
         MMLog.Log_InputCont("~~~~~~~~~~~~~~Contexts init!");
     }
 
     public void SetDebugInputMode(InputContext.ObjType type) {
-        debugMenu.type = type;
+        _debugMenu.type = type;
     }
 
     public void SwitchContext(MageMatch.State state) {
         MMLog.Log_InputCont("Switching context with state=" + state);
         switch (state) {
             case MageMatch.State.Targeting:
-                Targeting.TargetMode tMode = targeting.currentTMode;
+                Targeting.TargetMode tMode = _targeting.currentTMode;
                 if (tMode == Targeting.TargetMode.Drag)
-                    currentContext = target_drag;
+                    _currentContext = _target_drag;
                 else if (tMode == Targeting.TargetMode.Tile || tMode == Targeting.TargetMode.TileArea)
-                    currentContext = target_tile;
+                    _currentContext = _target_tile;
                 else
-                    currentContext = target_cell;
+                    _currentContext = _target_cell;
                 break;
 
             case MageMatch.State.Selecting:
-                currentContext = selection;
+                _currentContext = _selection;
                 break;
 
             case MageMatch.State.NewsfeedMenu:
-                currentContext = block;
+                _currentContext = _block;
                 break;
 
             case MageMatch.State.DebugMenu:
-                if (mm.IsDebugMode()) {
-                    currentContext = debugMenu;
-                    mm.debugTools.ValueChanged("insert");
+                if (_mm.IsDebugMode()) {
+                    _currentContext = _debugMenu;
+                    _mm.debugTools.ValueChanged("insert");
                 } else
-                    currentContext = block;
+                    _currentContext = _block;
                 break;
 
             case MageMatch.State.Normal:
                 // check for my turn?
                 MMLog.Log_InputCont("Normal context set.");
-                currentContext = myTurn;
+                _currentContext = _myTurn;
                 break;
 
             case MageMatch.State.TurnSwitching:
-                currentContext = block; // idk
+                _currentContext = _block; // idk
                 break;
         }
 
