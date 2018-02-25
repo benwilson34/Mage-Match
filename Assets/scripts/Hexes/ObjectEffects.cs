@@ -20,10 +20,10 @@ public class ObjectEffects {
 
     // -------------------------------------- SPELLS ------------------------------------------
 
-    public IEnumerator Deal496Dmg(TileSeq prereq) {
-        _mm.ActiveP().DealDamage(496);
-        yield return null;
-    }
+    //public IEnumerator Deal496Dmg(TileSeq prereq) {
+    //    _mm.ActiveP().DealDamage(496);
+    //    yield return null;
+    //}
 
     //public IEnumerator StoneTest(int id) {
     //    yield return targeting.WaitForCellTarget(1);
@@ -36,7 +36,7 @@ public class ObjectEffects {
     //    mm.DropTile(cb.col, stone);
     //}
 
-    public IEnumerator LightningPalm() {
+    public IEnumerator LightningPalm(int id) {
         yield return _targeting.WaitForTileTarget(1);
         List<TileBehav> tbs = _targeting.GetTargetTBs();
         if (tbs.Count != 1)
@@ -48,7 +48,7 @@ public class ObjectEffects {
             Tile tile = tileList[i].tile;
             if (tile.element.Equals(elem)) {
                 _hexMan.RemoveTile(tile, true);
-                _mm.ActiveP().DealDamage(15);
+                _mm.GetPC(id).DealDamage(15);
             }
         }
     }
@@ -76,7 +76,7 @@ public class ObjectEffects {
     }
     IEnumerator Ench_Cherrybomb_Remove(int id, TileBehav tb) {
         MMLog.Log_EnchantFx("Resolving Cherrybomb at " + tb.PrintCoord());
-        _mm.GetPlayer(id).DealDamage(200);
+        _mm.GetPC(id).DealDamage(200);
 
         List<TileBehav> tbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
         foreach (TileBehav ctb in tbs) {
@@ -103,11 +103,11 @@ public class ObjectEffects {
         MMLog.Log_EnchantFx("Burning TurnEffect at " + tb.PrintCoord());
         yield return _mm.animCont._Burning_Turn(_mm.GetOpponent(id), tb);
         _mm.audioCont.EnchantBurning( tb.GetComponent<AudioSource>() );
-        _mm.GetPlayer(id).DealDamage(3);
+        _mm.GetPC(id).DealDamage(3);
         //yield return null; // for now
     }
     IEnumerator Ench_Burning_End(int id, TileBehav tb) {
-        _mm.GetPlayer(id).DealDamage(6);
+        _mm.GetPC(id).DealDamage(6);
         yield return null; // for now
     }
 
@@ -184,8 +184,8 @@ public class ObjectEffects {
         if (selectTB.tile.element == Tile.Element.Muscle) {
             yield return _hexMan._RemoveTile(selectTB, true); // maybe?
 
-            _mm.GetPlayer(id).DealDamage(10);
-            _mm.GetPlayer(id).Heal(10);
+            _mm.GetPC(id).DealDamage(10);
+            _mm.GetPC(id).Heal(10);
         } else {
             yield return Ench_SetZombify(id, selectTB, true, false);
         }

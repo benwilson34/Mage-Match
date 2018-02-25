@@ -307,12 +307,13 @@ public class UIController : MonoBehaviour {
 
     IEnumerator UpdateHealthbar(Player p) {
         Transform pinfo = GetPinfo(p.id);
-        Image health = pinfo.Find("i_healthbar").GetComponent<Image>();
+        Image healthImg = pinfo.Find("i_healthbar").GetComponent<Image>();
         Text healthText = pinfo.Find("t_health").GetComponent<Text>();
 
-        TextNumTween(healthText, p.health);
+        int healthAmt = p.character.GetHealth();
+        TextNumTween(healthText, healthAmt);
 
-        float slideRatio = (float)p.health / p.character.GetMaxHealth();
+        float slideRatio = (float)healthAmt / p.character.GetMaxHealth();
 
         // TODO I have a feeling I can just Lerp this? lol
         // health bar coloring; green -> yellow -> red
@@ -321,8 +322,7 @@ public class UIController : MonoBehaviour {
         //float g = Mathf.Clamp(slideRatio, 0, thresh) / thresh;
         //healthbar.GetComponent<Image>().color = new Color(r, g, 0);
 
-        //yield return healthbar.DOScaleX(slideRatio, .8f).SetEase(Ease.OutCubic);
-        yield return health.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic).WaitForCompletion();
+        yield return healthImg.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic).WaitForCompletion();
     }
 
     IEnumerator UpdateMeterbar(Player p) {

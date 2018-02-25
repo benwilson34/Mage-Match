@@ -45,7 +45,7 @@ public class Gravekeeper : Character {
                 zombs = 3;
                 break;
         }
-        ThisPlayer().DealDamage(dmg);
+        DealDamage(dmg);
 
         if (seq.GetElementAt(0) == Tile.Element.Earth) // not safe if there are multi-color tiles
             zombs++;
@@ -90,7 +90,7 @@ public class Gravekeeper : Character {
 
         if (seq.GetElementAt(0) == Tile.Element.Muscle) // not safe if there are multi-color tiles
             dmg += 20;
-        _mm.ActiveP().DealDamage(dmg);
+        DealDamage(dmg);
 
         List<TileBehav> tbs = _targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
@@ -155,7 +155,7 @@ public class Gravekeeper : Character {
                 _hexMan.RemoveTile(col, nextTBrow, false);
             }
 
-            ThisPlayer().DealDamage(30);
+            DealDamage(30);
         }
         yield return null;
     }
@@ -218,12 +218,12 @@ public class Gravekeeper : Character {
         }
         MMLog.Log_Gravekeeper("DealAdjZombDmg has counted " + count + " adjacent zombs");
         if(count > 0)
-            _mm.ActiveP().DealDamage(count * 5);
+            DealDamage(count * 5);
     }
 
     // Tombstone
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        ThisPlayer().DealDamage(225);
+        DealDamage(225);
 
         yield return _targeting.WaitForCellTarget(1);
 

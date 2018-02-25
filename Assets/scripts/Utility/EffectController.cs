@@ -360,7 +360,7 @@ public class EffectController {
     private int healthResult_add = 0;
     private float healthResult_mult = 1;
 
-    public IEnumerator ResolveHealthEffects(int id, int dmg, bool dealing) {
+    public void ResolveHealthEffects(int id, int dmg, bool dealing) {
         HealthEffect he;
         healthResult_add = 0;
         healthResult_mult = 1;
@@ -385,7 +385,7 @@ public class EffectController {
             }
         }
 
-        yield return null;
+        //yield return null;
     }
 
     public int GetHEResult_Additive() { return healthResult_add; }

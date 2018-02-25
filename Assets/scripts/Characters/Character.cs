@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using MMDebug;
 
 public abstract class Character {
 
@@ -13,14 +14,16 @@ public abstract class Character {
     protected int _meter = 0;
 
     public static int HEALTH_WARNING_AMT = 150; // audio/visual warning at 150 hp
-    protected int _maxHealth;
-    protected ObjectEffects _objFX; // needed here?
+    protected int _healthMax;
+    protected int _health;
 
     protected static int DECK_BASIC_COUNT = 50; 
     protected int[] _basicDeck; // portions of 50 total
     protected Spell[] _spells;
+
     protected MageMatch _mm;
     protected HexManager _hexMan;
+    protected ObjectEffects _objFX; // needed here?
     protected int _playerId;
     protected List<string> _runes;
     //protected string genHexTag;
@@ -39,7 +42,8 @@ public abstract class Character {
 
         CharacterInfo info = CharacterInfo.GetCharacterInfoObj(ch);
         characterName = info.name;
-        _maxHealth = info.health;
+        _healthMax = info.health;
+        _health = _healthMax;
         SetDeckElements(info.deck);
         InitSpells(info);
     }
@@ -58,6 +62,66 @@ public abstract class Character {
 
     // override to init character with effect callbacks (for their passive, probably)
     public virtual void OnEffectContLoad() {}
+
+
+    // ----------  HEALTH  ----------
+
+    public int GetHealth() { return _health; }
+
+    public int GetMaxHealth() { return _healthMax; }
+
+    public void DealDamage(int amount) {
+        //int bonus = CalcBonus(); // TODO displaying the bonus amt in UI would be cool
+        _mm.effectCont.ResolveHealthEffects(_playerId, amount, true);
+        int bonus = _mm.effectCont.GetHEResult_Additive();
+        float mult = _mm.effectCont.GetHEResult_Mult();
+        int buffAmount = (int)((amount + bonus) * mult);
+        if (bonus != 0 || mult != 1)
+            MMLog.Log_Player("BUFF: bonus=" + bonus + ", mult=" + mult + "; amount changed from " + amount + " to " + buffAmount);
+        _mm.GetOpponent(_playerId).character.TakeDamage(buffAmount, true);
+    }
+
+    public void TakeDamage(int amount, bool dealt) {
+        if (amount <= 0) {
+            MMLog.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
+            return;
+        }
+        _mm.effectCont.ResolveHealthEffects(_playerId, amount, false); // buff/debuff
+        int bonus = _mm.effectCont.GetHEResult_Additive();
+        float mult = _mm.effectCont.GetHEResult_Mult();
+        int debuffAmount = (int)(amount * mult) + bonus;
+        if (bonus != 0 || mult != 1)
+            MMLog.Log_Player("DEBUFF: bonus=" + bonus + ", mult=" + mult + "; amount changed from " + amount + " to " + debuffAmount);
+        ChangeHealth(-debuffAmount, dealt);
+    }
+
+    public void SelfDamage(int amount) { TakeDamage(amount, false); }
+
+    public void Heal(int amount) {
+        ChangeHealth(amount, false);
+    }
+
+    void ChangeHealth(int amount, bool dealt) {
+        string str = ">>>>>";
+        Player p = ThisPlayer();
+        if (amount < 0) { // damage
+            if (dealt)
+                str += _mm.GetOpponent(_playerId).name + " dealt " + (-1 * amount) + " damage; ";
+            else
+                str += p.name + " took " + (-1 * amount) + " damage; ";
+        } else { // healing
+            str += p.name + " healed for " + amount + " health; ";
+        }
+        str += p.name + "'s health changed from " + _health + " to " + (_health + amount);
+        MMLog.Log("CHAR:", "green", str);
+
+        _health += amount;
+        _health = Mathf.Clamp(_health, 0, _healthMax); // clamp amount before event
+        _mm.eventCont.PlayerHealthChange(_playerId, amount, _health, dealt);
+
+        if (_health == 0)
+            _mm.EndTheGame();
+    }
 
 
     // ----------  METER  ----------
@@ -114,9 +178,6 @@ public abstract class Character {
         if (id == _playerId)
             ChangeMeter(5);
     }
-
-
-    public int GetMaxHealth() { return _maxHealth; }
 
     
     // ----------  SPELLS  ----------
@@ -198,6 +259,7 @@ public abstract class Character {
             return _runes[index]; // + "-" ?
         }
     }
+
 
     public Player ThisPlayer() {
         return _mm.GetPlayer(_playerId);

@@ -251,9 +251,9 @@ public class DebugTools : MonoBehaviour {
         int amt = int.Parse(_input.text);
         int pid = GetPlayerId();
         if (amt < 0)
-            _mm.GetOpponent(pid).DealDamage(-amt);
+            _mm.GetPC(pid).SelfDamage(amt);
         else
-            _mm.GetPlayer(pid).Heal(amt);
+            _mm.GetPC(pid).Heal(amt);
     }
 
     void ChangeMeterMode_OnClick() {

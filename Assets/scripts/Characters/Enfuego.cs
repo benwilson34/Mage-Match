@@ -34,7 +34,7 @@ public class Enfuego : Character {
 
     public IEnumerator Passive_Swap(int id, int c1, int r1, int c2, int r2) {
         if(_passive_swapsThisTurn > 0)
-            ThisPlayer().DealDamage(_passive_swapsThisTurn * 5);
+            DealDamage(_passive_swapsThisTurn * 5);
 
         _passive_swapsThisTurn++;
         MMLog.Log_Enfuego("Incrementing swaps to " + _passive_swapsThisTurn);
@@ -84,7 +84,7 @@ public class Enfuego : Character {
 
         if (seq.GetElementAt(0).Equals(Tile.Element.Fire)) // not safe for multi-element tiles
             dmg += 20;
-        ThisPlayer().DealDamage(dmg);
+        DealDamage(dmg);
 
         List<TileBehav> tbs = _mm.hexGrid.GetPlacedTiles(seq);
         for (int i = 0; i < tbs.Count; i++) {
@@ -130,7 +130,7 @@ public class Enfuego : Character {
             yield return new WaitForSeconds(.15f);
         }
 
-        ThisPlayer().DealDamage(dmg);
+        DealDamage(dmg);
     }
     public List<TileBehav> Inc_Filter(List<TileBehav> tbs) {
         List<TileBehav> filterTBs = new List<TileBehav>();
@@ -163,7 +163,7 @@ public class Enfuego : Character {
         List<TileBehav> tbs = _targeting.GetTargetTBs();
 
         foreach (TileBehav tb in tbs) {
-            _mm.ActiveP().DealDamage(70);
+            DealDamage(70);
 
             if (tb.tile.element.Equals(Tile.Element.Fire)) { // spread Burning to 4 nearby
                 List<TileBehav> ctbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);

@@ -583,6 +583,10 @@ public class MageMatch : MonoBehaviour {
         return GetPlayer(OpponentId(id));
     }
 
+    public Character GetPC(int id) { return GetPlayer(id).character; }
+
+    //public Character GetOpponentPC(int id) { return GetOpponent(id).character; }
+
     public int OpponentId(int id) {
         if (id == 1)
             return 2;

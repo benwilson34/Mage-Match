@@ -26,7 +26,7 @@ public class Valeria : Character {
     }
 
     public IEnumerator Passive_Swap(int id, int c1, int r1, int c2, int r2) {
-        ThisPlayer().Heal(7);
+        Heal(7);
         yield return null;
     }
 
@@ -58,7 +58,7 @@ public class Valeria : Character {
         if (seq.GetElementAt(0) == Tile.Element.Water) // not safe for multicolored tiles
             swaps++;
 
-        ThisPlayer().DealDamage(dmg);
+        DealDamage(dmg);
 
         MMLog.Log("Valeria", "magenta", "swaps="+swaps);
         for (int i = 0; i < swaps; i++) {
@@ -76,7 +76,7 @@ public class Valeria : Character {
         // deal 30-60 dmg
         yield return _mm.syncManager.SyncRand(_playerId, Random.Range(30, 61));
         int dmg = _mm.syncManager.GetRand();
-        ThisPlayer().DealDamage(dmg);
+        DealDamage(dmg);
 
         // get targets
         yield return _targeting.WaitForTileTarget(2);
@@ -116,7 +116,7 @@ public class Valeria : Character {
         // heal 15-25
         yield return _mm.syncManager.SyncRand(_playerId, Random.Range(15, 26));
         int healing = _mm.syncManager.GetRand();
-        ThisPlayer().Heal(healing);
+        Heal(healing);
 
         yield return null;
     }
@@ -157,7 +157,7 @@ public class Valeria : Character {
     }
     public IEnumerator Balanco_Drop(int id, bool playerAction, string tag, int col) {
         if (Hex.TagType(tag) == "W")
-            ThisPlayer().DealDamage(7);
+            DealDamage(7);
         yield return null;    
     }
     public IEnumerator Balanco_Swap(int id, int c1, int r1, int c2, int r2) {
@@ -170,7 +170,7 @@ public class Valeria : Character {
             dmg += 7;
 
         if (dmg > 0)
-            ThisPlayer().DealDamage(dmg);
+            DealDamage(dmg);
         yield return null;
     }
 
@@ -218,7 +218,7 @@ public class Valeria : Character {
 
                 yield return _mm.hexMan._RemoveSeq(seq, false);
 
-                ThisPlayer().DealDamage(dmg);
+                DealDamage(dmg);
                 yield return DropWaterIntoRandomCols(dropCount);
             }
 

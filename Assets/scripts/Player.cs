@@ -9,7 +9,6 @@ public class Player {
 
     public int id; // auto
     public string name; // auto
-    public int health; // private
     public int AP; // private w/ methods
     public Character character;
     public Hand hand;
@@ -38,7 +37,6 @@ public class Player {
         }
 
         character = Character.Load(_mm, id);
-        health = character.GetMaxHealth();
     }
 
     public void InitEvents() {
@@ -55,56 +53,6 @@ public class Player {
                 yield return DealTile();
         }
         yield return null;
-    }
-
-    public void DealDamage(int amount) {
-        //int bonus = CalcBonus(); // TODO displaying the bonus amt in UI would be cool
-        _mm.StartCoroutine(_mm.effectCont.ResolveHealthEffects(id, amount, true));
-        int bonus = _mm.effectCont.GetHEResult_Additive();
-        float mult = _mm.effectCont.GetHEResult_Mult();
-        int buffAmount = (int)(amount * mult) + bonus;
-        if (bonus != 0 || mult != 1)
-            MMLog.Log_Player("BUFF: bonus="+bonus+", mult="+mult+"; amount changed from "+amount+" to "+buffAmount);
-        _mm.GetOpponent(id).TakeDamage(buffAmount);
-    }
-
-    public void TakeDamage(int amount) {
-        if (amount <= 0) {
-            MMLog.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
-            return;
-        }
-        _mm.StartCoroutine(_mm.effectCont.ResolveHealthEffects(id, amount, false));
-        int bonus = _mm.effectCont.GetHEResult_Additive();
-        float mult = _mm.effectCont.GetHEResult_Mult();
-        int debuffAmount = (int)(amount * mult) + bonus;
-        if (bonus != 0 || mult != 1)
-            MMLog.Log_Player("DEBUFF: bonus=" + bonus + ", mult=" + mult + "; amount changed from " + amount + " to " + debuffAmount);
-        ChangeHealth(-debuffAmount, true);
-    }
-
-    public void Heal(int amount) {
-        ChangeHealth(amount, false);
-    }
-
-    void ChangeHealth(int amount, bool dealt) {
-        string str = ">>>>>";
-        if (amount < 0) { // damage
-            if (dealt)
-                str += _mm.GetOpponent(id).name + " dealt " + (-1 * amount) + " damage; ";
-            else
-                str += name + " took " + (-1 * amount) + " damage; ";
-        } else { // healing
-            str += name + " healed for " + amount + " health; ";
-        }
-        str += name + "'s health changed from " + health + " to " + (health + amount);
-        MMLog.Log_Player(str);
-
-        health += amount;
-        health = Mathf.Clamp(health, 0, character.GetMaxHealth()); // clamp amount before event
-        _mm.eventCont.PlayerHealthChange(id, amount, health, dealt);
-
-        if (health == 0)
-            _mm.EndTheGame();
     }
 
     public IEnumerator DealTile() {
