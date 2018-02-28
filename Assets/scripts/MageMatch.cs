@@ -462,6 +462,48 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
+    public void DropConsumable(Consumable cons) { StartCoroutine(_DropConsumable(cons)); }
+
+    IEnumerator _DropConsumable(Consumable cons) {
+        MMLog.Log_MageMatch("   ---------- DROP CONSUMABLE BEGIN ----------");
+        _actionsPerforming++;
+
+        _activep.hand.Remove(cons);
+
+        cons.Reveal();
+        // TODO animate? what should it look like when you use it?
+
+
+        // TODO eventCont begin
+        yield return cons.DropEffect();
+        // TODO eventCont end
+
+
+        hexMan.RemoveHex(cons);
+
+
+        //GameObject go = hex.gameObject;
+        //go.transform.SetParent(_tilesOnBoard);
+        //TileBehav tb = hex.GetComponent<TileBehav>();
+        //tb.SetPlaced();
+
+        //if (currentTurn == Turn.PlayerTurn) //kinda hacky
+        //    yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
+
+        //yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
+
+        //if (currentTurn == Turn.PlayerTurn) { //kinda hacky
+        //    yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
+        //} else if (currentTurn == Turn.CommishTurn)
+        //    eventCont.CommishDrop(tb.tile.element, col);
+
+        //syncManager.CheckHandContents(_activep.id);
+
+        MMLog.Log_MageMatch("   ---------- DROP CONSUMABLE END ----------");
+        _actionsPerforming--;
+        yield return null;
+    }
+
     public void PlayerSwapTiles(int c1, int r1, int c2, int r2) {
         StartCoroutine(_SwapTiles(true, c1, r1, c2, r2));
     }
@@ -506,18 +548,20 @@ public class MageMatch : MonoBehaviour {
             if (!targeting.selectionCanceled) {
                 uiCont.DeactivateAllSpellButtons(_activep.id); // ?
 
-                TileSeq seq = targeting.GetSelection();
+                TileSeq prereq = targeting.GetSelection();
                 //TileSeq seqCopy = seq.Copy(); //?
-                hexMan.SetInvokedSeq(seq);
+                hexMan.SetInvokedSeq(prereq);
 
-                yield return spell.Cast(seq);
+                yield return eventCont.SpellCast(EventController.Status.Begin, spell, prereq);
 
-                eventCont.SpellCast(spell);
+                yield return spell.Cast(prereq);
+
+                yield return eventCont.SpellCast(EventController.Status.End, spell, prereq);
 
                 StartCoroutine(uiCont.GetButtonCont(_activep.id, spellNum).Transition_MainView());
 
                 p.ApplySpellCosts(spell);
-                hexMan.RemoveInvokedSeq(seq);
+                hexMan.RemoveInvokedSeq(prereq);
                 yield return BoardChecking(); //?
             }
 

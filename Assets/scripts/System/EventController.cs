@@ -17,10 +17,11 @@ public class EventController {
         _swap = new List<EventPack>();
         _turnBegin = new List<EventPack>();
         _turnEnd = new List<EventPack>();
-        _match = new List<EventPack>();
+        //_match = new List<EventPack>();
         _drop = new List<EventPack>();
         _draw = new List<EventPack>();
         _discard = new List<EventPack>();
+        _spellCast = new List<EventPack>();
     }
 
     struct EventPack {
@@ -37,14 +38,16 @@ public class EventController {
                 return _turnBegin;
             case "turnEnd":
                 return _turnEnd;
-            case "match":
-                return _match;
+            //case "match":
+            //    return _match;
             case "draw":
                 return _draw;
             case "drop":
                 return _drop;
             case "discard":
                 return _discard;
+            case "spellCast":
+                return _spellCast;
             default:
                 MMLog.LogError("EVENTCONT: Bad type name!!");
                 return null;
@@ -202,33 +205,41 @@ public class EventController {
     }
     // TODO similar method to convert for removing (if it's ever needed...)
 
-    public delegate void SpellCastEvent(int id, Spell spell);
-    public event SpellCastEvent spellCast;
-    public void SpellCast(Spell spell) {
-        if (spellCast != null) {
-            spellCast.Invoke(_mm.ActiveP().id, spell);
+    public delegate IEnumerator SpellCastEvent(int id, Spell spell, TileSeq prereq);
+    private List<EventPack> _spellCast;
+    public IEnumerator SpellCast(Status status, Spell spell, TileSeq prereq) {
+        handlingEvents = true; // worth it?
+        foreach (EventPack pack in _spellCast) {
+            //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
+            if (pack.status == status)
+                yield return ((SpellCastEvent)pack.ev)(_mm.ActiveP().id, spell, prereq);
         }
+        MMLog.Log_EventCont("Just finished SWAP events...");
+        handlingEvents = false; // worth it?
+    }
+    public void AddSpellCastEvent(SpellCastEvent e, Type type, Status status) {
+        AddEvent("spellCast", e, type, status);
     }
     #endregion
 
 
-    public delegate IEnumerator MatchEvent(int id, string[] seqs);
-    private List<EventPack> _match;
-    public IEnumerator Match(string[] seqs) {
-        handlingEvents = true; // worth it?
-        foreach (EventPack pack in _match) {
-            //Debug.MMLog.Log_EventCont("EVENTCONT: Resolving matchEvent with p="+pack.priority);
-            yield return ((MatchEvent)pack.ev)(_mm.ActiveP().id, seqs); // OH YEAH
-        }
-        MMLog.Log_EventCont("Just finished MATCH events...");
-        handlingEvents = false; // worth it?
-    }
-    public void AddMatchEvent(MatchEvent ev, Type type) {
-        AddEvent("match", ev, type);
-    }
-    public void RemoveMatchEvent(MatchEvent ev) {
-        RemoveEvent("match", ev);
-    }
+    //public delegate IEnumerator MatchEvent(int id, string[] seqs);
+    //private List<EventPack> _match;
+    //public IEnumerator Match(string[] seqs) {
+    //    handlingEvents = true; // worth it?
+    //    foreach (EventPack pack in _match) {
+    //        //Debug.MMLog.Log_EventCont("EVENTCONT: Resolving matchEvent with p="+pack.priority);
+    //        yield return ((MatchEvent)pack.ev)(_mm.ActiveP().id, seqs); // OH YEAH
+    //    }
+    //    MMLog.Log_EventCont("Just finished MATCH events...");
+    //    handlingEvents = false; // worth it?
+    //}
+    //public void AddMatchEvent(MatchEvent ev, Type type) {
+    //    AddEvent("match", ev, type);
+    //}
+    //public void RemoveMatchEvent(MatchEvent ev) {
+    //    RemoveEvent("match", ev);
+    //}
 
     //public delegate void CascadeEvent(int id, int chain);
     //public event CascadeEvent cascade;

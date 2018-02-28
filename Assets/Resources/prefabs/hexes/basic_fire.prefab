@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 11409968}
   - component: {fileID: 8220240}
   m_Layer: 0
-  m_Name: tile_fire
+  m_Name: basic_fire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -139,13 +139,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
+  hextag: 
   initElement: 1
-  flipSprite: {fileID: 21300014, guid: 2b6ea0b184347d54c9567aa5402a8149, type: 3}
   ableSwap: 1
   ableMatch: 1
   ableGrav: 1
   ableDestroy: 1
+  ablePrereq: 1
   ableTarget: 1
+  wasInvoked: 0
 --- !u!212 &21279340
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -155,6 +157,7 @@ SpriteRenderer:
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
@@ -170,6 +173,7 @@ SpriteRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -186,6 +190,8 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

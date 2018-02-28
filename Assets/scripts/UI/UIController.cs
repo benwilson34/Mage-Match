@@ -59,9 +59,9 @@ public class UIController : MonoBehaviour {
         InitSprites();
         for (int id = 1; id <= 2; id++) {
             for (int i = 0; i < 5; i++) {
-                MMLog.Log_UICont("Init button " + i);
+                //MMLog.Log_UICont("Init button " + i);
                 var button = GetButtonCont(id, i);
-                MMLog.Log_UICont("mm = " + _mm.myID);
+                //MMLog.Log_UICont("mm = " + _mm.myID);
                 button.Init(_mm, id);
                 button.Deactivate();
                 if (id == _mm.myID) { // only make my buttons interactable for the match
@@ -112,7 +112,7 @@ public class UIController : MonoBehaviour {
         _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
         _mm.eventCont.gameAction += OnGameAction;
         _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.LastStep, EventController.Status.Begin);
-        _mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
+        //_mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
         _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
         _mm.eventCont.playerMeterChange += OnPlayerMeterChange;
     }
@@ -168,11 +168,11 @@ public class UIController : MonoBehaviour {
         yield return null;
     }
 
-    public IEnumerator OnMatch(int id, string[] seqs) {
-        if (seqs.Length > 1)
-            SendSlidingText("Wow, nice combo!");
-        yield return null;
-    }
+    //public IEnumerator OnMatch(int id, string[] seqs) {
+    //    if (seqs.Length > 1)
+    //        SendSlidingText("Wow, nice combo!");
+    //    yield return null;
+    //}
 
     public void OnCascade(int id, int chain) {
         UpdateMoveText("Wow, a cascade of " + chain + " matches!");

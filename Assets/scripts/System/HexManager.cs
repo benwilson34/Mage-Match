@@ -14,6 +14,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
     private GameObject _firePF, _waterPF, _earthPF, _airPF, _muscPF; // basic tile prefabs
     private GameObject _stonePF, _emberPF, _tombstonePF; // token prefabs
+    private GameObject _cons_sample;
 
     public HexManager(MageMatch mm) {
         this._mm = mm;
@@ -26,20 +27,20 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     }
 
     void LoadPrefabs() {
-        _firePF = Resources.Load("prefabs/tile_fire") as GameObject;
-        _waterPF = Resources.Load("prefabs/tile_water") as GameObject;
-        _earthPF = Resources.Load("prefabs/tile_earth") as GameObject;
-        _airPF = Resources.Load("prefabs/tile_air") as GameObject;
-        _muscPF = Resources.Load("prefabs/tile_muscle") as GameObject;
+        _firePF = Resources.Load("prefabs/hexes/basic_fire") as GameObject;
+        _waterPF = Resources.Load("prefabs/hexes/basic_water") as GameObject;
+        _earthPF = Resources.Load("prefabs/hexes/basic_earth") as GameObject;
+        _airPF = Resources.Load("prefabs/hexes/basic_air") as GameObject;
+        _muscPF = Resources.Load("prefabs/hexes/basic_muscle") as GameObject;
 
-        _stonePF = Resources.Load("prefabs/token_stone") as GameObject;
-        _emberPF = Resources.Load("prefabs/token_ember") as GameObject;
-        _tombstonePF = Resources.Load("prefabs/token_tombstone") as GameObject;
+        // TODO load only the tokens + consumables that either player will use??
+        _stonePF = Resources.Load("prefabs/hexes/token_stone") as GameObject;
+        _emberPF = Resources.Load("prefabs/hexes/token_ember") as GameObject;
+        _tombstonePF = Resources.Load("prefabs/hexes/token_tombstone") as GameObject;
+
+        _cons_sample = Resources.Load("prefabs/hexes/cons_sample") as GameObject;
 
         flipSprite = Resources.Load<Sprite>("sprites/hex-back");
-
-        //TODO consumables
-        // load only what could be used by either player??
     }
 
     string GenFullTag(int id, string cat, string type) {
@@ -57,14 +58,15 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     }
 
     public Hex GenerateRandomHex(Player p) {
-        string genTag = p.character.GenerateHexTag();
+        //string genTag = p.character.GenerateHexTag();
+        string genTag = p.deck.GetNextHextag();
         return GenerateHex(p.id, genTag);
     }
 
     //public HandObject GetRandomHex() { return genHex; }
 
     public Hex GenerateHex(int id, string genTag) {
-        MMLog.Log("TILEMAN", "black", "Generating tile from genTag \"" + genTag + "\"");
+        MMLog.Log("HEXMAN", "black", "Generating tile from genTag \"" + genTag + "\"");
         string type = Hex.TagType(genTag);
         switch (Hex.TagCat(genTag)) {
             case "B":
@@ -74,7 +76,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             case "C":
                 return GenerateConsumable(id, type);
             default:
-                MMLog.LogError("TILEMAN: Failed " + genTag + " with cat="+Hex.TagCat(genTag));
+                MMLog.LogError("HEXMAN: Failed " + genTag + " with cat="+Hex.TagCat(genTag));
                 return null;
         }
     }
@@ -110,7 +112,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
                 tag = "M";
                 break;
             default:
-                MMLog.LogError("TILEMAN: Tried to init a tile with elem None!");
+                MMLog.LogError("HEXMAN: Tried to init a tile with elem None!");
                 return null;
         }
 
@@ -135,7 +137,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
                 go = GameObject.Instantiate(_tombstonePF);
                 break;
             default:
-                MMLog.LogError("TILEMAN: Tried to init a token with bad name=" + name);
+                MMLog.LogError("HEXMAN: Tried to init a token with bad name=" + name);
                 return null;
         }
 
@@ -149,8 +151,11 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         GameObject go;
         string tag = "";
         switch (name) {
+            case "Sampl":
+                go = GameObject.Instantiate(_cons_sample);
+                break;
             default:
-                MMLog.LogError("TILEMAN: Tried to init a consumable with bad name=" + name);
+                MMLog.LogError("HEXMAN: Tried to init a consumable with bad name=" + name);
                 return null;
         }
 
@@ -220,12 +225,12 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         removing++;
 
         if (tb == null) {
-            MMLog.LogError("MAGEMATCH: RemoveTile tried to access a tile that's gone!");
+            MMLog.LogError("HEXMAN: RemoveTile tried to access a tile that's gone!");
             removing--;
             yield break;
         }
         if (!tb.ableDestroy) {
-            MMLog.LogWarning("MAGEMATCH: RemoveTile tried to remove an indestructable tile!");
+            MMLog.LogWarning("HEXMAN: RemoveTile tried to remove an indestructable tile!");
             removing--;
             yield break;
         }
@@ -244,9 +249,21 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             yield return _mm.animCont._InvokeTileRemove(tb); // just start it, don't yield?
         else
             yield return _mm.animCont._DestroyTile(tb); // just start it, don't yield?
-        GameObject.Destroy(tb.gameObject);
+
+        RemoveHex(tb);
+
         _mm.eventCont.TileRemove(tb); //? not needed for checking but idk
 
         removing--;
+    }
+
+    public void RemoveHex(Hex hex) {
+        string hextag = hex.hextag;
+        GameObject.Destroy(hex.gameObject);
+
+        // add to appropriate player's discard list
+        int id = Hex.TagPlayer(hextag);
+        MMLog.Log("HEXMAN", "orange", "Removing "+hextag+" and adding it to their remove list.");
+        _mm.GetPlayer(id).deck.AddHextagToRemoveList(hextag);
     }
 }

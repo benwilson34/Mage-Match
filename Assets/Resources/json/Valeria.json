@@ -2,11 +2,15 @@
   "name": "Valéria",
   "keyElements": "W",
   "health": 1000,
-  "deck": [ 0, 25, 10, 0, 15 ],
+  "deck": [ 0, 12, 6, 0, 7 ],
   "passive": {
     "title": "Flow",
     "desc": "Valéria heals for 7 health every time she performs a swap."
   },
+
+  "runes": [
+    "sampl"
+  ],
 
   "core": {
     "title": "Whirlpool Spin",

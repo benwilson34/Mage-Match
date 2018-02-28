@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System;
@@ -16,7 +17,7 @@ public class Stats {
     private class PlayerStat {
         public string name;
         public string character;
-        public int draws, drops, swaps, matches, match3s, match4s, match5s, tilesRemoved, spellsCast, timeouts, discards;
+        public int draws, drops, swaps, matches, tilesRemoved, spellsCast, timeouts, discards;
         public int dmgDealt, dmgTaken, healingDone;
     }
 
@@ -39,15 +40,15 @@ public class Stats {
         _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
         _mm.eventCont.timeout += OnTimeout;
         _mm.eventCont.commishDrop += OnCommishDrop;
-        _mm.eventCont.commishMatch += OnCommishMatch;
+        //_mm.eventCont.commishMatch += OnCommishMatch;
 
         _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.End);
         _mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.End);
         _mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.End);
-        _mm.eventCont.spellCast += OnSpellCast;
-        _mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
+        _mm.eventCont.AddSpellCastEvent(OnSpellCast, EventController.Type.Stats, EventController.Status.Begin);
+        //_mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
-        _mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
+        //_mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
         //mm.eventCont.cascade += OnCascade;
         _mm.eventCont.tileRemove += OnTileRemove;
         _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
@@ -57,8 +58,6 @@ public class Stats {
         _report = new StringBuilder();
         _report.Append(_ps1.name + " (" + _ps1.character + ") vs ");
         _report.AppendLine(_ps2.name + " (" + _ps2.character + ")");
-        int rand = UnityEngine.Random.state.GetHashCode(); //?
-        _report.AppendLine("random seed - " + rand);
         _report.AppendLine("...setup - deal p1 4, deal p2 4"); //?
         _report.AppendLine("T1 - ");
     }
@@ -98,31 +97,31 @@ public class Stats {
         _report.AppendLine("C-drop " + Tile.ElementToChar(elem) + " col" + col);
     }
 
-    public void OnCommishMatch(string[] seqs) {
-        _commishMatches += seqs.Length;
-        _report.AppendLine("...Commish made "+seqs.Length+" match(es)");
-    }
+    //public void OnCommishMatch(string[] seqs) {
+    //    _commishMatches += seqs.Length;
+    //    _report.AppendLine("...Commish made "+seqs.Length+" match(es)");
+    //}
 
     #region GameAction subscriptions
     // TODO for all, different report lines for playerAction or not...
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
-        if(dealt)
-            Report("Deal p" + id + " " + tag);
+        if (dealt)
+            Report("p" + id + " DEAL " + tag);
         else
-            Report("Draw " + tag);
+            Report("p" + id + " DRAW " + tag);
         GetPS(id).draws++;
         yield return null;
     }
 
-    public IEnumerator OnDiscard(int id, string tag) {
-        Report("p" + id + " discards " + tag);
-        GetPS(id).discards++;
-        yield return null;
-    }
+    //public IEnumerator OnDiscard(int id, string tag) {
+    //    Report("p" + id + " DISCARD " + tag);
+    //    GetPS(id).discards++;
+    //    yield return null;
+    //}
 
     public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
         if (playerAction) {
-            Report("Drop " + tag + " col" + col);
+            Report("p" + id + " DROP " + tag + " col" + col);
             GetPS(id).drops++;
         } else if (_mm.uiCont.IsDebugMenuOpen()) //?
             Report("menu Drop col" + col);
@@ -131,7 +130,7 @@ public class Stats {
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         if (!_mm.uiCont.IsDebugMenuOpen()) { //?
-            Report("Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
+            Report("p" + id + " SWAP (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
             if(playerAction)
                 GetPS(id).swaps++;
         } else
@@ -139,25 +138,44 @@ public class Stats {
         yield return null;
     }
 
-    public void OnSpellCast(int id, Spell spell) {
-        Report("Spell " + spell.name);
+    public IEnumerator OnSpellCast(int id, Spell spell, TileSeq prereq) {
+        Report("p" + id + " CAST spell" + spell.index + " " + spell.name);
+        Report("...invoked " + prereq.SeqAsString());
         GetPS(id).spellsCast++;
+        yield return null;
     }
     #endregion
 
-    public IEnumerator OnMatch(int id, string[] seqs) {
-        _report.AppendLine("...made " + seqs.Length + " match(es)");
-        GetPS(id).matches += seqs.Length;
-        foreach (string seq in seqs) {
-            int len = seq.Length;
-            if (len == 3)
-                GetPS(id).match3s++;
-            else if(len == 4)
-                GetPS(id).match4s++;
-            else
-                GetPS(id).match5s++;
-        }
-        yield return null;
+    //public IEnumerator OnMatch(int id, string[] seqs) {
+    //    _report.AppendLine("...made " + seqs.Length + " match(es)");
+    //    GetPS(id).matches += seqs.Length;
+    //    foreach (string seq in seqs) {
+    //        int len = seq.Length;
+    //        if (len == 3)
+    //            GetPS(id).match3s++;
+    //        else if(len == 4)
+    //            GetPS(id).match4s++;
+    //        else
+    //            GetPS(id).match5s++;
+    //    }
+    //    yield return null;
+    //}
+
+
+    public void OnSyncRand(int rand) {
+        
+    }
+
+    public void OnTileTarget(TileBehav tb) {
+        Report("...targeted " + tb.PrintCoord() + " " + tb.hextag);
+    }
+
+    public void OnTileAreaTarget(TileBehav tb) {
+        
+    }
+
+    public void OnDragTarget(List<TileBehav> tbs) {
+        
     }
 
     public void OnTileRemove(int id, TileBehav tb) {
@@ -228,9 +246,9 @@ public class Stats {
             sb.AppendLine("Tiles drawn," + ps.draws);
             sb.AppendLine("Tiles dropped," + ps.drops);
             sb.AppendLine("Tiles swapped," + ps.swaps);
-            sb.AppendLine("Matches," + ps.matches + ",...match-3s," + ps.match3s);
-            sb.AppendLine(",,...match-4s," + ps.match4s);
-            sb.AppendLine(",,...match-5s," + ps.match5s);
+            //sb.AppendLine("Matches," + ps.matches + ",...match-3s," + ps.match3s);
+            //sb.AppendLine(",,...match-4s," + ps.match4s);
+            //sb.AppendLine(",,...match-5s," + ps.match5s);
             sb.AppendLine("Tiles removed," + ps.tilesRemoved);
             sb.AppendLine("Spells cast," + ps.spellsCast);
             sb.AppendLine("Turns timed out," + ps.timeouts).AppendLine("");

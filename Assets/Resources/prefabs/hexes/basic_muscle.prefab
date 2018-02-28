@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 11451994}
   - component: {fileID: 8279886}
   m_Layer: 0
-  m_Name: tile_muscle
+  m_Name: basic_muscle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  tag: 
+  hextag: 
   initElement: 5
   ableSwap: 1
   ableMatch: 1
@@ -147,6 +147,7 @@ MonoBehaviour:
   ableDestroy: 1
   ablePrereq: 1
   ableTarget: 1
+  wasInvoked: 0
 --- !u!212 &21200530
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -156,6 +157,7 @@ SpriteRenderer:
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
@@ -171,6 +173,7 @@ SpriteRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -187,6 +190,8 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

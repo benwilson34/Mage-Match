@@ -17,7 +17,7 @@ public abstract class Character {
     protected int _healthMax;
     protected int _health;
 
-    protected static int DECK_BASIC_COUNT = 50; 
+     
     protected int[] _basicDeck; // portions of 50 total
     protected Spell[] _spells;
 
@@ -44,7 +44,7 @@ public abstract class Character {
         characterName = info.name;
         _healthMax = info.health;
         _health = _healthMax;
-        SetDeckElements(info.deck);
+        //SetDeckElements(info.deck);
         InitSpells(info);
     }
 
@@ -52,7 +52,7 @@ public abstract class Character {
         _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Player, EventController.Status.Begin);
         _mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Player, EventController.Status.Begin);
         _mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Player, EventController.Status.Begin);
-        _mm.eventCont.spellCast += OnSpellCast;
+        _mm.eventCont.AddSpellCastEvent(OnSpellCast, EventController.Type.Player, EventController.Status.Begin);
         _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
         _mm.eventCont.tileRemove += OnTileRemove;
     }
@@ -157,13 +157,14 @@ public abstract class Character {
         yield return null;
     }
 
-    public void OnSpellCast(int id, Spell spell) {
+    public IEnumerator OnSpellCast(int id, Spell spell, TileSeq prereq) {
         if (id == _playerId) {
             if (spell is SignatureSpell)
                 playedFullMeterSound = false;
             else
                 ChangeMeter(10);    
         }
+        yield return null;
     }
 
     public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
@@ -229,36 +230,36 @@ public abstract class Character {
     
     // ----------  DECK  ----------
 
-    protected void SetDeckElements(int[] fweam) {
-        _basicDeck = fweam;
-    }
+    //protected void SetDeckElements(int[] fweam) {
+    //    _basicDeck = fweam;
+    //}
 
-    // eventually we will need to generate a deck so this won't be needed.
-    public Tile.Element GetDeckBasicTile() {
-        int rand = Random.Range(0, DECK_BASIC_COUNT);
+    //// eventually we will need to generate a deck so this won't be needed.
+    //public Tile.Element GetDeckBasicTile() {
+    //    int rand = Random.Range(0, DECK_BASIC_COUNT);
 
-        for (int e = 1; e <= 5; e++) {
-            int threshold = 0;
-            for (int i = 0; i < e; i++)
-                threshold += _basicDeck[i];
-            if (rand < threshold)
-                return (Tile.Element)e;
-        }
-        MMDebug.MMLog.LogError("CHARACTER: Generating a tile from the deck didn't work?");
-        return Tile.Element.None;
-    }
+    //    for (int e = 1; e <= 5; e++) {
+    //        int threshold = 0;
+    //        for (int i = 0; i < e; i++)
+    //            threshold += _basicDeck[i];
+    //        if (rand < threshold)
+    //            return (Tile.Element)e;
+    //    }
+    //    MMDebug.MMLog.LogError("CHARACTER: Generating a tile from the deck didn't work?");
+    //    return Tile.Element.None;
+    //}
 
-    public string GenerateHexTag() {
-        int total = 50 + (_runes.Count * 10);
-        int rand = Random.Range(0, total);
+    //public string GenerateHexTag() {
+    //    int total = 50 + (_runes.Count * 10);
+    //    int rand = Random.Range(0, total);
 
-        if (rand < 50)
-            return "p" + _playerId + "-B-" + GetDeckBasicTile().ToString().Substring(0, 1); // + "-" ?
-        else {
-            int index = Mathf.CeilToInt((rand - 50) / 10f); 
-            return _runes[index]; // + "-" ?
-        }
-    }
+    //    if (rand < 50)
+    //        return "p" + _playerId + "-B-" + GetDeckBasicTile().ToString().Substring(0, 1); // + "-" ?
+    //    else {
+    //        int index = Mathf.CeilToInt((rand - 50) / 10f); 
+    //        return _runes[index]; // + "-" ?
+    //    }
+    //}
 
 
     public Player ThisPlayer() {

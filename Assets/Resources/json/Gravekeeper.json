@@ -1,55 +1,59 @@
 {
-    "name": "The Gravekeeper",
-    "keyElements": "ME",
-    "health": 1200,
-    "deck": [ 0, 10, 20, 0, 20 ],
-    "passive": {
-      "title": "Zombie Lord",
-      "desc": "Each of The Gravekeeper's Zombies can Attack a random adjacent non-Zombie tile. When Zombies Attack another tile they Zombify their victim. If their victim is a muscle tile, they will destroy it instead, healing The Gravekeeper for 15 health and dealing 15 damage to the opponent."
-    },
+  "name": "The Gravekeeper",
+  "keyElements": "ME",
+  "health": 1200,
+  "deck": [ 0, 5, 10, 0, 10 ],
+  "passive": {
+    "title": "Zombie Lord",
+    "desc": "Each of The Gravekeeper's Zombies can Attack a random adjacent non-Zombie tile. When Zombies Attack another tile they Zombify their victim. If their victim is a muscle tile, they will destroy it instead, healing The Gravekeeper for 15 health and dealing 15 damage to the opponent."
+  },
 
-    "core": {
-      "title": "Business in the Front",
-      "cost": 1,
-      "cooldown": 0,
-      "type": "none",
-      "desc": "Deal 10/30/60 damage and Zombify 1/2/3 random tiles on the board. Zombify 1 extra random tile when consuming an earth match. Switch to Party in the Back."
-    },
-    "spell1": {
-      "title": "The Oogie Boogie",
-      "prereq": "ME",
-      "cost": 1,
-      "type": "Tile Target",
-      "desc": "Distance swap any 2 Zombie tiles, then those Zombies attack."
-    },
-    "spell2": {
-      "title": "Party Crashers",
-      "prereq": "MWE",
-      "cost": 1,
-      "type": "Drop Prompt",
-      "desc": "Drop 2 tiles into the board. Each tile dropped deals 30 damage to the opponent and destroys the tile directly below it as it enters the board. Additionally, both enter the board as Zombie tiles."
-    },
-    "spell3": {
-      "title": "Undead Union",
-      "prereq": "WEM",
-      "cost": 1,
-      "type": "none",
-      "desc": "All Zombies deal 5 damage for each adjacent Zombie."
-    },
-    "signature": {
-      "title": "Tombstone",
-      "prereq": "EMEE",
-      "cost": 1,
-      "meterCost": 1000,
-      "type": "Cell Target",
-      "desc": "Drop a Tombstone into target column, dealing 225 damage and destroying all tiles in that column on the way down. At the end of each turn, the Tombstone will spawn one Zombie earth or muscle tile directly above itself. The Tombstone cannot be moved from its place, is indestructible, and lasts 5 turns."
-    },
+  "runes": [
+    
+  ],
 
-    "altSpell": {
-      "title": "Party in the Back",
-      "cost": 1,
-      "cooldown": 0,
-      "type": "Area Target",
-      "desc": "Deal 20/50/90 damage. All Zombies in a 1x1/2x2/3x3 area Attack. Deal 20 extra damage when consuming a muscle match. Switch to Business in the Front."
-    }
+  "core": {
+    "title": "Business in the Front",
+    "cost": 1,
+    "cooldown": 0,
+    "type": "none",
+    "desc": "Deal 10/30/60 damage and Zombify 1/2/3 random tiles on the board. Zombify 1 extra random tile when consuming an earth match. Switch to Party in the Back."
+  },
+  "spell1": {
+    "title": "The Oogie Boogie",
+    "prereq": "ME",
+    "cost": 1,
+    "type": "Tile Target",
+    "desc": "Distance swap any 2 Zombie tiles, then those Zombies attack."
+  },
+  "spell2": {
+    "title": "Party Crashers",
+    "prereq": "MWE",
+    "cost": 1,
+    "type": "Drop Prompt",
+    "desc": "Drop 2 tiles into the board. Each tile dropped deals 30 damage to the opponent and destroys the tile directly below it as it enters the board. Additionally, both enter the board as Zombie tiles."
+  },
+  "spell3": {
+    "title": "Undead Union",
+    "prereq": "WEM",
+    "cost": 1,
+    "type": "none",
+    "desc": "All Zombies deal 5 damage for each adjacent Zombie."
+  },
+  "signature": {
+    "title": "Tombstone",
+    "prereq": "EMEE",
+    "cost": 1,
+    "meterCost": 1000,
+    "type": "Cell Target",
+    "desc": "Drop a Tombstone into target column, dealing 225 damage and destroying all tiles in that column on the way down. At the end of each turn, the Tombstone will spawn one Zombie earth or muscle tile directly above itself. The Tombstone cannot be moved from its place, is indestructible, and lasts 5 turns."
+  },
+
+  "altSpell": {
+    "title": "Party in the Back",
+    "cost": 1,
+    "cooldown": 0,
+    "type": "Area Target",
+    "desc": "Deal 20/50/90 damage. All Zombies in a 1x1/2x2/3x3 area Attack. Deal 20 extra damage when consuming a muscle match. Switch to Business in the Front."
   }
+}

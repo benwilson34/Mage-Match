@@ -2,11 +2,15 @@
   "name": "Enfuego Martín",
   "keyElements": "F",
   "health": 1100,
-  "deck": [ 20, 0, 0, 15, 15 ],
+  "deck": [ 10, 0, 0, 7, 8 ],
   "passive": {
     "title": "Burning Rhythm",
     "desc": "Each swap Enfuego makes deals 4 damage for each swap he has made so far this turn."
   },
+
+  "runes": [
+    
+  ],
 
   "core": {
     "title": "Fiery Fandango",

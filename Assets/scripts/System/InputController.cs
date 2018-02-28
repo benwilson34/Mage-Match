@@ -443,7 +443,10 @@ public class InputController : MonoBehaviour {
                     CellBehav cb = _input.GetMouseCell(hits); // get cell underneath
 
                     if ((!_mm.IsPerformingAction() || _input.PromptedDrop()) && cb != null) {
-                        if (_input.DropCheck(cb.col)) {
+                        if (Hex.TagCat(_input._heldHex.hextag) == "C") { // if it's a Consumable
+                            _mm.DropConsumable((Consumable)_input._heldHex);
+                            return InputStatus.PartiallyHandled;
+                        } else if (_input.DropCheck(cb.col)) {
                             if (_input.PromptedDrop())
                                 _mm.prompt.SetDrop(cb.col, (TileBehav)_input._heldHex);
                             else

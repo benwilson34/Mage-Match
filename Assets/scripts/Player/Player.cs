@@ -12,19 +12,20 @@ public class Player {
     public int AP; // private w/ methods
     public Character character;
     public Hand hand;
+    public Deck deck;
 
     private const int INIT_AP = 4;
 
     private MageMatch _mm;
     //private MatchEffect _matchEffect;
 
-    public Player(int playerNum) {
+    public Player(int playerId) {
         AP = 0;
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
-        id = playerNum;
+        id = playerId;
         hand = new Hand(_mm, this);
 
-        switch (playerNum) {
+        switch (playerId) {
             case 1:
                 name = _mm.gameSettings.p1name;
                 break;
@@ -37,6 +38,7 @@ public class Player {
         }
 
         character = Character.Load(_mm, id);
+        deck = new Deck(this);
     }
 
     public void InitEvents() {
