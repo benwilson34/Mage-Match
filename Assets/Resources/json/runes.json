@@ -2,7 +2,7 @@
   "sampl": {
     "title": "Sample Consumable",
     "type": "Consumable",
-    "deckCount": 5,
+    "deckCount": 2,
     "desc": "This consumable is fxkin wild boi"
   }
 }

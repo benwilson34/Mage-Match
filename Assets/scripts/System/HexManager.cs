@@ -89,27 +89,27 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     // maybe return TB?
     public Hex GenerateTile(int id, Tile.Element element, Vector3 position) {
         GameObject go;
-        string tag;
+        string type;
         switch (element) {
             case Tile.Element.Fire:
                 go = GameObject.Instantiate(_firePF, position, Quaternion.identity);
-                tag = "F";
+                type = "F";
                 break;
             case Tile.Element.Water:
                 go = GameObject.Instantiate(_waterPF, position, Quaternion.identity);
-                tag = "W";
+                type = "W";
                 break;
             case Tile.Element.Earth:
                 go = GameObject.Instantiate(_earthPF, position, Quaternion.identity);
-                tag = "E";
+                type = "E";
                 break;
             case Tile.Element.Air:
                 go = GameObject.Instantiate(_airPF, position, Quaternion.identity);
-                tag = "A";
+                type = "A";
                 break;
             case Tile.Element.Muscle:
                 go = GameObject.Instantiate(_muscPF, position, Quaternion.identity);
-                tag = "M";
+                type = "M";
                 break;
             default:
                 MMLog.LogError("HEXMAN: Tried to init a tile with elem None!");
@@ -117,7 +117,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
 
         TileBehav tb = go.GetComponent<TileBehav>();
-        tb.hextag = GenFullTag(id, "B", tag); // B for Basic tile
+        tb.hextag = GenFullTag(id, "B", type); // B for Basic tile
         tb.gameObject.name = tb.hextag;
         return tb;
     }
@@ -125,16 +125,19 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     // maybe return TB?
     public Hex GenerateToken(int id, string name) {
         GameObject go;
-        string tag = "";
+        string type = "";
         switch (name) {
             case "stone":
                 go = GameObject.Instantiate(_stonePF);
+                type = "Stone";
                 break;
             case "ember":
                 go = GameObject.Instantiate(_emberPF);
+                type = "Ember";
                 break;
             case "tombstone":
                 go = GameObject.Instantiate(_tombstonePF);
+                type = "Tombstone";
                 break;
             default:
                 MMLog.LogError("HEXMAN: Tried to init a token with bad name=" + name);
@@ -142,17 +145,19 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
 
         TileBehav tb = go.GetComponent<TileBehav>();
-        tb.hextag = GenFullTag(id, "T", tag); // T for Token
+        tb.hextag = GenFullTag(id, "T", type); // T for Token
         tb.gameObject.name = tb.hextag;
         return tb;
     }
 
     public Hex GenerateConsumable(int id, string name) {
         GameObject go;
-        string tag = "";
+        string type = "";
+        // TODO type should maybe come from the JSON? Or from the Consumable component itself?
         switch (name) {
             case "Sampl":
                 go = GameObject.Instantiate(_cons_sample);
+                type = "Sampl";
                 break;
             default:
                 MMLog.LogError("HEXMAN: Tried to init a consumable with bad name=" + name);
@@ -160,7 +165,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
 
         Hex hex = go.GetComponent<Hex>();
-        hex.hextag = GenFullTag(id, "C", tag); // C for consumable
+        hex.hextag = GenFullTag(id, "C", type); // C for consumable
         hex.gameObject.name = hex.hextag;
         return hex;
     }

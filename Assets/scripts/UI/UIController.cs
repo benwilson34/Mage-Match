@@ -23,7 +23,8 @@ public class UIController : MonoBehaviour {
     private GameObject _debugReport;
     private Text _debugReportText;
 
-    private ButtonController _localDrawButton;
+    private ButtonController _drawButton;
+    private Text _tDeckCount, _tRemovedCount;
     private MageMatch _mm;
     private Transform _leftPinfo, _rightPinfo, _leftPspells, _rightPspells, _board;
     private GameObject _spellOutlineEnd, _spellOutlineMid;
@@ -69,10 +70,12 @@ public class UIController : MonoBehaviour {
                 }
             }
         }
-        _localDrawButton = GameObject.Find("b_draw").GetComponent<ButtonController>();
-        _localDrawButton.Init(_mm, _mm.myID);
+        Transform drawT = GameObject.Find("b_draw").transform;
+        _drawButton = drawT.GetComponent<ButtonController>();
+        _drawButton.Init(_mm, _mm.myID);
+        _tDeckCount = drawT.Find("t_deckCount").GetComponent<Text>();
+        _tRemovedCount = drawT.Find("t_removedCount").GetComponent<Text>();
         GameObject.Find("b_saveFiles").GetComponent<ButtonController>().Init(_mm, _mm.myID); // id not needed here
-
 
         // menus
         _menus = GameObject.Find("Menus");
@@ -516,10 +519,18 @@ public class UIController : MonoBehaviour {
     public void SetDrawButton(bool interactable) {
         if (_mm.MyTurn()) {
             if (interactable)
-                _localDrawButton.Activate();
+                _drawButton.Activate();
             else
-                _localDrawButton.Deactivate();
+                _drawButton.Deactivate();
         }
+    }
+
+    public void UpdateDeckCount(int count) {
+        _tDeckCount.text = count + "";
+    }
+
+    public void UpdateRemovedCount(int count) {
+        _tRemovedCount.text = count + "";
     }
 
     public Transform GetPspells(int id) {

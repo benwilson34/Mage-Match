@@ -38,7 +38,7 @@ public class Player {
         }
 
         character = Character.Load(_mm, id);
-        deck = new Deck(this);
+        deck = new Deck(_mm, this);
     }
 
     public void InitEvents() {

@@ -6,11 +6,13 @@ public class Deck {
 
     private static int DECK_BASIC_COUNT = 50;
 
+    private MageMatch _mm;
     private Player _player;
     private Queue<string> _deckQ;
     private List<string> _removeList;
 
-    public Deck(Player p) {
+    public Deck(MageMatch mm, Player p) {
+        _mm = mm;
         _player = p;
         _removeList = new List<string>();
         Init();
@@ -40,13 +42,22 @@ public class Deck {
         PrintDeck();
     }
 
-    void Shuffle(string[] coll = null) {
-        if (coll == null)
-            coll = _removeList.ToArray();
-
+    void Shuffle(string[] coll) {
+        Debug.Log("DECK: Shuffling " + coll.Length + " hexes...");
         // Knuth shuffle algorithm, courtesy of Wikipedia :)
+
+        // TODO make this an IEnumerator...other methods have to handle that too...
+        //var randList = new List<int>();
+        //for (int t = 0; t < coll.Length; t++) {
+        //    randList.Add(Random.Range(t, coll.Length));
+        //}
+        //yield return _mm.syncManager.SyncRands(_player.id, randList.ToArray());
+        //var rands = _mm.syncManager.GetRands(randList.Count);
+
         for (int t = 0; t < coll.Length; t++) {
             string tmp = coll[t];
+            // TODO use rands
+            // int r = rands[t];
             int r = Random.Range(t, coll.Length);
             coll[t] = coll[r];
             coll[r] = tmp;
@@ -58,21 +69,37 @@ public class Deck {
     void PrintDeck() {
         string s = "[";
         foreach (string hextag in _deckQ.ToArray()) {
-            s += hextag.Substring(5, hextag.Length - 5) + ", ";
+            s += Hex.TagType(hextag) + ", ";
         }
-        s = s.Substring(0, s.Length - 2) + "]";
+        if (_deckQ.Count > 0)
+            s = s.Substring(0, s.Length - 2);
+        s += "]";
 
         Debug.Log("DECK: " + s);
     }
 
+    public int GetDeckCount() { return _deckQ.Count; }
+
     public string GetNextHextag() {
+        if (_deckQ.Count == 0) {
+            Shuffle(_removeList.ToArray());
+            _removeList.Clear();
+            _mm.uiCont.UpdateRemovedCount(0);
+        }
+
         Debug.Log("DECK: Next hex is " + _deckQ.Peek());
         string nextHex = _deckQ.Dequeue();
+
+        _mm.uiCont.UpdateDeckCount(_deckQ.Count);
+
         PrintDeck();
         return nextHex; // + "-" ?
     }
 
     public void AddHextagToRemoveList(string hextag) {
         _removeList.Add(hextag);
+        _mm.uiCont.UpdateRemovedCount(_removeList.Count);
     }
+
+    public int GetRemoveListCount() { return _removeList.Count; }
 }

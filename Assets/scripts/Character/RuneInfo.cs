@@ -57,6 +57,7 @@ public class RuneInfo {
         //MMDebug.MMLog.Log("RuneInfo", "black", "json for "+rune+": " + json);
 
         RuneInfo info = new RuneInfo();
+        
         // I feel like this isn't the proper way to do this
         JsonConvert.PopulateObject(o[rune].ToString(), info);
 
