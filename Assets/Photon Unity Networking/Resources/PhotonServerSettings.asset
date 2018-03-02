@@ -81,4 +81,5 @@ MonoBehaviour:
   - OpponentCharacterChosen
   - OpponentLocked
   - SyncSettings
+  - HandleSyncRandomSeed
   DisableAutoOpenWizard: 1

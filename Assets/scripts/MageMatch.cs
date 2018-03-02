@@ -95,6 +95,7 @@ public class MageMatch : MonoBehaviour {
 
         syncManager = GetComponent<SyncManager>();
         syncManager.Init();
+        yield return syncManager.SyncRandomSeed(Random.Range(0, 255));
 
         hexGrid = new HexGrid();
         hexMan = new HexManager(this);
@@ -126,12 +127,13 @@ public class MageMatch : MonoBehaviour {
 
         // TODO animate beginning of game
         for (int i = 0; i < 4; i++) {
-            yield return LocalP().DealTile();
-            yield return new WaitForSeconds(.25f);
+            for (int p = 1; p <= 2; p++) {
+                yield return GetPlayer(p).DealTile();
+                yield return new WaitForSeconds(.1f);
+            }
         }
 
-        if (MyTurn())
-            yield return _activep.DealTile();
+        yield return _activep.DealTile();
 
         stats = new Stats(_p1, _p2);
 
@@ -394,7 +396,7 @@ public class MageMatch : MonoBehaviour {
 
     #region ----- Game Actions -----
 
-    public void PlayerDrawTile() {
+    public void PlayerDrawHex() {
         StartCoroutine(_Draw(_activep.id, "", true));
     }
     
@@ -434,26 +436,39 @@ public class MageMatch : MonoBehaviour {
         StartCoroutine(_Drop(false, col, hex));
     }
 
+    public void PlayerDropConsumable(Consumable cons) {
+        _activep.hand.Remove(cons);
+        StartCoroutine(_Drop(true, -1, cons));
+    }
+
     public IEnumerator _Drop(bool playerAction, int col, Hex hex) {
         MMLog.Log_MageMatch("   ---------- DROP BEGIN ----------");
         _actionsPerforming++;
 
         hex.Reveal();
 
-        GameObject go = hex.gameObject;
-        go.transform.SetParent(_tilesOnBoard);
-        TileBehav tb = hex.GetComponent<TileBehav>();
-        tb.SetPlaced();
-
         if (currentTurn == Turn.PlayerTurn) //kinda hacky
             yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
 
-        yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
+        if (Hex.IsConsumable(hex.hextag)) {
+            _activep.hand.Remove(hex);
+            Consumable cons = (Consumable)hex;
+
+            // TODO animate? what should it look like when you use it?
+            yield return cons.DropEffect();
+
+            hexMan.RemoveHex(cons);
+        } else {
+            hex.transform.SetParent(_tilesOnBoard);
+            TileBehav tb = hex.GetComponent<TileBehav>();
+            tb.SetPlaced();
+            yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
+        }
 
         if (currentTurn == Turn.PlayerTurn) { //kinda hacky
             yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
         } else if (currentTurn == Turn.CommishTurn)
-            eventCont.CommishDrop(tb.tile.element, col);
+            eventCont.CommishDrop(hex.hextag, col);
 
         syncManager.CheckHandContents(_activep.id);
 
@@ -462,47 +477,48 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
-    public void DropConsumable(Consumable cons) { StartCoroutine(_DropConsumable(cons)); }
+    //public void DropConsumable(Consumable cons) { StartCoroutine(_DropConsumable(cons)); }
 
-    IEnumerator _DropConsumable(Consumable cons) {
-        MMLog.Log_MageMatch("   ---------- DROP CONSUMABLE BEGIN ----------");
-        _actionsPerforming++;
+    //IEnumerator _DropConsumable(Consumable cons) {
+    //    MMLog.Log_MageMatch("   ---------- DROP CONSUMABLE BEGIN ----------");
+    //    _actionsPerforming++;
 
-        _activep.hand.Remove(cons);
+    //    _activep.hand.Remove(cons);
 
-        cons.Reveal();
-        // TODO animate? what should it look like when you use it?
-
-
-        // TODO eventCont begin
-        yield return cons.DropEffect();
-        // TODO eventCont end
+    //    cons.Reveal();
+    //    // TODO animate? what should it look like when you use it?
 
 
-        hexMan.RemoveHex(cons);
+    //    // TODO eventCont begin
+    //    yield return syncManager.OnDropLocal(_activep.id, true, cons.hextag, 0);
+    //    yield return cons.DropEffect();
+    //    // TODO eventCont end
 
 
-        //GameObject go = hex.gameObject;
-        //go.transform.SetParent(_tilesOnBoard);
-        //TileBehav tb = hex.GetComponent<TileBehav>();
-        //tb.SetPlaced();
+    //    hexMan.RemoveHex(cons);
 
-        //if (currentTurn == Turn.PlayerTurn) //kinda hacky
-        //    yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
 
-        //yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
+    //    //GameObject go = hex.gameObject;
+    //    //go.transform.SetParent(_tilesOnBoard);
+    //    //TileBehav tb = hex.GetComponent<TileBehav>();
+    //    //tb.SetPlaced();
 
-        //if (currentTurn == Turn.PlayerTurn) { //kinda hacky
-        //    yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
-        //} else if (currentTurn == Turn.CommishTurn)
-        //    eventCont.CommishDrop(tb.tile.element, col);
+    //    //if (currentTurn == Turn.PlayerTurn) //kinda hacky
+    //    //    yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
 
-        //syncManager.CheckHandContents(_activep.id);
+    //    //yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
 
-        MMLog.Log_MageMatch("   ---------- DROP CONSUMABLE END ----------");
-        _actionsPerforming--;
-        yield return null;
-    }
+    //    //if (currentTurn == Turn.PlayerTurn) { //kinda hacky
+    //    //    yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
+    //    //} else if (currentTurn == Turn.CommishTurn)
+    //    //    eventCont.CommishDrop(tb.tile.element, col);
+
+    //    //syncManager.CheckHandContents(_activep.id);
+
+    //    MMLog.Log_MageMatch("   ---------- DROP CONSUMABLE END ----------");
+    //    _actionsPerforming--;
+    //    yield return null;
+    //}
 
     public void PlayerSwapTiles(int c1, int r1, int c2, int r2) {
         StartCoroutine(_SwapTiles(true, c1, r1, c2, r2));

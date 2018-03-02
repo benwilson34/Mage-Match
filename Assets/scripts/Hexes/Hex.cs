@@ -21,10 +21,12 @@ public class Hex : MonoBehaviour, Tooltipable {
 
     public bool EqualsTag(Hex hex) { return this.hextag.Equals(hex.hextag); }
 
-    // ex: p2-B-W-005 (player 2 created this Basic tile, type is Water, and its the fifth one)
+    // ex: p2-B-W-005 (player 2 created this Basic tile, type is Water, and it's the fifth one)
     public static int TagPlayer(string tag) { return int.Parse(tag.Substring(1, 1)); }
 
     public static string TagCat(string tag) { return tag.Split(new char[] { '-' })[1]; }
+
+    public static bool IsConsumable(string tag) { return TagCat(tag) == "C"; }
 
     public static string TagType(string tag) { return tag.Split(new char[] { '-' })[2]; }
 

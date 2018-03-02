@@ -48,11 +48,10 @@ public class Player {
 
     // TODO this should really just happen in MM.TurnSystem unless priority is important...
     public IEnumerator OnTurnBegin(int id) {
-        if (id == this.id) {
+        if (id == this.id) { // only the active player
             InitAP();
 
-            if(ThisIsLocal()) // i think?
-                yield return DealTile();
+            yield return DealTile();
         }
         yield return null;
     }

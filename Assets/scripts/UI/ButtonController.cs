@@ -218,7 +218,7 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void OnDrawButtonClick() {
-        _mm.PlayerDrawTile();
+        _mm.PlayerDrawHex();
     }
 
     public void OnFileButtonClick() {

@@ -7,8 +7,8 @@ using Photon;
 public class GameSettings : PunBehaviour {
 
     public string p1name, p2name;
-    public Character.Ch p1char = Character.Ch.Enfuego;
-    public Character.Ch p2char = Character.Ch.Gravekeeper;
+    public Character.Ch p1char = Character.Ch.Valeria;
+    public Character.Ch p2char = Character.Ch.Enfuego;
     public bool turnTimerOn;
 
     void Start () {

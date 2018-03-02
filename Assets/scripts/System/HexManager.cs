@@ -268,7 +268,9 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
         // add to appropriate player's discard list
         int id = Hex.TagPlayer(hextag);
-        MMLog.Log("HEXMAN", "orange", "Removing "+hextag+" and adding it to their remove list.");
-        _mm.GetPlayer(id).deck.AddHextagToRemoveList(hextag);
+        if (id != 3) { // don't do this for tiles added by the Commish
+            MMLog.Log("HEXMAN", "orange", "Removing " + hextag + " and adding it to their remove list.");
+            _mm.GetPlayer(id).deck.AddHextagToRemoveList(hextag);
+        }
     }
 }

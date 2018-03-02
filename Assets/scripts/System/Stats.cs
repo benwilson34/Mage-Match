@@ -92,9 +92,9 @@ public class Stats {
         GetPS(id).timeouts++;
     }
 
-    public void OnCommishDrop(Tile.Element elem, int col) {
+    public void OnCommishDrop(string hextag, int col) {
         _commishDrops++;
-        _report.AppendLine("C-drop " + Tile.ElementToChar(elem) + " col" + col);
+        _report.AppendLine("C-drop " + hextag + " col" + col);
     }
 
     //public void OnCommishMatch(string[] seqs) {
@@ -121,7 +121,10 @@ public class Stats {
 
     public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
         if (playerAction) {
-            Report("p" + id + " DROP " + tag + " col" + col);
+            string s = "p" + id + " DROP " + tag;
+            if (!Hex.IsConsumable(tag))
+                s += " col" + col;
+            Report(s);
             GetPS(id).drops++;
         } else if (_mm.uiCont.IsDebugMenuOpen()) //?
             Report("menu Drop col" + col);

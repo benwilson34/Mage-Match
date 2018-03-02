@@ -124,11 +124,11 @@ public class EventController {
             timeout.Invoke(_mm.ActiveP().id);
     }
 
-    public delegate void CommishDropEvent(Tile.Element elem, int col);
+    public delegate void CommishDropEvent(string hextag, int col);
     public event CommishDropEvent commishDrop;
-    public void CommishDrop(Tile.Element elem, int col) {
+    public void CommishDrop(string hextag, int col) {
         if (commishDrop != null) // never will be due to Stats
-            commishDrop.Invoke(elem, col);
+            commishDrop.Invoke(hextag, col);
     }
 
     public delegate void CommishMatchEvent(string[] seqs);

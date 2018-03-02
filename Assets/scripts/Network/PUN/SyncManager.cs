@@ -26,6 +26,29 @@ public class SyncManager : PunBehaviour {
         //eventCont.spellCast += OnSpellCast;
     }
 
+    private bool _syncedSeed = false;
+
+    public IEnumerator SyncRandomSeed(int seed) {
+        PhotonView photonView = PhotonView.Get(this);
+        if (PhotonNetwork.player.ID == 1) { // send/enqueue
+            photonView.RPC("HandleSyncRandomSeed", PhotonTargets.Others, seed);
+
+            MMLog.Log_SyncMan("seed = " + seed);
+            Random.InitState(seed);
+        } else {             // wait for rands in queue
+            MMLog.Log_SyncMan("old seed = " + seed);
+            yield return new WaitUntil(() => _syncedSeed);
+        }
+        yield return null;
+    }
+    [PunRPC]
+    public void HandleSyncRandomSeed(int seed) {
+        Random.InitState(seed);
+        MMLog.Log_SyncMan("new seed = " + seed);
+        _syncedSeed = true;
+    }
+
+
     public IEnumerator SyncRand(int id, int value) {
         yield return SyncRands(id, new int[] { value });
     }
@@ -100,7 +123,8 @@ public class SyncManager : PunBehaviour {
 
     public IEnumerator OnDrawLocal(int id, string tag, bool playerAction, bool dealt) {
         //Debug.MMLog.Log_SyncMan("TURNMANAGER: id=" + id + " myID=" + mm.myID);
-        if ((playerAction || dealt) && id == _mm.myID) { // if local, send to remote
+        //if ((playerAction || dealt) && id == _mm.myID) { // if local, send to remote
+        if (playerAction && id == _mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDraw", PhotonTargets.Others, id, tag, playerAction, dealt);
         }
@@ -108,11 +132,12 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleDraw(int id, string tag, bool playerAction, bool dealt) {
-        MMLog.Log_SyncMan("Received draw with tag=" + tag);
-        if (dealt)
-            StartCoroutine(_mm.GetPlayer(id).DealTile(tag));
-        else
-            StartCoroutine(_mm._Draw(id, tag, playerAction));
+        //MMLog.Log_SyncMan("Received draw with tag=" + tag);
+        //if (dealt)
+        //    StartCoroutine(_mm.GetPlayer(id).DealTile());
+        //else
+            //StartCoroutine(_mm._Draw(id, "", playerAction));
+            _mm.PlayerDrawHex();
     }
 
     public IEnumerator OnDropLocal(int id, bool playerAction, string tag, int col) {
@@ -123,8 +148,8 @@ public class SyncManager : PunBehaviour {
         yield return null;
     }
     [PunRPC]
-    public void HandleDrop(int id, string tag, int col) {
-        Hex hex = _mm.GetPlayer(id).hand.GetHex(tag);
+    public void HandleDrop(int id, string hextag, int col) {
+        Hex hex = _mm.GetPlayer(id).hand.GetHex(hextag);
         _mm.PlayerDropTile(col, hex);
     }
 

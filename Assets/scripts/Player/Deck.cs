@@ -45,19 +45,8 @@ public class Deck {
     void Shuffle(string[] coll) {
         Debug.Log("DECK: Shuffling " + coll.Length + " hexes...");
         // Knuth shuffle algorithm, courtesy of Wikipedia :)
-
-        // TODO make this an IEnumerator...other methods have to handle that too...
-        //var randList = new List<int>();
-        //for (int t = 0; t < coll.Length; t++) {
-        //    randList.Add(Random.Range(t, coll.Length));
-        //}
-        //yield return _mm.syncManager.SyncRands(_player.id, randList.ToArray());
-        //var rands = _mm.syncManager.GetRands(randList.Count);
-
         for (int t = 0; t < coll.Length; t++) {
             string tmp = coll[t];
-            // TODO use rands
-            // int r = rands[t];
             int r = Random.Range(t, coll.Length);
             coll[t] = coll[r];
             coll[r] = tmp;

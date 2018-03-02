@@ -140,12 +140,12 @@ public class UIController : MonoBehaviour {
 
     #region EventCont calls
     public IEnumerator OnTurnBegin(int id) {
-        if (_mm.MyTurn())
+        if (_mm.MyTurn()) {
             SendSlidingText(_mm.ActiveP().name + ", make your move!");
-        //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
+            //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
 
-        SetDrawButton(true);
-        FlipGradient(); // ugly
+            SetDrawButton(true);
+        }
         UpdateAP(_mm.GetPlayer(id));
 
         //ChangePinfoColor(id, new Color(0, 1, 0, .4f));
@@ -197,7 +197,7 @@ public class UIController : MonoBehaviour {
         UpdateMoveText("Fight!!");
 
         if (!_mm.MyTurn())
-            FlipGradient();
+            SetDrawButton(false);
 
         for (int id = 1; id <= 2; id++) {
             Player p = _mm.GetPlayer(id);
@@ -258,13 +258,6 @@ public class UIController : MonoBehaviour {
     //    yield return t.WaitForCompletion();
     //    slidingText.rectTransform.position = slidingTextStart;
     //}
-
-    // delete
-    void FlipGradient() {
-        //		Vector3 scale = go.transform.localScale;
-        //		go.transform.localScale.Set (scale.x * -1, scale.y, scale.z);
-        //gradient.transform.Rotate(0, 0, 180);
-    }
 
     // delete
     public void UpdateMoveText(string str){
