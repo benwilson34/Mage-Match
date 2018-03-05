@@ -128,12 +128,12 @@ public class ObjectEffects {
         yield return null; // for now
     }
 
-    public IEnumerator Ench_SetZombify(int id, TileBehav tb, bool skip, bool anim = true) {
+    public IEnumerator Ench_SetZombie(int id, TileBehav tb, bool skip, bool anim = true) {
         if (anim)
             yield return _mm.animCont._Zombify(tb);
         _mm.audioCont.EnchantZombie( tb.GetComponent<AudioSource>() );
 
-        Enchantment ench = new Enchantment(id, Enchantment.EnchType.Zombify, Effect.Type.Enchant, Ench_Zombify_TEffect, null);
+        Enchantment ench = new Enchantment(id, Enchantment.EnchType.Zombify, Effect.Type.Enchant, Ench_Zombie_TEffect, null);
         if (skip)
             ench.SkipCurrent();
 
@@ -145,7 +145,7 @@ public class ObjectEffects {
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
         yield return null;
     }
-    IEnumerator Ench_Zombify_TEffect(int id, TileBehav tb) {
+    IEnumerator Ench_Zombie_TEffect(int id, TileBehav tb) {
         //zombify_select = false; // only use if you're sloppy. 
         if (tb == null)
             MMLog.LogError("SPELLFX: >>>>>Zombify called with a null tile!! Maybe it was removed?");
@@ -187,7 +187,7 @@ public class ObjectEffects {
             _mm.GetPC(id).DealDamage(10);
             _mm.GetPC(id).Heal(10);
         } else {
-            yield return Ench_SetZombify(id, selectTB, true, false);
+            yield return Ench_SetZombie(id, selectTB, true, false);
         }
 
         yield return _mm.animCont._Zombify_Back(tb.transform); // anim 2

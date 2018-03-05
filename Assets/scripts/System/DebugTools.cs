@@ -219,7 +219,7 @@ public class DebugTools : MonoBehaviour {
             //    break;
             case "Zombify":
                 MMLog.Log("DebugTools", "orange", "calling enchant, id=" + playerId);
-                StartCoroutine(_mm.hexFX.Ench_SetZombify(playerId, tb, false));
+                StartCoroutine(_mm.hexFX.Ench_SetZombie(playerId, tb, false));
                 break;
         }
     }

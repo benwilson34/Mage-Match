@@ -9,13 +9,19 @@
   },
 
   "runes": [
-    
+    "HR Form",
+    "Party Snacks",
+    "Protein Pills",
+    "Leeches!"
+  ],
+
+  "unused runes": [
+    "Muscle Mass"
   ],
 
   "core": {
     "title": "Business in the Front",
     "cost": 1,
-    "cooldown": 0,
     "type": "none",
     "desc": "Deal 10/30/60 damage and Zombify 1/2/3 random tiles on the board. Zombify 1 extra random tile when consuming an earth match. Switch to Party in the Back."
   },

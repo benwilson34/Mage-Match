@@ -33,7 +33,7 @@ public class Deck {
             var runeInfo = RuneInfo.GetRuneInfo(rune);
             if (runeInfo.type == "Consumable") {
                 for (int i = 0; i < runeInfo.deckCount; i++) {
-                    list.Add("p" + _player.id + "-C-" + runeInfo.title.Substring(0, 5)); // how long?
+                    list.Add("p" + _player.id + "-C-" + runeInfo.title);
                 }
             }
         }

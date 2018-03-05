@@ -23,7 +23,7 @@ public class Enfuego : Character {
         _mm.effectCont.AddSwapEffect(se, "EnSwp");
 
         // TurnEffect for reseting the counter
-        TurnEffect te = new TurnEffect(-1, Effect.Type.None, Passive_ResetSwaps, null); // idk about type here
+        TurnEffect te = new TurnEffect(_playerId, -1, Effect.Type.None, Passive_ResetSwaps, null); // idk about type here
         _mm.effectCont.AddEndTurnEffect(te, "EnEnd");
 
         // when we have List<Buff>
@@ -145,12 +145,12 @@ public class Enfuego : Character {
 
     // Hot Potatoes
     protected override IEnumerator Spell3(TileSeq prereq) {
-        HealthEffect he = new HealthEffect(_mm.OpponentId(_playerId), HotPot_Buff, true, false, 3);
+        HealthModEffect he = new HealthModEffect(_mm.OpponentId(_playerId), HotPot_Debuff, true, false, 3);
         _mm.effectCont.AddHealthEffect(he, "hotpo");
 
         yield return null;
     }
-    public float HotPot_Buff(Player p, int dmg) {
+    public float HotPot_Debuff(Player p, int dmg) {
         MMLog.Log_Enfuego("Hot Potato debuff on " + p.name + ", handcount=" + p.hand.Count());
         return p.hand.Count() * 3;
     }

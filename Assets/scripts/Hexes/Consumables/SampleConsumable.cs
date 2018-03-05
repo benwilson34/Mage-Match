@@ -13,11 +13,4 @@ public class SampleConsumable : Consumable {
         }
         yield return null;
     }
-
-    public override string GetTooltipInfo() {
-        string str = "This is a <b>hex</b>.\n";
-        str += "Its <color=green>tag</color> is " + hextag;
-        str += "\n" + RuneInfo.GetRuneInfo("sampl").desc;
-        return str;
-    }
 }

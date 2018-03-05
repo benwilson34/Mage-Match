@@ -15,6 +15,9 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     private GameObject _firePF, _waterPF, _earthPF, _airPF, _muscPF; // basic tile prefabs
     private GameObject _stonePF, _emberPF, _tombstonePF; // token prefabs
     private GameObject _cons_sample;
+    private GameObject _cons_HRform, _cons_partySnacks, _cons_proteinPills, _cons_leeches;
+    private GameObject _cons_bandages, _cons_waterLily;
+    private GameObject _cons_danceShoes, _cons_burningBracers, _cons_molotov, _cons_fiveAlarmBell;
 
     public HexManager(MageMatch mm) {
         this._mm = mm;
@@ -38,7 +41,22 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         _emberPF = Resources.Load("prefabs/hexes/token_ember") as GameObject;
         _tombstonePF = Resources.Load("prefabs/hexes/token_tombstone") as GameObject;
 
+
         _cons_sample = Resources.Load("prefabs/hexes/cons_sample") as GameObject;
+
+        _cons_HRform = Resources.Load("prefabs/hexes/cons_HRform") as GameObject;
+        _cons_partySnacks = Resources.Load("prefabs/hexes/cons_partySnacks") as GameObject;
+        _cons_proteinPills = Resources.Load("prefabs/hexes/cons_proteinPills") as GameObject;
+        _cons_leeches = Resources.Load("prefabs/hexes/cons_leeches") as GameObject;
+
+        _cons_bandages = Resources.Load("prefabs/hexes/cons_bandages") as GameObject;
+        _cons_waterLily = Resources.Load("prefabs/hexes/cons_waterLily") as GameObject;
+
+        _cons_danceShoes = Resources.Load("prefabs/hexes/cons_danceShoes") as GameObject;
+        _cons_burningBracers = Resources.Load("prefabs/hexes/cons_burningBracers") as GameObject;
+        _cons_molotov = Resources.Load("prefabs/hexes/cons_molotov") as GameObject;
+        _cons_fiveAlarmBell = Resources.Load("prefabs/hexes/cons_fiveAlarmBell") as GameObject;
+
 
         flipSprite = Resources.Load<Sprite>("sprites/hex-back");
     }
@@ -152,21 +170,53 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
     public Hex GenerateConsumable(int id, string name) {
         GameObject go;
-        string type = "";
-        // TODO type should maybe come from the JSON? Or from the Consumable component itself?
         switch (name) {
-            case "Sampl":
+            case "Sample Consumable":
                 go = GameObject.Instantiate(_cons_sample);
-                type = "Sampl";
                 break;
+
+            case "HR Form":
+                go = GameObject.Instantiate(_cons_HRform);
+                break;
+            case "Party Snacks":
+                go = GameObject.Instantiate(_cons_partySnacks);
+                break;
+            case "Protein Pills":
+                go = GameObject.Instantiate(_cons_proteinPills);
+                break;
+            case "Leeches!":
+                go = GameObject.Instantiate(_cons_leeches);
+                break;
+
+            case "Bandages":
+                go = GameObject.Instantiate(_cons_bandages);
+                break;
+            case "Water Lily":
+                go = GameObject.Instantiate(_cons_waterLily);
+                break;
+
+            case "Dance Shoes":
+                go = GameObject.Instantiate(_cons_danceShoes);
+                break;
+            case "Burning Bracers":
+                go = GameObject.Instantiate(_cons_burningBracers);
+                break;
+            case "Molotov":
+                go = GameObject.Instantiate(_cons_molotov);
+                break;
+            case "Five-Alarm Bell":
+                go = GameObject.Instantiate(_cons_fiveAlarmBell);
+                break;
+
             default:
                 MMLog.LogError("HEXMAN: Tried to init a consumable with bad name=" + name);
                 return null;
         }
 
         Hex hex = go.GetComponent<Hex>();
-        hex.hextag = GenFullTag(id, "C", type); // C for consumable
+        hex.hextag = GenFullTag(id, "C", name); // C for consumable
         hex.gameObject.name = hex.hextag;
+        hex.Init();
         return hex;
     }
 

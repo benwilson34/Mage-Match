@@ -15,7 +15,6 @@
   "core": {
     "title": "none",
     "cost": 1,
-    "cooldown": 0,
     "type": "none",
     "desc": "no desc"
   },

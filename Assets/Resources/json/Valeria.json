@@ -9,13 +9,18 @@
   },
 
   "runes": [
-    "sampl"
+    "Bandages",
+    "Water Lily"
+  ],
+
+  "unused runes": [
+	"White Water",
+	"Rain Drops"
   ],
 
   "core": {
     "title": "Whirlpool Spin",
     "cost": 1,
-    "cooldown": 0,
     "type": "Drag Target",
     "desc": "Deal 20/40/70 damage, heal yourself for 10/20/40 health, and perform 0/1/2 swaps. Perform 1 additional swap when invoking a water match."
   },

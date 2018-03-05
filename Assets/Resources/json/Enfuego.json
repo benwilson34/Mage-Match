@@ -9,13 +9,19 @@
   },
 
   "runes": [
-    "sampl"
+    "Dance Shoes",
+    "Burning Bracers",
+    "Molotov",
+    "Five-Alarm Bell"
+  ],
+
+  "unused runes": [
+    "Brushfire"
   ],
 
   "core": {
     "title": "Fiery Fandango",
     "cost": 1,
-    "cooldown": 0,
     "type": "none",
     "desc": "Deal 30/50/80 damage to your opponent, force them to discard 0/1/2 hexes, and inflict 2/4/7 random tiles with burning. Deal 20 additional damage when consuming a fire match."
   },

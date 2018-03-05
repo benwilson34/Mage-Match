@@ -6,7 +6,7 @@ using UnityEngine;
 public class CharacterInfo {
 
     public class SpellInfo {
-        public string title, prereq, cooldown, type, desc;
+        public string title, prereq, type, desc;
         public int cost, meterCost;
     }
 
@@ -23,7 +23,7 @@ public class CharacterInfo {
         s += string.Format("{0}F/{1}W/{2}E/{3}A/{4}M - \n", c.deck[0], c.deck[1], c.deck[2], c.deck[3], c.deck[4]);
 
         s += string.Format("Passive - {0}: {1}\nSignature: {2} - {3}/{4} - {5}\n", c.passive.title, c.passive.desc, c.signature.title, c.signature.prereq, c.signature.type, c.signature.desc);
-        s += string.Format("Core Spell: {0} - {1}-turn cooldown/{2} - {3}", c.core.title, c.core.cooldown, c.core.type, c.core.desc);
+        s += string.Format("Core Spell: {0} - {1} - {2}", c.core.title, c.core.type, c.core.desc);
 
         s += GetSpellInfo(c.spell1, false) + "\n" + GetSpellInfo(c.spell2, false) + "\n" + GetSpellInfo(c.spell3, false);
 

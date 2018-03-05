@@ -53,6 +53,11 @@ public class Prompt {
         yield return new WaitUntil(() => currentMode == PromptMode.None);
     }
 
+    public IEnumerator WaitForQuickdrawDrop(Hex hex) {
+
+        yield return null;
+    }
+
     public void SetDrop(int col, TileBehav tb) {
         MMLog.Log("PROMPT", "blue", "DROP is " + tb.hextag);
         _mm.syncManager.SendDropSelection(col, tb);

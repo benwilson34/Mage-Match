@@ -7,7 +7,7 @@ public abstract class Effect {
 
     public delegate IEnumerator MyEffect(int id); // move to TurnEffect?
     // rename to EffType?
-    public enum Type { None = 0, Cooldown, Damage, Healing, Buff, Destruct, Subtract, Add, Enchant, Movement }
+    public enum Type { None = 0, Damage, Healing, Buff, Destruct, Subtract, Add, Enchant, Movement }
 
     public int playerID;
     public Type type; // protected eventually?
@@ -31,9 +31,9 @@ public class TurnEffect : Effect {
     private MyEffect _turnEffect, _endEffect, _cancelEffect;
 
     // TODO add infinite Constructor...or just pass in a negative for turns?
-    public TurnEffect(int turns, Type t, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect = null) {
+    public TurnEffect(int id, int turns, Type t, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect = null) {
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
-        playerID = _mm.ActiveP().id;
+        playerID = id;
         _turnsLeft = turns;
         this.type = t;
         this._turnEffect = turnEffect;
@@ -294,24 +294,31 @@ public class SwapEffect : Effect {
 
 
 
-public class HealthEffect : Effect {
+// This would be for if something needs to happen in reaction to HealthChange events...
+//public class HealthEffect : Effect {
+//    public delegate float MyHealthEffect(Player p, int dmg);
+
+//}
+
+
+
+public class HealthModEffect : Effect {
 
     public delegate float MyHealthEffect(Player p, int dmg);
     public bool isAdditive;    // additive or multiplicative? could be an enum in time
-    public bool isBuff = true; // TODO this could safely be refactored to isDealing?
+    public bool isDealing = true;
     public int countLeft = -1;
 
     private MyHealthEffect _healthEffect;
 
-    // TODO add infinite Constructor...or just pass in a negative for turns?
-    public HealthEffect(int id, MyHealthEffect healthEffect, bool isAdditive, bool isBuff = true, int turns = -1, int count = -1) {
+    public HealthModEffect(int id, MyHealthEffect healthEffect, bool isAdditive, bool isDealing = true, int turns = -1, int count = -1) {
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id;
         _turnsLeft = turns;
         this.type = Type.Buff; //?
         this._healthEffect = healthEffect;
         this.isAdditive = isAdditive;
-        this.isBuff = isBuff;
+        this.isDealing = isDealing;
         countLeft = count;
     }
 

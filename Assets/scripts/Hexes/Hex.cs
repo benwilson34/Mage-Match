@@ -17,6 +17,8 @@ public class Hex : MonoBehaviour, Tooltipable {
 		_mm = GameObject.Find("board").GetComponent<MageMatch>();
 	}
 
+    public virtual void Init() { }
+
     public bool EqualsTag(string tag) { return this.hextag.Equals(tag); }
 
     public bool EqualsTag(Hex hex) { return this.hextag.Equals(hex.hextag); }
@@ -51,6 +53,17 @@ public class Hex : MonoBehaviour, Tooltipable {
         if (_flipped)
             Flip();
     }
+
+    //public IEnumerator Quickdraw() {
+    //    // TODO prompt drop
+    //    yield return _mm.prompt.WaitForQuickdrawDrop(this);
+
+    //    yield return null;
+    //}
+
+    //public IEnumerator Duplicate() {
+    //    yield return null;
+    //}
 
     public virtual string GetTooltipInfo() {
         string str = "This is a <b>hex</b>.\n";

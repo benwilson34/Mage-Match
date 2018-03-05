@@ -102,7 +102,7 @@ public class Valeria : Character {
 
     // Rain Dance
     protected override IEnumerator Spell2(TileSeq prereq) {
-        TurnEffect te = new TurnEffect(5, Effect.Type.Add, RainDance_T, null);
+        TurnEffect te = new TurnEffect(_playerId, 5, Effect.Type.Add, RainDance_T, null);
         _mm.effectCont.AddBeginTurnEffect(te, "rainD");
         yield return null;
     }
@@ -121,7 +121,7 @@ public class Valeria : Character {
         yield return null;
     }
 
-    IEnumerator DropWaterIntoRandomCols(int count) {
+    public IEnumerator DropWaterIntoRandomCols(int count) {
         int[] cols = _mm.boardCheck.GetRandomCols(count);
         yield return _mm.syncManager.SyncRands(_playerId, cols);
         cols = _mm.syncManager.GetRands(cols.Length);

@@ -11,7 +11,7 @@ public class EffectController {
     //private List<MatchEffect> _matchEffects;
     private List<DropEffect> _dropEffects;
     private List<SwapEffect> _swapEffects;
-    private List<HealthEffect> _healthEffects;
+    private List<HealthModEffect> _healthEffects;
     private Dictionary<string, int> _tagDict;
     private int _effectsResolving = 0, _beginTurnRes = 0, _endTurnRes = 0; // TODO match+swap effs
 
@@ -25,7 +25,7 @@ public class EffectController {
         //_matchEffects = new List<MatchEffect>();
         _dropEffects = new List<DropEffect>();
         _swapEffects = new List<SwapEffect>();
-        _healthEffects = new List<HealthEffect>();
+        _healthEffects = new List<HealthModEffect>();
         _tagDict = new Dictionary<string, int>();
     }
 
@@ -231,7 +231,7 @@ public class EffectController {
             }
         }
         for (int i = 0; i < _healthEffects.Count; i++) { // foreach
-            HealthEffect he = _healthEffects[i];
+            HealthModEffect he = _healthEffects[i];
             Effect.Type t = he.type;
             MMLog.Log_EffectCont(he.tag + " (type " + t + ", p" + (int)t + ") has " + he.TurnsLeft() + " turns left (including this one).");
             yield return he.Turn();
@@ -352,7 +352,7 @@ public class EffectController {
 
 
     #region HealthEffects
-    public void AddHealthEffect(HealthEffect he, string tag) {
+    public void AddHealthEffect(HealthModEffect he, string tag) {
         he.tag = GenFullTag("hlth", tag);
         _healthEffects.Add(he);
     }
@@ -361,7 +361,7 @@ public class EffectController {
     private float healthResult_mult = 1;
 
     public void ResolveHealthEffects(int id, int dmg, bool dealing) {
-        HealthEffect he;
+        HealthModEffect he;
         healthResult_add = 0;
         healthResult_mult = 1;
 
@@ -369,7 +369,7 @@ public class EffectController {
 
         for (int i = 0; i < _healthEffects.Count; i++) { // foreach
             he = _healthEffects[i];
-            if (he.playerID == id && he.isBuff == dealing) {
+            if (he.playerID == id && he.isDealing == dealing) {
                 MMLog.Log_EffectCont("Checking healthEff with tag " + he.tag + "; count=" + he.countLeft);
 
                 if (he.isAdditive)

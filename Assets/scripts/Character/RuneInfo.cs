@@ -47,7 +47,7 @@ public class RuneInfo {
         MMDebug.MMLog.Log("RuneInfo", "black", "json for "+rune+": " + json);
 
         JObject o = JObject.Parse(json);
-        MMDebug.MMLog.Log("RuneInfo", "black", "parsed: " + o["sampl"].ToString());
+        MMDebug.MMLog.Log("RuneInfo", "black", "parsed: " + o[rune].ToString());
 
         if (o[rune] == null) {
             MMDebug.MMLog.LogError("RuneInfo: Couldn't find info for \"" + rune + "\"");
@@ -60,6 +60,7 @@ public class RuneInfo {
         
         // I feel like this isn't the proper way to do this
         JsonConvert.PopulateObject(o[rune].ToString(), info);
+        info.title = rune;
 
         return info;
     }

@@ -1,8 +1,98 @@
 {
-  "sampl": {
-    "title": "Sample Consumable",
+  "Sample Consumable": {
     "type": "Consumable",
+    "subtype": "",
     "deckCount": 2,
     "desc": "This consumable is fxkin wild boi"
-  }
+  },
+
+
+  "HR Form": {
+    "type": "Consumable",
+    "subtype": "Area Target",
+    "deckCount": 3,
+    "desc": "Zombify all Muscle tiles in a small area."
+  },
+  "Party Snacks": {
+    "type": "Consumable",
+    "subtype": "Tile Target",
+    "deckCount": 3,
+    "desc": "Target Zombie explodes, destroying itself and 2 random adjacent tiles, and dealing 60-80 damage."
+  },
+  "Muscle Mass": {
+    "type": "Consumable",
+    "subtype": "Duplicate",
+    "deckCount": 9,
+    "desc": "Basic Muscle tile."
+  },
+  "Protein Pills": {
+    "type": "Consumable",
+    "subtype": "Buff",
+    "deckCount": 3,
+    "desc": "Gain a 2-turn buff that increases the damage you deal and reduces the damage you take by 15%."
+  },
+  "Leeches!": {
+    "type": "Consumable",
+    "subtype": "Buff",
+    "deckCount": 4,
+    "desc": "Gain a buff this turn that heals you for 20% of all damage you deal."
+  },
+
+
+  "Bandages": {
+    "type": "Consumable",
+    "subtype": "Buff",
+    "deckCount": 4,
+    "desc": "Heal yourself for 60-80 health and gain a stacking 2-turn buff that reduces the damage you take by 10%."
+  },
+  "Water Lily": {
+    "type": "Consumable",
+    "subtype": "",
+    "deckCount": 7,
+    "desc": "Add 4 Water tiles into the board in random columns."
+  },
+  "White Water": {
+    "type": "Consumable",
+    "subtype": "Quickdraw",
+    "deckCount": 8,
+    "desc": "Basic Water tile."
+  },
+  "Rain Drops": {
+    "type": "Consumable",
+    "subtype": "Duplicate",
+    "deckCount": 9,
+    "desc": "Basic Water tile."
+  },
+
+
+  "Dance Shoes": {
+    "type": "Consumable",
+    "subtype": "Swap Prompt",
+    "deckCount": 5,
+    "desc": "Perform a swap. Inflict Burning on both tiles swapped."
+  },
+  "Burning Bracers": {
+    "type": "Consumable",
+    "subtype": "",
+    "deckCount": 4,
+    "desc": "Gain 1 AP. Has Quickdraw if more than 9 tiles are burning."
+  },
+  "Molotov": {
+    "type": "Consumable",
+    "subtype": "",
+    "deckCount": 3,
+    "desc": "Deal 30 damage to your opponent and inflict Burning on all tiles in a small area. Discard 1 random hex."
+  },
+  "Five-Alarm Bell": {
+    "type": "Consumable",
+    "subtype": "",
+    "deckCount": 2,
+    "desc": "Locked: Consumable: Drag target 5 tiles and inflict them with Burning and deal 50 damage. Key: Inflict Burning on 8 or more tiles this turn."
+  },
+  "Brushfire": {
+    "type": "Consumable",
+    "subtype": "Quickdraw",
+    "deckCount": 8,
+    "desc": "Basic Fire tile."
+  },
 }

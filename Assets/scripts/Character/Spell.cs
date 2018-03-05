@@ -64,29 +64,17 @@ public class Spell {
 
 
 
-public class CooldownSpell : Spell {
+public class CoreSpell : Spell {
 
-    public string effectTag = "";
+    public Tile.Element currentElem = Tile.Element.None;
 
-    private int _cooldown;
-
-    public CooldownSpell(int index, string name, int cooldown, MySpellEffect effect, int APcost = 1) 
-        : base(index, name, effect, APcost) { // core spell
-        this._cooldown = cooldown;
-        this._seq = new TileSeq(); // empty seq...be wary of errors...
+    public CoreSpell(int index, string name, MySpellEffect effect, int APcost = 1) 
+        : base(index, name, effect, APcost) {
+        _seq = new TileSeq(); // empty seq...be wary of errors...
     }
 
-    public override IEnumerator Cast(TileSeq prereq) {
-        TurnEffect te = new TurnEffect(_cooldown, Effect.Type.Cooldown, null, null);
-        effectTag = _mm.effectCont.AddEndTurnEffect(te, name.Substring(0, 5) + "-C");
-
-        return _effect(prereq); // yield??
-    }
-
-    // TODO maybe override boardSeq stuff since it's not needed?
-
-    public bool IsReadyToCast() {
-        return _mm.effectCont.GetTurnEffect(effectTag) == null;
+    public override int GetLength() {
+        return 5; // max core spell length
     }
 }
 
@@ -103,21 +91,5 @@ public class SignatureSpell : Spell {
     public bool IsReadyToCast() {
         MMLog.Log("SIGSPELL", "black", "Checking " + _mm.ActiveP().name + "'s sig spell.");
         return _mm.ActiveP().character.GetMeter() >= meterCost;
-    }
-}
-
-
-
-public class CoreSpell : Spell {
-
-    public Tile.Element currentElem = Tile.Element.None;
-
-    public CoreSpell(int index, string name, MySpellEffect effect, int APcost = 1) 
-        : base(index, name, effect, APcost) {
-        _seq = new TileSeq(); // empty seq...be wary of errors...
-    }
-
-    public override int GetLength() {
-        return 5; // max core spell length
     }
 }

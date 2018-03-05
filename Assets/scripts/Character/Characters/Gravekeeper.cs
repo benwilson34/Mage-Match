@@ -61,7 +61,7 @@ public class Gravekeeper : Character {
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
             yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, tbs.Count));
             int rand = _mm.syncManager.GetRand();
-            yield return _objFX.Ench_SetZombify(_playerId, tbs[rand], false); // skip?
+            yield return _objFX.Ench_SetZombie(_playerId, tbs[rand], false); // skip?
             tbs.RemoveAt(rand);
         }
 
@@ -145,7 +145,7 @@ public class Gravekeeper : Character {
 
             TileBehav tb = _mm.prompt.GetDropTile();
             MMLog.Log_Gravekeeper("Player " + _playerId + " dropped " + tb.hextag);
-            yield return _objFX.Ench_SetZombify(_playerId, tb, false);
+            yield return _objFX.Ench_SetZombie(_playerId, tb, false);
             int col = _mm.prompt.GetDropCol();
             int nextTBrow = _mm.boardCheck.CheckColumn(col) - 1; // next TB under, if any
 
@@ -233,7 +233,7 @@ public class Gravekeeper : Character {
         tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
 
         TombstoneToken ttb = (TombstoneToken)tomb;
-        _mm.effectCont.AddEndTurnEffect(new TurnEffect(5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
+        _mm.effectCont.AddEndTurnEffect(new TurnEffect(_playerId, 5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
 
         // destroy tiles under token
         for (int row = _hexGrid.BottomOfColumn(col); row < _hexGrid.TopOfColumn(col); row++)

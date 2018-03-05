@@ -339,38 +339,18 @@ public class MageMatch : MonoBehaviour {
         
         for (int s = 0; s < _spellsOnBoard.Length; s++) {
             Spell sp = c.GetSpell(s);
-            //Debug.Log("MAGEMATCH: Checking "+sp.name+"...");
-            //bool spellIsOnBoard = false;
-            //if (sp is CooldownSpell) {
-            //    if (((CooldownSpell)sp).IsReadyToCast()) {
-            //        //Debug.Log("MAGEMATCH: " + sp.name + " is core, and there's no effect with tag=" + sp.effectTag);
-            //        //spellIsOnBoard = true;
-            //    } else {
-            //        MMLog.Log_MageMatch(sp.name + " is core, but it's cooling down!");
-            //    }                    
-            //} else { // could be cleaner.
-                if (sp is SignatureSpell && !((SignatureSpell)sp).IsReadyToCast()) {
-                    //Log(sp.name + " is signature, but not enough meter!");
-                    continue;
-                }
+            if (sp is SignatureSpell && !((SignatureSpell)sp).IsReadyToCast()) {
+                //Log(sp.name + " is signature, but not enough meter!");
+                continue;
+            }
 
-            //for (int i = 0; i < spellsOnBoard.Length; i++) {
-                    MMLog.Log_MageMatch("spell[" + s + "] count=" + _spellsOnBoard[s].Count);
-                    if (_spellsOnBoard[s].Count > 0)
-                        uiCont.ActivateSpellButton(id, s);
-                    else
-                        uiCont.DeactivateSpellButton(id, s); // needed?
+            MMLog.Log_MageMatch("spell[" + s + "] count=" + _spellsOnBoard[s].Count);
+            if (_spellsOnBoard[s].Count > 0)
+                uiCont.ActivateSpellButton(id, s);
+            else
+                uiCont.DeactivateSpellButton(id, s); // needed?
 
-                    // TODO boardseq stuff will be handled by the spell selection thing
-
-                    //TileSeq matchSeq = spellsOnBoard[i];
-                    //if (matchSeq.MatchesTileSeq(sp.GetTileSeq())) {
-                    //    spellIsOnBoard = true;
-                    //    c.GetSpell(s).SetBoardSeq(matchSeq);
-                    //    break;
-                    //}
-                //}
-            //}                
+            // TODO boardseq stuff will be handled by the spell selection thing                
         }
     }
 
