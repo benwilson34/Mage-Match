@@ -18,13 +18,6 @@ public class Targeting {
     private TileBehav _lastDragTarget;
     //private List<GameObject> outlines;
 
-    //public delegate void TBTargetEffect(TileBehav tb);
-    //public delegate void TBMultiTargetEffect(List<TileBehav> tbs);
-    //public delegate void CBTargetEffect(CellBehav cb);
-    //private TBTargetEffect TBtargetEffect;
-    //private TBMultiTargetEffect TBmultiTargetEffect;
-    //private CBTargetEffect CBtargetEffect;
-
     public delegate List<TileBehav> TileFilterFunc(List<TileBehav> tbs);
     public delegate List<CellBehav> CellFilterFunc(List<CellBehav> cbs);
 
@@ -208,7 +201,7 @@ public class Targeting {
         _mm.GetComponent<InputController>().InvalidateClick(); // prevent weirdness from player still dragging
         _lastDragTarget = null;
 
-        _mm.uiCont.SendSlidingText("Here are your targets!");
+        _mm.uiCont.newsfeed.AddActionLogItem("Here are your targets!");
         yield return new WaitForSeconds(2f);
 
         _mm.uiCont.DeactivateTargetingUI();

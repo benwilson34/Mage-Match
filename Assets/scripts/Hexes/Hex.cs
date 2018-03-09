@@ -12,12 +12,21 @@ public class Hex : MonoBehaviour, Tooltipable {
     protected MageMatch _mm;
     private Sprite _flipSprite;
     private bool _flipped = false;
+    private bool _quickdraw = false, _duplicate = false;
 
 	void Awake () {
 		_mm = GameObject.Find("board").GetComponent<MageMatch>();
 	}
 
     public virtual void Init() { }
+
+    protected void SetQuickdraw() { _quickdraw = true; }
+    public IEnumerator OnDraw() {
+        if (_quickdraw) {
+            yield return _mm.prompt.WaitForQuickdrawAction(this);
+        }
+        yield return null;
+    }
 
     public bool EqualsTag(string tag) { return this.hextag.Equals(tag); }
 

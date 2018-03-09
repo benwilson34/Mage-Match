@@ -1,16 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MuscleMass : MonoBehaviour {
+public class MuscleMass : Consumable {
+    
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public override IEnumerator DropEffect() {
+        throw new NotImplementedException();
+    }
 }

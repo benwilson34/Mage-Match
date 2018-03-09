@@ -200,6 +200,8 @@ public class HexGrid {
 		return returnList;
 	}
 
+    public bool IsBoardFull() { return GetPlacedTiles().Count == NUM_CELLS; }
+
     public int GetEmptyCellCount() {
         int count = 0;
         for (int c = 0; c < NUM_COLS; c++) { // for each col

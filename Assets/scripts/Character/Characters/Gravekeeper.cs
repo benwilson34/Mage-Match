@@ -143,7 +143,7 @@ public class Gravekeeper : Character {
             if (!_mm.prompt.WasSuccessful())
                 break;
 
-            TileBehav tb = _mm.prompt.GetDropTile();
+            TileBehav tb = (TileBehav) _mm.prompt.GetDropTile();
             MMLog.Log_Gravekeeper("Player " + _playerId + " dropped " + tb.hextag);
             yield return _objFX.Ench_SetZombie(_playerId, tb, false);
             int col = _mm.prompt.GetDropCol();

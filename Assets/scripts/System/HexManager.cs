@@ -75,11 +75,11 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return fullTag;
     }
 
-    public Hex GenerateRandomHex(Player p) {
-        //string genTag = p.character.GenerateHexTag();
-        string genTag = p.deck.GetNextHextag();
-        return GenerateHex(p.id, genTag);
-    }
+    //public Hex GenerateRandomHex(Player p) {
+    //    //string genTag = p.character.GenerateHexTag();
+    //    string genTag = p.deck.GetNextHextag();
+    //    return GenerateHex(p.id, genTag);
+    //}
 
     //public HandObject GetRandomHex() { return genHex; }
 

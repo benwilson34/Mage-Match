@@ -265,7 +265,11 @@ public class InputController : MonoBehaviour {
         return _mm.boardCheck.CheckColumn(col) >= 0;
     }
 
-    bool PromptedDrop() { return _mm.MyTurn() && _mm.prompt.currentMode == Prompt.PromptMode.Drop; }
+    bool PromptedDrop() {
+        return  _mm.MyTurn() && 
+               (_mm.prompt.currentMode == Prompt.PromptMode.Drop || 
+                _mm.prompt.currentMode == Prompt.PromptMode.QuickdrawDrop);
+    }
 
     bool PromptedSwap() { return _mm.MyTurn() && _mm.prompt.currentMode == Prompt.PromptMode.Swap; }
 
@@ -444,11 +448,14 @@ public class InputController : MonoBehaviour {
 
                     if ((!_mm.IsPerformingAction() || _input.PromptedDrop()) && cb != null) {
                         if (Hex.IsConsumable(_input._heldHex.hextag)) {
-                            _mm.PlayerDropConsumable((Consumable)_input._heldHex);
+                            if (_input.PromptedDrop())
+                                _mm.prompt.SetDrop(_input._heldHex);
+                            else
+                                _mm.PlayerDropConsumable((Consumable)_input._heldHex);
                             return InputStatus.PartiallyHandled;
                         } else if (_input.DropCheck(cb.col)) {
                             if (_input.PromptedDrop())
-                                _mm.prompt.SetDrop(cb.col, (TileBehav)_input._heldHex);
+                                _mm.prompt.SetDrop(_input._heldHex, cb.col);
                             else
                                 _mm.PlayerDropTile(cb.col, _input._heldHex);
                             return InputStatus.PartiallyHandled;

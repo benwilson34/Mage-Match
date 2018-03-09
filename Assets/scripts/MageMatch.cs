@@ -128,12 +128,13 @@ public class MageMatch : MonoBehaviour {
         // TODO animate beginning of game
         for (int i = 0; i < 4; i++) {
             for (int p = 1; p <= 2; p++) {
-                yield return GetPlayer(p).DealTile();
+                //yield return GetPlayer(p).DealHex();
+                yield return _Deal(p);
                 yield return new WaitForSeconds(.1f);
             }
         }
 
-        yield return _activep.DealTile();
+        yield return _Deal(_activep.id);
 
         stats = new Stats(_p1, _p2);
 
@@ -376,21 +377,15 @@ public class MageMatch : MonoBehaviour {
 
     #region ----- Game Actions -----
 
+    public IEnumerator _Deal(int id) {
+        yield return _Draw(id, 1, false, true);
+    }
+
     public void PlayerDrawHex() {
-        StartCoroutine(_Draw(_activep.id, "", true));
-    }
-    
-    // for spells and such
-    // needed? just call mm.GetPlayer(id).DrawTiles()?
-    public void DrawTile(int id) {
-        StartCoroutine(_Draw(id, "", false));
+        StartCoroutine(_Draw(_activep.id, 1, true));
     }
 
-    public void DrawTile(int id, string genTag) {
-        StartCoroutine(_Draw(id, genTag, false));
-    }
-
-    public IEnumerator _Draw(int id, string genTag, bool playerAction) {
+    public IEnumerator _Draw(int id, int count = 1, bool playerAction = false, bool dealt = false) {
         MMLog.Log_MageMatch("   ---------- DRAW BEGIN ----------");
         _actionsPerforming++;
 
@@ -398,7 +393,36 @@ public class MageMatch : MonoBehaviour {
         if (p.hand.IsFull()) {
             MMLog.Log_MageMatch("Player " + id + "'s hand is full.");
         } else {
-            yield return p.DrawTiles(1, genTag, playerAction, false);
+            yield return p.DrawHexes(1, playerAction, false);
+            //MMLog.Log_Player("p" + id + " drawing with genTag=" + genTag);
+            for (int i = 0; i < count && !p.hand.IsFull(); i++) {
+                Hex hex;
+                //if (genTag.Equals("")) {
+                //    hex = _mm.hexMan.GenerateRandomHex(this);
+                //} else
+                //    hex = _mm.hexMan.GenerateHex(id, genTag);
+
+                string hextag = p.deck.GetNextHextag();
+                hex = hexMan.GenerateHex(id, hextag);
+
+                if (!MyTurn())
+                    hex.Flip();
+
+                //hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
+
+                yield return eventCont.Draw(EventController.Status.Begin, id, hex.hextag, playerAction, dealt);
+
+                p.hand.Add(hex);
+                // I feel like the draw anim should go here
+
+                yield return hex.OnDraw(); // Quickdraw prompting/other effects?
+
+                yield return eventCont.Draw(EventController.Status.End, id, hex.hextag, playerAction, dealt);
+
+                if (playerAction)
+                    eventCont.GameAction(true); //?
+            }
+            MMLog.Log_Player(">>>" + p.hand.NumFullSlots() + " slots filled...");
         }
 
         MMLog.Log_MageMatch("   ---------- DRAW END ----------");
@@ -406,23 +430,25 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
+
+
     public void PlayerDropTile(int col, Hex hex) {
         _activep.hand.Remove(hex);
-        StartCoroutine(_Drop(true, col, hex));
+        StartCoroutine(_Drop(hex, col, true));
     }
 
     public void DropTile(int col, Hex hex) {
         // remove from hand?
-        StartCoroutine(_Drop(false, col, hex));
+        StartCoroutine(_Drop(hex, col));
     }
 
     public void PlayerDropConsumable(Consumable cons) {
         _activep.hand.Remove(cons);
-        StartCoroutine(_Drop(true, -1, cons));
+        StartCoroutine(_Drop(cons, -1, true));
     }
 
-    public IEnumerator _Drop(bool playerAction, int col, Hex hex) {
-        MMLog.Log_MageMatch("   ---------- DROP BEGIN ----------");
+    public IEnumerator _Drop(Hex hex, int col, bool playerAction = false) {
+        MMLog.Log_MageMatch("   ---------- DROP BEGIN ---------- ");
         _actionsPerforming++;
 
         hex.Reveal();
@@ -532,7 +558,7 @@ public class MageMatch : MonoBehaviour {
         Player p = _activep;
         uiCont.SetDrawButton(false);
         Spell spell = p.character.GetSpell(spellNum);
-        if (p.AP >= spell.APcost) {
+        if (p.AP >= spell.APcost) { // maybe do this check before boardcheck so the button isn't on
             targeting.selectionCanceled = false; // maybe not needed here
 
             MMLog.Log_MageMatch("spell cast spellNum=" + spellNum + ", spell count=" + _spellsOnBoard[spellNum].Count);

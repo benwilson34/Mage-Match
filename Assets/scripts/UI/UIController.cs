@@ -141,7 +141,7 @@ public class UIController : MonoBehaviour {
     #region EventCont calls
     public IEnumerator OnTurnBegin(int id) {
         if (_mm.MyTurn()) {
-            SendSlidingText(_mm.ActiveP().name + ", make your move!");
+            newsfeed.AddActionLogItem(_mm.ActiveP().name + ", make your move!");
             //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
 
             SetDrawButton(true);
@@ -169,17 +169,6 @@ public class UIController : MonoBehaviour {
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
         // TODO update button
         yield return null;
-    }
-
-    //public IEnumerator OnMatch(int id, string[] seqs) {
-    //    if (seqs.Length > 1)
-    //        SendSlidingText("Wow, nice combo!");
-    //    yield return null;
-    //}
-
-    public void OnCascade(int id, int chain) {
-        UpdateMoveText("Wow, a cascade of " + chain + " matches!");
-        SendSlidingText("Wow, a cascade of " + chain + " matches!");
     }
 
     public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
@@ -242,22 +231,6 @@ public class UIController : MonoBehaviour {
         }
         yield return null;
     }
-
-    // delete
-    public void SendSlidingText(string str) {
-        //slidingText.text = str;
-        //StartCoroutine(_SlidingText());
-    }
-
-    // TODO prevent retriggering
-    //IEnumerator _SlidingText() {
-    //    RectTransform boxRect = slidingText.rectTransform;
-    //    Vector3 end = new Vector3(-boxRect.rect.width, slidingTextStart.y);
-    //    //Debug.Log("UICONT: _SlidingText: start=" + slidingTextStart.ToString() + ", end=" + end.ToString());
-    //    Tween t = slidingText.rectTransform.DOMoveX(end.x, 3f).SetEase(slidingEase);
-    //    yield return t.WaitForCompletion();
-    //    slidingText.rectTransform.position = slidingTextStart;
-    //}
 
     // delete
     public void UpdateMoveText(string str){

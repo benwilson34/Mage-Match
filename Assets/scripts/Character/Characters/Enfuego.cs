@@ -33,8 +33,9 @@ public class Enfuego : Character {
     }
 
     public IEnumerator Passive_Swap(int id, int c1, int r1, int c2, int r2) {
+        const int swapDmg = 5;
         if(_passive_swapsThisTurn > 0)
-            DealDamage(_passive_swapsThisTurn * 5);
+            DealDamage(_passive_swapsThisTurn * swapDmg);
 
         _passive_swapsThisTurn++;
         MMLog.Log_Enfuego("Incrementing swaps to " + _passive_swapsThisTurn);
@@ -110,8 +111,8 @@ public class Enfuego : Character {
 
     // Baila!
     protected override IEnumerator Spell1(TileSeq prereq) {
-        yield return ThisPlayer().DrawTiles(2, "", false, false); // my draw
-        yield return _mm.GetOpponent(_playerId).DrawTiles(2, "", false, false); // their draw
+        yield return ThisPlayer().DrawHexes(2, false, false); // my draw
+        yield return _mm.GetOpponent(_playerId).DrawHexes(2, false, false); // their draw
 
         yield return _mm.prompt.WaitForSwap(prereq);
         if(_mm.prompt.WasSuccessful())

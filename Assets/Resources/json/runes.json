@@ -7,6 +7,9 @@
   },
 
 
+
+
+
   "HR Form": {
     "type": "Consumable",
     "subtype": "Area Target",
@@ -19,6 +22,37 @@
     "deckCount": 3,
     "desc": "Target Zombie explodes, destroying itself and 2 random adjacent tiles, and dealing 60-80 damage."
   },
+
+  "Bandages": {
+    "type": "Consumable",
+    "subtype": "Buff",
+    "deckCount": 4,
+    "desc": "Heal yourself for 60-80 health and gain a stacking 2-turn buff that reduces the damage you take by 10%."
+  },
+  "Water Lily": {
+    "type": "Consumable",
+    "subtype": "",
+    "deckCount": 7,
+    "desc": "Add 4 Water tiles into the board in random columns."
+  },
+
+  "Dance Shoes": {
+    "type": "Consumable",
+    "subtype": "Swap Prompt",
+    "deckCount": 5,
+    "desc": "Perform a swap. Inflict Burning on both tiles swapped."
+  },
+  "Burning Bracers": {
+    "type": "Consumable",
+    "subtype": "",
+    "deckCount": 4,
+    "desc": "Gain 1 AP. Has Quickdraw if more than 9 tiles are burning."
+  },
+
+
+
+
+
   "Muscle Mass": {
     "type": "Consumable",
     "subtype": "Duplicate",
@@ -38,19 +72,6 @@
     "desc": "Gain a buff this turn that heals you for 20% of all damage you deal."
   },
 
-
-  "Bandages": {
-    "type": "Consumable",
-    "subtype": "Buff",
-    "deckCount": 4,
-    "desc": "Heal yourself for 60-80 health and gain a stacking 2-turn buff that reduces the damage you take by 10%."
-  },
-  "Water Lily": {
-    "type": "Consumable",
-    "subtype": "",
-    "deckCount": 7,
-    "desc": "Add 4 Water tiles into the board in random columns."
-  },
   "White Water": {
     "type": "Consumable",
     "subtype": "Quickdraw",
@@ -63,20 +84,13 @@
     "deckCount": 9,
     "desc": "Basic Water tile."
   },
-
-
-  "Dance Shoes": {
+  "Shuffle Gem": {
     "type": "Consumable",
     "subtype": "Swap Prompt",
-    "deckCount": 5,
-    "desc": "Perform a swap. Inflict Burning on both tiles swapped."
+    "deckCount": 6,
+    "desc": "Perform two swaps."
   },
-  "Burning Bracers": {
-    "type": "Consumable",
-    "subtype": "",
-    "deckCount": 4,
-    "desc": "Gain 1 AP. Has Quickdraw if more than 9 tiles are burning."
-  },
+
   "Molotov": {
     "type": "Consumable",
     "subtype": "",
@@ -94,5 +108,6 @@
     "subtype": "Quickdraw",
     "deckCount": 8,
     "desc": "Basic Fire tile."
-  },
+  }
+
 }

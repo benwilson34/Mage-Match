@@ -234,7 +234,7 @@ public class DebugTools : MonoBehaviour {
     }
 
     void AddToHandMode_OnClick() {
-        StartCoroutine(_mm._Draw(GetPlayerId(), GetHexGenTag(), false));
+        StartCoroutine(_mm._Draw(GetPlayerId()));
     }
 
     void DiscardMode_OnClick(Hex h) {

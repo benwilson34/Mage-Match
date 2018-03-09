@@ -6,34 +6,31 @@ using MMDebug;
 
 public class Prompt {
 
-    public enum PromptMode { None, Swap, Drop };
+    public enum PromptMode { None, Drop, Swap, QuickdrawDrop };
     public PromptMode currentMode = PromptMode.None;
 
     private MageMatch _mm;
 
     // TODO make/support dropping hexes (i.e. you could drop a consumable)
     // perhaps the Wait func should take a filter like targeting...
-    private TileBehav _dropTile;
+    private Hex _dropTile;
     private int _dropCol;
 
     private TileBehav[] _swapTiles;
     private bool _successful = false;
 
+    private int _quickdrawDropCol;
+    private bool _quickdrawWentToHand = false;
+
     public Prompt(MageMatch mm) {
         this._mm = mm;
     }
-
-    //public void Cancel() {
-    //    canceled = true;
-    //    currentMode = PromptMode.None;
-    //}
-
-    //public bool WasCanceled() { return canceled; }
 
     public bool WasSuccessful() {
         MMLog.Log("PROMPT", "blue", "prompt was" + (_successful ? "" : " not") + " successful");
         return _successful;
     }
+
 
     // ----- DROP -----
 
@@ -41,44 +38,79 @@ public class Prompt {
         MMLog.Log("PROMPT", "blue", "Waiting for DROP...");
         _successful = false;
 
-        if (_mm.ActiveP().hand.Count() == 0 ||                      // if player hand is empty, or
-            _mm.hexGrid.GetPlacedTiles().Count == HexGrid.NUM_CELLS) { // the board is full
+        if (_mm.ActiveP().hand.IsEmpty() || _mm.hexGrid.IsBoardFull()) {
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted DROP!!");
             yield break;
         }
 
-        _mm.uiCont.SendSlidingText("Drop a tile into the board!");
+        _mm.uiCont.newsfeed.AddActionLogItem("Drop a tile into the board!");
         currentMode = PromptMode.Drop;
 
         yield return new WaitUntil(() => currentMode == PromptMode.None);
     }
 
-    public IEnumerator WaitForQuickdrawDrop(Hex hex) {
+    public void SetDrop(Hex hex, int col = -1) {
+        MMLog.Log("PROMPT", "blue", "DROP is " + hex.hextag);
+        _mm.syncManager.SendDropSelection(hex, col);
 
-        yield return null;
-    }
-
-    public void SetDrop(int col, TileBehav tb) {
-        MMLog.Log("PROMPT", "blue", "DROP is " + tb.hextag);
-        _mm.syncManager.SendDropSelection(col, tb);
-
-        _dropTile = tb;
+        _dropTile = hex;
         _dropCol = col;
 
         currentMode = PromptMode.None;
         _successful = true;
     }
 
-    public TileBehav GetDropTile() { return _dropTile; }
+    public Hex GetDropTile() { return _dropTile; }
 
     public int GetDropCol() { return _dropCol; }
 
     public IEnumerator ContinueDrop() {
         _mm.ActiveP().hand.Remove(_dropTile);
-        yield return _mm._Drop(false, _dropCol, _dropTile);
+        yield return _mm._Drop(_dropTile, _dropCol);
     }
 
+
+    // ----- QUICKDRAW -----
+
+    public IEnumerator WaitForQuickdrawAction(Hex hex) {
+        _successful = false;
+        bool isCharm = Hex.IsConsumable(hex.hextag);
+
+        if (!isCharm && _mm.hexGrid.IsBoardFull()) {
+            yield break;
+        }
+
+        // TODO glow under hex
+
+        _mm.uiCont.newsfeed.AddActionLogItem("Choose what to do with the Quickdraw hex!");
+        _quickdrawWentToHand = false;
+        currentMode = PromptMode.Drop;
+
+        // the InputController calls SetDrop for this too
+        yield return new WaitUntil(() => currentMode == PromptMode.None);
+
+        if (!_quickdrawWentToHand) { // the player dropped it
+            // TODO sound fx
+            yield return _mm._Drop(hex, _dropCol);
+            yield return _mm._Draw(_mm.ActiveP().id);
+        }
+
+        // TODO remove glow
+
+        yield return null;
+    }
+
+    public void SetQuickdrawHand() {
+        _quickdrawWentToHand = true;
+        currentMode = PromptMode.None;
+    }
+
+
     // ----- SWAP -----
+
+    public IEnumerator WaitForSwap() {
+        yield return WaitForSwap(new TileSeq()); // is this ok?
+    }
 
     public IEnumerator WaitForSwap(TileSeq seq) {
         MMLog.Log("PROMPT", "blue", "Waiting for SWAP...");
@@ -90,7 +122,7 @@ public class Prompt {
             yield break;
         }
 
-        _mm.uiCont.SendSlidingText("Swap two tiles on the board!");
+        _mm.uiCont.newsfeed.AddActionLogItem("Swap two tiles on the board!");
         currentMode = PromptMode.Swap;
         _mm.uiCont.UpdateMoveText(_mm.ActiveP().name + ", swap two adjacent tiles!");
 
@@ -126,4 +158,5 @@ public class Prompt {
         Tile f = _swapTiles[0].tile, s = _swapTiles[1].tile;
         yield return _mm._SwapTiles(false, f.col, f.row, s.col, s.row);
     }
+
 }

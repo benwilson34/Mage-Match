@@ -51,44 +51,13 @@ public class Player {
         if (id == this.id) { // only the active player
             InitAP();
 
-            yield return DealTile();
+            yield return _mm._Deal(id);
         }
         yield return null;
     }
 
-    public IEnumerator DealTile() {
-        yield return DrawTiles(1, "", false, true);
-    }
-
-    public IEnumerator DealTile(string genTag) {
-        yield return DrawTiles(1, genTag, false, true);
-    }
-
-    public IEnumerator DrawTiles(int numTiles, string genTag, bool playerAction, bool dealt) {
-        MMLog.Log_Player("p" + id + " drawing with genTag=" + genTag);
-        for (int i = 0; i < numTiles && !hand.IsFull(); i++) {
-            Hex hex;
-            if (genTag.Equals("")) {
-                hex = _mm.hexMan.GenerateRandomHex(this);
-            } else
-                hex = _mm.hexMan.GenerateHex(id, genTag);
-
-            if (!ThisIsLocal())
-                hex.Flip();
-
-            //hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
-
-            yield return _mm.eventCont.Draw(EventController.Status.Begin, id, hex.hextag, playerAction, dealt);
-
-            hand.Add(hex);
-            // I feel like the draw anim should go here
-
-            yield return _mm.eventCont.Draw(EventController.Status.End, id, hex.hextag, playerAction, dealt);
-
-            if (playerAction)
-                _mm.eventCont.GameAction(true); //?
-        }
-        MMLog.Log_Player(">>>" + hand.NumFullSlots() + " slots filled...");
+    public IEnumerator DrawHexes(int count, bool playerAction, bool dealt) {
+        yield return _mm._Draw(id, count, playerAction, dealt);
     }
 
     public IEnumerator DiscardRandom(int count) {

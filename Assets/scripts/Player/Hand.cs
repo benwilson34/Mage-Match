@@ -122,6 +122,8 @@ public class Hand {
 
     public int Count() { return _hexes.Count; }
 
+    public bool IsEmpty() { return _hexes.Count == 0; }
+
     public bool IsFull() { return _hexes.Count == MAX_HAND_SIZE; }
 
     public HandSlot GetHandSlot(int ind) { return _slots[ind]; }

@@ -494,11 +494,13 @@
     <Compile Include="Assets\scripts\Hexes\Consumables\Molotov.cs" />
     <Compile Include="Assets\scripts\Hexes\Consumables\ProteinPills.cs" />
     <Compile Include="Assets\scripts\Hexes\Consumables\SampleConsumable.cs" />
+    <Compile Include="Assets\scripts\Hexes\Consumables\ShuffleGem.cs" />
     <Compile Include="Assets\scripts\Hexes\Consumables\VA_Bandages.cs" />
     <Compile Include="Assets\scripts\Hexes\Consumables\VA_RiverBracelet.cs" />
     <Compile Include="Assets\scripts\Hexes\Consumables\VA_WaterLily.cs" />
     <Compile Include="Assets\scripts\Hexes\Hex.cs" />
     <Compile Include="Assets\scripts\Hexes\ObjectEffects.cs" />
+    <Compile Include="Assets\scripts\Hexes\Rune Basics\BasicQuickdraw.cs" />
     <Compile Include="Assets\scripts\Hexes\Rune Basics\Brushfire.cs" />
     <Compile Include="Assets\scripts\Hexes\Rune Basics\MuscleMass.cs" />
     <Compile Include="Assets\scripts\Hexes\Rune Basics\RainDrops.cs" />
