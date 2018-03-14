@@ -605,7 +605,7 @@ public class MageMatch : MonoBehaviour {
 
             uiCont.TurnOnSpellButtonsAfterCast(_activep.id, spellNum);
         } else {
-            uiCont.UpdateMoveText("Not enough AP to cast!");
+            uiCont.ShowAlertText("Not enough AP to cast!");
         }
 
         uiCont.SetDrawButton(true);
@@ -699,7 +699,7 @@ public class MageMatch : MonoBehaviour {
     public void EndTheGame() {
         _endGame = true;
         audioCont.GameEnd();
-        uiCont.UpdateMoveText("Wow!! " + _activep.name + " has won!!");
+        uiCont.ShowAlertText("Wow!! " + _activep.name + " has won!!");
         uiCont.DeactivateAllSpellButtons(1);
         uiCont.DeactivateAllSpellButtons(2);
         eventCont.boardAction -= OnBoardAction; //?

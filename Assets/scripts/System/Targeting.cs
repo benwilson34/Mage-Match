@@ -105,7 +105,7 @@ public class Targeting {
             _mm.uiCont.OutlineTarget(t.col, t.row);
             _targetTBs.Add(tb);
             DecTargets();
-            _mm.uiCont.UpdateMoveText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
+            _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
             MMLog.Log_Targeting("Targeted tile (" + t.col + ", " + t.row + ")");
         } else if (currentTMode == TargetMode.TileArea) {
             List<TileBehav> tbs;
@@ -136,7 +136,7 @@ public class Targeting {
             _mm.uiCont.OutlineTarget(t.col, t.row);
             _targetTBs.Add(tb);
             DecTargets();
-            _mm.uiCont.UpdateMoveText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
+            _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
             MMLog.Log_Targeting("Targeted tile (" + t.col + ", " + t.row + ")");
         }
     }
@@ -176,7 +176,7 @@ public class Targeting {
         _mm.uiCont.OutlineTarget(cb.col, cb.row);
         _targetCBs.Add(cb);
         DecTargets();
-        _mm.uiCont.UpdateMoveText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
+        _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
         MMLog.Log_Targeting("Targeted tile (" + cb.col + ", " + cb.row + ")");
     }
 
@@ -185,7 +185,7 @@ public class Targeting {
         Player p = _mm.ActiveP();
         _mm.EnterState(MageMatch.State.Targeting);
 
-        _mm.uiCont.UpdateMoveText(p.name + ", choose " + _targetsLeft + " more targets.");
+        _mm.uiCont.ShowAlertText(p.name + ", choose " + _targetsLeft + " more targets.");
 
         IList validObjs; // selected targets are removed from this, so the loop breaks if no more valids
         if (currentTMode == TargetMode.Cell) {
@@ -205,7 +205,7 @@ public class Targeting {
         yield return new WaitForSeconds(2f);
 
         _mm.uiCont.DeactivateTargetingUI();
-        _mm.uiCont.UpdateMoveText("");
+        _mm.uiCont.ShowAlertText("");
 
         currentTMode = TargetMode.Tile; // needed?
         //targetTBs = null?

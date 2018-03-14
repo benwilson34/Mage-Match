@@ -42,6 +42,9 @@ public class UIController : MonoBehaviour {
 
     private GameObject _quickdrawButton, _hexGlow;
 
+    private Transform _alertbar;
+    private const float ALERT_DIS = 55f, ALERT_DELAY = 3f;
+    private bool _alertShowing = false;
 
     public void Init(){
         _board = GameObject.Find("cells").transform;
@@ -114,6 +117,9 @@ public class UIController : MonoBehaviour {
 
         _quickdrawButton = GameObject.Find("b_quickdraw");
         _quickdrawButton.SetActive(false);
+
+        _alertbar = GameObject.Find("Alertbar").transform;
+        _alertbar.Translate(0, ALERT_DIS, 0);
     }
 
     public void InitEvents() {
@@ -189,7 +195,7 @@ public class UIController : MonoBehaviour {
 
     public void Reset() {
         UpdateDebugGrid();
-        UpdateMoveText("Fight!!");
+        ShowAlertText("Fight!!");
 
         if (!_mm.MyTurn())
             SetDrawButton(false);
@@ -238,9 +244,20 @@ public class UIController : MonoBehaviour {
         yield return null;
     }
 
-    // delete
-    public void UpdateMoveText(string str){
-        //moveText.text = str;
+    public void ShowAlertText(string str) {
+        StartCoroutine(_ShowAlertText(str));
+    }
+    IEnumerator _ShowAlertText(string str) {
+        _alertbar.Find("t_alert").GetComponent<Text>().text = str;
+
+        if (!_alertShowing) {
+            _alertShowing = true;
+            float posY = _alertbar.position.y;
+            yield return _alertbar.DOMoveY(posY - ALERT_DIS, .25f).WaitForCompletion();
+            yield return new WaitForSeconds(ALERT_DELAY);
+            yield return _alertbar.DOMoveY(posY, .25f).WaitForCompletion();
+            _alertShowing = false;
+        }
     }
 
 

@@ -124,7 +124,7 @@ public class Prompt {
 
         _mm.uiCont.newsfeed.AddActionLogItem("Swap two tiles on the board!");
         currentMode = PromptMode.Swap;
-        _mm.uiCont.UpdateMoveText(_mm.ActiveP().name + ", swap two adjacent tiles!");
+        _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", swap two adjacent tiles!");
 
         yield return new WaitUntil(() => currentMode == PromptMode.None);
     }
