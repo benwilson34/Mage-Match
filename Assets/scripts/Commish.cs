@@ -14,22 +14,22 @@ public class Commish  {
     }
 
     public void InitEvents() {
-        _mm.eventCont.commishMatch += OnCommishMatch;
+        //_mm.eventCont.commishMatch += OnCommishMatch;
         //mm.eventCont.match += OnMatch;
     }
 
-    public void OnCommishMatch(string[] seqs) {
-        int sum = 0;
-        string s = "{";
-        foreach (string seq in seqs) {
-            int i = seq.Length;
-            sum += i;
-            s += i + ",";
-        }
-        s = s.Remove(s.Length - 1, 1) + "}";
-        MMLog.Log_Commish("CommishMatch: lens=" + s + ", sum=" + sum);
-        _numTiles += sum;
-    }
+    //public void OnCommishMatch(string[] seqs) {
+    //    int sum = 0;
+    //    string s = "{";
+    //    foreach (string seq in seqs) {
+    //        int i = seq.Length;
+    //        sum += i;
+    //        s += i + ",";
+    //    }
+    //    s = s.Remove(s.Length - 1, 1) + "}";
+    //    MMLog.Log_Commish("CommishMatch: lens=" + s + ", sum=" + sum);
+    //    _numTiles += sum;
+    //}
 
     //public void OnMatch(int id, int[] lens) {
     //    // TODO mood stuff etc.
@@ -75,7 +75,7 @@ public class Commish  {
                 yield return new WaitForSeconds(.15f);
             }
 
-            Hex tb = _mm.hexMan.GenerateTile(3, elems.Dequeue()); // should get own func?
+            Hex tb = _mm.hexMan.GenerateBasicTile(0, elems.Dequeue()); // should get own func?
             MMLog.Log_Commish("Dropping into col " + colQ.Peek());
 
             int col = colQ.Dequeue();

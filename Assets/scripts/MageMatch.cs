@@ -7,7 +7,7 @@ using MMDebug;
 public class MageMatch : MonoBehaviour {
 
     // how to handle performing action here? also better name for Normal?
-    public enum State { Normal, Selecting, Targeting, NewsfeedMenu, DebugMenu, TurnSwitching };
+    public enum State { Normal, BeginningOfGame, Selecting, Targeting, NewsfeedMenu, DebugMenu, TurnSwitching };
     private Stack<State> _stateStack;
 
     public enum Turn { PlayerTurn, CommishTurn }; // MyTurn, OppTurn?
@@ -75,6 +75,10 @@ public class MageMatch : MonoBehaviour {
     }
 
     public IEnumerator Reset() {
+        inputCont = GetComponent<InputController>();
+        EnterState(State.Normal);
+        EnterState(State.BeginningOfGame);
+
         _tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
         gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
         MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name + ",p1 char=" + gameSettings.p1char + ",p2="+gameSettings.p2name+",p2 char=" + gameSettings.p2char+",timer=" +gameSettings.turnTimerOn);
@@ -140,8 +144,7 @@ public class MageMatch : MonoBehaviour {
 
         timer.StartTimer();
 
-        inputCont = GetComponent<InputController>();
-        EnterState(State.Normal);
+        ExitState(); // end BeginningOfGame state
 
         // TODO init some stuff that would otherwise be BeginTurnEvent()
         yield return null;
@@ -393,19 +396,13 @@ public class MageMatch : MonoBehaviour {
         if (p.hand.IsFull()) {
             MMLog.Log_MageMatch("Player " + id + "'s hand is full.");
         } else {
-            yield return p.DrawHexes(1, playerAction, false);
             //MMLog.Log_Player("p" + id + " drawing with genTag=" + genTag);
             for (int i = 0; i < count && !p.hand.IsFull(); i++) {
-                Hex hex;
-                //if (genTag.Equals("")) {
-                //    hex = _mm.hexMan.GenerateRandomHex(this);
-                //} else
-                //    hex = _mm.hexMan.GenerateHex(id, genTag);
-
                 string hextag = p.deck.GetNextHextag();
-                hex = hexMan.GenerateHex(id, hextag);
+                Hex hex = hexMan.GenerateHex(id, hextag);
+                hex.putBackIntoDeck = true;
 
-                if (!MyTurn())
+                if (id != myID)
                     hex.Flip();
 
                 //hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
@@ -430,6 +427,25 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
+    public IEnumerator _Duplicate(int id, string hextag) {
+        Player p = GetPlayer(id);
+        if (p.hand.IsFull()) {
+            MMLog.Log_MageMatch("Player " + id + "'s hand is full. Duplicate failed.");
+            yield break;
+        }
+
+        Hex hex = hexMan.GenerateHex(id, hextag);
+
+        // TODO animate second hex being duped from first
+
+        if (id != myID)
+            hex.Flip();
+
+        p.hand.Add(hex);
+
+        yield return null;
+    }
+
 
 
     public void PlayerDropTile(int col, Hex hex) {
@@ -442,9 +458,9 @@ public class MageMatch : MonoBehaviour {
         StartCoroutine(_Drop(hex, col));
     }
 
-    public void PlayerDropConsumable(Consumable cons) {
-        _activep.hand.Remove(cons);
-        StartCoroutine(_Drop(cons, -1, true));
+    public void PlayerDropCharm(Charm charm) {
+        _activep.hand.Remove(charm);
+        StartCoroutine(_Drop(charm, -1, true));
     }
 
     public IEnumerator _Drop(Hex hex, int col, bool playerAction = false) {
@@ -456,9 +472,9 @@ public class MageMatch : MonoBehaviour {
         if (currentTurn == Turn.PlayerTurn) //kinda hacky
             yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
 
-        if (Hex.IsConsumable(hex.hextag)) {
+        if (Hex.IsCharm(hex.hextag)) {
             _activep.hand.Remove(hex);
-            Consumable cons = (Consumable)hex;
+            Charm cons = (Charm)hex;
 
             // TODO animate? what should it look like when you use it?
             yield return cons.DropEffect();

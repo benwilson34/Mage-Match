@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Deck {
 
-    private static int DECK_BASIC_COUNT = 50;
-
     private MageMatch _mm;
     private Player _player;
     private Queue<string> _deckQ;
@@ -31,10 +29,9 @@ public class Deck {
 
         foreach (string rune in info.runes) {
             var runeInfo = RuneInfo.GetRuneInfo(rune);
-            if (runeInfo.type == "Consumable") {
-                for (int i = 0; i < runeInfo.deckCount; i++) {
-                    list.Add("p" + _player.id + "-C-" + runeInfo.title);
-                }
+            string cat = runeInfo.category.Substring(0, 1);
+            for (int i = 0; i < runeInfo.deckCount; i++) {
+                list.Add("p" + _player.id + "-" + cat + "-" + runeInfo.title);
             }
         }
 
@@ -58,7 +55,7 @@ public class Deck {
     void PrintDeck() {
         string s = "[";
         foreach (string hextag in _deckQ.ToArray()) {
-            s += Hex.TagType(hextag) + ", ";
+            s += Hex.TagTitle(hextag) + ", ";
         }
         if (_deckQ.Count > 0)
             s = s.Substring(0, s.Length - 2);

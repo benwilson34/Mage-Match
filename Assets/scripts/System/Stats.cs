@@ -122,7 +122,7 @@ public class Stats {
     public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
         if (playerAction) {
             string s = "p" + id + " DROP " + tag;
-            if (!Hex.IsConsumable(tag))
+            if (!Hex.IsCharm(tag))
                 s += " col" + col;
             Report(s);
             GetPS(id).drops++;

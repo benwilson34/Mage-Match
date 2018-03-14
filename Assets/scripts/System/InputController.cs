@@ -447,11 +447,11 @@ public class InputController : MonoBehaviour {
                     CellBehav cb = _input.GetMouseCell(hits); // get cell underneath
 
                     if ((!_mm.IsPerformingAction() || _input.PromptedDrop()) && cb != null) {
-                        if (Hex.IsConsumable(_input._heldHex.hextag)) {
+                        if (Hex.IsCharm(_input._heldHex.hextag)) {
                             if (_input.PromptedDrop())
                                 _mm.prompt.SetDrop(_input._heldHex);
                             else
-                                _mm.PlayerDropConsumable((Consumable)_input._heldHex);
+                                _mm.PlayerDropCharm((Charm)_input._heldHex);
                             return InputStatus.PartiallyHandled;
                         } else if (_input.DropCheck(cb.col)) {
                             if (_input.PromptedDrop())
@@ -545,21 +545,9 @@ public class InputController : MonoBehaviour {
 
             MMLog.Log_InputCont("Standard mouse up");
 
-            //Hex hex = (Hex)obj;
             //if (hex.currentState == Hex.State.Hand) {
                 if (_input._holdingHex) {
                     _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
-                    //Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    //RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
-                    //CellBehav cb = input.GetMouseCell(hits); // get cell underneath
-
-                    //if ((!mm.IsPerformingAction() || input.PromptedDrop()) && cb != null) {
-                    //    if (input.DropCheck(cb.col)) {
-                    //        if (input.PromptedDrop())
-                    //            mm.prompt.SetDrop(cb.col, (TileBehav)input.heldHex);
-                    //        else
-                    //            mm.PlayerDropTile(cb.col, input.heldHex);
-                    //    }
                     if(status == InputStatus.Unhandled)
                         _mm.LocalP().hand.ReleaseTile(_input._heldHex); //?
                     else

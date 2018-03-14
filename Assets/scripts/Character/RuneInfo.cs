@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class RuneInfo {
 
-    public string title, type;
+    public string title, category;
+    public string[] keywords;
     public int deckCount;
     public string desc;
 

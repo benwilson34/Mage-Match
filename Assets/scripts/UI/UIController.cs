@@ -40,6 +40,9 @@ public class UIController : MonoBehaviour {
     private Vector3 _slidingTextStart;
     private bool _localOnRight = false;
 
+    private GameObject _quickdrawButton, _hexGlow;
+
+
     public void Init(){
         _board = GameObject.Find("cells").transform;
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
@@ -108,6 +111,9 @@ public class UIController : MonoBehaviour {
         LoadPrefabs();
 
         tooltipMan = GetComponent<TooltipManager>();
+
+        _quickdrawButton = GameObject.Find("b_quickdraw");
+        _quickdrawButton.SetActive(false);
     }
 
     public void InitEvents() {
@@ -480,6 +486,27 @@ public class UIController : MonoBehaviour {
 
     #endregion
 
+    public void ToggleQuickdrawUI(bool on, Hex hex = null) {
+        // TODO glow under hex
+        _quickdrawButton.SetActive(on);
+
+        int id = _mm.ActiveP().id;
+        TurnAllSpellButtons(id, !on);
+        if (on) {
+            _drawButton.Deactivate();
+
+            Vector3 newPos = hex.transform.position;
+            newPos.y += 1;
+            _quickdrawButton.transform.position = newPos;
+        } else {
+            _drawButton.Activate();
+        }
+    }
+
+    public void KeepQuickdraw() {
+        _mm.prompt.SetQuickdrawHand();
+    }
+
 
     #region ----- BUTTONS -----
     public void SetDrawButton(bool interactable) {
@@ -531,6 +558,16 @@ public class UIController : MonoBehaviour {
             button.Deactivate();
         }
 	}
+
+    public void TurnAllSpellButtons(int id, bool on) {
+        for (int i = 0; i < 5; i++) {
+            var button = GetButtonCont(id, i);
+            if (on)
+                button.TurnOnScreen();
+            else
+                button.TurnOffScreen();
+        }
+    }
 
     public void TurnOffSpellButtonsDuringCast(int id, int spellNum) {
         for (int i = 0; i < 5; i++) {

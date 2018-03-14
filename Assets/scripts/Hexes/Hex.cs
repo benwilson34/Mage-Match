@@ -8,22 +8,29 @@ public class Hex : MonoBehaviour, Tooltipable {
 	public enum State { Hand, Placed, Removed };
 	public State currentState;
     public string hextag;
+    public bool putBackIntoDeck = false;
 
     protected MageMatch _mm;
     private Sprite _flipSprite;
     private bool _flipped = false;
     private bool _quickdraw = false, _duplicate = false;
 
-	void Awake () {
-		_mm = GameObject.Find("board").GetComponent<MageMatch>();
-	}
-
-    public virtual void Init() { }
+    public virtual void Init(MageMatch mm) {
+        _mm = mm;
+    }
 
     protected void SetQuickdraw() { _quickdraw = true; }
+    protected void SetDuplicate() { _duplicate = true; }
     public IEnumerator OnDraw() {
-        if (_quickdraw) {
-            yield return _mm.prompt.WaitForQuickdrawAction(this);
+        if (_mm.GetState() == MageMatch.State.BeginningOfGame)
+            yield break;
+
+        int playerId = TagPlayer(hextag);
+        if (playerId == _mm.ActiveP().id) { // if this hex was generated on that player's turn
+            if (_quickdraw)
+                yield return _mm.prompt.WaitForQuickdrawAction(this);
+            if (_duplicate)
+                yield return _mm._Duplicate(playerId, hextag);
         }
         yield return null;
     }
@@ -37,9 +44,9 @@ public class Hex : MonoBehaviour, Tooltipable {
 
     public static string TagCat(string tag) { return tag.Split(new char[] { '-' })[1]; }
 
-    public static bool IsConsumable(string tag) { return TagCat(tag) == "C"; }
+    public static bool IsCharm(string tag) { return TagCat(tag) == "C"; }
 
-    public static string TagType(string tag) { return tag.Split(new char[] { '-' })[2]; }
+    public static string TagTitle(string tag) { return tag.Split(new char[] { '-' })[2]; }
 
     public static int TagNum(string tag) { return int.Parse(tag.Split(new char[] { '-' })[3]); }
 
@@ -62,13 +69,6 @@ public class Hex : MonoBehaviour, Tooltipable {
         if (_flipped)
             Flip();
     }
-
-    //public IEnumerator Quickdraw() {
-    //    // TODO prompt drop
-    //    yield return _mm.prompt.WaitForQuickdrawDrop(this);
-
-    //    yield return null;
-    //}
 
     //public IEnumerator Duplicate() {
     //    yield return null;

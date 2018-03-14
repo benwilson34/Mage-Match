@@ -12,15 +12,17 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     private MageMatch _mm;
     private HexGrid _hexGrid;
 
-    private GameObject _firePF, _waterPF, _earthPF, _airPF, _muscPF; // basic tile prefabs
-    private GameObject _stonePF, _emberPF, _tombstonePF; // token prefabs
-    private GameObject _cons_sample;
-    private GameObject _cons_HRform, _cons_partySnacks, _cons_proteinPills, _cons_leeches;
-    private GameObject _cons_bandages, _cons_waterLily;
-    private GameObject _cons_danceShoes, _cons_burningBracers, _cons_molotov, _cons_fiveAlarmBell;
+    private GameObject _b_fire, _b_water, _b_earth, _b_air, _b_musc; // basic tile prefabs
+    private GameObject _stonePF, _emberPF, _t_tombstone; // token prefabs
+    private GameObject _tq_brushfire, _tq_whiteWater;
+    private GameObject _td_muscleMass;
+    private GameObject _c_sample;
+    private GameObject _c_HRform, _c_partySnacks, _c_proteinPills, _c_leeches;
+    private GameObject _c_bandages, _c_waterLily, _c_shuffleGem;
+    private GameObject _c_danceShoes, _c_burningBracers, _c_molotov, _c_fiveAlarmBell;
 
     public HexManager(MageMatch mm) {
-        this._mm = mm;
+        _mm = mm;
         _hexGrid = mm.hexGrid;
         _tagDicts = new Dictionary<string, int>[3];
         for (int i = 0; i < 3; i++) {
@@ -30,35 +32,192 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     }
 
     void LoadPrefabs() {
-        _firePF = Resources.Load("prefabs/hexes/basic_fire") as GameObject;
-        _waterPF = Resources.Load("prefabs/hexes/basic_water") as GameObject;
-        _earthPF = Resources.Load("prefabs/hexes/basic_earth") as GameObject;
-        _airPF = Resources.Load("prefabs/hexes/basic_air") as GameObject;
-        _muscPF = Resources.Load("prefabs/hexes/basic_muscle") as GameObject;
+        _b_fire = Resources.Load("prefabs/hexes/b_fire") as GameObject;
+        _b_water = Resources.Load("prefabs/hexes/b_water") as GameObject;
+        _b_earth = Resources.Load("prefabs/hexes/b_earth") as GameObject;
+        _b_air = Resources.Load("prefabs/hexes/b_air") as GameObject;
+        _b_musc = Resources.Load("prefabs/hexes/b_muscle") as GameObject;
 
         // TODO load only the tokens + consumables that either player will use??
-        _stonePF = Resources.Load("prefabs/hexes/token_stone") as GameObject;
-        _emberPF = Resources.Load("prefabs/hexes/token_ember") as GameObject;
-        _tombstonePF = Resources.Load("prefabs/hexes/token_tombstone") as GameObject;
+        //_stonePF = Resources.Load("prefabs/hexes/token_stone") as GameObject;
+        //_emberPF = Resources.Load("prefabs/hexes/token_ember") as GameObject;
+        _t_tombstone = Resources.Load("prefabs/hexes/token_tombstone") as GameObject;
 
 
-        _cons_sample = Resources.Load("prefabs/hexes/cons_sample") as GameObject;
+        _c_sample = Resources.Load("prefabs/hexes/c_sample") as GameObject;
 
-        _cons_HRform = Resources.Load("prefabs/hexes/cons_HRform") as GameObject;
-        _cons_partySnacks = Resources.Load("prefabs/hexes/cons_partySnacks") as GameObject;
-        _cons_proteinPills = Resources.Load("prefabs/hexes/cons_proteinPills") as GameObject;
-        _cons_leeches = Resources.Load("prefabs/hexes/cons_leeches") as GameObject;
+        _c_HRform = Resources.Load("prefabs/hexes/c_HRform") as GameObject;
+        _c_partySnacks = Resources.Load("prefabs/hexes/c_partySnacks") as GameObject;
+        _c_proteinPills = Resources.Load("prefabs/hexes/c_proteinPills") as GameObject;
+        _c_leeches = Resources.Load("prefabs/hexes/c_leeches") as GameObject;
+        _td_muscleMass = Resources.Load("prefabs/hexes/td_muscleMass") as GameObject;
 
-        _cons_bandages = Resources.Load("prefabs/hexes/cons_bandages") as GameObject;
-        _cons_waterLily = Resources.Load("prefabs/hexes/cons_waterLily") as GameObject;
+        _c_bandages = Resources.Load("prefabs/hexes/c_bandages") as GameObject;
+        _c_waterLily = Resources.Load("prefabs/hexes/c_waterLily") as GameObject;
+        _tq_whiteWater = Resources.Load("prefabs/hexes/tq_whiteWater") as GameObject;
+        _c_shuffleGem = Resources.Load("prefabs/hexes/c_shuffleGem") as GameObject;
 
-        _cons_danceShoes = Resources.Load("prefabs/hexes/cons_danceShoes") as GameObject;
-        _cons_burningBracers = Resources.Load("prefabs/hexes/cons_burningBracers") as GameObject;
-        _cons_molotov = Resources.Load("prefabs/hexes/cons_molotov") as GameObject;
-        _cons_fiveAlarmBell = Resources.Load("prefabs/hexes/cons_fiveAlarmBell") as GameObject;
+        _c_danceShoes = Resources.Load("prefabs/hexes/c_danceShoes") as GameObject;
+        _c_burningBracers = Resources.Load("prefabs/hexes/c_burningBracers") as GameObject;
+        _c_molotov = Resources.Load("prefabs/hexes/c_molotov") as GameObject;
+        //_c_fiveAlarmBell = Resources.Load("prefabs/hexes/c_fiveAlarmBell") as GameObject;
+        _tq_brushfire = Resources.Load("prefabs/hexes/tq_brushfire") as GameObject;
 
 
         flipSprite = Resources.Load<Sprite>("sprites/hex-back");
+    }
+
+    
+    // ---------- GENERATION ----------
+
+    public Hex GenerateHex(int id, string genTag) {
+        MMLog.Log("HEXMAN", "black", "Generating tile from genTag \"" + genTag + "\"");
+        string type = Hex.TagTitle(genTag);
+        switch (Hex.TagCat(genTag)) {
+            case "B":
+                return GenerateBasicTile(id, Tile.CharToElement(type[0]));
+            case "T":
+                return GenerateTile(id, type);
+            case "C":
+                return GenerateCharm(id, type);
+            default:
+                MMLog.LogError("HEXMAN: Failed " + genTag + " with cat="+Hex.TagCat(genTag));
+                return null;
+        }
+    }
+
+    // maybe return TB?
+    public Hex GenerateBasicTile(int id, Tile.Element element) {
+        return GenerateBasicTile(id, element, GameObject.Find("tileSpawn").transform.position);
+    }
+
+    // maybe return TB?
+    public Hex GenerateBasicTile(int id, Tile.Element element, Vector3 position) {
+        GameObject go;
+        string type;
+        switch (element) {
+            case Tile.Element.Fire:
+                go = GameObject.Instantiate(_b_fire, position, Quaternion.identity);
+                type = "F";
+                break;
+            case Tile.Element.Water:
+                go = GameObject.Instantiate(_b_water, position, Quaternion.identity);
+                type = "W";
+                break;
+            case Tile.Element.Earth:
+                go = GameObject.Instantiate(_b_earth, position, Quaternion.identity);
+                type = "E";
+                break;
+            case Tile.Element.Air:
+                go = GameObject.Instantiate(_b_air, position, Quaternion.identity);
+                type = "A";
+                break;
+            case Tile.Element.Muscle:
+                go = GameObject.Instantiate(_b_musc, position, Quaternion.identity);
+                type = "M";
+                break;
+            default:
+                MMLog.LogError("HEXMAN: Tried to init a tile with elem None!");
+                return null;
+        }
+
+        TileBehav tb = go.GetComponent<TileBehav>();
+        tb.hextag = GenFullTag(id, "B", type); // B for Basic tile
+        tb.Init(_mm);
+        tb.gameObject.name = tb.hextag;
+        return tb;
+    }
+
+    // maybe return TB?
+    public Hex GenerateTile(int id, string type) {
+        GameObject go;
+        switch (type) {
+            //case "Stone":
+            //    go = GameObject.Instantiate(_stonePF);
+            //    break;
+            //case "Ember":
+            //    go = GameObject.Instantiate(_emberPF);
+            //    break;
+            case "Tombstone":
+                go = GameObject.Instantiate(_t_tombstone);
+                break;
+
+            case "Brushfire":
+                go = GameObject.Instantiate(_tq_brushfire);
+                break;
+            case "White Water":
+                go = GameObject.Instantiate(_tq_whiteWater);
+                break;
+
+            case "Muscle Mass":
+                go = GameObject.Instantiate(_td_muscleMass);
+                break;
+
+            default:
+                MMLog.LogError("HEXMAN: Tried to init a token with bad name=" + type);
+                return null;
+        }
+
+        TileBehav tb = go.GetComponent<TileBehav>();
+        tb.hextag = GenFullTag(id, "T", type); // T for Tile
+        tb.Init(_mm);
+        tb.gameObject.name = tb.hextag;
+        return tb;
+    }
+
+    public Hex GenerateCharm(int id, string type) {
+        GameObject go;
+        switch (type) {
+            case "Sample Charm":
+                go = GameObject.Instantiate(_c_sample);
+                break;
+
+            case "HR Form":
+                go = GameObject.Instantiate(_c_HRform);
+                break;
+            case "Party Snacks":
+                go = GameObject.Instantiate(_c_partySnacks);
+                break;
+            case "Protein Pills":
+                go = GameObject.Instantiate(_c_proteinPills);
+                break;
+            case "Leeches!":
+                go = GameObject.Instantiate(_c_leeches);
+                break;
+
+            case "Bandages":
+                go = GameObject.Instantiate(_c_bandages);
+                break;
+            case "Water Lily":
+                go = GameObject.Instantiate(_c_waterLily);
+                break;
+            case "Shuffle Gem":
+                go = GameObject.Instantiate(_c_shuffleGem);
+                break;
+
+            case "Dance Shoes":
+                go = GameObject.Instantiate(_c_danceShoes);
+                break;
+            case "Burning Bracers":
+                go = GameObject.Instantiate(_c_burningBracers);
+                break;
+            case "Molotov":
+                go = GameObject.Instantiate(_c_molotov);
+                break;
+            case "Five-Alarm Bell":
+                go = GameObject.Instantiate(_c_fiveAlarmBell);
+                break;
+
+            default:
+                MMLog.LogError("HEXMAN: Tried to init a consumable with bad type=" + type);
+                return null;
+        }
+
+        Hex hex = go.GetComponent<Hex>();
+        hex.hextag = GenFullTag(id, "C", type); // C for Charm
+        hex.gameObject.name = hex.hextag;
+        hex.Init(_mm);
+        return hex;
     }
 
     string GenFullTag(int id, string cat, string type) {
@@ -75,150 +234,8 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return fullTag;
     }
 
-    //public Hex GenerateRandomHex(Player p) {
-    //    //string genTag = p.character.GenerateHexTag();
-    //    string genTag = p.deck.GetNextHextag();
-    //    return GenerateHex(p.id, genTag);
-    //}
 
-    //public HandObject GetRandomHex() { return genHex; }
-
-    public Hex GenerateHex(int id, string genTag) {
-        MMLog.Log("HEXMAN", "black", "Generating tile from genTag \"" + genTag + "\"");
-        string type = Hex.TagType(genTag);
-        switch (Hex.TagCat(genTag)) {
-            case "B":
-                return GenerateTile(id, Tile.CharToElement(type[0]));
-            case "T":
-                return GenerateToken(id, type);
-            case "C":
-                return GenerateConsumable(id, type);
-            default:
-                MMLog.LogError("HEXMAN: Failed " + genTag + " with cat="+Hex.TagCat(genTag));
-                return null;
-        }
-    }
-
-    // maybe return TB?
-    public Hex GenerateTile(int id, Tile.Element element) {
-        return GenerateTile(id, element, GameObject.Find("tileSpawn").transform.position);
-    }
-
-    // maybe return TB?
-    public Hex GenerateTile(int id, Tile.Element element, Vector3 position) {
-        GameObject go;
-        string type;
-        switch (element) {
-            case Tile.Element.Fire:
-                go = GameObject.Instantiate(_firePF, position, Quaternion.identity);
-                type = "F";
-                break;
-            case Tile.Element.Water:
-                go = GameObject.Instantiate(_waterPF, position, Quaternion.identity);
-                type = "W";
-                break;
-            case Tile.Element.Earth:
-                go = GameObject.Instantiate(_earthPF, position, Quaternion.identity);
-                type = "E";
-                break;
-            case Tile.Element.Air:
-                go = GameObject.Instantiate(_airPF, position, Quaternion.identity);
-                type = "A";
-                break;
-            case Tile.Element.Muscle:
-                go = GameObject.Instantiate(_muscPF, position, Quaternion.identity);
-                type = "M";
-                break;
-            default:
-                MMLog.LogError("HEXMAN: Tried to init a tile with elem None!");
-                return null;
-        }
-
-        TileBehav tb = go.GetComponent<TileBehav>();
-        tb.hextag = GenFullTag(id, "B", type); // B for Basic tile
-        tb.gameObject.name = tb.hextag;
-        return tb;
-    }
-
-    // maybe return TB?
-    public Hex GenerateToken(int id, string name) {
-        GameObject go;
-        string type = "";
-        switch (name) {
-            case "stone":
-                go = GameObject.Instantiate(_stonePF);
-                type = "Stone";
-                break;
-            case "ember":
-                go = GameObject.Instantiate(_emberPF);
-                type = "Ember";
-                break;
-            case "tombstone":
-                go = GameObject.Instantiate(_tombstonePF);
-                type = "Tombstone";
-                break;
-            default:
-                MMLog.LogError("HEXMAN: Tried to init a token with bad name=" + name);
-                return null;
-        }
-
-        TileBehav tb = go.GetComponent<TileBehav>();
-        tb.hextag = GenFullTag(id, "T", type); // T for Token
-        tb.gameObject.name = tb.hextag;
-        return tb;
-    }
-
-    public Hex GenerateConsumable(int id, string name) {
-        GameObject go;
-        switch (name) {
-            case "Sample Consumable":
-                go = GameObject.Instantiate(_cons_sample);
-                break;
-
-            case "HR Form":
-                go = GameObject.Instantiate(_cons_HRform);
-                break;
-            case "Party Snacks":
-                go = GameObject.Instantiate(_cons_partySnacks);
-                break;
-            case "Protein Pills":
-                go = GameObject.Instantiate(_cons_proteinPills);
-                break;
-            case "Leeches!":
-                go = GameObject.Instantiate(_cons_leeches);
-                break;
-
-            case "Bandages":
-                go = GameObject.Instantiate(_cons_bandages);
-                break;
-            case "Water Lily":
-                go = GameObject.Instantiate(_cons_waterLily);
-                break;
-
-            case "Dance Shoes":
-                go = GameObject.Instantiate(_cons_danceShoes);
-                break;
-            case "Burning Bracers":
-                go = GameObject.Instantiate(_cons_burningBracers);
-                break;
-            case "Molotov":
-                go = GameObject.Instantiate(_cons_molotov);
-                break;
-            case "Five-Alarm Bell":
-                go = GameObject.Instantiate(_cons_fiveAlarmBell);
-                break;
-
-            default:
-                MMLog.LogError("HEXMAN: Tried to init a consumable with bad name=" + name);
-                return null;
-        }
-
-        Hex hex = go.GetComponent<Hex>();
-        hex.hextag = GenFullTag(id, "C", name); // C for consumable
-        hex.gameObject.name = hex.hextag;
-        hex.Init();
-        return hex;
-    }
+    // ---------- REMOVAL ----------
 
     public void RemoveTileSeq(TileSeq seq) {
         _mm.StartCoroutine(_RemoveSeq(seq, false));
@@ -318,7 +335,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
         // add to appropriate player's discard list
         int id = Hex.TagPlayer(hextag);
-        if (id != 3) { // don't do this for tiles added by the Commish
+        if (id != 0 && hex.putBackIntoDeck) { // don't do this for tiles added by the Commish
             MMLog.Log("HEXMAN", "orange", "Removing " + hextag + " and adding it to their remove list.");
             _mm.GetPlayer(id).deck.AddHextagToRemoveList(hextag);
         }

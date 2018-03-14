@@ -93,7 +93,7 @@ public class Valeria : Character {
         yield return first._ChangePos(secCol, secRow, 0.3f);
 
         // put new water tile in first's place
-        TileBehav waterTile = (TileBehav)_hexMan.GenerateTile(_playerId, Tile.Element.Water);
+        TileBehav waterTile = (TileBehav)_hexMan.GenerateBasicTile(_playerId, Tile.Element.Water);
         waterTile.SetPlaced(); // this kinda sucks here
         yield return waterTile._ChangePos(firstCol, firstRow);
 
@@ -139,7 +139,7 @@ public class Valeria : Character {
         int col;
         while (colQ.Count > 0) {
             col = colQ.Dequeue();
-            TileBehav newWater = (TileBehav)_hexMan.GenerateTile(_playerId, Tile.Element.Water);
+            TileBehav newWater = (TileBehav)_hexMan.GenerateBasicTile(_playerId, Tile.Element.Water);
             _mm.DropTile(col, newWater);
         }
     }
@@ -156,7 +156,7 @@ public class Valeria : Character {
         yield return null;
     }
     public IEnumerator Balanco_Drop(int id, bool playerAction, string tag, int col) {
-        if (Hex.TagType(tag) == "W")
+        if (Hex.TagTitle(tag) == "W")
             DealDamage(7);
         yield return null;    
     }

@@ -116,7 +116,6 @@ public class Gravekeeper : Character {
     }
 
     // The Oogie Boogie
-    // TODO handle 0 or 1 zombies on the board
     protected override IEnumerator Spell1(TileSeq prereq) {
         if (Filter_Zombs(_hexGrid.GetPlacedTiles()).Count < 2) // if not enough Zombies
             yield break; // TODO feedback for whiffs
@@ -229,11 +228,11 @@ public class Gravekeeper : Character {
 
         CellBehav cb = _targeting.GetTargetCBs()[0];
         int col = cb.col;
-        Hex tomb = _hexMan.GenerateToken(_playerId, "tombstone");
+
+        TombstoneTile tomb = (TombstoneTile)_hexMan.GenerateTile(_playerId, "Tombstone");
         tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
 
-        TombstoneToken ttb = (TombstoneToken)tomb;
-        _mm.effectCont.AddEndTurnEffect(new TurnEffect(_playerId, 5, Effect.Type.Add, ttb.Tombstone_Turn, ttb.Tombstone_TEnd), "tombs");
+        _mm.effectCont.AddEndTurnEffect(new TurnEffect(_playerId, 5, Effect.Type.Add, tomb.Tombstone_Turn, tomb.Tombstone_TEnd), "tombs");
 
         // destroy tiles under token
         for (int row = _hexGrid.BottomOfColumn(col); row < _hexGrid.TopOfColumn(col); row++)
@@ -242,7 +241,7 @@ public class Gravekeeper : Character {
             else
                 break; // TODO handle floating tiles
 
-        _mm.DropTile(col, ttb); // idk how to animate this one yet
+        _mm.DropTile(col, tomb); // idk how to animate this one yet
     }
 
     //public IEnumerator CompanyLuncheon() {

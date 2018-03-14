@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
 
-public class TileBehav : Hex, Tooltipable {
+public class TileBehav : Hex {
 
 	public Tile tile;
 	public Tile.Element initElement;
@@ -17,13 +17,9 @@ public class TileBehav : Hex, Tooltipable {
     private List<TileEffect> _tileEffects;
 	private bool _inPos = true; // auto?
 
-    void Awake(){
-        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+    public override void Init(MageMatch mm) {
+        base.Init(mm);
         _tileEffects = new List<TileEffect>(); // move to Init?
-        Init();
-	}
-
-    protected virtual void Init() {
         tile = new Tile(initElement);
         currentState = State.Hand;
     }

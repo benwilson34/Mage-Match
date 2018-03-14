@@ -74,13 +74,13 @@ public class Prompt {
 
     public IEnumerator WaitForQuickdrawAction(Hex hex) {
         _successful = false;
-        bool isCharm = Hex.IsConsumable(hex.hextag);
+        bool isCharm = Hex.IsCharm(hex.hextag);
 
         if (!isCharm && _mm.hexGrid.IsBoardFull()) {
             yield break;
         }
 
-        // TODO glow under hex
+        _mm.uiCont.ToggleQuickdrawUI(true, hex);
 
         _mm.uiCont.newsfeed.AddActionLogItem("Choose what to do with the Quickdraw hex!");
         _quickdrawWentToHand = false;
@@ -95,7 +95,7 @@ public class Prompt {
             yield return _mm._Draw(_mm.ActiveP().id);
         }
 
-        // TODO remove glow
+        _mm.uiCont.ToggleQuickdrawUI(false);
 
         yield return null;
     }
