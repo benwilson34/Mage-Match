@@ -10,8 +10,10 @@ public class EM_DanceShoes : Charm {
             yield break;
 
         var tbs = _mm.prompt.GetSwapTBs();
-        _mm.hexFX.Ench_SetBurning(TagPlayer(hextag), tbs[0]);
-        _mm.hexFX.Ench_SetBurning(TagPlayer(hextag), tbs[1]);
+        for (int i = 0; i < 2; i++) {
+            if(tbs[i].CanSetEnch(Enchantment.Type.Burning))
+                yield return _mm.hexFX.Ench_SetBurning(TagPlayer(hextag), tbs[i]);
+        }
         yield return _mm.prompt.ContinueSwap();
     }
 }

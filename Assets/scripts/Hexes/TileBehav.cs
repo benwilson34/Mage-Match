@@ -9,8 +9,8 @@ public class TileBehav : Hex {
 	public Tile.Element initElement;
 
     // all these should be auto?
-	public bool ableSwap = true, ableMatch = true, ableGrav = true, ableDestroy = true;
-	public bool ablePrereq = true, ableTarget = true;
+	public bool ableSwap = true, ableGrav = true, ableDestroy = true;
+	public bool ableInvoke = true, ableTarget = true;
     public bool wasInvoked = false;
 
 	private Enchantment _enchantment;
@@ -78,7 +78,7 @@ public class TileBehav : Hex {
 		return _inPos;
 	}
 
-    public bool CanSetEnch(Enchantment.EnchType type) {
+    public bool CanSetEnch(Enchantment.Type type) {
         if (type == GetEnchType()) {
             MMLog.Log_TileBehav("Tile has same enchant: " + type.ToString());
             return false;
@@ -91,11 +91,11 @@ public class TileBehav : Hex {
 		return _enchantment != null;
 	}
 
-    public Enchantment.EnchType GetEnchType() {
+    public Enchantment.Type GetEnchType() {
         if (HasEnchantment())
             return _enchantment.enchType;
         else
-            return Enchantment.EnchType.None;
+            return Enchantment.Type.None;
     }
 
     int GetEnchTier() {
@@ -156,6 +156,11 @@ public class TileBehav : Hex {
 
     public string PrintCoord() {
         return "(" + tile.col + ", " + tile.row + ")";
+    }
+
+    public override string GetTooltipInfo() {
+        string title = TagTitle(hextag);
+        return GetTooltipInfo(title, "Tile", "");
     }
 
 }

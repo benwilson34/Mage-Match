@@ -7,6 +7,7 @@ public class Leeches : Charm {
     public override IEnumerator DropEffect() {
         _mm.eventCont.playerHealthChange += Leeches_Buff;
         TurnEffect turn = new TurnEffect(_playerId, 1, Effect.Type.Healing, null, Leeches_End);
+        _mm.effectCont.AddEndTurnEffect(turn, "Leech");
         yield return null;
     }
 

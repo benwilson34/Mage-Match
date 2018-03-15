@@ -9,8 +9,10 @@ public class Molotov : Charm {
         yield return _mm.targeting.WaitForTileAreaTarget(false);
 
         int id = TagPlayer(hextag);
-        foreach (TileBehav tb in _mm.targeting.GetTargetTBs()) {
-            _mm.hexFX.Ench_SetBurning(id, tb);
+        var tbs = _mm.targeting.GetTargetTBs();
+        tbs = TileFilter.FilterByAbleEnch(tbs, Enchantment.Type.Burning);
+        foreach (TileBehav tb in tbs) {
+            yield return _mm.hexFX.Ench_SetBurning(id, tb);
         }
 
         _mm.GetPlayer(id).DiscardRandom(1);

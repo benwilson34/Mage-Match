@@ -70,7 +70,7 @@ public class ObjectEffects {
     // TODO IEnum types for animation
 
     public void Ench_SetCherrybomb(int id, TileBehav tb) {
-        Enchantment ench = new Enchantment(id, Enchantment.EnchType.Cherrybomb, Effect.Type.Destruct, null, null, Ench_Cherrybomb_Remove);
+        Enchantment ench = new Enchantment(id, Enchantment.Type.Cherrybomb, Effect.Type.Destruct, null, null, Ench_Cherrybomb_Remove);
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(.4f, .4f, .4f);
     }
@@ -92,7 +92,7 @@ public class ObjectEffects {
         yield return _mm.animCont._Burning(tb);
         _mm.audioCont.EnchantBurning( tb.GetComponent<AudioSource>() );
 
-        Enchantment ench = new Enchantment(id, 5, Enchantment.EnchType.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
+        Enchantment ench = new Enchantment(id, 5, Enchantment.Type.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
         ench.TriggerEffectEveryTurn();
 
         tb.SetEnchantment(ench);
@@ -112,7 +112,7 @@ public class ObjectEffects {
     }
 
     public void Ench_SetStone(TileBehav tb) {
-        Enchantment ench = new Enchantment(5, Enchantment.EnchType.StoneTok, Effect.Type.Destruct, Ench_StoneTok_TEffect, Ench_StoneTok_End, null);
+        Enchantment ench = new Enchantment(5, Enchantment.Type.StoneTok, Effect.Type.Destruct, Ench_StoneTok_TEffect, Ench_StoneTok_End, null);
         tb.SetEnchantment(ench);
         _mm.effectCont.AddEndTurnEffect(ench, "stoT");
     }
@@ -133,7 +133,7 @@ public class ObjectEffects {
             yield return _mm.animCont._Zombify(tb);
         _mm.audioCont.EnchantZombie( tb.GetComponent<AudioSource>() );
 
-        Enchantment ench = new Enchantment(id, Enchantment.EnchType.Zombify, Effect.Type.Enchant, Ench_Zombie_TEffect, null);
+        Enchantment ench = new Enchantment(id, Enchantment.Type.Zombie, Effect.Type.Enchant, Ench_Zombie_TEffect, null);
         if (skip)
             ench.SkipCurrent();
 
@@ -155,7 +155,7 @@ public class ObjectEffects {
         MMLog.Log_EnchantFx("Tile has " + tbs.Count + " tiles around it.");
         for (int i = 0; i < tbs.Count; i++) {
             TileBehav ctb = tbs[i];
-            if (!ctb.CanSetEnch(Enchantment.EnchType.Zombify)) { // other conditions where Zombify wouldn't work?
+            if (!ctb.CanSetEnch(Enchantment.Type.Zombie)) { // other conditions where Zombify wouldn't work?
                 tbs.RemoveAt(i);
                 i--;
                 MMLog.Log_EnchantFx("Ignoring tile at " + ctb.PrintCoord());

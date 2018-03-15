@@ -205,9 +205,9 @@ public class UIController : MonoBehaviour {
             Transform pinfo = GetPinfo(id);
 
             Text nameText = pinfo.Find("t_name").GetComponent<Text>();
-            nameText.text = "P"+id+": " + p.name;
-            if (id == _mm.myID)
-                nameText.text += " (ME!)";
+            nameText.text = p.name;
+            //if (id == _mm.myID)
+            //    nameText.text += " (ME!)";
 
             ShowAllSpellInfo(id);
             DeactivateAllSpellButtons(id); // not needed now
@@ -425,7 +425,9 @@ public class UIController : MonoBehaviour {
             }
         }
 
-        OutlinePrereq(_mm.targeting.GetSelection());
+        TileSeq selection = _mm.targeting.GetSelection();
+        if(selection != null)
+            OutlinePrereq(selection);
 
         //gradient.SetActive(!gradient.activeSelf);
         //targetingBG.SetActive(!targetingBG.activeSelf);
@@ -484,14 +486,14 @@ public class UIController : MonoBehaviour {
         _outlines.Add(go);
     }
 
-    public void ClearTargets() {
-        int prereqs = _mm.targeting.GetSelection().sequence.Count;
-        for (int i = 0; i < _outlines.Count - prereqs;) { // clear just the target outlines
-            GameObject go = _outlines[prereqs];
-            GameObject.Destroy(go);
-            _outlines.Remove(go);
-        }
-    }
+    //public void ClearTargets() {
+    //    int prereqs = _mm.targeting.GetSelection().sequence.Count;
+    //    for (int i = 0; i < _outlines.Count - prereqs;) { // clear just the target outlines
+    //        GameObject go = _outlines[prereqs];
+    //        GameObject.Destroy(go);
+    //        _outlines.Remove(go);
+    //    }
+    //}
 
     void ClearOutlines() {
         for (int i = 0; i < _outlines.Count;) {
@@ -522,6 +524,7 @@ public class UIController : MonoBehaviour {
 
     public void KeepQuickdraw() {
         _mm.prompt.SetQuickdrawHand();
+        _mm.syncManager.SendKeepQuickdraw();
     }
 
 

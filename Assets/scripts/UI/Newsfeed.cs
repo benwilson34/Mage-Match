@@ -30,7 +30,7 @@ public class Newsfeed : MonoBehaviour {
         _turnCounterText = transform.Find("t_turns").GetComponent<Text>();
         UpdateTurnCount(1);
         _newsText = transform.Find("t_news").GetComponent<Text>();
-        UpdateNewsfeed("!!! FIGHT !!!");
+        UpdateNewsfeed("Begin match!!");
 
         _newsfeedMenu.SetActive(false);
 	}

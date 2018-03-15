@@ -70,13 +70,15 @@ public class Hex : MonoBehaviour, Tooltipable {
             Flip();
     }
 
-    //public IEnumerator Duplicate() {
-    //    yield return null;
-    //}
-
     public virtual string GetTooltipInfo() {
-        string str = "This is a <b>hex</b>.\n";
-        str += "Its <color=green>tag</color> is " + hextag;
+        return GetTooltipInfo("", "hex", "");
+    }
+
+    protected string GetTooltipInfo(string title, string cat, string desc) {
+        string str = "<size=40>" + title + "</size>\n";
+        str += "<size=25><i>" + cat + "</i></size>\n";
+        str += "<size=25><color=grey>tag: " + hextag + "</color></size>\n";
+        str += desc;
         return str;
     }
 }

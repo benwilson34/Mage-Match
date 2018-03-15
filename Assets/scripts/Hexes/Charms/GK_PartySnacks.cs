@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class GK_PartySnacks : Charm {
     public override IEnumerator DropEffect() {
-        yield return _mm.targeting.WaitForTileTarget(1, PartySnacks_Filter);
+        var zombs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
+        yield return _mm.targeting.WaitForTileTarget(1, zombs);
 
         var tbs = _mm.targeting.GetTargetTBs();
         if (tbs.Count != 1)
@@ -26,14 +27,5 @@ public class GK_PartySnacks : Charm {
         yield return _mm.syncManager.SyncRand(_playerId, Random.Range(60, 81));
         int dmg = _mm.syncManager.GetRand();
         ThisCharacter().DealDamage(dmg);
-    }
-
-    List<TileBehav> PartySnacks_Filter(List<TileBehav> tbs) {
-        var filtTBs = new List<TileBehav>();
-        foreach (var tb in tbs) {
-            if (tb.GetEnchType() == Enchantment.EnchType.Zombify)
-                filtTBs.Add(tb);
-        }
-        return filtTBs;
     }
 }

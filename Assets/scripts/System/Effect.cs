@@ -137,19 +137,19 @@ public class TileEffect : Effect {
 
 public class Enchantment : TileEffect {
 
-    public enum EnchType { None = 0, Burning, Zombify, Cherrybomb, ZombieTok, StoneTok }
-    public EnchType enchType; // private?
+    public enum Type { None = 0, Burning, Zombie, Cherrybomb, ZombieTok, StoneTok }
+    public Type enchType; // private?
 
     private MyTileEffect _turnEffect, _endEffect, _cancelEffect;
     private TileBehav _enchantee;
     private ObjectEffects _objFX; //?
     private bool _hasTurnEffect = false;
 
-    public Enchantment(int id, int turns, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
+    public Enchantment(int id, int turns, Type enchType, Effect.Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
         _turnsLeft = turns;
     }
 
-    public Enchantment(int id, EnchType enchType, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :base(id, type, turnEffect, endEffect) {
+    public Enchantment(int id, Type enchType, Effect.Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :base(id, type, turnEffect, endEffect) {
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id; // NO!!!
         _turnsLeft = -1;
@@ -171,10 +171,10 @@ public class Enchantment : TileEffect {
         }
     }
 
-    public static int GetEnchTier(EnchType enchType) {
-        if (enchType == EnchType.None)
+    public static int GetEnchTier(Type enchType) {
+        if (enchType == Type.None)
             return 0;
-        else if ((int)enchType < (int)EnchType.Cherrybomb)
+        else if ((int)enchType < (int)Type.Cherrybomb)
             return 1;
         else
             return 2;

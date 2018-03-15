@@ -45,10 +45,10 @@ public class RuneInfo {
 
     public static RuneInfo GetRuneInfo(string rune) {
         string json = (Resources.Load("json/runes") as TextAsset).text;
-        MMDebug.MMLog.Log("RuneInfo", "black", "json for "+rune+": " + json);
+        //MMDebug.MMLog.Log("RuneInfo", "black", "json for "+rune+": " + json);
 
         JObject o = JObject.Parse(json);
-        MMDebug.MMLog.Log("RuneInfo", "black", "parsed: " + o[rune].ToString());
+        //MMDebug.MMLog.Log("RuneInfo", "black", "parsed: " + o[rune].ToString());
 
         if (o[rune] == null) {
             MMDebug.MMLog.LogError("RuneInfo: Couldn't find info for \"" + rune + "\"");

@@ -483,6 +483,7 @@
     <Compile Include="Assets\scripts\Commish.cs" />
     <Compile Include="Assets\scripts\Hexes\BasicDuplicate.cs" />
     <Compile Include="Assets\scripts\Hexes\BasicQuickdraw.cs" />
+    <Compile Include="Assets\scripts\Hexes\BasicTile.cs" />
     <Compile Include="Assets\scripts\Hexes\Charm.cs" />
     <Compile Include="Assets\scripts\Hexes\Charms\EM_BurningBracers.cs" />
     <Compile Include="Assets\scripts\Hexes\Charms\EM_DanceShoes.cs" />
@@ -540,6 +541,7 @@
     <Compile Include="Assets\scripts\System\Stats.cs" />
     <Compile Include="Assets\scripts\System\Targeting.cs" />
     <Compile Include="Assets\scripts\System\Tile.cs" />
+    <Compile Include="Assets\scripts\System\TileFilter.cs" />
     <Compile Include="Assets\scripts\System\TileSeq.cs" />
     <Compile Include="Assets\scripts\System\TurnTimer.cs" />
     <Compile Include="Assets\scripts\UI\ButtonController.cs" />

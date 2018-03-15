@@ -82,4 +82,5 @@ MonoBehaviour:
   - OpponentLocked
   - SyncSettings
   - HandleSyncRandomSeed
+  - HandleKeepQuickdraw
   DisableAutoOpenWizard: 1

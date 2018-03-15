@@ -194,8 +194,8 @@ public class InputController : MonoBehaviour {
             //MMLog.Log_InputCont("2D Raycast hit "+hit.collider.gameObject.name);
             Tooltipable tt = hit.collider.GetComponent<Tooltipable>(); // is this okay?
             if (tt != null) {
-                MMLog.Log_InputCont("GetTooltipable found a Tooltipable! " + 
-                    tt.GetTooltipInfo());
+                //MMLog.Log_InputCont("GetTooltipable found a Tooltipable! " + 
+                    //tt.GetTooltipInfo());
                 return tt;
             }
         }

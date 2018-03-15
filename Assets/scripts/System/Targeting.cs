@@ -44,33 +44,42 @@ public class Targeting {
     }
 
     public IEnumerator WaitForTileTarget(int count, TileFilterFunc filter = null) {
+        yield return WaitForTileTarget(count, GetValidTBs(filter));
+    }
+    public IEnumerator WaitForTileTarget(int count, List<TileBehav> tbs) {
         currentTMode = TargetMode.Tile;
         _targetsLeft = count;
         _targetTBs = new List<TileBehav>();
         MMLog.Log_Targeting("targets = " + _targetsLeft);
 
-        _validTBs = GetValidTBs(filter);
+        _validTBs = tbs;
         yield return TargetingScreen();
     }
 
     public IEnumerator WaitForTileAreaTarget(bool largeArea, TileFilterFunc filter = null) {
+        yield return WaitForTileAreaTarget(largeArea, GetValidTBs(filter));
+    }
+    public IEnumerator WaitForTileAreaTarget(bool largeArea, List<TileBehav> tbs) {
         currentTMode = TargetMode.TileArea;
         _targetsLeft = 1;
         _targetTBs = new List<TileBehav>();
         _largeAreaMode = largeArea;
         MMLog.Log_Targeting("Waiting for TileArea target. Targets = " + _targetsLeft);
 
-        _validTBs = GetValidTBs(filter);
+        _validTBs = tbs;
         yield return TargetingScreen();
     }
 
     public IEnumerator WaitForDragTarget(int count, TileFilterFunc filter = null) {
+        yield return WaitForDragTarget(count, GetValidTBs(filter));
+    }
+    public IEnumerator WaitForDragTarget(int count, List<TileBehav> tbs) {
         currentTMode = TargetMode.Drag;
         _targetsLeft = count;
         _targetTBs = new List<TileBehav>();
         MMLog.Log_Targeting("Waiting for Drag target. Targets = " + _targetsLeft);
 
-        _validTBs = GetValidTBs(filter);
+        _validTBs = tbs;
         yield return TargetingScreen();
     }
 
@@ -80,9 +89,9 @@ public class Targeting {
                 return;
 
         // TODO these shouldn't be in the valid tiles in the first place
-        foreach (Tile ct in GetSelection().sequence) // prevent targeting prereq
-            if (ct.HasSamePos(tb.tile))
-                return;
+        //foreach (Tile ct in GetSelection().sequence) // prevent targeting prereq
+        //    if (ct.HasSamePos(tb.tile))
+        //        return;
 
         bool valid = false;
         for(int i = 0; i < _validTBs.Count; i++) {
@@ -201,8 +210,8 @@ public class Targeting {
         _mm.GetComponent<InputController>().InvalidateClick(); // prevent weirdness from player still dragging
         _lastDragTarget = null;
 
-        _mm.uiCont.newsfeed.AddActionLogItem("Here are your targets!");
-        yield return new WaitForSeconds(2f);
+        _mm.uiCont.ShowAlertText("Here are your targets!");
+        yield return new WaitForSeconds(1f);
 
         _mm.uiCont.DeactivateTargetingUI();
         _mm.uiCont.ShowAlertText("");
@@ -301,7 +310,14 @@ public class Targeting {
             MMLog.Log_Targeting("Player clicked on an invalid tile: " + tb.PrintCoord());
     }
 
-    public TileSeq GetSelection() { return selections[0]; }
+    public TileSeq GetSelection() {
+        if (selections == null)
+            return null;
+        else
+            return selections[0];
+    }
+
+    public void ClearSelection() { selections = null; }
 
     public bool IsSelectionMode() { return currentTMode == TargetMode.Selection; }
 

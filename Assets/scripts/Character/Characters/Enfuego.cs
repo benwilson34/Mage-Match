@@ -87,14 +87,7 @@ public class Enfuego : Character {
             dmg += 20;
         DealDamage(dmg);
 
-        List<TileBehav> tbs = _mm.hexGrid.GetPlacedTiles(seq);
-        for (int i = 0; i < tbs.Count; i++) {
-            TileBehav tb = tbs[i];
-            if (!tb.CanSetEnch(Enchantment.EnchType.Burning)) {
-                tbs.RemoveAt(i);
-                i--;
-            }
-        }
+        List<TileBehav> tbs = TileFilter.GetTilesByAbleEnch(Enchantment.Type.Burning);
 
         burnNum = Mathf.Min(burnNum, tbs.Count);
         for (int i = 0; i < burnNum; i++) {
@@ -136,7 +129,7 @@ public class Enfuego : Character {
     public List<TileBehav> Inc_Filter(List<TileBehav> tbs) {
         List<TileBehav> filterTBs = new List<TileBehav>();
         foreach(TileBehav tb in tbs) {
-            if (tb.GetEnchType() == Enchantment.EnchType.Burning) {
+            if (tb.GetEnchType() == Enchantment.Type.Burning) {
                 MMLog.Log_Enfuego("Incinerate adding tile at " + tb.PrintCoord());
                 filterTBs.Add(tb);
             }
@@ -178,7 +171,7 @@ public class Enfuego : Character {
                         }
                     }
 
-                    if (remove || !ctb.CanSetEnch(Enchantment.EnchType.Burning)) {
+                    if (remove || !ctb.CanSetEnch(Enchantment.Type.Burning)) {
                         ctbs.RemoveAt(i);
                         i--;
                     }

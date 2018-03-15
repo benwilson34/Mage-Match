@@ -288,4 +288,15 @@ public class SyncManager : PunBehaviour {
     public void HandleSwapSelection(int c1, int r1, int c2, int r2) {
         _mm.prompt.SetSwaps(c1, r1, c2, r2);
     }
+
+    public void SendKeepQuickdraw() {
+        if (_mm.MyTurn()) {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("HandleQuickdrawKeep", PhotonTargets.Others);
+        }
+    }
+    [PunRPC]
+    public void HandleKeepQuickdraw() {
+        _mm.uiCont.KeepQuickdraw();
+    }
 }

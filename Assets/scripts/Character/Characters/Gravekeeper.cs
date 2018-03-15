@@ -22,15 +22,6 @@ public class Gravekeeper : Character {
 
     // ----- spells -----
 
-    List<TileBehav> Filter_Zombs(List<TileBehav> tbs) {
-        List<TileBehav> filterTBs = new List<TileBehav>();
-        foreach (TileBehav tb in tbs) {
-            if (tb.GetEnchType() == Enchantment.EnchType.Zombify)
-                filterTBs.Add(tb);
-        }
-        return filterTBs;
-    }
-
     // Business in the Front
     protected override IEnumerator CoreSpell(TileSeq seq) {
         int dmg = 0, zombs = 0;
@@ -50,13 +41,7 @@ public class Gravekeeper : Character {
         if (seq.GetElementAt(0) == Tile.Element.Earth) // not safe if there are multi-color tiles
             zombs++;
 
-        List<TileBehav> tbs = _hexGrid.GetPlacedTiles(seq);
-        for (int i = 0; i < tbs.Count; i++) {
-            if (tbs[i].GetEnchType() == Enchantment.EnchType.Zombify) {
-                tbs.RemoveAt(i);
-                i--;
-            }
-        }
+        List<TileBehav> tbs = TileFilter.GetTilesByAbleEnch(Enchantment.Type.Zombie);
 
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
             yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, tbs.Count));
@@ -94,7 +79,7 @@ public class Gravekeeper : Character {
 
         List<TileBehav> tbs = _targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
-            if(tb.GetEnchType() == Enchantment.EnchType.Zombify)
+            if(tb.GetEnchType() == Enchantment.Type.Zombie)
                 yield return tb.TriggerEnchantment(); // that easy?
         }
 
@@ -117,10 +102,11 @@ public class Gravekeeper : Character {
 
     // The Oogie Boogie
     protected override IEnumerator Spell1(TileSeq prereq) {
-        if (Filter_Zombs(_hexGrid.GetPlacedTiles()).Count < 2) // if not enough Zombies
+        var zombs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
+        if (zombs.Count < 2) // if not enough Zombies
             yield break; // TODO feedback for whiffs
 
-        yield return _targeting.WaitForTileTarget(2, Filter_Zombs);
+        yield return _targeting.WaitForTileTarget(2, zombs);
 
         List<TileBehav> tbs = _targeting.GetTargetTBs();
         if (tbs.Count < 2)
@@ -189,35 +175,27 @@ public class Gravekeeper : Character {
 
     // Undead Union
     protected override IEnumerator Spell3(TileSeq prereq) {
-        List<TileBehav> tbs = _mm.hexGrid.GetPlacedTiles();
-        for (int i = 0; i < tbs.Count; i++) { // filter zombs
-            TileBehav tb = tbs[i];
-            if (tb.GetEnchType() != Enchantment.EnchType.Zombify) {
-                tbs.RemoveAt(i);
-                i--;
-            }
-        }
+        var tbs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
         MMLog.Log_Gravekeeper(tbs.Count + " zombs on the board...");
 
-        DealAdjZombDmg(tbs);
-
-        yield return null;
-    }
-    void DealAdjZombDmg(List<TileBehav> tbs) {
         int count = 0;
         foreach (TileBehav tb in tbs) {
-            if (tb.GetEnchType() == Enchantment.EnchType.Zombify) {
+            if (tb.GetEnchType() == Enchantment.Type.Zombie) {
                 List<TileBehav> adjTBs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 foreach (TileBehav adjTB in adjTBs) {
-                    if (adjTB.GetEnchType() == Enchantment.EnchType.Zombify) {
+                    if (adjTB.GetEnchType() == Enchantment.Type.Zombie) {
                         count++;
                     }
                 }
             }
         }
         MMLog.Log_Gravekeeper("DealAdjZombDmg has counted " + count + " adjacent zombs");
+
+        const int dmgAmount = 5;
         if(count > 0)
-            DealDamage(count * 5);
+            DealDamage(count * dmgAmount);
+
+        yield return null;
     }
 
     // Tombstone

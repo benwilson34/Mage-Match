@@ -12,12 +12,12 @@ public class Stats {
 
     private MageMatch _mm;
     private StringBuilder _report;
-    private int _commishMatches, _commishDrops;
+    private int _commishDrops;
 
     private class PlayerStat {
         public string name;
         public string character;
-        public int draws, drops, swaps, matches, tilesRemoved, spellsCast, timeouts, discards;
+        public int draws, drops, swaps, tilesRemoved, spellsCast, timeouts, discards;
         public int dmgDealt, dmgTaken, healingDone;
     }
 
@@ -241,7 +241,7 @@ public class Stats {
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("Turns complete," + turns);
         sb.AppendLine("Commish drops," + _commishDrops).AppendLine("");
-        sb.AppendLine("Commish matches," + _commishMatches).AppendLine("");
+        //sb.AppendLine("Commish matches," + _commishMatches).AppendLine("");
         for (int id = 1; id <= 2; id++) {
             PlayerStat ps = GetPS(id);
             sb.AppendLine("Player " + id);

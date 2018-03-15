@@ -4,8 +4,6 @@ using UnityEngine;
 
 public abstract class Charm : Hex {
 
-    // TODO probably an Enum for subtype? Or just have a method that subclasses can call?
-
     public abstract IEnumerator DropEffect();
 
     protected int _playerId;
@@ -16,19 +14,11 @@ public abstract class Charm : Hex {
     }
 
     public override string GetTooltipInfo() {
-        string str = "This is a <b>hex</b>.\n";
-        str += "Its <color=green>tag</color> is " + hextag;
-        str += "\n" + RuneInfo.GetRuneInfo(TagTitle(hextag)).desc;
-        return str;
+        string title = TagTitle(hextag);
+        return GetTooltipInfo(title, "Charm", RuneInfo.GetRuneInfo(title).desc);
     }
 
     public Character ThisCharacter() {
         return _mm.GetPlayer(_playerId).character;
-    }
-
-
-    public IEnumerator Duplicate() {
-        // TODO dupe tile if there's an extra space in the hand
-        yield return null;
     }
 }

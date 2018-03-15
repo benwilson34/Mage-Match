@@ -8,4 +8,9 @@ public class BasicQuickdraw : TileBehav {
         base.Init(mm);
         SetQuickdraw();
     }
+
+    public override string GetTooltipInfo() {
+        string elem = tile.element.ToString();
+        return GetTooltipInfo(TagTitle(hextag), "Tile", "Basic " + elem + " tile with Quickdraw.");
+    }
 }

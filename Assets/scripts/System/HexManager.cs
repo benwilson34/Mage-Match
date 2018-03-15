@@ -222,6 +222,8 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
     string GenFullTag(int id, string cat, string type) {
         string fullTag = "p" + id + "-" + cat + "-" + type + "-";
+        if (id == 0)
+            id = 3;
         Dictionary<string, int> dict = _tagDicts[id - 1];
         if (dict.ContainsKey(type)) {
             dict[type]++;

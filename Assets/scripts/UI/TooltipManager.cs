@@ -31,7 +31,7 @@ public class TooltipManager : MonoBehaviour {
 
         Transform staticUI = GameObject.Find("static ui").transform;
         _currentTT = (RectTransform)Instantiate(_tooltipPF, staticUI).transform;
-        MMDebug.MMLog.Log("TooltipMan", "orange", "Setting tooltip: " + obj.GetTooltipInfo());
+        //MMDebug.MMLog.Log("TooltipMan", "orange", "Setting tooltip: " + obj.GetTooltipInfo());
 
         RectTransform textRect = (RectTransform)_currentTT.GetChild(0);
         textRect.GetComponent<Text>().text = obj.GetTooltipInfo();

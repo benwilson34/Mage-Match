@@ -8,4 +8,9 @@ public class BasicDuplicate : TileBehav {
         base.Init(mm);
         SetDuplicate();
     }
+
+    public override string GetTooltipInfo() {
+        string elem = tile.element.ToString();
+        return GetTooltipInfo(TagTitle(hextag), "Tile", "Basic " + elem + " tile with Duplicate.");
+    }
 }

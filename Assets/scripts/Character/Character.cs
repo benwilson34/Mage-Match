@@ -113,7 +113,7 @@ public abstract class Character {
             str += p.name + " healed for " + amount + " health; ";
         }
         str += p.name + "'s health changed from " + _health + " to " + (_health + amount);
-        MMLog.Log("CHAR:", "green", str);
+        MMLog.Log("CHAR", "green", str);
 
         _health += amount;
         _health = Mathf.Clamp(_health, 0, _healthMax); // clamp amount before event

@@ -7,7 +7,9 @@ public class GK_HRForm : Charm {
     public override IEnumerator DropEffect() {
         yield return _mm.targeting.WaitForTileAreaTarget(false);
 
-        foreach (var tb in _mm.targeting.GetTargetTBs()) {
+        var tbs = _mm.targeting.GetTargetTBs();
+        tbs = TileFilter.FilterByAbleEnch(tbs, Enchantment.Type.Zombie);
+        foreach (var tb in tbs) {
             yield return _mm.hexFX.Ench_SetZombie(_playerId, tb, false);
         }
     }

@@ -110,7 +110,8 @@ public class BoardCheck {
 		} // --Ends checking loops
 
         for (int i = 0; i < spells.Count; i++) {
-            MMLog.Log_BoardCheck(spells[i].name + " --> " + PrintSeqList(returnList[i]), MMLog.LogLevel.Standard);
+            if(returnList[i].Count > 0)
+                MMLog.Log_BoardCheck(spells[i].name + " --> " + PrintSeqList(returnList[i]), MMLog.LogLevel.Standard);
         }
 
 		return returnList;
@@ -123,7 +124,7 @@ public class BoardCheck {
             returnList[i] = new List<TileSeq>();
         }
 
-        if (!_hexGrid.GetTileBehavAt (c, r).ableMatch) // handle current tile not matchable
+        if (!_hexGrid.GetTileBehavAt (c, r).ableInvoke) // handle current tile not matchable
 			return returnList;
 
         List<Spell> shortList = new List<Spell>(spells);
@@ -159,7 +160,7 @@ public class BoardCheck {
 			bool skip = false;
 			foreach (SkipCheck s in _skips) {
 				if (s.col == c && s.row == r && s.dir == dir) {
-                    MMLog.Log_BoardCheck("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir, MMLog.LogLevel.Standard);
+                    //MMLog.Log_BoardCheck("Skipping (" + s.col + ", " + s.row + ") in dir " + s.dir, MMLog.LogLevel.Standard);
 					skip = true;
 					break;
 				}
@@ -188,7 +189,7 @@ public class BoardCheck {
                 }
 
                 TileBehav ctb = _hexGrid.GetTileBehavAt(c + dc, r + dr);
-                if (skipCurrentSeq || !ctb.ableMatch) {
+                if (skipCurrentSeq || !ctb.ableInvoke) {
                     for (int i = 0; i < _checkList.Count; i++) {
                         if (_checkList[i] is CoreSpell && seqs[i].GetSeqLength() >= 3) {
                             AddCoreSkips(seqs[i], dir);
@@ -246,7 +247,7 @@ public class BoardCheck {
 	}
 
 	void AddCoreSkips(TileSeq seq, int dir){
-		MMLog.Log_BoardCheck("Adding skips for " + PrintSeq (seq, true), MMLog.LogLevel.Standard);
+		//MMLog.Log_BoardCheck("Adding skips for " + PrintSeq (seq, true), MMLog.LogLevel.Standard);
 		switch (seq.GetSeqLength ()) {
 		case 3:
 			_skips.Add (new SkipCheck (seq.sequence [2], OppDir(dir))); // 3

@@ -103,6 +103,7 @@ public class MageMatch : MonoBehaviour {
 
         hexGrid = new HexGrid();
         hexMan = new HexManager(this);
+        TileFilter.Init(hexGrid);
 
         uiCont.GetCellOverlays();
         boardCheck = new BoardCheck(this);
@@ -348,7 +349,7 @@ public class MageMatch : MonoBehaviour {
                 continue;
             }
 
-            MMLog.Log_MageMatch("spell[" + s + "] count=" + _spellsOnBoard[s].Count);
+            //MMLog.Log_MageMatch("spell[" + s + "] count=" + _spellsOnBoard[s].Count);
             if (_spellsOnBoard[s].Count > 0)
                 uiCont.ActivateSpellButton(id, s);
             else
@@ -599,6 +600,7 @@ public class MageMatch : MonoBehaviour {
                 StartCoroutine(uiCont.GetButtonCont(_activep.id, spellNum).Transition_MainView());
 
                 p.ApplySpellCosts(spell);
+                targeting.ClearSelection();
                 hexMan.RemoveInvokedSeq(prereq);
                 yield return BoardChecking(); //?
             }
