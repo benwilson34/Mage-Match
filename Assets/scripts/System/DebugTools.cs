@@ -25,7 +25,7 @@ public class DebugTools : MonoBehaviour {
     private Transform _debugContent;
     private GameObject _debugReport;
     private Text _debugReportText;
-    private GameObject _toolsMenuButton;
+    private GameObject _systemMenuButton, _reportMenuButton, _toolsMenuButton;
 
     private int _playerId = 1;
     private bool _relativeDmgMode = true;
@@ -37,7 +37,9 @@ public class DebugTools : MonoBehaviour {
         //menus.SetActive(true);
 
         // System pane
-        systemMenu.SetActive(true);
+        //systemMenu.SetActive(true);
+        _systemMenuButton = menus.transform.Find("b_system").gameObject;
+
         _debugItemPF = Resources.Load("prefabs/ui/debug_statusItem") as GameObject;
 
         Transform scroll = systemMenu.transform.Find("scr_debugEffects");
@@ -45,7 +47,8 @@ public class DebugTools : MonoBehaviour {
         _debugGridText = systemMenu.transform.Find("t_debugGrid").GetComponent<Text>(); // UI debug grid
 
         // Report pane
-        reportMenu.SetActive(true);
+        //reportMenu.SetActive(true);
+        _reportMenuButton = menus.transform.Find("b_report").gameObject;
         _debugReport = reportMenu.transform.Find("scr_report").gameObject;
         _debugReportText = _debugReport.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>();
 
@@ -118,8 +121,21 @@ public class DebugTools : MonoBehaviour {
 
     void SetPanesActive(bool system, bool report, bool tools) {
         systemMenu.SetActive(system);
+        SetButtonColor(_systemMenuButton, system);
+
         reportMenu.SetActive(report);
+        SetButtonColor(_reportMenuButton, report);
+
         toolsMenu.SetActive(tools);
+        SetButtonColor(_toolsMenuButton, tools);
+    }
+
+    void SetButtonColor(GameObject go, bool active) {
+        Image bg = go.GetComponent<Image>();
+        if (active)
+            bg.color = Color.white;
+        else
+            bg.color = Color.grey;
     }
 
     public void ToggleDebugMenu() {
@@ -171,27 +187,35 @@ public class DebugTools : MonoBehaviour {
         Color lightBlue = new Color(.07f, .89f, .93f, .8f);
 
         List<Effect> beginTurnEff = (List<Effect>)lists[0];
-        debugItems.Add(InstantiateDebugEntry("BeginTurnEffs:", lightBlue));
-        foreach (Effect e in beginTurnEff) {
-            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        if (beginTurnEff.Count > 0) {
+            debugItems.Add(InstantiateDebugEntry("<b>BeginTurnEffs:</b>", lightBlue));
+            foreach (Effect e in beginTurnEff) {
+                debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+            }
         }
 
         List<Effect> endTurnEff = (List<Effect>)lists[1];
-        debugItems.Add(InstantiateDebugEntry("EndTurnEffs:", lightBlue));
-        foreach (Effect e in endTurnEff) {
-            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        if (endTurnEff.Count > 0) {
+            debugItems.Add(InstantiateDebugEntry("<b>EndTurnEffs:</b>", lightBlue));
+            foreach (Effect e in endTurnEff) {
+                debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+            }
         }
 
         List<DropEffect> dropEff = (List<DropEffect>)lists[2];
-        debugItems.Add(InstantiateDebugEntry("DropEffs:", lightBlue));
-        foreach (DropEffect e in dropEff) {
-            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        if (dropEff.Count > 0) {
+            debugItems.Add(InstantiateDebugEntry("<b>DropEffs:</b>", lightBlue));
+            foreach (DropEffect e in dropEff) {
+                debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+            }
         }
 
         List<SwapEffect> swapEff = (List<SwapEffect>)lists[3];
-        debugItems.Add(InstantiateDebugEntry("SwapEffs:", lightBlue));
-        foreach (SwapEffect e in swapEff) {
-            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        if (swapEff.Count > 0) {
+            debugItems.Add(InstantiateDebugEntry("<b>SwapEffs:</b>", lightBlue));
+            foreach (SwapEffect e in swapEff) {
+                debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+            }
         }
     }
 
@@ -214,7 +238,6 @@ public class DebugTools : MonoBehaviour {
 
     // ---------- TOOLS MENU ----------
 
-    // TODO break the inner part out into another method and just set a string here? or enum?
     public void ValueChanged(string func) {
         if (func == _oldFunc)
             return;
@@ -421,7 +444,18 @@ public class DebugTools : MonoBehaviour {
     }
 
     void AddToHandMode_OnClick() {
-        StartCoroutine(_mm._Draw(GetPlayerId()));
+        int id = GetPlayerId();
+        Player p = _mm.GetPlayer(id);
+        if (p.hand.IsFull())
+            return;
+
+        Hex hex = _mm.hexMan.GenerateHex(id, GetHexGenTag());
+        if (id != _mm.myID)
+            hex.Flip();
+
+        p.hand.Add(hex);
+
+        StartCoroutine(hex.OnDraw());
     }
 
     void DiscardMode_OnClick(Hex h) {

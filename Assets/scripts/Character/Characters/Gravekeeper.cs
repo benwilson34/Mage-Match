@@ -124,11 +124,11 @@ public class Gravekeeper : Character {
     // Party Crashers
     protected override IEnumerator Spell2(TileSeq prereq) {
         for (int i = 0; i < 2; i++) {
-            yield return _mm.prompt.WaitForDrop();
+            yield return _mm.prompt.WaitForDropTile();
             if (!_mm.prompt.WasSuccessful())
                 break;
 
-            TileBehav tb = (TileBehav) _mm.prompt.GetDropTile();
+            TileBehav tb = (TileBehav) _mm.prompt.GetDropHex();
             MMLog.Log_Gravekeeper("Player " + _playerId + " dropped " + tb.hextag);
             yield return _objFX.Ench_SetZombie(_playerId, tb, false);
             int col = _mm.prompt.GetDropCol();

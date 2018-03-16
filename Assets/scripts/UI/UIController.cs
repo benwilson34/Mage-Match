@@ -90,6 +90,7 @@ public class UIController : MonoBehaviour {
         quickdrawButton.SetActive(false);
 
         alertbar.transform.Translate(0, ALERT_DIS, 0);
+        alertbar.SetActive(true);
     }
 
     public void InitEvents() {

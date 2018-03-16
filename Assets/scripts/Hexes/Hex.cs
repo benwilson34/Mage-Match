@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Hex : MonoBehaviour, Tooltipable {
 
+    public enum Category { BasicTile, Tile, Charm };
+
 	public enum State { Hand, Placed, Removed };
 	public State currentState;
     public string hextag;
@@ -42,9 +44,19 @@ public class Hex : MonoBehaviour, Tooltipable {
     // ex: p2-B-W-005 (player 2 created this Basic tile, type is Water, and it's the fifth one)
     public static int TagPlayer(string tag) { return int.Parse(tag.Substring(1, 1)); }
 
-    public static string TagCat(string tag) { return tag.Split(new char[] { '-' })[1]; }
+    public static Category TagCat(string tag) {
+        string cat = tag.Split(new char[] { '-' })[1];
+        switch (cat) {
+            case "B": return Category.BasicTile;
+            case "T": return Category.Tile;
+            case "C": return Category.Charm;
+            default:
+                MMDebug.MMLog.LogError("HEX: Bad category name: " + cat);
+                return Category.BasicTile;
+        }
+    }
 
-    public static bool IsCharm(string tag) { return TagCat(tag) == "C"; }
+    public static bool IsCharm(string tag) { return TagCat(tag) == Category.Charm; }
 
     public static string TagTitle(string tag) { return tag.Split(new char[] { '-' })[2]; }
 

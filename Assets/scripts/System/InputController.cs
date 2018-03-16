@@ -20,9 +20,6 @@ public class InputController : MonoBehaviour {
     private Vector3 _dragHexPos;
 
 	private bool _lastClick = false, _nowClick = false;
-	//private Hex clickHex; // needed?
- //   private CellBehav clickCB; // needed?
-	//private bool isClickHex = false;
 
     private bool _validClick = true;
 
@@ -273,6 +270,26 @@ public class InputController : MonoBehaviour {
 
     bool PromptedSwap() { return _mm.MyTurn() && _mm.prompt.currentMode == Prompt.PromptMode.Swap; }
 
+    public void SetAllowHandDragging(bool allow) {
+        ((StandardContext)_standardContext).allowHandDragging = allow; 
+    }
+
+    public void SetAllowHandRearrange(bool allow) {
+        ((StandardContext)_standardContext).allowHandRearrangement = allow;
+    }
+
+    // This idea might be worth echoing throughout some of the implementation.
+    // Slightly more work for the spell programmer, but more control.
+    public void RestrictInteractableHexes(List<Hex> ignoredHexes) {
+        var sc = (StandardContext)_standardContext;
+        sc.restrictInteractableHexes = true;
+        sc.ignoredHexes = ignoredHexes;
+    }
+
+    public void EndRestrictInteractableHexes() {
+        ((StandardContext)_standardContext).restrictInteractableHexes = false;
+    }
+
 
 
 
@@ -322,6 +339,7 @@ public class InputController : MonoBehaviour {
         }
     }
 
+
     private class Target_TileContext : InputContext {
         public Target_TileContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
 
@@ -336,6 +354,7 @@ public class InputController : MonoBehaviour {
         }
     }
 
+
     private class Target_CellContext : InputContext {
         public Target_CellContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Cell) { }
 
@@ -345,6 +364,7 @@ public class InputController : MonoBehaviour {
             return InputStatus.FullyHandled;
         }
     }
+
 
     private class Target_DragContext : InputContext {
 
@@ -387,6 +407,7 @@ public class InputController : MonoBehaviour {
 
     }
 
+
     private class Target_SelectionContext : InputContext {
         public Target_SelectionContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
 
@@ -401,6 +422,7 @@ public class InputController : MonoBehaviour {
         }
     }
 
+
     private class DebugToolsContext : InputContext {
         public DebugToolsContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
 
@@ -409,6 +431,7 @@ public class InputController : MonoBehaviour {
             return InputStatus.FullyHandled;
         }
     }
+
 
     private class MyTurnContext : InputContext {
         public MyTurnContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
@@ -469,6 +492,10 @@ public class InputController : MonoBehaviour {
 
     private class StandardContext : InputContext {
 
+        public bool allowHandDragging = true, allowHandRearrangement = true, 
+            restrictInteractableHexes = false;
+        public List<Hex> ignoredHexes;
+
         private Tooltipable _tooltip;
         private Vector3 _mouseDownPos;
 
@@ -478,6 +505,17 @@ public class InputController : MonoBehaviour {
 
         public void SetTooltip(Tooltipable tooltip) {
             this._tooltip = tooltip;
+        }
+
+        bool AbleToInteract(Hex hex) {
+            if (restrictInteractableHexes) {
+                foreach (Hex h in ignoredHexes) {
+                    if (hex.EqualsTag(h))
+                        return false;
+                }
+                return true;
+            } else
+                return true;
         }
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
@@ -491,8 +529,11 @@ public class InputController : MonoBehaviour {
             MMLog.Log_InputCont("Standard mouse ; hex state="+hex.currentState);
 
             if (hex.currentState == Hex.State.Hand) {
-                if (_mm.LocalP().IsHexMine(hex)) {
+                if (_mm.LocalP().IsHexMine(hex) && allowHandDragging) {
                     MMLog.Log_InputCont("Standard mouse down");
+
+                    if (!AbleToInteract(hex))
+                        return InputStatus.Unhandled;
 
                     _input._holdingHex = true;
 
@@ -525,10 +566,12 @@ public class InputController : MonoBehaviour {
                 cursor.z = 0;
                 _input._heldHex.transform.position = cursor;
 
-                RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
-                HandSlot slot = _input.GetHandSlot(hits);
-                if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
-                    _mm.LocalP().hand.Rearrange(slot);
+                if (allowHandRearrangement) {
+                    RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
+                    HandSlot slot = _input.GetHandSlot(hits);
+                    if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
+                        _mm.LocalP().hand.Rearrange(slot);
+                }
                 return InputStatus.FullyHandled;
             }
             //}
@@ -546,17 +589,17 @@ public class InputController : MonoBehaviour {
             MMLog.Log_InputCont("Standard mouse up");
 
             //if (hex.currentState == Hex.State.Hand) {
-                if (_input._holdingHex) {
-                    _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
-                    if(status == InputStatus.Unhandled)
-                        _mm.LocalP().hand.ReleaseTile(_input._heldHex); //?
-                    else
-                        _mm.LocalP().hand.ClearPlaceholder();
+            if (_input._holdingHex) {
+                _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
+                if(status == InputStatus.Unhandled)
+                    _mm.LocalP().hand.ReleaseTile(_input._heldHex); //?
+                else
+                    _mm.LocalP().hand.ClearPlaceholder();
 
-                    _input._holdingHex = false;
-                    return InputStatus.FullyHandled;
-                }
-        //}
+                _input._holdingHex = false;
+                return InputStatus.FullyHandled;
+            }
+            //}
             return InputStatus.Unhandled;
         }
     }
@@ -606,7 +649,6 @@ public class InputController : MonoBehaviour {
             case MageMatch.State.DebugMenu:
                 if (_mm.IsDebugMode()) {
                     _currentContext = _debugMenu;
-                    _mm.debugTools.ValueChanged("insert");
                 } else
                     _currentContext = _block;
                 break;

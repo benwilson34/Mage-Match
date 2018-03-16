@@ -80,14 +80,6 @@ public class Hand {
 
     public TileBehav GetTile(int i) { return (TileBehav)_hexes[i]; }
 
-    public GameObject GetTile(Tile.Element elem) {
-        for (int i = 0; i < _hexes.Count; i++) {
-            if (((TileBehav)_hexes[i]).tile.element == elem)
-                return _hexes[i].gameObject;
-        }
-        return null;
-    }
-
     public Hex GetHex(string tag) {
         foreach (Hex obj in _hexes) {
             //MMLog.Log("HAND", "black", "Trying \"" + tag + "\" against \"" + obj.tag + "\"");
@@ -97,6 +89,8 @@ public class Hand {
         MMLog.LogError("HAND: Failed to find hex with tag \"" + tag + "\"");
         return null;
     }
+
+    public List<Hex> GetAllHexes() { return _hexes; }
 
     public List<string> Debug_GetAllTags() {
         List<string> tags = new List<string>();

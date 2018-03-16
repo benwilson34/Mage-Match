@@ -214,7 +214,6 @@ public class Targeting {
         yield return new WaitForSeconds(1f);
 
         _mm.uiCont.DeactivateTargetingUI();
-        _mm.uiCont.ShowAlertText("");
 
         currentTMode = TargetMode.Tile; // needed?
         //targetTBs = null?

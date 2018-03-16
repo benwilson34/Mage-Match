@@ -74,11 +74,11 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         MMLog.Log("HEXMAN", "black", "Generating tile from genTag \"" + genTag + "\"");
         string type = Hex.TagTitle(genTag);
         switch (Hex.TagCat(genTag)) {
-            case "B":
+            case Hex.Category.BasicTile:
                 return GenerateBasicTile(id, Tile.CharToElement(type[0]));
-            case "T":
+            case Hex.Category.Tile:
                 return GenerateTile(id, type);
-            case "C":
+            case Hex.Category.Charm:
                 return GenerateCharm(id, type);
             default:
                 MMLog.LogError("HEXMAN: Failed " + genTag + " with cat="+Hex.TagCat(genTag));

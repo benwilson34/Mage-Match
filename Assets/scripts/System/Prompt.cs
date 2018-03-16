@@ -13,7 +13,7 @@ public class Prompt {
 
     // TODO make/support dropping hexes (i.e. you could drop a consumable)
     // perhaps the Wait func should take a filter like targeting...
-    private Hex _dropTile;
+    private Hex _dropHex;
     private int _dropCol;
 
     private TileBehav[] _swapTiles;
@@ -35,38 +35,74 @@ public class Prompt {
     // ----- DROP -----
 
     public IEnumerator WaitForDrop() {
-        MMLog.Log("PROMPT", "blue", "Waiting for DROP...");
         _successful = false;
+        yield return WaitForDrop(null);
+    }
 
-        if (_mm.ActiveP().hand.IsEmpty() || _mm.hexGrid.IsBoardFull()) {
+    public IEnumerator WaitForDropTile() {
+        _successful = false;
+        var hexes = _mm.ActiveP().hand.GetAllHexes();
+
+        if (_mm.hexGrid.IsBoardFull())
+            yield break;
+
+        hexes = TileFilter.FilterByCategory(hexes, Hex.Category.Charm);
+        yield return WaitForDrop(hexes);
+    }
+
+    public IEnumerator WaitForDrop(List<Hex> ignoredHexes) {
+        MMLog.Log("PROMPT", "blue", "Waiting for DROP...");
+        //_successful = false;
+
+        int ignCount = 0;
+        if (ignoredHexes != null)
+            ignCount = ignoredHexes.Count;
+
+        if (_mm.ActiveP().hand.Count() == ignCount) {
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted DROP!!");
             yield break;
         }
 
-        _mm.uiCont.ShowAlertText("Drop a tile into the board!");
+        _mm.uiCont.ShowAlertText("Drop a hex into the board!");
         currentMode = PromptMode.Drop;
 
+        if (ignoredHexes != null) {
+            // flip unavailable ones
+            foreach (Hex h in ignoredHexes)
+                h.Flip();
+            _mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+        }
+
+        _mm.inputCont.SetAllowHandRearrange(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
+        _mm.inputCont.SetAllowHandRearrange(true);
+
+        if (ignoredHexes != null) {
+            // flip back
+            foreach (Hex h in ignoredHexes)
+                h.Flip();
+            _mm.inputCont.EndRestrictInteractableHexes();
+        }
     }
 
     public void SetDrop(Hex hex, int col = -1) {
         MMLog.Log("PROMPT", "blue", "DROP is " + hex.hextag);
         _mm.syncManager.SendDropSelection(hex, col);
 
-        _dropTile = hex;
+        _dropHex = hex;
         _dropCol = col;
 
         currentMode = PromptMode.None;
         _successful = true;
     }
 
-    public Hex GetDropTile() { return _dropTile; }
+    public Hex GetDropHex() { return _dropHex; }
 
     public int GetDropCol() { return _dropCol; }
 
     public IEnumerator ContinueDrop() {
-        _mm.ActiveP().hand.Remove(_dropTile);
-        yield return _mm._Drop(_dropTile, _dropCol);
+        _mm.ActiveP().hand.Remove(_dropHex);
+        yield return _mm._Drop(_dropHex, _dropCol);
     }
 
 
@@ -79,6 +115,7 @@ public class Prompt {
         if (!isCharm && _mm.hexGrid.IsBoardFull()) {
             yield break;
         }
+        Player p = _mm.ActiveP();
 
         _mm.uiCont.ToggleQuickdrawUI(true, hex);
 
@@ -86,13 +123,29 @@ public class Prompt {
         _quickdrawWentToHand = false;
         currentMode = PromptMode.Drop;
 
+        // ignore every hex except this one
+        var ignoredHexes = new List<Hex>();
+        foreach (Hex h in p.hand.GetAllHexes())
+            if (!h.EqualsTag(hex)) {
+                ignoredHexes.Add(h);
+                h.Flip();
+            }
+        _mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+
         // the InputController calls SetDrop for this too
+        _mm.inputCont.SetAllowHandRearrange(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
+        _mm.inputCont.SetAllowHandRearrange(true);
+
+        foreach (Hex h in ignoredHexes)
+            h.Flip();
+        _mm.inputCont.EndRestrictInteractableHexes();
 
         if (!_quickdrawWentToHand) { // the player dropped it
             // TODO sound fx
+            p.hand.Remove(hex);
             yield return _mm._Drop(hex, _dropCol);
-            yield return _mm._Draw(_mm.ActiveP().id);
+            yield return _mm._Draw(p.id);
         }
 
         _mm.uiCont.ToggleQuickdrawUI(false);
@@ -125,7 +178,9 @@ public class Prompt {
         _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", swap two adjacent tiles!");
         currentMode = PromptMode.Swap;
 
+        _mm.inputCont.SetAllowHandDragging(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
+        _mm.inputCont.SetAllowHandDragging(true);
     }
 
     // if needed elsewhere, move to HexGrid
