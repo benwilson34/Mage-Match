@@ -9,99 +9,299 @@ public class DebugTools : MonoBehaviour {
     public enum ToolMode { Insert, Destroy, Enchant, Properties, Clear, AddToHand, Discard, ChangeHealth, ChangeMeter };
     public ToolMode mode = ToolMode.Insert;
 
+    public GameObject menus, systemMenu, reportMenu, toolsMenu;
+    // maybe other menus?
+
+    private enum DropdownType { None, Hex, Tile, Property, Enchantment };
+    private List<string> _ddTileOptions, _ddCharmOptions, _ddPropertyOptions, _ddEnchantmentOptions;
+
     private MageMatch _mm;
-    private GameObject _toolsMenu;
-    private Dropdown _dd_hex, _dd_enchant, _dd_property;
+    private Dropdown _dd_options;
     private InputField _input;
     private Button _b_healthMode, _b_player, _b_ok;
 
-    private int playerId = 1;
-    private bool relativeDmgMode = true;
+    private Text _debugGridText, _slidingText;
+    private GameObject _debugItemPF;
+    private Transform _debugContent;
+    private GameObject _debugReport;
+    private Text _debugReportText;
+    private GameObject _toolsMenuButton;
 
-    private string oldFunc;
+    private int _playerId = 1;
+    private bool _relativeDmgMode = true;
 
-	public void Init (MageMatch mm) {
+    private string _oldFunc;
+
+	public void Init(MageMatch mm) {
         this._mm = mm;
+        //menus.SetActive(true);
 
-        _toolsMenu = GameObject.Find("ToolsMenu");
-        Transform t = _toolsMenu.transform;
-        _dd_hex = t.Find("dd_hex").GetComponent<Dropdown>();
-        _dd_enchant = t.Find("dd_enchant").GetComponent<Dropdown>();
-        _dd_property = t.Find("dd_prop").GetComponent<Dropdown>();
-        _input = t.Find("input_dmg").GetComponent<InputField>();
-        _b_healthMode = t.Find("b_healthMode").GetComponent<Button>();
-        _b_player = t.Find("b_player").GetComponent<Button>();
-        _b_ok = t.Find("b_ok").GetComponent<Button>();
+        // System pane
+        systemMenu.SetActive(true);
+        _debugItemPF = Resources.Load("prefabs/ui/debug_statusItem") as GameObject;
+
+        Transform scroll = systemMenu.transform.Find("scr_debugEffects");
+        _debugContent = scroll.transform.Find("Viewport").Find("Content");
+        _debugGridText = systemMenu.transform.Find("t_debugGrid").GetComponent<Text>(); // UI debug grid
+
+        // Report pane
+        reportMenu.SetActive(true);
+        _debugReport = reportMenu.transform.Find("scr_report").gameObject;
+        _debugReportText = _debugReport.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>();
+
+        // Tools pane
+        _toolsMenuButton = menus.transform.Find("b_tools").gameObject;
+        if (!_mm.IsDebugMode()) {
+            _toolsMenuButton.SetActive(false);
+            toolsMenu.SetActive(false);
+        } else {
+            //toolsMenu.SetActive(true);
+            Transform t = toolsMenu.transform;
+            _dd_options = t.Find("dd_option").GetComponent<Dropdown>();
+            _input = t.Find("input_dmg").GetComponent<InputField>();
+            _b_healthMode = t.Find("b_healthMode").GetComponent<Button>();
+            _b_player = t.Find("b_player").GetComponent<Button>();
+            _b_ok = t.Find("b_ok").GetComponent<Button>();
+
+            string[] ddTileOptions = { "B-F", "B-W", "B-E", "B-A", "B-M" };
+            _ddTileOptions = new List<string>(ddTileOptions);
+            // TODO append list of rune tiles
+            _ddTileOptions.AddRange(RuneInfo.GetTileList());
+
+            _ddCharmOptions = new List<string>(RuneInfo.GetCharmList());
+
+            //_ddPropertyOptions = new List<string>();
+
+            string[] ddEnchOptions = { "Burning", "Zombie" };
+            _ddEnchantmentOptions = new List<string>(ddEnchOptions);
+        }
+
+        UpdateDebugGrid();
+
+        ShowPane(1);
+        menus.SetActive(false);
     }
 
-    //void Update () {
+    public void InitEvents() {
+        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
+        _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
+        _mm.eventCont.gameAction += OnGameAction;
+    }
 
-    //}
+    public IEnumerator OnTurnBegin(int id) {
+        UpdateEffTexts();
+        yield return null;
+    }
+
+    public IEnumerator OnTurnEnd(int id) {
+        UpdateEffTexts();
+        yield return null;
+    }
+
+    public void OnGameAction(int id, bool costsAP) {
+        UpdateEffTexts(); // could be considerable overhead...
+    }
+
+    public void ShowPane(int p) {
+        switch (p) {
+            case 1:
+                SetPanesActive(true, false, false);
+                break;
+            case 2:
+                SetPanesActive(false, true, false);
+                break;
+            case 3:
+                SetPanesActive(false, false, true);
+                break;
+        }
+    }
+
+    void SetPanesActive(bool system, bool report, bool tools) {
+        systemMenu.SetActive(system);
+        reportMenu.SetActive(report);
+        toolsMenu.SetActive(tools);
+    }
+
+    public void ToggleDebugMenu() {
+        bool openingMenu = !menus.GetActive();
+        Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
+        if (openingMenu) {
+            menuButtonText.text = "Close";
+            _mm.EnterState(MageMatch.State.DebugMenu);
+        } else {
+            menuButtonText.text = "Debug";
+            _mm.ExitState();
+        }
+        menus.SetActive(openingMenu);
+    }
+
+    public bool IsDebugMenuOpen() { return menus.GetActive(); }
+
+    public void UpdateDebugGrid() {
+        string grid = "   0  1  2  3  4  5  6 \n";
+        for (int r = HexGrid.NUM_ROWS - 1; r >= 0; r--) {
+            grid += r + " ";
+            for (int c = 0; c < HexGrid.NUM_COLS; c++) {
+                if (r <= _mm.hexGrid.TopOfColumn(c) && r >= _mm.hexGrid.BottomOfColumn(c)) {
+                    if (_mm.hexGrid.IsCellFilled(c, r)) {
+                        TileBehav tb = _mm.hexGrid.GetTileBehavAt(c, r);
+                        if (tb.wasInvoked)
+                            grid += "[*]";
+                        else
+                            grid += "[" + tb.tile.ThisElementToChar() + "]";
+
+                    } else
+                        grid += "[ ]";
+                } else
+                    grid += " - ";
+            }
+            grid += '\n';
+        }
+        _debugGridText.text = grid;
+    }
+
+    public void UpdateEffTexts() {
+        foreach (Transform child in _debugContent) {
+            Destroy(child.gameObject);
+        }
+
+        object[] lists = _mm.effectCont.GetLists();
+        List<GameObject> debugItems = new List<GameObject>();
+
+        Color lightBlue = new Color(.07f, .89f, .93f, .8f);
+
+        List<Effect> beginTurnEff = (List<Effect>)lists[0];
+        debugItems.Add(InstantiateDebugEntry("BeginTurnEffs:", lightBlue));
+        foreach (Effect e in beginTurnEff) {
+            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        }
+
+        List<Effect> endTurnEff = (List<Effect>)lists[1];
+        debugItems.Add(InstantiateDebugEntry("EndTurnEffs:", lightBlue));
+        foreach (Effect e in endTurnEff) {
+            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        }
+
+        List<DropEffect> dropEff = (List<DropEffect>)lists[2];
+        debugItems.Add(InstantiateDebugEntry("DropEffs:", lightBlue));
+        foreach (DropEffect e in dropEff) {
+            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        }
+
+        List<SwapEffect> swapEff = (List<SwapEffect>)lists[3];
+        debugItems.Add(InstantiateDebugEntry("SwapEffs:", lightBlue));
+        foreach (SwapEffect e in swapEff) {
+            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        }
+    }
+
+    GameObject InstantiateDebugEntry(string t, Color c) {
+        GameObject item = Instantiate(_debugItemPF, _debugContent);
+        item.GetComponent<Image>().color = c;
+        item.transform.Find("Text").GetComponent<Text>().text = t;
+        return item;
+    }
+
+    public void SaveFiles() {
+        MMLog.Log("ButtonCont", "black", "Saving files...");
+        _mm.stats.SaveFiles();
+    }
+
+    public void UpdateReport(string str) {
+        _debugReportText.text = str;
+    }
 
 
-        // TODO break the inner part out into another method and just set a string here? or enum?
+    // ---------- TOOLS MENU ----------
+
+    // TODO break the inner part out into another method and just set a string here? or enum?
     public void ValueChanged(string func) {
-        if (func == oldFunc)
+        if (func == _oldFunc)
             return;
-        oldFunc = func;
+        _oldFunc = func;
         MMLog.Log_UICont("DEBUGTOOLS: ValueChanged=" + func);
 
         switch (func) {
             case "insert":
                 mode = ToolMode.Insert;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Cell);
-                SetInputs(true, false, false, false, false);
+                SetInputs(DropdownType.Hex, false, true);
                 break;
             case "destroy":
                 mode = ToolMode.Destroy;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
-                SetInputs(false, false, false, false, false);
+                SetInputs(DropdownType.None, false, false);
                 break;
             case "enchant":
                 mode = ToolMode.Enchant;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
-                SetInputs(false, false, true, false, false);
+                SetInputs(DropdownType.Enchantment, false, false);
                 break;
             case "properties":
                 mode = ToolMode.Properties;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
-                SetInputs(false, true, false, false, false);
+                SetInputs(DropdownType.Property, false, false);
                 break;
             case "clear":
                 mode = ToolMode.Clear;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
-                SetInputs(false, false, false, false, false);
+                SetInputs(DropdownType.None, false, false);
                 break;
             case "addToHand":
                 mode = ToolMode.AddToHand;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
-                SetInputs(true, false, false, false, true, "ADD");
+                SetInputs(DropdownType.Hex, false, true, "ADD");
                 break;
             case "discard":
                 mode = ToolMode.Discard;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
-                SetInputs(false, false, false, false, false);
+                SetInputs(DropdownType.None, false, false);
                 break;
             case "changeHealth":
                 mode = ToolMode.ChangeHealth;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
-                SetInputs(false, false, false, true, true, "APPLY");
+                SetInputs(DropdownType.None, true, true, "APPLY");
                 break;
             case "changeMeter":
                 mode = ToolMode.ChangeMeter;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
-                SetInputs(false, false, false, true, true, "APPLY");
+                SetInputs(DropdownType.None, true, true, "APPLY");
                 break;
         }
     }
 
-    public void SetInputs(bool hex, bool prop, bool ench, bool health, bool player, string buttonText = "") {
-        _dd_hex.interactable = hex;
-        _dd_property.interactable = prop;
-        _dd_enchant.interactable = ench;
-        _input.interactable = health;
-        _b_healthMode.interactable = health;
+    void SetInputs(DropdownType ddType, bool input, bool player, string buttonText = "") {
+        if (ddType == DropdownType.None)
+            _dd_options.interactable = false;
+        else {
+            _dd_options.interactable = true;
+
+            switch (ddType) {
+                case DropdownType.Hex:
+                    _dd_options.ClearOptions();
+                    var hexList = _ddTileOptions;
+                    hexList.AddRange(_ddCharmOptions);
+                    _dd_options.AddOptions(hexList);
+                    break;
+                case DropdownType.Tile:
+                    _dd_options.ClearOptions();
+                    _dd_options.AddOptions(_ddCharmOptions);
+                    break;
+                case DropdownType.Property:
+                    //_dd_options.ClearOptions();
+                    //_dd_options.AddOptions(_ddPropertyOptions);
+                    break;
+                case DropdownType.Enchantment:
+                    _dd_options.ClearOptions();
+                    _dd_options.AddOptions(_ddEnchantmentOptions);
+                    break;
+            }
+        }
+
+        _input.interactable = input;
+        //_b_healthMode.interactable = input;
         _b_player.interactable = player;
+
         if (buttonText == "")
             _b_ok.interactable = false;
         else {
@@ -115,43 +315,29 @@ public class DebugTools : MonoBehaviour {
     }
 
     string GetHexGenTag(int id) {
-        string selection = _dd_hex.options[_dd_hex.value].text;
-        switch (selection) {
-            case "Fire":
-                return "p" + id + "-B-F";
-            case "Water":
-                return "p" + id + "-B-W";
-            case "Earth":
-                return "p" + id + "-B-E";
-            case "Air":
-                return "p" + id + "-B-A";
-            case "Muscle":
-                return "p" + id + "-B-M";
-            default:
-                MMLog.LogError("DEBUGTOOLS: Couldn't make tag from \"" + selection + "\"");
-                return "";
-        }
+        string selection = _dd_options.options[_dd_options.value].text;
+        return "p" + id + "-" + selection;
     }
 
     public void TogglePlayer() {
-        if (playerId == 1)
-            playerId = 2;
+        if (_playerId == 1)
+            _playerId = 2;
         else
-            playerId = 1;
+            _playerId = 1;
 
-        _b_player.transform.GetChild(0).GetComponent<Text>().text = "P" + playerId;
+        _b_player.transform.GetChild(0).GetComponent<Text>().text = "P" + _playerId;
     }
 
     int GetPlayerId() {
-        return playerId;
+        return _playerId;
     }
 
     public void ToggleDmgMode() {
-        relativeDmgMode = !relativeDmgMode;
-        if(relativeDmgMode)
-            _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "relative";
+        _relativeDmgMode = !_relativeDmgMode;
+        if(_relativeDmgMode)
+            _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "rel";
         else
-            _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "absolute";
+            _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "abs";
     }
 
     public void HandleInput(MonoBehaviour obj) {
@@ -192,10 +378,11 @@ public class DebugTools : MonoBehaviour {
     }
 
 
-
+    // ---------- ACTUAL TOOLS ----------
 
     void InsertMode_OnClick(CellBehav cb) {
-        TileBehav insertTB = (TileBehav) _mm.hexMan.GenerateHex(_mm.ActiveP().id, GetHexGenTag(1));
+        string genTag = GetHexGenTag(GetPlayerId());
+        TileBehav insertTB = (TileBehav) _mm.hexMan.GenerateHex(_mm.ActiveP().id, genTag);
         _mm.PutTile(insertTB, cb.col, cb.row);
         //insertTB.HardSetPos(cb.col, cb.row);
     }
@@ -206,10 +393,10 @@ public class DebugTools : MonoBehaviour {
     }
 
     void EnchantMode_OnClick(TileBehav tb) {
-        string option = _dd_enchant.options[_dd_enchant.value].text;
+        string option = _dd_options.options[_dd_options.value].text;
         switch (option) {
             case "Burning":
-                StartCoroutine(_mm.hexFX.Ench_SetBurning(playerId, tb));
+                StartCoroutine(_mm.hexFX.Ench_SetBurning(_playerId, tb));
                 break;
             //case "Cherrybomb":
             //    StartCoroutine(mm.hexFX.Ench_SetCherrybomb(id, tb));
@@ -217,9 +404,9 @@ public class DebugTools : MonoBehaviour {
             //case "Stone":
             //    mm.hexFX.Ench_SetStone(tb);
             //    break;
-            case "Zombify":
-                MMLog.Log("DebugTools", "orange", "calling enchant, id=" + playerId);
-                StartCoroutine(_mm.hexFX.Ench_SetZombie(playerId, tb, false));
+            case "Zombie":
+                MMLog.Log("DebugTools", "orange", "calling enchant, id=" + _playerId);
+                StartCoroutine(_mm.hexFX.Ench_SetZombie(_playerId, tb, false));
                 break;
         }
     }

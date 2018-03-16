@@ -43,13 +43,17 @@ public class RuneInfo {
     //    );
     //}
 
-    public static RuneInfo GetRuneInfo(string rune) {
+    static JObject GetRuneJObject() {
         string json = (Resources.Load("json/runes") as TextAsset).text;
         //MMDebug.MMLog.Log("RuneInfo", "black", "json for "+rune+": " + json);
 
         JObject o = JObject.Parse(json);
         //MMDebug.MMLog.Log("RuneInfo", "black", "parsed: " + o[rune].ToString());
+        return o;
+    }
 
+    public static RuneInfo GetRuneInfo(string rune) {
+        JObject o = GetRuneJObject();
         if (o[rune] == null) {
             MMDebug.MMLog.LogError("RuneInfo: Couldn't find info for \"" + rune + "\"");
         }
@@ -64,5 +68,40 @@ public class RuneInfo {
         info.title = rune;
 
         return info;
+    }
+
+    public static List<RuneInfo> GetRuneList() {
+        JObject o = GetRuneJObject();
+
+        List<RuneInfo> runes = new List<RuneInfo>();
+        foreach (JProperty prop in o.Properties()) {
+            //string cat = prop.Value.ToObject<JObject>()["category"].ToString().Substring(0, 1);
+            //runes.Add(cat + "-" + prop.Name);
+            var rune = new RuneInfo();
+            // I feel like this isn't the proper way to do this
+            JsonConvert.PopulateObject(prop.Value.ToString(), rune);
+            rune.title = prop.Name;
+            runes.Add(rune);
+        }
+        return runes;
+    }
+
+    // This is only for DebugTools right now, but will be adapted in time
+    public static List<string> GetCatList(string category) {
+        var runes = GetRuneList();
+        var list = new List<string>();
+        foreach (var rune in runes) {
+            if (rune.category == category)
+                list.Add(category.Substring(0, 1) + "-" + rune.title);
+        }
+        return list;
+    }
+
+    public static List<string> GetTileList() {
+        return GetCatList("Tile");
+    }
+
+    public static List<string> GetCharmList() {
+        return GetCatList("Charm");
     }
 }

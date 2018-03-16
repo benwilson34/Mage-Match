@@ -13,7 +13,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     private HexGrid _hexGrid;
 
     private GameObject _b_fire, _b_water, _b_earth, _b_air, _b_musc; // basic tile prefabs
-    private GameObject _stonePF, _emberPF, _t_tombstone; // token prefabs
+    private GameObject _stonePF, _emberPF, _t_tombstone; // other tile prefabs
     private GameObject _tq_brushfire, _tq_whiteWater;
     private GameObject _td_muscleMass;
     private GameObject _c_sample;

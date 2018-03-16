@@ -95,7 +95,7 @@ public abstract class Character {
         ChangeHealth(-debuffAmount, dealt);
     }
 
-    public void SelfDamage(int amount) { TakeDamage(amount, false); }
+    public void SelfDamage(int amount) { TakeDamage(-amount, false); }
 
     public void Heal(int amount) {
         ChangeHealth(amount, false);

@@ -43,7 +43,7 @@ public class Prompt {
             yield break;
         }
 
-        _mm.uiCont.newsfeed.AddActionLogItem("Drop a tile into the board!");
+        _mm.uiCont.ShowAlertText("Drop a tile into the board!");
         currentMode = PromptMode.Drop;
 
         yield return new WaitUntil(() => currentMode == PromptMode.None);
@@ -82,7 +82,7 @@ public class Prompt {
 
         _mm.uiCont.ToggleQuickdrawUI(true, hex);
 
-        _mm.uiCont.newsfeed.AddActionLogItem("Choose what to do with the Quickdraw hex!");
+        _mm.uiCont.ShowAlertText("Choose what to do with the Quickdraw hex!");
         _quickdrawWentToHand = false;
         currentMode = PromptMode.Drop;
 
@@ -122,9 +122,8 @@ public class Prompt {
             yield break;
         }
 
-        _mm.uiCont.newsfeed.AddActionLogItem("Swap two tiles on the board!");
-        currentMode = PromptMode.Swap;
         _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", swap two adjacent tiles!");
+        currentMode = PromptMode.Swap;
 
         yield return new WaitUntil(() => currentMode == PromptMode.None);
     }

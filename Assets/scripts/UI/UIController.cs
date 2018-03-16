@@ -9,7 +9,7 @@ using MMDebug;
 
 public class UIController : MonoBehaviour {
 
-    public AnimationCurve slidingEase;
+    //public AnimationCurve slidingEase;
     [HideInInspector]
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
     [HideInInspector]
@@ -17,11 +17,7 @@ public class UIController : MonoBehaviour {
     [HideInInspector]
     public Newsfeed newsfeed;
 
-	private Text _debugGridText, _slidingText;
-    private GameObject _debugItemPF;
-    private Transform _debugContent;
-    private GameObject _debugReport;
-    private Text _debugReportText;
+    public GameObject alertbar, quickdrawButton; 
 
     private ButtonController _drawButton;
     private Text _tDeckCount, _tRemovedCount;
@@ -31,18 +27,14 @@ public class UIController : MonoBehaviour {
     private GameObject _prereqPF, _targetPF;
     private GameObject _gradient, _targetingBG;
     private GameObject _tCancelB, _tClearB;
-    private GameObject _menus; // ?
-    private GameObject _newsfeedMenu;
-    private GameObject _overlay;
     private GameObject _screenScroll;
     private List<GameObject> _outlines, _spellOutlines;
     private SpriteRenderer[,] _cellOverlays;
     private Vector3 _slidingTextStart;
     private bool _localOnRight = false;
 
-    private GameObject _quickdrawButton, _hexGlow;
+    private GameObject _hexGlow;
 
-    private Transform _alertbar;
     private const float ALERT_DIS = 55f, ALERT_DELAY = 3f;
     private bool _alertShowing = false;
 
@@ -59,7 +51,6 @@ public class UIController : MonoBehaviour {
         _rightPinfo = GameObject.Find("RightPlayer_Info").transform;
         _leftPspells = GameObject.Find("LeftPlayer_Spells").transform;
         _rightPspells = GameObject.Find("RightPlayer_Spells").transform;
-
 
 
         // buttons
@@ -81,22 +72,6 @@ public class UIController : MonoBehaviour {
         _drawButton.Init(_mm, _mm.myID);
         _tDeckCount = drawT.Find("t_deckCount").GetComponent<Text>();
         _tRemovedCount = drawT.Find("t_removedCount").GetComponent<Text>();
-        GameObject.Find("b_saveFiles").GetComponent<ButtonController>().Init(_mm, _mm.myID); // id not needed here
-
-        // menus
-        _menus = GameObject.Find("Menus");
-        Transform scroll = _menus.transform.Find("DebugMenu").Find("scr_debugEffects");
-        _debugContent = scroll.transform.Find("Viewport").Find("Content");
-		_debugGridText = GameObject.Find ("t_debugHex").GetComponent<Text>(); // UI debug grid
-        _debugReport = _menus.transform.Find("scr_report").gameObject;
-        _debugReportText = _debugReport.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>();
-        _debugReport.SetActive(false);
-
-        GameObject toolsMenu = _menus.transform.Find("ToolsMenu").gameObject;
-        if (!_mm.IsDebugMode())
-            toolsMenu.SetActive(false);
-
-        _menus.SetActive(false);
 
 
         // newsfeed
@@ -105,9 +80,6 @@ public class UIController : MonoBehaviour {
 
 
         // other
-        //overlay = GameObject.Find("Targeting Overlay");
-        //overlay.SetActive(false);
-        
         _spellOutlines = new List<GameObject>();
         _outlines = new List<GameObject>();
 
@@ -115,11 +87,9 @@ public class UIController : MonoBehaviour {
 
         tooltipMan = GetComponent<TooltipManager>();
 
-        _quickdrawButton = GameObject.Find("b_quickdraw");
-        _quickdrawButton.SetActive(false);
+        quickdrawButton.SetActive(false);
 
-        _alertbar = GameObject.Find("Alertbar").transform;
-        _alertbar.Translate(0, ALERT_DIS, 0);
+        alertbar.transform.Translate(0, ALERT_DIS, 0);
     }
 
     public void InitEvents() {
@@ -137,8 +107,6 @@ public class UIController : MonoBehaviour {
         _spellOutlineMid = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
         _prereqPF = Resources.Load("prefabs/outline_prereq") as GameObject;
         _targetPF = Resources.Load("prefabs/outline_target") as GameObject;
-
-        _debugItemPF = Resources.Load("prefabs/ui/debug_statusItem") as GameObject;
     }
 
     void InitSprites() {
@@ -153,7 +121,7 @@ public class UIController : MonoBehaviour {
     #region EventCont calls
     public IEnumerator OnTurnBegin(int id) {
         if (_mm.MyTurn()) {
-            newsfeed.AddActionLogItem(_mm.ActiveP().name + ", make your move!");
+            ShowAlertText(_mm.ActiveP().name + ", make your move!");
             //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
 
             SetDrawButton(true);
@@ -162,12 +130,10 @@ public class UIController : MonoBehaviour {
 
         //ChangePinfoColor(id, new Color(0, 1, 0, .4f));
         //PinfoColorTween(id, CorrectPinfoColor(id));
-        UpdateEffTexts();
         yield return null;
     }
 
     public IEnumerator OnTurnEnd(int id) {
-        UpdateEffTexts();
         newsfeed.UpdateTurnCount(_mm.stats.turns);
         //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
         yield return null;
@@ -175,7 +141,6 @@ public class UIController : MonoBehaviour {
 
     public void OnGameAction(int id, bool costsAP) {
         UpdateAP(_mm.GetPlayer(id));
-        UpdateEffTexts(); // could be considerable overhead...
     }
 
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
@@ -194,7 +159,6 @@ public class UIController : MonoBehaviour {
     #endregion
 
     public void Reset() {
-        UpdateDebugGrid();
         ShowAlertText("Fight!!");
 
         if (!_mm.MyTurn())
@@ -248,14 +212,15 @@ public class UIController : MonoBehaviour {
         StartCoroutine(_ShowAlertText(str));
     }
     IEnumerator _ShowAlertText(string str) {
-        _alertbar.Find("t_alert").GetComponent<Text>().text = str;
+        Transform t = alertbar.transform;
+        t.Find("t_alert").GetComponent<Text>().text = str;
 
         if (!_alertShowing) {
             _alertShowing = true;
-            float posY = _alertbar.position.y;
-            yield return _alertbar.DOMoveY(posY - ALERT_DIS, .25f).WaitForCompletion();
+            float posY = t.position.y;
+            yield return t.DOMoveY(posY - ALERT_DIS, .25f).WaitForCompletion();
             yield return new WaitForSeconds(ALERT_DELAY);
-            yield return _alertbar.DOMoveY(posY, .25f).WaitForCompletion();
+            yield return t.DOMoveY(posY, .25f).WaitForCompletion();
             _alertShowing = false;
         }
     }
@@ -506,8 +471,11 @@ public class UIController : MonoBehaviour {
     #endregion
 
     public void ToggleQuickdrawUI(bool on, Hex hex = null) {
+        if (!_mm.MyTurn())
+            return;
+
         // TODO glow under hex
-        _quickdrawButton.SetActive(on);
+        quickdrawButton.SetActive(on);
 
         int id = _mm.ActiveP().id;
         TurnAllSpellButtons(id, !on);
@@ -516,7 +484,7 @@ public class UIController : MonoBehaviour {
 
             Vector3 newPos = hex.transform.position;
             newPos.y += 1;
-            _quickdrawButton.transform.position = newPos;
+            quickdrawButton.transform.position = newPos;
         } else {
             _drawButton.Activate();
         }
@@ -608,96 +576,4 @@ public class UIController : MonoBehaviour {
     }
     #endregion
 
-
-    #region ----- DEBUG MENU -----
-    public void ToggleDebugMenu() {
-        bool menuOpen = !_menus.GetActive();
-        Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
-        if (menuOpen) {
-            menuButtonText.text = "Close Menu";
-            _mm.EnterState(MageMatch.State.DebugMenu);
-        } else {
-            menuButtonText.text = "Menu";
-            _mm.ExitState();
-        }
-        _menus.SetActive(menuOpen);
-    }
-
-    public bool IsDebugMenuOpen() { return _menus.GetActive(); }
-
-    public void UpdateDebugGrid() {
-        string grid = "   0  1  2  3  4  5  6 \n";
-        for (int r = HexGrid.NUM_ROWS - 1; r >= 0; r--) {
-            grid += r + " ";
-            for (int c = 0; c < HexGrid.NUM_COLS; c++) {
-                if (r <= _mm.hexGrid.TopOfColumn(c) && r >= _mm.hexGrid.BottomOfColumn(c)) {
-                    if (_mm.hexGrid.IsCellFilled(c, r)) {
-                        TileBehav tb = _mm.hexGrid.GetTileBehavAt(c, r);
-                        if (tb.wasInvoked)
-                            grid += "[*]";
-                        else
-                            grid += "[" + tb.tile.ThisElementToChar() + "]";
-
-                    } else
-                        grid += "[ ]";
-                } else
-                    grid += " - ";
-            }
-            grid += '\n';
-        }
-        _debugGridText.text = grid;
-    }
-
-    public void UpdateEffTexts() {
-        object[] lists = _mm.effectCont.GetLists();
-        List<GameObject> debugItems = new List<GameObject>();
-
-        Color lightBlue = new Color(.07f, .89f, .93f, .8f);
-
-        List<Effect> beginTurnEff = (List<Effect>)lists[0];
-        debugItems.Add(InstantiateDebugEntry("BeginTurnEffs:", lightBlue));
-        foreach (Effect e in beginTurnEff) {
-            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
-        }
-
-        List<Effect> endTurnEff = (List<Effect>)lists[1];
-        debugItems.Add(InstantiateDebugEntry("EndTurnEffs:", lightBlue));
-        foreach (Effect e in endTurnEff) {
-            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
-        }
-
-        List<DropEffect> dropEff = (List<DropEffect>)lists[2];
-        debugItems.Add(InstantiateDebugEntry("DropEffs:", lightBlue));
-        foreach (DropEffect e in dropEff) {
-            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
-        }
-
-        List<SwapEffect> swapEff = (List<SwapEffect>)lists[3];
-        debugItems.Add(InstantiateDebugEntry("SwapEffs:", lightBlue));
-        foreach (SwapEffect e in swapEff) {
-            debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
-        }
-
-        foreach (Transform child in _debugContent) {
-            Destroy(child.gameObject);
-        }
-        foreach (GameObject go in debugItems) {
-            go.transform.SetParent(_debugContent);
-        }
-    }
-
-    public GameObject InstantiateDebugEntry(string t, Color c) {
-        GameObject item = Instantiate(_debugItemPF);
-        item.GetComponent<Image>().color = c;
-        item.transform.Find("Text").GetComponent<Text>().text = t;
-        return item;
-    }
-
-    public void ToggleReport(bool b) {
-        if (b)
-            _debugReportText.text = _mm.stats.GetReportText();
-
-        _debugReport.SetActive(b);
-    }
-    #endregion
 }

@@ -60,14 +60,12 @@ public class MageMatch : MonoBehaviour {
             debugSettings = debugObj.GetComponent<DebugSettings>();
             isDebugMode = true;
 
-            debugTools = GameObject.Find("ToolsMenu").GetComponent<DebugTools>();
-            debugTools.Init(this);
-
             MMLog.LogWarning("This scene is in debug mode!!");
             PhotonNetwork.offlineMode = true;
             PhotonNetwork.CreateRoom("debug");
             PhotonNetwork.JoinRoom("debug");
         }
+
 
         _stateStack = new Stack<State>();
 
@@ -104,6 +102,9 @@ public class MageMatch : MonoBehaviour {
         hexGrid = new HexGrid();
         hexMan = new HexManager(this);
         TileFilter.Init(hexGrid);
+
+        debugTools = GameObject.Find("Debug").GetComponent<DebugTools>();
+        debugTools.Init(this);
 
         uiCont.GetCellOverlays();
         boardCheck = new BoardCheck(this);
@@ -170,6 +171,7 @@ public class MageMatch : MonoBehaviour {
         effectCont.InitEvents();
         commish.InitEvents();
         uiCont.InitEvents();
+        debugTools.InitEvents();
         _p1.InitEvents();
         _p2.InitEvents();
 
@@ -330,7 +332,7 @@ public class MageMatch : MonoBehaviour {
         if (currentTurn == Turn.PlayerTurn && spellCheck)
             SpellCheck();
 
-        uiCont.UpdateDebugGrid();
+        debugTools.UpdateDebugGrid();
 
         MMLog.Log_MageMatch("Done checking.");
         _checking--;

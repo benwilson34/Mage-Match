@@ -21,7 +21,7 @@ public class ButtonController : MonoBehaviour {
     private bool _isActivated = false, _interactable = false;
 
     public void Init(MageMatch mm, int id) {
-        MMLog.Log("ButtonCont", "black", "Init button " + spellNum + " with id="+id);
+        MMLog.Log("ButtonCont", "black", "Object " + gameObject.name + " Init button " + spellNum + " with id="+id);
         this._mm = mm;
         this._playerId = id;
 
@@ -219,11 +219,6 @@ public class ButtonController : MonoBehaviour {
 
     public void OnDrawButtonClick() {
         _mm.PlayerDrawHex();
-    }
-
-    public void OnFileButtonClick() {
-        MMLog.Log("ButtonCont", "black", "Saving files...");
-        _mm.stats.SaveFiles();
     }
 
     public void DoAThing() {

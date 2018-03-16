@@ -6,7 +6,8 @@ using DG.Tweening;
 
 public class Newsfeed : MonoBehaviour {
 
-    private GameObject _newsfeedMenu;
+    public GameObject newsfeedMenu;
+
     private GameObject _actionLogItemPF;
     private Transform _actionLog;
     private Text _turnCounterText, _newsText;
@@ -19,10 +20,11 @@ public class Newsfeed : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        _newsfeedMenu = GameObject.Find("Newsfeed_Menu");
         _actionLogItemPF = Resources.Load("prefabs/ui/actionLogItem") as GameObject;
 
-        Transform actionLogT = GameObject.Find("scr_actionLog").transform;
+        newsfeedMenu.SetActive(true); // needed to find objects...
+
+        Transform actionLogT = newsfeedMenu.transform.GetChild(0).Find("scr_actionLog");
         _actionLog = actionLogT.Find("Viewport").Find("Content");
 
         _timerHourglass = transform.Find("i_hourglass").GetComponent<Image>();
@@ -32,12 +34,7 @@ public class Newsfeed : MonoBehaviour {
         _newsText = transform.Find("t_news").GetComponent<Text>();
         UpdateNewsfeed("Begin match!!");
 
-        _newsfeedMenu.SetActive(false);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+        newsfeedMenu.SetActive(false);
 	}
 
     public void Init(MageMatch mm) {
@@ -96,15 +93,15 @@ public class Newsfeed : MonoBehaviour {
     }
 
     public void ToggleMenu() {
-        bool menuOpen = !_newsfeedMenu.GetActive();
+        bool menuOpen = !newsfeedMenu.GetActive();
         if (menuOpen)
             _mm.EnterState(MageMatch.State.NewsfeedMenu);
         else
             _mm.ExitState();
 
-        _newsfeedMenu.SetActive(menuOpen);
+        newsfeedMenu.SetActive(menuOpen);
     }
 
-    public bool isMenuOpen() { return _newsfeedMenu.GetActive(); }
+    public bool isMenuOpen() { return newsfeedMenu.GetActive(); }
 
 }
