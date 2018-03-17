@@ -40,7 +40,7 @@ public class CharacterInfo {
         string format = "{0} - {1}/{2} - {3}\n";
         if (formatted) {
             format  = "<size=40>{0}</size>\n";
-            format += "<size=40>{1}</size>\n";
+            format += "<size=25>{1}</size>\n";
             format += "<size=25><i>{2}</i></size>\n";
             format += "{3}";
         }
@@ -48,7 +48,7 @@ public class CharacterInfo {
         return string.Format(format,
             title,
             prereq,
-            string.Join(", ", keywords),
+            keywords != null ? string.Join(", ", keywords) : "",
             desc
         );
     }

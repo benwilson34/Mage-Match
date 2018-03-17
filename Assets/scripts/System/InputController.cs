@@ -201,8 +201,8 @@ public class InputController : MonoBehaviour {
             //MMLog.Log_InputCont("UI Raycast hit "+hit.gameObject.name);
             Tooltipable tt = hit.gameObject.GetComponent<Tooltipable>(); // is this okay?
             if (tt != null) {
-                MMLog.Log_InputCont("GetTooltipable found a Tooltipable! " + 
-                    tt.GetTooltipInfo());
+                //MMLog.Log_InputCont("GetTooltipable found a Tooltipable! " + 
+                    //tt.GetTooltipInfo());
                 return tt;
             }
         }

@@ -22,7 +22,7 @@
   "core": {
     "title": "Whirlpool Spin",
     "cost": 1,
-    "keywords": ["Drag Target"],
+    "keywords": ["Swap Prompt"],
     "desc": "Deal 20/40/70 damage, heal yourself for 10/20/40 health, and perform 0/1/2 swaps. Perform 1 additional swap when invoking a water match."
   },
   "spell1": {
