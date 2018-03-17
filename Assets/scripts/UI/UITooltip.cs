@@ -9,14 +9,4 @@ public class UITooltip : MonoBehaviour, Tooltipable {
     public string GetTooltipInfo() {
         return tooltipInfo;
     }
-
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

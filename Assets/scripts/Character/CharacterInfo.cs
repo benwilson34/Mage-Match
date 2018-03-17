@@ -38,13 +38,17 @@ public class CharacterInfo {
     public static string GetSpellInfoJSON(string title, string prereq, string[] keywords, string desc, bool formatted) {
         // title, prereq, type, desc
         string format = "{0} - {1}/{2} - {3}\n";
-        if (formatted)
-            format = "<b>{0}</b>\n{1}/{2}\n\n{3}\n";
+        if (formatted) {
+            format  = "<size=40>{0}</size>\n";
+            format += "<size=40>{1}</size>\n";
+            format += "<size=25><i>{2}</i></size>\n";
+            format += "{3}";
+        }
 
         return string.Format(format,
             title,
             prereq,
-            keywords,
+            string.Join(", ", keywords),
             desc
         );
     }

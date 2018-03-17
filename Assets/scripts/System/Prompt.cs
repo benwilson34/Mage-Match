@@ -66,7 +66,7 @@ public class Prompt {
         _mm.uiCont.ShowAlertText("Drop a hex into the board!");
         currentMode = PromptMode.Drop;
 
-        if (ignoredHexes != null) {
+        if (ignoredHexes != null && _mm.MyTurn()) {
             // flip unavailable ones
             foreach (Hex h in ignoredHexes)
                 h.Flip();
@@ -77,7 +77,7 @@ public class Prompt {
         yield return new WaitUntil(() => currentMode == PromptMode.None);
         _mm.inputCont.SetAllowHandRearrange(true);
 
-        if (ignoredHexes != null) {
+        if (ignoredHexes != null && _mm.MyTurn()) {
             // flip back
             foreach (Hex h in ignoredHexes)
                 h.Flip();
@@ -125,21 +125,25 @@ public class Prompt {
 
         // ignore every hex except this one
         var ignoredHexes = new List<Hex>();
-        foreach (Hex h in p.hand.GetAllHexes())
-            if (!h.EqualsTag(hex)) {
-                ignoredHexes.Add(h);
-                h.Flip();
-            }
-        _mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+        if (_mm.MyTurn()) {
+            foreach (Hex h in p.hand.GetAllHexes())
+                if (!h.EqualsTag(hex)) {
+                    ignoredHexes.Add(h);
+                    h.Flip();
+                }
+            _mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+        }
 
         // the InputController calls SetDrop for this too
         _mm.inputCont.SetAllowHandRearrange(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
         _mm.inputCont.SetAllowHandRearrange(true);
 
-        foreach (Hex h in ignoredHexes)
-            h.Flip();
-        _mm.inputCont.EndRestrictInteractableHexes();
+        if (_mm.MyTurn()) {
+            foreach (Hex h in ignoredHexes)
+                h.Flip();
+            _mm.inputCont.EndRestrictInteractableHexes();
+        }
 
         if (!_quickdrawWentToHand) { // the player dropped it
             // TODO sound fx

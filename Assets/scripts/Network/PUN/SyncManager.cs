@@ -292,7 +292,7 @@ public class SyncManager : PunBehaviour {
     public void SendKeepQuickdraw() {
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleQuickdrawKeep", PhotonTargets.Others);
+            photonView.RPC("HandleKeepQuickdraw", PhotonTargets.Others);
         }
     }
     [PunRPC]
