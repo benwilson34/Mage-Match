@@ -119,7 +119,7 @@ public class Prompt {
 
         _mm.uiCont.ToggleQuickdrawUI(true, hex);
 
-        _mm.uiCont.ShowAlertText("Choose what to do with the Quickdraw hex!");
+        _mm.uiCont.ShowLocalAlertText(p.id, "Choose what to do with the Quickdraw hex!");
         _quickdrawWentToHand = false;
         currentMode = PromptMode.Drop;
 

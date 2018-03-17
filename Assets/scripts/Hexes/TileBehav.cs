@@ -160,7 +160,10 @@ public class TileBehav : Hex {
 
     public override string GetTooltipInfo() {
         string title = TagTitle(hextag);
-        return GetTooltipInfo(title, "Tile", "");
+        string ench = "";
+        if (HasEnchantment())
+            ench = "This tile is enchanted with " + GetEnchType().ToString();
+        return GetTooltipInfo(title, "Tile", ench);
     }
 
 }

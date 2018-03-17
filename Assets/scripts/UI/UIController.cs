@@ -146,6 +146,8 @@ public class UIController : MonoBehaviour {
 
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
         // TODO update button
+        if (_mm.GetPlayer(id).hand.IsFull())
+            _drawButton.Deactivate();
         yield return null;
     }
 
@@ -171,6 +173,7 @@ public class UIController : MonoBehaviour {
 
             Text nameText = pinfo.Find("t_name").GetComponent<Text>();
             nameText.text = p.name;
+            SetPinfoColor(id);
             //if (id == _mm.myID)
             //    nameText.text += " (ME!)";
 
@@ -209,6 +212,10 @@ public class UIController : MonoBehaviour {
         yield return null;
     }
 
+    public void ShowLocalAlertText(int id, string str) {
+        if (id == _mm.myID)
+            ShowAlertText(str);
+    }
     public void ShowAlertText(string str) {
         StartCoroutine(_ShowAlertText(str));
     }
@@ -235,9 +242,24 @@ public class UIController : MonoBehaviour {
             return _rightPinfo;
     }
 
-    //void ChangePinfoColor(int id, Color c) {
-    //    GetPinfo(id).GetComponent<Image>().color = c; // idk why
-    //}
+    void SetPinfoColor(int id) {
+        Image healthImg = GetPinfo(id).Find("i_healthbar").GetComponent<Image>();
+        switch (_mm.GetPlayer(id).character.ch) {
+            case Character.Ch.Enfuego:
+                healthImg.color = Color.red;
+                break;
+            case Character.Ch.Gravekeeper:
+                healthImg.color = Color.green;
+                break;
+            case Character.Ch.Valeria:
+                healthImg.color = Color.blue;
+                break;
+
+            case Character.Ch.Sample:
+                healthImg.color = Color.gray;
+                break;
+        }
+    }
 
     //Tween PinfoColorTween(int id, Color newColor) {
     //    Transform pinfo = GetPinfo(id);
@@ -245,20 +267,7 @@ public class UIController : MonoBehaviour {
     //        .SetEase(Ease.InOutQuad).SetLoops(7, LoopType.Yoyo);
     //} 
 
-    // TODO re-enable once this is designed in again
     void UpdateAP(Player p) {
-        //      Text APText = GetPinfo(p.id).Find ("Text_AP").GetComponent<Text>();
-        //APText.text = "AP left: " + p.AP;
-
-        //Transform APblock = GetPinfo(p.id).Find("i_AP");
-
-        //for (int i = 0; i < 6; i++) {
-        //    if (i < p.AP)
-        //        APblock.Find("AP" + i).GetComponent<Image>().enabled = true;
-        //    else
-        //        APblock.Find("AP" + i).GetComponent<Image>().enabled = false;
-        //}      
-
         var APimage = GetPinfo(p.id).Find("i_AP").GetComponent<Image>();
         APimage.fillAmount = (float)p.AP / Player.MAX_AP;
     }

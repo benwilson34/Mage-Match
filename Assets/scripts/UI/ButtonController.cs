@@ -185,12 +185,13 @@ public class ButtonController : MonoBehaviour {
             _newSpell = false;
         }
 
-        if(_cancelView != null)
+        if (_cancelView != null) {
             Destroy(_cancelView.gameObject);
-        _mainView.SetActive(true);
+            _cancelView = null;
+            _mainView.SetActive(true);
 
-        SetOnClick(_mainClick);
-        //onClick = mainClick;
+            SetOnClick(_mainClick);
+        }
 
         yield return null;
     }

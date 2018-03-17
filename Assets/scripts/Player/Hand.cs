@@ -106,8 +106,8 @@ public class Hand {
             string ttag = theirTags[i];
             if (theirTags[i] != myTags[i]) {
                 // that's bad
-                MMLog.LogError("Hand desync!!\nmine =" + string.Concat(myTags) + 
-                    "\ntheirs=" + string.Concat(theirTags));
+                MMLog.LogError("Hand desync!!\nmine =" + string.Join(", ", myTags.ToArray()) +
+                    "\ntheirs=" + string.Join(", ", theirTags.ToArray()));
                 return false;
             }
         }

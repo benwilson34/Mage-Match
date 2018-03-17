@@ -151,7 +151,7 @@ public class AnimationController : MonoBehaviour {
     public IEnumerator _Burning_Turn(Player p, TileBehav tb) {
         GameObject fb = Instantiate(_fireballPF, tb.transform);
 
-        Vector3 dmgSpot = Camera.main.ScreenToWorldPoint(_mm.uiCont.GetPinfo(p.id).position);
+        Vector3 dmgSpot = _mm.uiCont.GetPinfo(p.id).position;
         Tween t = fb.transform.DOMove(dmgSpot, .4f);
         t.SetEase(Ease.InQuart);
         yield return t.WaitForCompletion();

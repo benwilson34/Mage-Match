@@ -495,7 +495,7 @@ public class MageMatch : MonoBehaviour {
         } else if (currentTurn == Turn.CommishTurn)
             eventCont.CommishDrop(hex.hextag, col);
 
-        syncManager.CheckHandContents(_activep.id);
+        //syncManager.CheckHandContents(_activep.id);
 
         MMLog.Log_MageMatch("   ---------- DROP END ----------");
         _actionsPerforming--;
