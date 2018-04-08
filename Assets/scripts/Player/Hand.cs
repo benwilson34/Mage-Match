@@ -52,7 +52,7 @@ public class Hand {
                 slot.SetHex(hex);
                 hex.transform.position = slot.transform.position;
                 _mm.animCont.PlayAnim(_mm.animCont._Draw(hex));
-                _mm.audioCont.HexDraw(hex.GetComponent<AudioSource>());
+                _mm.audioCont.Trigger(AudioController.HexSoundEffect.Draw, hex.GetComponent<AudioSource>());
                 MMLog.Log("HAND", "black", "Added hex with tag " + hex.hextag);
                 break;
             }
@@ -158,6 +158,8 @@ public class Hand {
 
                 slot.SetHex(_placeholder);
                 _placeholderSlot = slot;
+
+                _mm.audioCont.Trigger(AudioController.HexSoundEffect.Pickup);
                 break;
             }
         }
@@ -213,6 +215,8 @@ public class Hand {
             _placeholderSlot.ClearHex();
         _placeholderSlot = newSlot;
 
+        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Pickup);
+
         //MMDebug.MMLog.Log("HAND", "black", "After:");
         //NumFullSlots();
     }
@@ -224,6 +228,9 @@ public class Hand {
 
         _placeholderSlot.SetHex(hex);
         ClearPlaceholder();
+
+        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Pickup);
+
         //NumFullSlots();
     }
 

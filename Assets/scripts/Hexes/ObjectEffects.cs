@@ -90,7 +90,7 @@ public class ObjectEffects {
         // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
         //		Debug.MMLog.Log_EnchantFx("SPELLEFFECTS: Setting burning...");
         yield return _mm.animCont._Burning(tb);
-        _mm.audioCont.EnchantBurning( tb.GetComponent<AudioSource>() );
+        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.BurningEnchant);
 
         Enchantment ench = new Enchantment(id, 5, Enchantment.Type.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
         ench.TriggerEffectEveryTurn();
@@ -102,12 +102,13 @@ public class ObjectEffects {
     IEnumerator Ench_Burning_TEffect(int id, TileBehav tb) {
         MMLog.Log_EnchantFx("Burning TurnEffect at " + tb.PrintCoord());
         yield return _mm.animCont._Burning_Turn(_mm.GetOpponent(id), tb);
-        _mm.audioCont.EnchantBurning( tb.GetComponent<AudioSource>() );
+        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.BurningDamage);
         _mm.GetPC(id).DealDamage(3);
         //yield return null; // for now
     }
     IEnumerator Ench_Burning_End(int id, TileBehav tb) {
         _mm.GetPC(id).DealDamage(6);
+        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.BurningTimeout);
         yield return null; // for now
     }
 
@@ -128,10 +129,12 @@ public class ObjectEffects {
         yield return null; // for now
     }
 
-    public IEnumerator Ench_SetZombie(int id, TileBehav tb, bool skip, bool anim = true) {
-        if (anim)
+    // TODO take skip out since Zombie doesn't have a turn effect anymore
+    public IEnumerator Ench_SetZombie(int id, TileBehav tb, bool skip = false, bool anim = true) {
+        if (anim) {
             yield return _mm.animCont._Zombify(tb);
-        _mm.audioCont.EnchantZombie( tb.GetComponent<AudioSource>() );
+            _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.ZombieEnchant);
+        }
 
         Enchantment ench = new Enchantment(id, Enchantment.Type.Zombie, Effect.Type.Enchant, Ench_Zombie_TEffect, null);
         if (skip)
@@ -149,25 +152,25 @@ public class ObjectEffects {
         //zombify_select = false; // only use if you're sloppy. 
         if (tb == null)
             MMLog.LogError("SPELLFX: >>>>>Zombify called with a null tile!! Maybe it was removed?");
-        MMLog.Log_EnchantFx("----- Zombify at " + tb.PrintCoord() + " starting -----");
+        //MMLog.Log_EnchantFx("----- Zombify at " + tb.PrintCoord() + " starting -----");
 
         List<TileBehav> tbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-        MMLog.Log_EnchantFx("Tile has " + tbs.Count + " tiles around it.");
+        //MMLog.Log_EnchantFx("Tile has " + tbs.Count + " tiles around it.");
         for (int i = 0; i < tbs.Count; i++) {
             TileBehav ctb = tbs[i];
             if (!ctb.CanSetEnch(Enchantment.Type.Zombie)) { // other conditions where Zombify wouldn't work?
                 tbs.RemoveAt(i);
                 i--;
-                MMLog.Log_EnchantFx("Ignoring tile at " + ctb.PrintCoord());
+                //MMLog.Log_EnchantFx("Ignoring tile at " + ctb.PrintCoord());
             }
         }
-        MMLog.Log_EnchantFx("Tile now has " + tbs.Count + " available tiles around it.");
+        //MMLog.Log_EnchantFx("Tile now has " + tbs.Count + " available tiles around it.");
 
         //yield return new WaitUntil(() => zombify_select);
         //zombify_select = false;
 
         if (tbs.Count == 0) { // no targets
-            MMLog.Log_EnchantFx("Zombify at " + tb.PrintCoord() + " has no targets!");
+            //MMLog.Log_EnchantFx("Zombify at " + tb.PrintCoord() + " has no targets!");
             //mm.syncManager.SendZombifySelect(id, -1, -1);
             yield break;
         }
@@ -179,20 +182,22 @@ public class ObjectEffects {
 
         //mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);
 
-        yield return _mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); //anim 1
+        yield return _mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); // anim 1
 
         if (selectTB.tile.element == Tile.Element.Muscle) {
             yield return _hexMan._RemoveTile(selectTB, true); // maybe?
+            _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.ZombieGulp);
 
             _mm.GetPC(id).DealDamage(10);
             _mm.GetPC(id).Heal(10);
         } else {
             yield return Ench_SetZombie(id, selectTB, true, false);
+            _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.ZombieAttack);
         }
 
         yield return _mm.animCont._Zombify_Back(tb.transform); // anim 2
 
-        MMLog.Log_EnchantFx("----- Zombify at " + tb.PrintCoord() + " done -----");
+        //MMLog.Log_EnchantFx("----- Zombify at " + tb.PrintCoord() + " done -----");
         yield return null; // needed?
     }
 }

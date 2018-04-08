@@ -35,7 +35,7 @@ public class TurnTimer : MonoBehaviour {
             _timeRemaining -= .1f;
 
             if (!_playedWarningSound && _timeRemaining < TIMER_WARNING) {
-                _mm.audioCont.TurnTimerWarning();
+                _mm.audioCont.Trigger(AudioController.OtherSoundEffect.TurnTimerWarning);
                 _playedWarningSound = true;
             }
 

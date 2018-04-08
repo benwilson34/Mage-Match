@@ -107,7 +107,7 @@ public class Targeting {
         // TODO if targetable
 
         _mm.syncManager.SendTBTarget(tb);
-        _mm.audioCont.ChooseTargets();
+        _mm.audioCont.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
 
         if (currentTMode == TargetMode.Tile) {
             Tile t = tb.tile;

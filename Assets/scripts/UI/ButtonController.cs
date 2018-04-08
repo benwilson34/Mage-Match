@@ -117,9 +117,10 @@ public class ButtonController : MonoBehaviour {
 
     public void OnClick() {
         MMLog.Log("ButtonCont","black","Button " + spellNum + " clicked...");
-        if (_onClick != null)
+        if (_onClick != null) {
             _onClick();
-        else
+            _mm.audioCont.Trigger(AudioController.OtherSoundEffect.UIButton);
+        } else
             MMLog.LogError("BUTTONCONT: Button was clicked and onClick is somehow null!");
     }
 

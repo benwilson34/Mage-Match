@@ -429,7 +429,7 @@ public class DebugTools : MonoBehaviour {
             //    break;
             case "Zombie":
                 MMLog.Log("DebugTools", "orange", "calling enchant, id=" + _playerId);
-                StartCoroutine(_mm.hexFX.Ench_SetZombie(_playerId, tb, false));
+                StartCoroutine(_mm.hexFX.Ench_SetZombie(_playerId, tb));
                 break;
         }
     }

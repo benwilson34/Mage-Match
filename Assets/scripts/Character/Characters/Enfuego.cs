@@ -60,13 +60,14 @@ public class Enfuego : Character {
             _mm.StartCoroutine(_objFX.Ench_SetBurning(_playerId, tb));
         }
     }
-    // TODO sample filter???
 
 
     // -----  SPELLS  -----
 
     // Fiery Fandango
     protected override IEnumerator CoreSpell(TileSeq seq) {
+        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.FieryFandango);
+
         int burnNum = 2, dmg = 30;
         switch (seq.GetSeqLength()) {
             case 3: // safe to remove?
@@ -104,6 +105,8 @@ public class Enfuego : Character {
 
     // Baila!
     protected override IEnumerator Spell1(TileSeq prereq) {
+        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.Baila);
+
         yield return ThisPlayer().DrawHexes(2, false, false); // my draw
         yield return _mm.GetOpponent(_playerId).DrawHexes(2, false, false); // their draw
 
@@ -115,6 +118,8 @@ public class Enfuego : Character {
     // Incinerate
     protected override IEnumerator Spell2(TileSeq prereq) {
         yield return _targeting.WaitForDragTarget(6, Inc_Filter);
+
+        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.Incinerate);
 
         List<TileBehav> tbs = _targeting.GetTargetTBs();
         int dmg = tbs.Count * 35;
@@ -146,6 +151,7 @@ public class Enfuego : Character {
     }
     public float HotPot_Debuff(Player p, int dmg) {
         MMLog.Log_Enfuego("Hot Potato debuff on " + p.name + ", handcount=" + p.hand.Count());
+        // TODO sound fx
         return p.hand.Count() * 3;
     }
 
@@ -188,10 +194,13 @@ public class Enfuego : Character {
                     _mm.StartCoroutine(_objFX.Ench_SetBurning(_playerId, ctb)); // yield return?
                 }
             } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
-                yield return _mm.InactiveP().DiscardRandom(1);
+                yield return _mm.GetOpponent(_playerId).DiscardRandom(1);
             }
 
             _mm.hexMan.RemoveTile(tb.tile, true);
+            _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.WHCK);
+
+            yield return new WaitForSeconds(.4f);
         }
     }
 
