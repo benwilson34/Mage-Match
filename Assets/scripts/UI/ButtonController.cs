@@ -21,7 +21,7 @@ public class ButtonController : MonoBehaviour {
     private bool _isActivated = false, _interactable = false;
 
     public void Init(MageMatch mm, int id) {
-        MMLog.Log("ButtonCont", "black", "Object " + gameObject.name + " Init button " + spellNum + " with id="+id);
+        //MMLog.Log("ButtonCont", "black", "Object " + gameObject.name + " Init button " + spellNum + " with id="+id);
         this._mm = mm;
         this._playerId = id;
 
@@ -111,7 +111,7 @@ public class ButtonController : MonoBehaviour {
     //}
 
     void SetOnClick(ButtonClick click) {
-        MMLog.Log("ButtonCont", "black","Setting onClick of spell" + spellNum + " to " + click.ToString());
+        //MMLog.Log("ButtonCont", "black","Setting onClick of spell" + spellNum + " to " + click.ToString());
         _onClick = click;
     }
 

@@ -109,13 +109,15 @@ public class Targeting {
         _mm.syncManager.SendTBTarget(tb);
         _mm.audioCont.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
 
+        _mm.stats.Report("$ TARGET TILE " + tb.PrintCoord(), false);
+
         if (currentTMode == TargetMode.Tile) {
             Tile t = tb.tile;
             _mm.uiCont.OutlineTarget(t.col, t.row);
             _targetTBs.Add(tb);
             DecTargets();
             _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
-            MMLog.Log_Targeting("Targeted tile (" + t.col + ", " + t.row + ")");
+            MMLog.Log_Targeting("Targeted tile " + tb.PrintCoord());
         } else if (currentTMode == TargetMode.TileArea) {
             List<TileBehav> tbs;
             Tile t = tb.tile;
@@ -133,7 +135,7 @@ public class Targeting {
                 _targetTBs.Add(ctb);
             }
             DecTargets();
-            MMLog.Log_Targeting("Targeted area centered on tile (" + tb.tile.col + ", " + tb.tile.row + ")");
+            MMLog.Log_Targeting("Targeted area centered on tile " + tb.PrintCoord());
         } else if (currentTMode == TargetMode.Drag) {
             if (!IsDragTBValid(tb)) {
                 EndDragTarget();
@@ -146,7 +148,7 @@ public class Targeting {
             _targetTBs.Add(tb);
             DecTargets();
             _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
-            MMLog.Log_Targeting("Targeted tile (" + t.col + ", " + t.row + ")");
+            MMLog.Log_Targeting("Targeted tile " + tb.PrintCoord());
         }
     }
 
@@ -182,11 +184,13 @@ public class Targeting {
 
         _mm.syncManager.SendCBTarget(cb);
 
+        _mm.stats.Report(string.Format("$ TARGET CELL ({0},{1})", cb.col, cb.row), false);
+
         _mm.uiCont.OutlineTarget(cb.col, cb.row);
         _targetCBs.Add(cb);
         DecTargets();
         _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
-        MMLog.Log_Targeting("Targeted tile (" + cb.col + ", " + cb.row + ")");
+        MMLog.Log_Targeting("Targeted cell (" + cb.col + ", " + cb.row + ")");
     }
 
     IEnumerator TargetingScreen() {

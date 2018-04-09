@@ -1,0 +1,253 @@
+This scene is in debug mode!!
+OnStatusChanged: Connect current State: ConnectingToGameserver
+Connected to gameserver.
+JoinRoom failed. In offline mode you still have to leave a room to enter another.
+INPUT-CONT: Switching context with state=Normal
+INPUT-CONT: Normal context set.
+INPUT-CONT: Switching context with state=BeginningOfGame
+MAGE MATCH: gamesettings: p1=GOD,p1 char=Valeria,p2=Training dummy,p2 char=Sample,timer=False
+ButtonCont: Object b_Spell0 Init button 0 with id=1
+ButtonCont: Setting onClick of spell0 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell1 Init button 1 with id=1
+ButtonCont: Setting onClick of spell1 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell2 Init button 2 with id=1
+ButtonCont: Setting onClick of spell2 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell3 Init button 3 with id=1
+ButtonCont: Setting onClick of spell3 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell4 Init button 4 with id=1
+ButtonCont: Setting onClick of spell4 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell0 Init button 0 with id=2
+ButtonCont: Setting onClick of spell0 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell1 Init button 1 with id=2
+ButtonCont: Setting onClick of spell1 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell2 Init button 2 with id=2
+ButtonCont: Setting onClick of spell2 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell3 Init button 3 with id=2
+ButtonCont: Setting onClick of spell3 to ButtonController+ButtonClick
+ButtonCont: Object b_Spell4 Init button 4 with id=2
+ButtonCont: Setting onClick of spell4 to ButtonController+ButtonClick
+ButtonCont: Object b_draw Init button -1 with id=1
+ButtonCont: Setting onClick of spell-1 to ButtonController+ButtonClick
+Sending RPC "HandleSyncRandomSeed" to target: Others or player:.
+SYNC-MAN: seed = 75
+INPUT-CONT: ~~~~~~~~~~~~~~Contexts init!
+Core spell has a cost of 1
+DECK: Init player 1
+DECK: Shuffling 54 hexes...
+DECK: [Water Lily, Bandages, W, M, W, E, W, W, Leeches!, White Water, Water Lily, W, W, Shuffle Gem, M, E, White Water, W, Bandages, Shuffle Gem, M, Water Lily, M, Shuffle Gem, E, Water Lily, Bandages, Water Lily, Leeches!, Leeches!, M, Bandages, White Water, E, Water Lily, W, E, W, W, White Water, Shuffle Gem, W, Shuffle Gem, Leeches!, White Water, White Water, White Water, W, Shuffle Gem, White Water, E, M, M, Water Lily]
+Core spell has a cost of 1
+DECK: Init player 2
+DECK: Shuffling 50 hexes...
+DECK: [M, A, F, M, M, W, F, A, W, E, F, F, F, W, E, F, M, A, A, W, W, F, M, A, A, E, M, E, A, M, M, M, W, M, W, W, W, E, E, A, E, F, W, E, F, F, A, A, E, E]
+Valeria: Loading PASSIVE...
+EFFECT-CONT: ...adding effect with tag swap-VlSwp-001
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p1-C-Water Lily
+DECK: [Bandages, W, M, W, E, W, W, Leeches!, White Water, Water Lily, W, W, Shuffle Gem, M, E, White Water, W, Bandages, Shuffle Gem, M, Water Lily, M, Shuffle Gem, E, Water Lily, Bandages, Water Lily, Leeches!, Leeches!, M, Bandages, White Water, E, Water Lily, W, E, W, W, White Water, Shuffle Gem, W, Shuffle Gem, Leeches!, White Water, White Water, White Water, W, Shuffle Gem, White Water, E, M, M, Water Lily]
+HEXMAN: Generating tile from genTag "p1-C-Water Lily"
+TILEMAN: ...generated HandObject with tag p1-C-Water Lily-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p1-C-Water Lily-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [?] [ ] [ ] [ ] [ ] [ ] [ ] 
+PLAYER: >>>1 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p2-B-M
+DECK: [A, F, M, M, W, F, A, W, E, F, F, F, W, E, F, M, A, A, W, W, F, M, A, A, E, M, E, A, M, M, M, W, M, W, W, W, E, E, A, E, F, W, E, F, F, A, A, E, E]
+HEXMAN: Generating tile from genTag "p2-B-M"
+TILEMAN: ...generated HandObject with tag p2-B-M-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p2-B-M-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [M] [ ] [ ] [ ] [ ] [ ] [ ] 
+PLAYER: >>>1 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p1-C-Bandages
+DECK: [W, M, W, E, W, W, Leeches!, White Water, Water Lily, W, W, Shuffle Gem, M, E, White Water, W, Bandages, Shuffle Gem, M, Water Lily, M, Shuffle Gem, E, Water Lily, Bandages, Water Lily, Leeches!, Leeches!, M, Bandages, White Water, E, Water Lily, W, E, W, W, White Water, Shuffle Gem, W, Shuffle Gem, Leeches!, White Water, White Water, White Water, W, Shuffle Gem, White Water, E, M, M, Water Lily]
+HEXMAN: Generating tile from genTag "p1-C-Bandages"
+TILEMAN: ...generated HandObject with tag p1-C-Bandages-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p1-C-Bandages-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [?] [?] [ ] [ ] [ ] [ ] [ ] 
+PLAYER: >>>2 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p2-B-A
+DECK: [F, M, M, W, F, A, W, E, F, F, F, W, E, F, M, A, A, W, W, F, M, A, A, E, M, E, A, M, M, M, W, M, W, W, W, E, E, A, E, F, W, E, F, F, A, A, E, E]
+HEXMAN: Generating tile from genTag "p2-B-A"
+TILEMAN: ...generated HandObject with tag p2-B-A-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p2-B-A-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [M] [A] [ ] [ ] [ ] [ ] [ ] 
+PLAYER: >>>2 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p1-B-W
+DECK: [M, W, E, W, W, Leeches!, White Water, Water Lily, W, W, Shuffle Gem, M, E, White Water, W, Bandages, Shuffle Gem, M, Water Lily, M, Shuffle Gem, E, Water Lily, Bandages, Water Lily, Leeches!, Leeches!, M, Bandages, White Water, E, Water Lily, W, E, W, W, White Water, Shuffle Gem, W, Shuffle Gem, Leeches!, White Water, White Water, White Water, W, Shuffle Gem, White Water, E, M, M, Water Lily]
+HEXMAN: Generating tile from genTag "p1-B-W"
+TILEMAN: ...generated HandObject with tag p1-B-W-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p1-B-W-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [?] [?] [W] [ ] [ ] [ ] [ ] 
+PLAYER: >>>3 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p2-B-F
+DECK: [M, M, W, F, A, W, E, F, F, F, W, E, F, M, A, A, W, W, F, M, A, A, E, M, E, A, M, M, M, W, M, W, W, W, E, E, A, E, F, W, E, F, F, A, A, E, E]
+HEXMAN: Generating tile from genTag "p2-B-F"
+TILEMAN: ...generated HandObject with tag p2-B-F-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p2-B-F-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [M] [A] [F] [ ] [ ] [ ] [ ] 
+PLAYER: >>>3 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p1-B-M
+DECK: [W, E, W, W, Leeches!, White Water, Water Lily, W, W, Shuffle Gem, M, E, White Water, W, Bandages, Shuffle Gem, M, Water Lily, M, Shuffle Gem, E, Water Lily, Bandages, Water Lily, Leeches!, Leeches!, M, Bandages, White Water, E, Water Lily, W, E, W, W, White Water, Shuffle Gem, W, Shuffle Gem, Leeches!, White Water, White Water, White Water, W, Shuffle Gem, White Water, E, M, M, Water Lily]
+HEXMAN: Generating tile from genTag "p1-B-M"
+TILEMAN: ...generated HandObject with tag p1-B-M-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p1-B-M-001
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [?] [?] [W] [M] [ ] [ ] [ ] 
+PLAYER: >>>4 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p2-B-M
+DECK: [M, W, F, A, W, E, F, F, F, W, E, F, M, A, A, W, W, F, M, A, A, E, M, E, A, M, M, M, W, M, W, W, W, E, E, A, E, F, W, E, F, F, A, A, E, E]
+HEXMAN: Generating tile from genTag "p2-B-M"
+TILEMAN: ...generated HandObject with tag p2-B-M-002
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p2-B-M-002
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [M] [A] [F] [M] [ ] [ ] [ ] 
+PLAYER: >>>4 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+INPUT-CONT: Switching context with state=Normal
+INPUT-CONT: Normal context set.
+MAGE MATCH:    ---------- DRAW BEGIN ----------
+DECK: Next hex is p1-B-W
+DECK: [E, W, W, Leeches!, White Water, Water Lily, W, W, Shuffle Gem, M, E, White Water, W, Bandages, Shuffle Gem, M, Water Lily, M, Shuffle Gem, E, Water Lily, Bandages, Water Lily, Leeches!, Leeches!, M, Bandages, White Water, E, Water Lily, W, E, W, W, White Water, Shuffle Gem, W, Shuffle Gem, Leeches!, White Water, White Water, White Water, W, Shuffle Gem, White Water, E, M, M, Water Lily]
+HEXMAN: Generating tile from genTag "p1-B-W"
+TILEMAN: ...generated HandObject with tag p1-B-W-002
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Stats
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: Added hex with tag p1-B-W-002
+EVENT-CONT: going thru draw event with type Network
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Player
+EVENT-CONT: going thru draw event with type Stats
+EVENT-CONT: going thru draw event with type LastStep
+EVENT-CONT: Just finished DRAW events...
+HAND: [?] [?] [W] [M] [W] [ ] [ ] 
+PLAYER: >>>5 slots filled...
+MAGE MATCH:    ---------- DRAW END ----------
+EFFECT-CONT: Just finished resolving TURN BEGIN effects.
+MAGE MATCH: About to check the board.
+BOARDCHECK: Checking the board...
+SIGSPELL: Checking GOD's sig spell.
+MAGE MATCH: Done checking.
+EVENT-CONT: Just finished TURN BEGIN events...
+INPUT-CONT: Switching context with state=DebugMenu
+INPUT-CONT: Standard mouse up
+INPUT-CONT: Standard mouse up
+INPUT-CONT: Switching context with state=Normal
+INPUT-CONT: Normal context set.
+INPUT-CONT: Standard mouse up
+MAGE MATCH: About to check the board.
+BOARDCHECK: Checking the board...
+SIGSPELL: Checking GOD's sig spell.
+MAGE MATCH: Done checking.
+EVENT-CONT: Timeout event raised.
+INPUT-CONT: Switching context with state=DebugMenu
+INPUT-CONT: Standard mouse up
+INPUT-CONT: Standard mouse up
+INPUT-CONT: Standard mouse up
+INPUT-CONT: Standard mouse up
+UI-CONT: DEBUGTOOLS: ValueChanged=insert
+UI-CONT: DEBUGTOOLS: ValueChanged=destroy
+INPUT-CONT: Standard mouse up
+UI-CONT: DEBUGTOOLS: ValueChanged=insert
+INPUT-CONT: Standard mouse up
+HEXMAN: Generating tile from genTag "p1-B-F"
+TILEMAN: ...generated HandObject with tag p1-B-F-001
+HEX-GRID: setting (1, 2) to p1-B-F-001
+INPUT-CONT: Standard mouse up
+INPUT-CONT: Standard mouse up
+ButtonCont: Saving files...
+Stats: dataPath is C:/Users/Ben/Documents/Unity projects/Mage-Match/Assets...
+Stats: saving files to C:\Users\Ben\Documents\Unity projects\Mage-Match\Assets\2018-4-8_23-52-34...

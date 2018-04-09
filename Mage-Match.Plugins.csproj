@@ -321,6 +321,8 @@
     <Compile Include="Assets\Plugins\WebSocket\WebSocket.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\2018-4-8_23-52-34\MageMatch_2018-4-8_23-52-34_DebugLog.txt" />
+    <None Include="Assets\2018-4-8_23-52-34\MageMatch_2018-4-8_23-52-34_Report.txt" />
     <None Include="Assets\Demigiant\DOTween\DOTween.XML" />
     <None Include="Assets\JsonDotNet\Assemblies\AOT\Newtonsoft.Json.XML" />
     <None Include="Assets\JsonDotNet\Assemblies\Standalone\Newtonsoft.Json.XML" />

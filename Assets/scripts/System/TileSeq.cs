@@ -48,11 +48,13 @@ public class TileSeq {
         return false;
     }
 
-	public string SeqAsString(){
-		string seqString = "";
-		foreach (Tile t in sequence)
-			seqString += "" + t.ThisElementToChar();
-		return seqString;
+	public string SeqAsString(bool showLetters = true, bool showCoords = false){
+		string letters = "", coords = "";
+        foreach (Tile t in sequence) {
+            letters += "" + t.ThisElementToChar();
+            coords += t.PrintCoord();
+        }
+		return (showLetters ? letters + " " : "") + (showCoords ? coords : "");
 	}
 
 	public bool MatchesTileSeq(TileSeq compSeq){

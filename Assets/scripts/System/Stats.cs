@@ -42,9 +42,9 @@ public class Stats {
         _mm.eventCont.commishDrop += OnCommishDrop;
         //_mm.eventCont.commishMatch += OnCommishMatch;
 
-        _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.End);
-        _mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.End);
-        _mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.End);
+        _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.Begin);
+        _mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.Begin);
+        _mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.Begin);
         _mm.eventCont.AddSpellCastEvent(OnSpellCast, EventController.Type.Stats, EventController.Status.Begin);
         //_mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
@@ -58,8 +58,7 @@ public class Stats {
         _report = new StringBuilder();
         _report.Append(_ps1.name + " (" + _ps1.character + ") vs ");
         _report.AppendLine(_ps2.name + " (" + _ps2.character + ")");
-        _report.AppendLine("...setup - deal p1 4, deal p2 4"); //?
-        _report.AppendLine("T1 - ");
+        _report.AppendLine("  # SETUP"); 
     }
 
     PlayerStat GetPS(int id) {
@@ -77,12 +76,12 @@ public class Stats {
     }
 
     public IEnumerator OnTurnBegin(int id) {
-        _report.Append("\nT" + turns + " - ");
+        _report.AppendLine("\n  # TURN " + turns + " (p"+id+")");
         yield return null;
     }
 
     public IEnumerator OnTurnEnd(int id) {
-        _report.AppendLine("\nC" + turns + " - ");
+        _report.AppendLine("\n  # COMMISH TURN");
         turns++;
         yield return null;
     }
@@ -94,7 +93,7 @@ public class Stats {
 
     public void OnCommishDrop(string hextag, int col) {
         _commishDrops++;
-        _report.AppendLine("C-drop " + hextag + " col" + col);
+        _report.AppendLine("C-DROP " + hextag + " col" + col);
     }
 
     //public void OnCommishMatch(string[] seqs) {
@@ -103,71 +102,44 @@ public class Stats {
     //}
 
     #region GameAction subscriptions
-    // TODO for all, different report lines for playerAction or not...
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
         if (dealt)
-            Report("p" + id + " DEAL " + tag);
-        else
-            Report("p" + id + " DRAW " + tag);
+            Report("DEAL " + tag);
+        else if (playerAction)
+            Report("DRAW " + tag);
         GetPS(id).draws++;
         yield return null;
     }
 
-    //public IEnumerator OnDiscard(int id, string tag) {
-    //    Report("p" + id + " DISCARD " + tag);
-    //    GetPS(id).discards++;
-    //    yield return null;
-    //}
-
     public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
         if (playerAction) {
-            string s = "p" + id + " DROP " + tag;
+            string s = "DROP " + tag;
             if (!Hex.IsCharm(tag))
                 s += " col" + col;
             Report(s);
             GetPS(id).drops++;
-        } else if (_mm.debugTools.IsDebugMenuOpen()) //?
-            Report("menu Drop col" + col);
+        }
         yield return null;
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        if (!_mm.debugTools.IsDebugMenuOpen()) { //?
-            Report("p" + id + " SWAP (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
-            if(playerAction)
-                GetPS(id).swaps++;
-        } else
-            Report("menu Swap (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
+        if (playerAction) {
+            Report("SWAP (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
+            GetPS(id).swaps++;
+        }
         yield return null;
     }
 
     public IEnumerator OnSpellCast(int id, Spell spell, TileSeq prereq) {
-        Report("p" + id + " CAST spell" + spell.index + " " + spell.name);
-        Report("...invoked " + prereq.SeqAsString());
+        Report("CAST spell" + spell.index, false);
+        Report("$ SELECT " + prereq.SeqAsString(true, true), false);
+        Report("  # " + spell.name, false);
+        _mm.uiCont.newsfeed.UpdateNewsfeed("CAST " + spell.name);
         GetPS(id).spellsCast++;
         yield return null;
     }
     #endregion
 
-    //public IEnumerator OnMatch(int id, string[] seqs) {
-    //    _report.AppendLine("...made " + seqs.Length + " match(es)");
-    //    GetPS(id).matches += seqs.Length;
-    //    foreach (string seq in seqs) {
-    //        int len = seq.Length;
-    //        if (len == 3)
-    //            GetPS(id).match3s++;
-    //        else if(len == 4)
-    //            GetPS(id).match4s++;
-    //        else
-    //            GetPS(id).match5s++;
-    //    }
-    //    yield return null;
-    //}
-
-
-    public void OnSyncRand(int rand) {
-        
-    }
 
     public void OnTileTarget(TileBehav tb) {
         Report("...targeted " + tb.PrintCoord() + " " + tb.hextag);
@@ -182,31 +154,28 @@ public class Stats {
     }
 
     public void OnTileRemove(int id, TileBehav tb) {
-        if (!_mm.IsCommishTurn()) {
-            if (!_mm.debugTools.IsDebugMenuOpen()) //?
-                GetPS(id).tilesRemoved++;
-            else
-                _report.AppendLine("menu Remove (" + tb.tile.col + "," + tb.tile.row + ")");
-        }
+        GetPS(id).tilesRemoved++;
     }
 
     public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         if (dealt) {
             GetPS(GetOpponentID(id)).dmgDealt -= amount;
-            _report.AppendLine("...p" + GetOpponentID(id) + " dealt " + (-amount) + " dmg...");
+            //_report.AppendLine("...p" + GetOpponentID(id) + " dealt " + (-amount) + " dmg...");
         }
         if (amount < 0)
             GetPS(id).dmgTaken -= amount;
         else
             GetPS(id).healingDone += amount;
-        _report.AppendLine("...p"+id+" changes health by " + amount);
+        //_report.AppendLine("...p"+id+" changes health by " + amount);
     }
 
 
-    void Report(string str) {
+    public void Report(string str, bool showInNewsfeed = true) {
         _report.AppendLine(str);
-        _mm.uiCont.newsfeed.UpdateNewsfeed(str);
         _mm.debugTools.UpdateReport(_report.ToString());
+
+        if (showInNewsfeed)
+            _mm.uiCont.newsfeed.UpdateNewsfeed(str);
     }
 
     public string GetReportText() { return _report.ToString(); }
@@ -231,7 +200,7 @@ public class Stats {
         string filename = "MageMatch_" + timestamp + "_Report";
         filename = @"/" + filename + ".txt";
 
-        File.WriteAllText(path + filename, GetReportText());
+        File.WriteAllText(path + filename, timestamp + "\n" + GetReportText());
     }
 
     public void SaveStatsCSV(string path, string timestamp) {

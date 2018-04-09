@@ -305,10 +305,12 @@ public class DebugTools : MonoBehaviour {
                     var hexList = _ddTileOptions;
                     hexList.AddRange(_ddCharmOptions);
                     _dd_options.AddOptions(hexList);
+                    _dd_options.value = 0;
                     break;
                 case DropdownType.Tile:
                     _dd_options.ClearOptions();
-                    _dd_options.AddOptions(_ddCharmOptions);
+                    _dd_options.AddOptions(_ddTileOptions);
+                    _dd_options.value = 0;
                     break;
                 case DropdownType.Property:
                     //_dd_options.ClearOptions();
@@ -317,6 +319,7 @@ public class DebugTools : MonoBehaviour {
                 case DropdownType.Enchantment:
                     _dd_options.ClearOptions();
                     _dd_options.AddOptions(_ddEnchantmentOptions);
+                    _dd_options.value = 0;
                     break;
             }
         }
@@ -406,13 +409,16 @@ public class DebugTools : MonoBehaviour {
     void InsertMode_OnClick(CellBehav cb) {
         string genTag = GetHexGenTag(GetPlayerId());
         TileBehav insertTB = (TileBehav) _mm.hexMan.GenerateHex(_mm.ActiveP().id, genTag);
+        _mm.stats.Report(string.Format("$ DEBUG INSERT {0} ({1},{2})", insertTB.hextag, cb.col, cb.row), false);
         _mm.PutTile(insertTB, cb.col, cb.row);
         //insertTB.HardSetPos(cb.col, cb.row);
     }
 
     void DestroyMode_OnClick(TileBehav tb) {
-        MMLog.Log("DebugTools", "orange", "calling destroy mode!"); 
+        MMLog.Log("DebugTools", "orange", "calling destroy mode!");
+        _mm.stats.Report(string.Format("$ DEBUG DESTROY ({0},{1})", tb.tile.col, tb.tile.row), false);
         _mm.hexMan.RemoveTile(tb.tile, false);
+
     }
 
     void EnchantMode_OnClick(TileBehav tb) {
@@ -432,6 +438,8 @@ public class DebugTools : MonoBehaviour {
                 StartCoroutine(_mm.hexFX.Ench_SetZombie(_playerId, tb));
                 break;
         }
+
+        _mm.stats.Report(string.Format("$ DEBUG ENCHANT {0} ({1},{2}) ", option, tb.tile.col, tb.tile.row), false);
     }
 
     void ApplyPropertiesMode_OnClick(TileBehav tb) {
@@ -441,6 +449,7 @@ public class DebugTools : MonoBehaviour {
     void ClearMode_OnClick(TileBehav tb) {
         // TODO reset props
         tb.ClearEnchantment();
+        _mm.stats.Report(string.Format("$ DEBUG CLEAR ({0},{1})", tb.tile.col, tb.tile.row), false);
     }
 
     void AddToHandMode_OnClick() {
@@ -456,15 +465,21 @@ public class DebugTools : MonoBehaviour {
         p.hand.Add(hex);
 
         StartCoroutine(hex.OnDraw());
+
+        _mm.stats.Report("$ DEBUG ADDTOHAND " + hex.hextag, false);
     }
 
-    void DiscardMode_OnClick(Hex h) {
-        if (_mm.GetPlayer(1).IsHexMine(h)) {
-            _mm.GetPlayer(1).Discard(h);
-        } else if (_mm.GetPlayer(2).IsHexMine(h)) {
-            _mm.GetPlayer(2).Discard(h);
-        } else
+    void DiscardMode_OnClick(Hex hex) {
+        if (_mm.GetPlayer(1).IsHexMine(hex)) {
+            _mm.GetPlayer(1).Discard(hex);
+        } else if (_mm.GetPlayer(2).IsHexMine(hex)) {
+            _mm.GetPlayer(2).Discard(hex);
+        } else {
             MMLog.LogWarning("DebugTools: user clicked on a non-hand hex! Naughty!");
+            return;
+        }
+
+        _mm.stats.Report("$ DEBUG DISCARD " + hex.hextag, false);
     }
 
     void ChangeHealthMode_OnClick() {
@@ -475,10 +490,15 @@ public class DebugTools : MonoBehaviour {
             _mm.GetPC(pid).SelfDamage(amt);
         else
             _mm.GetPC(pid).Heal(amt);
+
+        _mm.stats.Report("$ DEBUG CHANGEHEALTH p" + pid + " " + amt, false);
     }
 
     void ChangeMeterMode_OnClick() {
         int amt = int.Parse(_input.text);
-        _mm.GetPlayer(GetPlayerId()).character.ChangeMeter(amt);
+        int pid = GetPlayerId();
+        _mm.GetPlayer(pid).character.ChangeMeter(amt);
+
+        _mm.stats.Report("$ DEBUG CHANGEMETER p" + pid + " " + amt, false);
     }
 }

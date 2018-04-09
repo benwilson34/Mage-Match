@@ -503,6 +503,7 @@ public class UIController : MonoBehaviour {
     public void KeepQuickdraw() {
         _mm.prompt.SetQuickdrawHand();
         _mm.syncManager.SendKeepQuickdraw();
+        _mm.stats.Report("$ QUICKDRAW KEEP", false);
     }
 
 

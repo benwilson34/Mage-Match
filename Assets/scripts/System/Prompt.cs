@@ -89,6 +89,9 @@ public class Prompt {
         MMLog.Log("PROMPT", "blue", "DROP is " + hex.hextag);
         _mm.syncManager.SendDropSelection(hex, col);
 
+        string str = "$ PROMPT DROP " + hex.hextag + (col == -1 ? "" : " col" + col);
+        _mm.stats.Report(str, false);
+
         _dropHex = hex;
         _dropCol = col;
 
@@ -199,6 +202,8 @@ public class Prompt {
 
     public void SetSwaps(int c1, int r1, int c2, int r2) {
         _mm.syncManager.SendSwapSelection(c1, r1, c2, r2);
+
+        _mm.stats.Report(string.Format("$ PROMPT SWAP ({0},{1})({2},{3})", c1, r1, c2, r2), false);
 
         _swapTiles = new TileBehav[2];
         _swapTiles[0] = _mm.hexGrid.GetTileBehavAt(c1, r1);

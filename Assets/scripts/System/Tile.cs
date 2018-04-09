@@ -26,6 +26,19 @@ public class Tile {
 		return this.col == comp.col && this.row == comp.row;
 	}
 
+	public char ThisElementToChar(){
+        return ElementToChar(element);
+	}
+
+    public Tile Copy() {
+        Tile newT = new Tile(element);
+        newT.SetPos(col, row);
+        return newT;
+    }
+
+    public string PrintCoord() { return "(" + col + "," + row + ")"; }
+
+
 	public static char ElementToChar(Element element){ // maybe not necessary?
 		switch (element) {
 		case Element.Fire:
@@ -42,17 +55,6 @@ public class Tile {
 			return '*';
 		}
 	}
-
-	public char ThisElementToChar(){
-        return ElementToChar(element);
-	}
-
-    public Tile Copy() {
-        Tile newT = new Tile(element);
-        newT.SetPos(col, row);
-        return newT;
-    }
-
 
 	public static Element CharToElement(char c){
 		c = char.ToUpper (c); //?

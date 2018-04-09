@@ -123,33 +123,33 @@ public class MageMatch : MonoBehaviour {
         InitEvents();
 
         currentTurn = Turn.PlayerTurn;
-        uiCont.SetDrawButton(true);
-        _activep.InitAP();
+        //uiCont.SetDrawButton(true);
+        //_activep.InitAP();
 
         if(!IsDebugMode())
             yield return syncManager.Checkpoint(); // idk if this is really doing anything
 
         uiCont.Reset();
+        stats = new Stats(_p1, _p2);
 
         // TODO animate beginning of game
         for (int i = 0; i < 4; i++) {
-            for (int p = 1; p <= 2; p++) {
+            for (int pid = 1; pid <= 2; pid++) {
                 //yield return GetPlayer(p).DealHex();
-                yield return _Deal(p);
+                yield return _Deal(pid);
                 yield return new WaitForSeconds(.1f);
             }
         }
 
-        yield return _Deal(_activep.id);
+        //yield return _Deal(_activep.id);
 
-        stats = new Stats(_p1, _p2);
 
         timer.StartTimer();
 
         ExitState(); // end BeginningOfGame state
 
-        // TODO init some stuff that would otherwise be BeginTurnEvent()
-        yield return null;
+        // is this ok?
+        yield return eventCont.TurnBegin();
     }
 
     public void InitEvents() {
@@ -360,25 +360,6 @@ public class MageMatch : MonoBehaviour {
             // TODO boardseq stuff will be handled by the spell selection thing                
         }
     }
-
-    //IEnumerator ResolveMatches(List<TileSeq> seqList) {
-    //    matchesResolving++;
-    //    MMLog.Log_MageMatch("   ---------- MATCH BEGIN ----------");
-    //    MMLog.Log_MageMatch("At least one match: " + boardCheck.PrintSeqList(seqList) + " and state="+currentState.ToString());
-    //    if (currentState != GameState.CommishTurn) {
-    //        MMLog.Log_MageMatch("Match was made by a player!");
-    //        string[] seqs = GetTileSeqs(seqList);
-    //        RemoveSeqList(seqList); // hopefully putting this first makes it more responsive?
-    //        yield return eventCont.Match(seqs); // raise player Match event
-    //    } else {
-    //        eventCont.CommishMatch(GetTileSeqs(seqList)); // raise CommishMatch event
-    //        RemoveSeqList(seqList);
-    //    }
-
-    //    yield return BoardChecking();
-    //    MMLog.Log_MageMatch("   ---------- MATCH END ----------");
-    //    matchesResolving--;
-    //}
 
 
     #region ----- Game Actions -----

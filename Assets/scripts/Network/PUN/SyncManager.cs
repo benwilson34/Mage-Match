@@ -77,10 +77,13 @@ public class SyncManager : PunBehaviour {
 
     public int[] GetRands(int count) {
         int[] r = new int[count];
+        string str = "";
         for (int i = 0; i < count; i++) {
             r[i] = _rands.Dequeue();
+            str += r[i].ToString() + " ";
             //Debug.MMLog.Log_SyncMan("SYNCMANAGER: Just read random["+i+"]=" + r[i]);
         }
+        _mm.stats.Report("$ SYNC (x" + count + ") " + str, false);
         return r;
     }
 

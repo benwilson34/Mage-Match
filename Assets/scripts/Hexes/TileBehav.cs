@@ -155,7 +155,7 @@ public class TileBehav : Hex {
     }
 
     public string PrintCoord() {
-        return "(" + tile.col + ", " + tile.row + ")";
+        return tile.PrintCoord();
     }
 
     public override string GetTooltipInfo() {
