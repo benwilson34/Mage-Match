@@ -405,25 +405,40 @@ public class DebugTools : MonoBehaviour {
 
 
     // ---------- ACTUAL TOOLS ----------
-
+  
     void InsertMode_OnClick(CellBehav cb) {
-        string genTag = GetHexGenTag(GetPlayerId());
-        TileBehav insertTB = (TileBehav) _mm.hexMan.GenerateHex(_mm.ActiveP().id, genTag);
-        _mm.stats.Report(string.Format("$ DEBUG INSERT {0} ({1},{2})", insertTB.hextag, cb.col, cb.row), false);
-        _mm.PutTile(insertTB, cb.col, cb.row);
+        Insert(GetHexGenTag(GetPlayerId()), cb.col, cb.row);
+    }
+    public void Insert(string hextag, int col, int row) {
+        TileBehav insertTB = (TileBehav) _mm.hexMan.GenerateHex(_mm.ActiveP().id, hextag);
+        _mm.stats.Report(string.Format("$ DEBUG INSERT {0} ({1},{2})", insertTB.hextag, col, row), false);
+        _mm.PutTile(insertTB, col, row);
         //insertTB.HardSetPos(cb.col, cb.row);
     }
 
-    void DestroyMode_OnClick(TileBehav tb) {
-        MMLog.Log("DebugTools", "orange", "calling destroy mode!");
-        _mm.stats.Report(string.Format("$ DEBUG DESTROY ({0},{1})", tb.tile.col, tb.tile.row), false);
-        _mm.hexMan.RemoveTile(tb.tile, false);
 
+    void DestroyMode_OnClick(TileBehav tb) {
+        Destroy(tb.tile.col, tb.tile.row);
+    }
+    public void Destroy(int col, int row) { // maybe need to rename?
+        //MMLog.Log("DebugTools", "orange", "calling destroy mode!");
+        _mm.stats.Report(string.Format("$ DEBUG DESTROY ({0},{1})", col, row), false);
+        _mm.hexMan.RemoveTile(col, row, false);
     }
 
-    void EnchantMode_OnClick(TileBehav tb) {
-        string option = _dd_options.options[_dd_options.value].text;
-        switch (option) {
+
+    public void Enchant(int col, int row, string ench) {
+        TileBehav tb = _mm.hexGrid.GetTileBehavAt(col, row);
+        EnchantMode_OnClick(tb, ench);
+    }
+    void EnchantMode_OnClick(TileBehav tb, string ench = "") {
+        if(ench == "")
+            ench = _dd_options.options[_dd_options.value].text;
+        
+        if (tb == null)
+            MMLog.LogError("DEBUGTOOLS: Somehow enchant TB is null!");
+
+        switch (ench) {
             case "Burning":
                 StartCoroutine(_mm.hexFX.Ench_SetBurning(_playerId, tb));
                 break;
@@ -439,26 +454,33 @@ public class DebugTools : MonoBehaviour {
                 break;
         }
 
-        _mm.stats.Report(string.Format("$ DEBUG ENCHANT {0} ({1},{2}) ", option, tb.tile.col, tb.tile.row), false);
+        _mm.stats.Report(string.Format("$ DEBUG ENCHANT {0} ({1},{2}) ", ench, tb.tile.col, tb.tile.row), false);
     }
 
     void ApplyPropertiesMode_OnClick(TileBehav tb) {
         // TODO get props from dd and apply to TB
     }
 
+    public void Clear(int col, int row) {
+        TileBehav tb = _mm.hexGrid.GetTileBehavAt(col, row);
+        ClearMode_OnClick(tb);
+    }
     void ClearMode_OnClick(TileBehav tb) {
         // TODO reset props
+        //MMLog.Log("DebugTools", "orange", "Clearing " + tb.PrintCoord());
         tb.ClearEnchantment();
         _mm.stats.Report(string.Format("$ DEBUG CLEAR ({0},{1})", tb.tile.col, tb.tile.row), false);
     }
 
     void AddToHandMode_OnClick() {
-        int id = GetPlayerId();
+        AddToHand(GetPlayerId(), GetHexGenTag());
+    }
+    public void AddToHand(int id, string hextag) {
         Player p = _mm.GetPlayer(id);
         if (p.hand.IsFull())
             return;
 
-        Hex hex = _mm.hexMan.GenerateHex(id, GetHexGenTag());
+        Hex hex = _mm.hexMan.GenerateHex(id, hextag);
         if (id != _mm.myID)
             hex.Flip();
 
@@ -469,6 +491,11 @@ public class DebugTools : MonoBehaviour {
         _mm.stats.Report("$ DEBUG ADDTOHAND " + hex.hextag, false);
     }
 
+    public void Discard(string hextag) {
+        int id = Hex.TagPlayer(hextag);
+        Hex hex = _mm.GetPlayer(id).hand.GetHex(hextag);
+        DiscardMode_OnClick(hex);
+    }
     void DiscardMode_OnClick(Hex hex) {
         if (_mm.GetPlayer(1).IsHexMine(hex)) {
             _mm.GetPlayer(1).Discard(hex);
@@ -483,22 +510,28 @@ public class DebugTools : MonoBehaviour {
     }
 
     void ChangeHealthMode_OnClick() {
-        // TODO relative vs absolute
         int amt = int.Parse(_input.text);
         int pid = GetPlayerId();
+        ChangeHealth(pid, amt);
+    }
+    public void ChangeHealth(int id, int amt) {
+        // TODO relative vs absolute
         if (amt < 0)
-            _mm.GetPC(pid).SelfDamage(amt);
+            _mm.GetPC(id).SelfDamage(amt);
         else
-            _mm.GetPC(pid).Heal(amt);
+            _mm.GetPC(id).Heal(amt);
 
-        _mm.stats.Report("$ DEBUG CHANGEHEALTH p" + pid + " " + amt, false);
+        _mm.stats.Report("$ DEBUG HEALTH p" + id + " " + amt, false);
     }
 
     void ChangeMeterMode_OnClick() {
         int amt = int.Parse(_input.text);
         int pid = GetPlayerId();
-        _mm.GetPlayer(pid).character.ChangeMeter(amt);
+        ChangeMeter(pid, amt);
+    }
+    public void ChangeMeter(int id, int amt) {
+        _mm.GetPlayer(id).character.ChangeMeter(amt);
 
-        _mm.stats.Report("$ DEBUG CHANGEMETER p" + pid + " " + amt, false);
+        _mm.stats.Report("$ DEBUG METER p" + id + " " + amt, false);
     }
 }

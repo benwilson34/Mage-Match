@@ -209,13 +209,16 @@ public class Targeting {
             _mm.uiCont.ActivateTargetingUI(_validTBs);
         }
 
+        if (_mm.IsReplayMode())
+            _mm.replay.GetTargets();
+
         yield return new WaitUntil(() => _targetsLeft == 0 || validObjs.Count == 0);
         MMLog.Log_Targeting("no more targets.");
         _mm.GetComponent<InputController>().InvalidateClick(); // prevent weirdness from player still dragging
         _lastDragTarget = null;
 
         _mm.uiCont.ShowAlertText("Here are your targets!");
-        yield return new WaitForSeconds(1f);
+        yield return _mm.animCont.WaitForSeconds(1f);
 
         _mm.uiCont.DeactivateTargetingUI();
 

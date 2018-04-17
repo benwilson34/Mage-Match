@@ -44,7 +44,8 @@ public class MageMatch : MonoBehaviour {
 
     public DebugSettings debugSettings;
     public DebugTools debugTools;
-    private bool isDebugMode = false;
+    public ReplayEngine replay;
+    private bool _isDebugMode = false, _isReplayMode = false;
 
     public delegate void LoadEvent();
     public event LoadEvent onEffectContReady;
@@ -58,14 +59,19 @@ public class MageMatch : MonoBehaviour {
         GameObject debugObj = GameObject.Find("debugSettings");
         if (debugObj != null) {
             debugSettings = debugObj.GetComponent<DebugSettings>();
-            isDebugMode = true;
+            _isDebugMode = true;
+
+            if (debugSettings.replayMode) {
+                _isReplayMode = true;
+                replay = new ReplayEngine(this);
+                replay.Load("2018-4-16_16-33-0");
+            }
 
             MMLog.LogWarning("This scene is in debug mode!!");
             PhotonNetwork.offlineMode = true;
             PhotonNetwork.CreateRoom("debug");
             PhotonNetwork.JoinRoom("debug");
         }
-
 
         _stateStack = new Stack<State>();
 
@@ -96,8 +102,8 @@ public class MageMatch : MonoBehaviour {
         animCont = GetComponent<AnimationController>();
 
         syncManager = GetComponent<SyncManager>();
-        syncManager.Init();
-        yield return syncManager.SyncRandomSeed(Random.Range(0, 255));
+        syncManager.Init(this);
+        //yield return syncManager.SyncRandomSeed(Random.Range(0, 255));
 
         hexGrid = new HexGrid();
         hexMan = new HexManager(this);
@@ -132,24 +138,36 @@ public class MageMatch : MonoBehaviour {
         uiCont.Reset();
         stats = new Stats(_p1, _p2);
 
+        yield return _p1.deck.Shuffle();
+        yield return _p2.deck.Shuffle();
+
         // TODO animate beginning of game
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 7; i++) {
             for (int pid = 1; pid <= 2; pid++) {
                 //yield return GetPlayer(p).DealHex();
                 yield return _Deal(pid);
-                yield return new WaitForSeconds(.1f);
+                yield return animCont.WaitForSeconds(.1f);
             }
         }
 
         //yield return _Deal(_activep.id);
 
-
         timer.StartTimer();
 
         ExitState(); // end BeginningOfGame state
 
-        // is this ok?
-        yield return eventCont.TurnBegin();
+        yield return eventCont.TurnBegin(); // is this ok?
+
+        if (IsReplayMode()) {
+            uiCont.ToggleLoadingText(true);
+            inputCont.SetBlocking(true);
+
+            yield return replay.StartReplay();
+
+            _isReplayMode = false;
+            uiCont.ToggleLoadingText(false);
+            inputCont.SetBlocking(false);
+        }
     }
 
     public void InitEvents() {
@@ -166,7 +184,7 @@ public class MageMatch : MonoBehaviour {
         if (gameSettings.turnTimerOn)
             eventCont.timeout += OnTimeout;
 
-        syncManager.InitEvents(this, eventCont);
+        syncManager.InitEvents(eventCont);
         audioCont.InitEvents();
         effectCont.InitEvents();
         commish.InitEvents();
@@ -209,7 +227,9 @@ public class MageMatch : MonoBehaviour {
         return _stateStack.Peek();
     }
 
-    public bool IsDebugMode() { return isDebugMode; }
+    public bool IsDebugMode() { return _isDebugMode; }
+
+    public bool IsReplayMode() { return _isReplayMode; }
 
     // passthru function...not the best.
     public bool Debug_ApplyAPcost() {
@@ -382,6 +402,7 @@ public class MageMatch : MonoBehaviour {
         } else {
             //MMLog.Log_Player("p" + id + " drawing with genTag=" + genTag);
             for (int i = 0; i < count && !p.hand.IsFull(); i++) {
+                yield return p.deck.ReadyNextHextag();
                 string hextag = p.deck.GetNextHextag();
                 Hex hex = hexMan.GenerateHex(id, hextag);
                 hex.putBackIntoDeck = true;
@@ -432,12 +453,12 @@ public class MageMatch : MonoBehaviour {
 
 
 
-    public void PlayerDropTile(int col, Hex hex) {
+    public void PlayerDropTile(Hex hex, int col) {
         _activep.hand.Remove(hex);
         StartCoroutine(_Drop(hex, col, true));
     }
 
-    public void DropTile(int col, Hex hex) {
+    public void DropTile(Hex hex, int col) {
         // remove from hand?
         StartCoroutine(_Drop(hex, col));
     }
@@ -473,8 +494,9 @@ public class MageMatch : MonoBehaviour {
 
         if (currentTurn == Turn.PlayerTurn) { //kinda hacky
             yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
-        } else if (currentTurn == Turn.CommishTurn)
-            eventCont.CommishDrop(hex.hextag, col);
+        } 
+        //else if (currentTurn == Turn.CommishTurn)
+        //    eventCont.CommishDrop(hex.hextag, col);
 
         //syncManager.CheckHandContents(_activep.id);
 
@@ -483,48 +505,19 @@ public class MageMatch : MonoBehaviour {
         yield return null;
     }
 
-    //public void DropConsumable(Consumable cons) { StartCoroutine(_DropConsumable(cons)); }
+    public void CommishDrop(TileBehav tb, int col) {
+        MMLog.Log_MageMatch("   ---------- DROP BEGIN ---------- ");
+        _actionsPerforming++;
 
-    //IEnumerator _DropConsumable(Consumable cons) {
-    //    MMLog.Log_MageMatch("   ---------- DROP CONSUMABLE BEGIN ----------");
-    //    _actionsPerforming++;
+        tb.transform.SetParent(_tilesOnBoard);
+        tb.SetPlaced();
+        StartCoroutine(tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f));
 
-    //    _activep.hand.Remove(cons);
-
-    //    cons.Reveal();
-    //    // TODO animate? what should it look like when you use it?
-
-
-    //    // TODO eventCont begin
-    //    yield return syncManager.OnDropLocal(_activep.id, true, cons.hextag, 0);
-    //    yield return cons.DropEffect();
-    //    // TODO eventCont end
+        MMLog.Log_MageMatch("   ---------- DROP END ----------");
+        _actionsPerforming--;
+    }
 
 
-    //    hexMan.RemoveHex(cons);
-
-
-    //    //GameObject go = hex.gameObject;
-    //    //go.transform.SetParent(_tilesOnBoard);
-    //    //TileBehav tb = hex.GetComponent<TileBehav>();
-    //    //tb.SetPlaced();
-
-    //    //if (currentTurn == Turn.PlayerTurn) //kinda hacky
-    //    //    yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
-
-    //    //yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
-
-    //    //if (currentTurn == Turn.PlayerTurn) { //kinda hacky
-    //    //    yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
-    //    //} else if (currentTurn == Turn.CommishTurn)
-    //    //    eventCont.CommishDrop(tb.tile.element, col);
-
-    //    //syncManager.CheckHandContents(_activep.id);
-
-    //    MMLog.Log_MageMatch("   ---------- DROP CONSUMABLE END ----------");
-    //    _actionsPerforming--;
-    //    yield return null;
-    //}
 
     public void PlayerSwapTiles(int c1, int r1, int c2, int r2) {
         StartCoroutine(_SwapTiles(true, c1, r1, c2, r2));
@@ -550,6 +543,8 @@ public class MageMatch : MonoBehaviour {
         _actionsPerforming--;
     }
 
+
+
     public IEnumerator _CastSpell(int spellNum) {
         MMLog.Log_MageMatch("   ---------- CAST SPELL BEGIN ----------");
         _actionsPerforming++;
@@ -559,34 +554,11 @@ public class MageMatch : MonoBehaviour {
         uiCont.SetDrawButton(false);
         Spell spell = p.character.GetSpell(spellNum);
         if (p.AP >= spell.APcost) { // maybe do this check before boardcheck so the button isn't on
-            targeting.selectionCanceled = false; // maybe not needed here
-
             MMLog.Log_MageMatch("spell cast spellNum=" + spellNum + ", spell count=" + _spellsOnBoard[spellNum].Count);
 
             uiCont.TurnOffSpellButtonsDuringCast(_activep.id, spellNum);
 
-            yield return targeting.SpellSelectScreen(_spellsOnBoard[spellNum]);
-
-            if (!targeting.selectionCanceled) {
-                uiCont.DeactivateAllSpellButtons(_activep.id); // ?
-
-                TileSeq prereq = targeting.GetSelection();
-                //TileSeq seqCopy = seq.Copy(); //?
-                hexMan.SetInvokedSeq(prereq);
-
-                yield return eventCont.SpellCast(EventController.Status.Begin, spell, prereq);
-
-                yield return spell.Cast(prereq);
-
-                yield return eventCont.SpellCast(EventController.Status.End, spell, prereq);
-
-                StartCoroutine(uiCont.GetButtonCont(_activep.id, spellNum).Transition_MainView());
-
-                p.ApplySpellCosts(spell);
-                targeting.ClearSelection();
-                hexMan.RemoveInvokedSeq(prereq);
-                yield return BoardChecking(); //?
-            }
+            yield return GetSelectionAndCast(spellNum);
 
             uiCont.TurnOnSpellButtonsAfterCast(_activep.id, spellNum);
         } else {
@@ -596,6 +568,42 @@ public class MageMatch : MonoBehaviour {
         uiCont.SetDrawButton(true);
         MMLog.Log_MageMatch("   ---------- CAST SPELL END ----------");
         _actionsPerforming--;
+    }
+
+    IEnumerator GetSelectionAndCast(int spellNum) {
+        Spell spell = _activep.character.GetSpell(spellNum);
+
+        TileSeq prereq;
+        if (IsReplayMode()) {
+            prereq = replay.GetSpellSelection();
+        } else {
+            targeting.selectionCanceled = false;
+            yield return targeting.SpellSelectScreen(_spellsOnBoard[spellNum]);
+            if (targeting.selectionCanceled)
+                yield break;
+            prereq = targeting.GetSelection();
+        }
+
+        uiCont.DeactivateAllSpellButtons(_activep.id); // ?
+
+        //TileSeq seqCopy = seq.Copy(); //?
+        hexMan.SetInvokedSeq(prereq);
+
+        yield return eventCont.SpellCast(EventController.Status.Begin, spell, prereq);
+
+        yield return spell.Cast(prereq);
+
+        yield return eventCont.SpellCast(EventController.Status.End, spell, prereq);
+
+        if (!IsReplayMode()) {
+            StartCoroutine(uiCont.GetButtonCont(_activep.id, spellNum).Transition_MainView());
+            targeting.ClearSelection();
+        }
+
+        _activep.ApplySpellCosts(spell);
+        
+        hexMan.RemoveInvokedSeq(prereq);
+        yield return BoardChecking(); //?
     }
 
     public IEnumerator _CancelSpell() {

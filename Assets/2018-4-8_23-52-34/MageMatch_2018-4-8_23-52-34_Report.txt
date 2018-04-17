@@ -1,7 +1,0 @@
-GOD (Valéria) vs Training dummy (Test character)
-  # SETUP
-DEAL p1-B-W-002
-
-  # TURN 1 (p1)
-...the turn timer timed out!
-$ DEBUG INSERT p1-B-F-001 (1,2)

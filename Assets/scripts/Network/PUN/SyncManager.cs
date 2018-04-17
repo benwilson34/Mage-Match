@@ -10,12 +10,12 @@ public class SyncManager : PunBehaviour {
     private Queue<int> _rands;
     private bool _checkpoint = false;
 
-    public void Init() {
+    public void Init(MageMatch mm) {
         _rands = new Queue<int>();
+        _mm = mm;
     }
 
-    public void InitEvents(MageMatch mm, EventController eventCont) {
-        this._mm = mm;
+    public void InitEvents(EventController eventCont) {
         eventCont.AddDrawEvent(OnDrawLocal, EventController.Type.Network, EventController.Status.Begin);
         eventCont.AddDropEvent(OnDropLocal, EventController.Type.Network, EventController.Status.Begin);
         eventCont.AddSwapEvent(OnSwapLocal, EventController.Type.Network, EventController.Status.Begin);
@@ -26,27 +26,27 @@ public class SyncManager : PunBehaviour {
         //eventCont.spellCast += OnSpellCast;
     }
 
-    private bool _syncedSeed = false;
+    //private bool _syncedSeed = false;
 
-    public IEnumerator SyncRandomSeed(int seed) {
-        PhotonView photonView = PhotonView.Get(this);
-        if (PhotonNetwork.player.ID == 1) { // send/enqueue
-            photonView.RPC("HandleSyncRandomSeed", PhotonTargets.Others, seed);
+    //public IEnumerator SyncRandomSeed(int seed) {
+    //    PhotonView photonView = PhotonView.Get(this);
+    //    if (PhotonNetwork.player.ID == 1) { // send/enqueue
+    //        photonView.RPC("HandleSyncRandomSeed", PhotonTargets.Others, seed);
 
-            MMLog.Log_SyncMan("seed = " + seed);
-            Random.InitState(seed);
-        } else {             // wait for rands in queue
-            MMLog.Log_SyncMan("old seed = " + seed);
-            yield return new WaitUntil(() => _syncedSeed);
-        }
-        yield return null;
-    }
-    [PunRPC]
-    public void HandleSyncRandomSeed(int seed) {
-        Random.InitState(seed);
-        MMLog.Log_SyncMan("new seed = " + seed);
-        _syncedSeed = true;
-    }
+    //        MMLog.Log_SyncMan("seed = " + seed);
+    //        Random.InitState(seed);
+    //    } else {             // wait for rands in queue
+    //        MMLog.Log_SyncMan("old seed = " + seed);
+    //        yield return new WaitUntil(() => _syncedSeed);
+    //    }
+    //    yield return null;
+    //}
+    //[PunRPC]
+    //public void HandleSyncRandomSeed(int seed) {
+    //    Random.InitState(seed);
+    //    MMLog.Log_SyncMan("new seed = " + seed);
+    //    _syncedSeed = true;
+    //}
 
 
     public IEnumerator SyncRand(int id, int value) {
@@ -54,12 +54,18 @@ public class SyncManager : PunBehaviour {
     }
 
     public IEnumerator SyncRands(int id, int[] values) {
-        PhotonView photonView = PhotonView.Get(this);
-        if (id == _mm.myID) { // send/enqueue
-            photonView.RPC("HandleSyncRands", PhotonTargets.All, values);
-        } else {             // wait for rands in queue
-            MMLog.Log_SyncMan("Wating for " + values.Length + " values...");
-            yield return new WaitUntil(() => _rands.Count >= values.Length); // will the amount always be the same??
+        if (_mm.IsReplayMode()) {
+            int[] replayRands = _mm.replay.GetSyncedRands();
+            foreach (int r in replayRands)
+                _rands.Enqueue(r);
+        } else {
+            PhotonView photonView = PhotonView.Get(this);
+            if (id == _mm.myID) { // send/enqueue
+                photonView.RPC("HandleSyncRands", PhotonTargets.All, values);
+            } else {             // wait for rands in queue
+                MMLog.Log_SyncMan("Wating for " + values.Length + " values...");
+                yield return new WaitUntil(() => _rands.Count >= values.Length); // will the amount always be the same??
+            }
         }
         yield return null;
     }
@@ -153,7 +159,7 @@ public class SyncManager : PunBehaviour {
     [PunRPC]
     public void HandleDrop(int id, string hextag, int col) {
         Hex hex = _mm.GetPlayer(id).hand.GetHex(hextag);
-        _mm.PlayerDropTile(col, hex);
+        _mm.PlayerDropTile(hex, col);
     }
 
     public IEnumerator OnSwapLocal(int id, bool playerAction, int c1, int r1, int c2, int r2) {
@@ -300,6 +306,6 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleKeepQuickdraw() {
-        _mm.uiCont.KeepQuickdraw();
+        _mm.prompt.SetQuickdrawHand();
     }
 }

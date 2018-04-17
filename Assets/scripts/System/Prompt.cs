@@ -73,6 +73,9 @@ public class Prompt {
             _mm.inputCont.RestrictInteractableHexes(ignoredHexes);
         }
 
+        if (_mm.IsReplayMode())
+            _mm.replay.GetPrompt();
+
         _mm.inputCont.SetAllowHandRearrange(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
         _mm.inputCont.SetAllowHandRearrange(true);
@@ -137,6 +140,9 @@ public class Prompt {
             _mm.inputCont.RestrictInteractableHexes(ignoredHexes);
         }
 
+        if (_mm.IsReplayMode())
+            _mm.replay.GetPrompt();
+
         // the InputController calls SetDrop for this too
         _mm.inputCont.SetAllowHandRearrange(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
@@ -162,7 +168,9 @@ public class Prompt {
 
     public void SetQuickdrawHand() {
         _quickdrawWentToHand = true;
+        _mm.syncManager.SendKeepQuickdraw();
         currentMode = PromptMode.None;
+        _mm.stats.Report("$ PROMPT KEEP QUICKDRAW", false);
     }
 
 
@@ -185,6 +193,9 @@ public class Prompt {
         _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", swap two adjacent tiles!");
         currentMode = PromptMode.Swap;
 
+        if (_mm.IsReplayMode())
+            _mm.replay.GetPrompt();
+
         _mm.inputCont.SetAllowHandDragging(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
         _mm.inputCont.SetAllowHandDragging(true);
@@ -203,7 +214,7 @@ public class Prompt {
     public void SetSwaps(int c1, int r1, int c2, int r2) {
         _mm.syncManager.SendSwapSelection(c1, r1, c2, r2);
 
-        _mm.stats.Report(string.Format("$ PROMPT SWAP ({0},{1})({2},{3})", c1, r1, c2, r2), false);
+        _mm.stats.Report(string.Format("$ PROMPT SWAP ({0},{1}) ({2},{3})", c1, r1, c2, r2), false);
 
         _swapTiles = new TileBehav[2];
         _swapTiles[0] = _mm.hexGrid.GetTileBehavAt(c1, r1);

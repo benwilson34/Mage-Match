@@ -203,7 +203,7 @@ public class Gravekeeper : Character {
             else
                 break; // TODO handle floating tiles
 
-        _mm.DropTile(col, tomb); // idk how to animate this one yet
+        _mm.DropTile(tomb, col); // idk how to animate this one yet
 
         _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.SigDrop);
     }

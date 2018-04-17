@@ -27,19 +27,19 @@ public class Stats {
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
         _ps1 = new PlayerStat() {
             name = p1.name,
-            character = p1.character.characterName
+            character = p1.character.ch.ToString()
         };
         _ps2 = new PlayerStat() {
             name = p2.name,
-            character = p2.character.characterName
+            character = p2.character.ch.ToString()
         };
 
         InitReport();
 
-        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Stats);
+        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Report);
         _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
         _mm.eventCont.timeout += OnTimeout;
-        _mm.eventCont.commishDrop += OnCommishDrop;
+        //_mm.eventCont.commishDrop += OnCommishDrop;
         //_mm.eventCont.commishMatch += OnCommishMatch;
 
         _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.Begin);
@@ -56,7 +56,7 @@ public class Stats {
 
     void InitReport() {
         _report = new StringBuilder();
-        _report.Append(_ps1.name + " (" + _ps1.character + ") vs ");
+        _report.Append("  # " + _ps1.name + " (" + _ps1.character + ") vs ");
         _report.AppendLine(_ps2.name + " (" + _ps2.character + ")");
         _report.AppendLine("  # SETUP"); 
     }
@@ -87,14 +87,14 @@ public class Stats {
     }
 
     public void OnTimeout(int id) {
-        _report.AppendLine("...the turn timer timed out!");
+        //_report.AppendLine("...the turn timer timed out!");
         GetPS(id).timeouts++;
     }
 
-    public void OnCommishDrop(string hextag, int col) {
-        _commishDrops++;
-        _report.AppendLine("C-DROP " + hextag + " col" + col);
-    }
+    //public void OnCommishDrop(string hextag, int col) {
+    //    _commishDrops++;
+    //    _report.AppendLine("  # C-DROP " + hextag + " col" + col);
+    //}
 
     //public void OnCommishMatch(string[] seqs) {
     //    _commishMatches += seqs.Length;
@@ -104,7 +104,7 @@ public class Stats {
     #region GameAction subscriptions
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
         if (dealt)
-            Report("DEAL " + tag);
+            Report("  # DEAL " + tag);
         else if (playerAction)
             Report("DRAW " + tag);
         GetPS(id).draws++;
@@ -124,7 +124,7 @@ public class Stats {
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         if (playerAction) {
-            Report("SWAP (" + c1 + "," + r1 + ")(" + c2 + "," + r2 + ")");
+            Report(string.Format("SWAP ({0},{1}) ({2},{3})", c1, r1, c2, r2));
             GetPS(id).swaps++;
         }
         yield return null;
@@ -186,7 +186,7 @@ public class Stats {
         string timestamp = dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
         timestamp += dt.Hour + "-" + dt.Minute + "-" + dt.Second;
 
-        string dirPath = Application.dataPath;
+        string dirPath = Application.persistentDataPath;
         MMLog.Log("Stats", "black", "dataPath is " + dirPath + "...");
         dirPath = Directory.CreateDirectory(dirPath + "/" + timestamp).FullName;
         MMLog.Log("Stats", "black", "saving files to " + dirPath + "...");
@@ -200,7 +200,7 @@ public class Stats {
         string filename = "MageMatch_" + timestamp + "_Report";
         filename = @"/" + filename + ".txt";
 
-        File.WriteAllText(path + filename, timestamp + "\n" + GetReportText());
+        File.WriteAllText(path + filename, "  # " + timestamp + "\n" + GetReportText());
     }
 
     public void SaveStatsCSV(string path, string timestamp) {

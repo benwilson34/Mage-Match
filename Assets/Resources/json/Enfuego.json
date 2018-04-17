@@ -9,15 +9,15 @@
   },
 
   "runes": [
-    "Dance Shoes",
-    "Burning Bracers",
+    "DanceShoes",
+    "BurningBracers",
     "Molotov",
     "Brushfire",
-    "Shuffle Gem"
+    "ShuffleGem"
   ],
 
   "unused runes": [
-    "Five Alarm Bell"
+    "FiveAlarmBell"
   ],
 
   "core": {

@@ -1,5 +1,6 @@
 {
-  "Sample Charm": {
+  "SampleCharm": {
+  	"title": "Sample Charm",
     "category": "Charm",
     "keywords": [],
     "deckCount": 2,
@@ -10,13 +11,15 @@
 
 
 
-  "HR Form": {
+  "HRForm": {
+    "title": "HR Form",
     "category": "Charm",
     "keywords": ["Area Target"],
     "deckCount": 3,
     "desc": "Zombify all Muscle tiles in a small area."
   },
-  "Party Snacks": {
+  "PartySnacks": {
+    "title": "Party Snacks",
     "category": "Charm",
     "keywords": ["Tile Target"],
     "deckCount": 3,
@@ -29,20 +32,23 @@
     "deckCount": 4,
     "desc": "Heal yourself for 60-80 health and gain a stacking 2-turn buff that reduces the damage you take by 10%."
   },
-  "Water Lily": {
+  "WaterLily": {
+    "title": "Water Lily",
     "category": "Charm",
     "keywords": [],
     "deckCount": 7,
     "desc": "Add 4 Water tiles into the board in random columns."
   },
 
-  "Dance Shoes": {
+  "DanceShoes": {
+    "title": "Dance Shoes",
     "category": "Charm",
     "keywords": ["Swap Prompt"],
     "deckCount": 5,
     "desc": "Perform a swap. Inflict Burning on both tiles swapped."
   },
-  "Burning Bracers": {
+  "BurningBracers": {
+    "title": "Burning Bracers",
     "category": "Charm",
     "keywords": [],
     "deckCount": 4,
@@ -53,38 +59,44 @@
 
 
 
-  "Muscle Mass": {
+  "MuscleMass": {
+    "title": "Muscle Mass",
     "category": "Tile",
     "keywords": ["Duplicate"],
     "deckCount": 9,
     "desc": "Basic Muscle tile with Duplicate."
   },
-  "Protein Pills": {
+  "ProteinPills": {
+    "title": "Protein Pills",
     "category": "Charm",
     "keywords": ["Buff"],
     "deckCount": 3,
     "desc": "Gain a 2-turn buff that increases the damage you deal and reduces the damage you take by 15%."
   },
-  "Leeches!": {
+  "Leeches": {
+    "title": "Leeches!",
     "category": "Charm",
     "keywords": ["Buff"],
     "deckCount": 4,
     "desc": "Gain a buff this turn that heals you for 20% of all damage you deal."
   },
 
-  "White Water": {
+  "WhiteWater": {
+    "title": "White Water",
     "category": "Tile",
     "keywords": ["Quickdraw"],
     "deckCount": 8,
     "desc": "Basic Water tile with Quickdraw."
   },
-  "Rain Drops": {
+  "RainDrops": {
+    "title": "Rain Drops",
     "category": "Charm",
     "keywords": ["Duplicate"],
     "deckCount": 9,
     "desc": "Basic Water tile with Duplicate."
   },
-  "Shuffle Gem": {
+  "ShuffleGem": {
+    "title": "Shuffle Gem",
     "category": "Charm",
     "keywords": ["Swap Prompt"],
     "deckCount": 6,
@@ -97,7 +109,8 @@
     "deckCount": 3,
     "desc": "Deal 30 damage to your opponent and inflict Burning on all tiles in a small area. Discard 1 random hex."
   },
-  "Five-Alarm Bell": {
+  "FiveAlarmBell": {
+    "title": "Five-Alarm Bell",
     "category": "Charm",
     "keywords": ["Drag Target"],
     "deckCount": 2,

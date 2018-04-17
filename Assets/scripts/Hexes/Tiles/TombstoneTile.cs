@@ -19,7 +19,7 @@ public class TombstoneTile : TileBehav {
         else
             elem = Tile.Element.Muscle;
 
-        TileBehav tb = (TileBehav)_mm.hexMan.GenerateBasicTile(id, elem);
+        TileBehav tb = _mm.hexMan.GenerateBasicTile(id, elem);
         yield return _mm.hexFX.Ench_SetZombie(id, tb);
         _mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
         _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.SigEffect);

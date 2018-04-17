@@ -51,8 +51,8 @@ public class TileSeq {
 	public string SeqAsString(bool showLetters = true, bool showCoords = false){
 		string letters = "", coords = "";
         foreach (Tile t in sequence) {
-            letters += "" + t.ThisElementToChar();
-            coords += t.PrintCoord();
+            letters += t.ThisElementToChar() + "";
+            coords += t.PrintCoord() + " ";
         }
 		return (showLetters ? letters + " " : "") + (showCoords ? coords : "");
 	}

@@ -8,15 +8,15 @@ public class Deck {
     private Player _player;
     private Queue<string> _deckQ;
     private List<string> _removeList;
+    private string _nextHexTag;
 
     public Deck(MageMatch mm, Player p) {
         _mm = mm;
         _player = p;
         _removeList = new List<string>();
-        Init();
     }
 
-    public void Init() {
+    string[] GetInitHextags() {
         MMDebug.MMLog.Log("DECK", "black", "Init player " + _player.id);
         var list = new List<string>();
         var info = CharacterInfo.GetCharacterInfoObj(_player.character.ch);
@@ -31,25 +31,43 @@ public class Deck {
             var runeInfo = RuneInfo.GetRuneInfo(rune);
             string cat = runeInfo.category.Substring(0, 1);
             for (int i = 0; i < runeInfo.deckCount; i++) {
-                list.Add("p" + _player.id + "-" + cat + "-" + runeInfo.title);
+                list.Add("p" + _player.id + "-" + cat + "-" + runeInfo.tagTitle);
             }
         }
 
-        Shuffle(list.ToArray());
-        PrintDeck();
+        return list.ToArray();
     }
 
-    void Shuffle(string[] coll) {
-        Debug.Log("DECK: Shuffling " + coll.Length + " hexes...");
-        // Knuth shuffle algorithm, courtesy of Wikipedia :)
-        for (int t = 0; t < coll.Length; t++) {
-            string tmp = coll[t];
-            int r = Random.Range(t, coll.Length);
-            coll[t] = coll[r];
-            coll[r] = tmp;
+    public IEnumerator Shuffle(string[] hextags = null) {
+        if (hextags == null)
+            hextags = GetInitHextags();
+
+        int id;
+        if (_mm.IsDebugMode())
+            id = 1;
+        else
+            id = _player.id;
+
+        int count = hextags.Length;
+        Debug.Log("DECK: Shuffling " + count + " hexes...");
+        int[] rands = new int[count];
+        for (int t = 0; t < count; t++) {
+            rands[t] = Random.Range(t, count);
         }
 
-        _deckQ = new Queue<string>(coll);
+        yield return _mm.syncManager.SyncRands(id, rands);
+        rands = _mm.syncManager.GetRands(count);
+
+        // Knuth shuffle algorithm, courtesy of Wikipedia :)
+        for (int t = 0; t < count; t++) {
+            string tmp = hextags[t];
+            int r = rands[t];
+            hextags[t] = hextags[r];
+            hextags[r] = tmp;
+        }
+
+        _deckQ = new Queue<string>(hextags);
+        PrintDeck();
     }
 
     void PrintDeck() {
@@ -66,9 +84,9 @@ public class Deck {
 
     public int GetDeckCount() { return _deckQ.Count; }
 
-    public string GetNextHextag() {
+    public IEnumerator ReadyNextHextag() {
         if (_deckQ.Count == 0) {
-            Shuffle(_removeList.ToArray());
+            yield return Shuffle(_removeList.ToArray());
             _removeList.Clear();
             _mm.uiCont.UpdateRemovedCount(0);
         }
@@ -79,8 +97,10 @@ public class Deck {
         _mm.uiCont.UpdateDeckCount(_deckQ.Count);
 
         PrintDeck();
-        return nextHex; // + "-" ?
+        _nextHexTag = nextHex; // + "-" ?
     }
+
+    public string GetNextHextag() { return _nextHexTag; }
 
     public void AddHextagToRemoveList(string hextag) {
         _removeList.Add(hextag);

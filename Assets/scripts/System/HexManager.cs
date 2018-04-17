@@ -86,13 +86,11 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
     }
 
-    // maybe return TB?
-    public Hex GenerateBasicTile(int id, Tile.Element element) {
+    public TileBehav GenerateBasicTile(int id, Tile.Element element) {
         return GenerateBasicTile(id, element, GameObject.Find("tileSpawn").transform.position);
     }
 
-    // maybe return TB?
-    public Hex GenerateBasicTile(int id, Tile.Element element, Vector3 position) {
+    public TileBehav GenerateBasicTile(int id, Tile.Element element, Vector3 position) {
         GameObject go;
         string type;
         switch (element) {
@@ -128,8 +126,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return tb;
     }
 
-    // maybe return TB?
-    public Hex GenerateTile(int id, string type) {
+    public TileBehav GenerateTile(int id, string type) {
         GameObject go;
         switch (type) {
             //case "Stone":
@@ -145,11 +142,11 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             case "Brushfire":
                 go = GameObject.Instantiate(_tq_brushfire);
                 break;
-            case "White Water":
+            case "WhiteWater":
                 go = GameObject.Instantiate(_tq_whiteWater);
                 break;
 
-            case "Muscle Mass":
+            case "MuscleMass":
                 go = GameObject.Instantiate(_td_muscleMass);
                 break;
 
@@ -165,46 +162,46 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return tb;
     }
 
-    public Hex GenerateCharm(int id, string type) {
+    public Charm GenerateCharm(int id, string type) {
         GameObject go;
         switch (type) {
-            case "Sample Charm":
+            case "SampleCharm":
                 go = GameObject.Instantiate(_c_sample);
                 break;
 
-            case "HR Form":
+            case "HRForm":
                 go = GameObject.Instantiate(_c_HRform);
                 break;
-            case "Party Snacks":
+            case "PartySnacks":
                 go = GameObject.Instantiate(_c_partySnacks);
                 break;
-            case "Protein Pills":
+            case "ProteinPills":
                 go = GameObject.Instantiate(_c_proteinPills);
                 break;
-            case "Leeches!":
+            case "Leeches":
                 go = GameObject.Instantiate(_c_leeches);
                 break;
 
             case "Bandages":
                 go = GameObject.Instantiate(_c_bandages);
                 break;
-            case "Water Lily":
+            case "WaterLily":
                 go = GameObject.Instantiate(_c_waterLily);
                 break;
-            case "Shuffle Gem":
+            case "ShuffleGem":
                 go = GameObject.Instantiate(_c_shuffleGem);
                 break;
 
-            case "Dance Shoes":
+            case "DanceShoes":
                 go = GameObject.Instantiate(_c_danceShoes);
                 break;
-            case "Burning Bracers":
+            case "BurningBracers":
                 go = GameObject.Instantiate(_c_burningBracers);
                 break;
             case "Molotov":
                 go = GameObject.Instantiate(_c_molotov);
                 break;
-            case "Five-Alarm Bell":
+            case "FiveAlarmBell":
                 go = GameObject.Instantiate(_c_fiveAlarmBell);
                 break;
 
@@ -213,11 +210,11 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
                 return null;
         }
 
-        Hex hex = go.GetComponent<Hex>();
-        hex.hextag = GenFullTag(id, "C", type); // C for Charm
-        hex.gameObject.name = hex.hextag;
-        hex.Init(_mm);
-        return hex;
+        Charm charm = go.GetComponent<Charm>();
+        charm.hextag = GenFullTag(id, "C", type); // C for Charm
+        charm.gameObject.name = charm.hextag;
+        charm.Init(_mm);
+        return charm;
     }
 
     string GenFullTag(int id, string cat, string type) {

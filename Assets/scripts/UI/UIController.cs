@@ -17,7 +17,7 @@ public class UIController : MonoBehaviour {
     [HideInInspector]
     public Newsfeed newsfeed;
 
-    public GameObject alertbar, quickdrawButton; 
+    public GameObject alertbar, quickdrawButton, loadingText; 
 
     private ButtonController _drawButton;
     private Text _tDeckCount, _tRemovedCount;
@@ -227,7 +227,7 @@ public class UIController : MonoBehaviour {
             _alertShowing = true;
             float posY = t.position.y;
             yield return t.DOMoveY(posY - ALERT_DIS, .25f).WaitForCompletion();
-            yield return new WaitForSeconds(ALERT_DELAY);
+            yield return _mm.animCont.WaitForSeconds(ALERT_DELAY);
             yield return t.DOMoveY(posY, .25f).WaitForCompletion();
             _alertShowing = false;
         }
@@ -310,7 +310,7 @@ public class UIController : MonoBehaviour {
             Image pinfoImg = GetPinfo(p.id).GetComponent<Image>();
             pinfoImg.color = new Color(1, 0, 0, 0.4f); // red
             Color pColor = CorrectPinfoColor(p.id);
-            yield return new WaitForSeconds(.2f);
+            yield return _mm.animCont.WaitForSeconds(.2f);
             pinfoImg.DOColor(pColor, .3f).SetEase(Ease.OutQuad);
         }
     }
@@ -502,8 +502,6 @@ public class UIController : MonoBehaviour {
 
     public void KeepQuickdraw() {
         _mm.prompt.SetQuickdrawHand();
-        _mm.syncManager.SendKeepQuickdraw();
-        _mm.stats.Report("$ QUICKDRAW KEEP", false);
     }
 
 
@@ -587,4 +585,8 @@ public class UIController : MonoBehaviour {
     }
     #endregion
 
+
+    public void ToggleLoadingText(bool on) {
+        loadingText.SetActive(on);
+    }
 }

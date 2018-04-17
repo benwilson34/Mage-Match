@@ -164,6 +164,9 @@ public class AudioController {
 
     // Do I even need to pass in the AudioSource now?
     public void Trigger(HexSoundEffect sound, AudioSource source = null) {
+        if (_mm.IsReplayMode() && !_mm.debugSettings.animateReplay) // should be shell method
+            return;
+
         if (source == null)
             source = _source;
 
@@ -208,6 +211,9 @@ public class AudioController {
     }
 
     public void Trigger(EnfuegoSoundEffect sound) {
+        if (_mm.IsReplayMode() && !_mm.debugSettings.animateReplay) // should be shell method
+            return;
+
         AudioClip clip = null;
         Pitch pitch = Pitch.A0;
         switch (sound) {
@@ -249,6 +255,9 @@ public class AudioController {
     }
 
     public void Trigger(GraveKSoundEffect sound) {
+        if (_mm.IsReplayMode() && !_mm.debugSettings.animateReplay) // should be shell method
+            return;
+
         AudioClip clip = null;
         Pitch pitch = Pitch.A0;
         switch (sound) {
@@ -306,6 +315,9 @@ public class AudioController {
     }
 
     public void Trigger(ValeriaSoundEffect sound) {
+        if (_mm.IsReplayMode() && !_mm.debugSettings.animateReplay) // should be shell method
+            return;
+
         AudioClip clip = null;
         Pitch pitch = Pitch.A0;
         switch (sound) {
@@ -352,6 +364,9 @@ public class AudioController {
     }
 
     public void Trigger(OtherSoundEffect sound) {
+        if (_mm.IsReplayMode() && !_mm.debugSettings.animateReplay) // should be shell method
+            return;
+
         AudioClip clip = null;
         Pitch pitch = Pitch.A0;
         switch (sound) {

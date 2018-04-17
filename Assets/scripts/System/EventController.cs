@@ -6,7 +6,7 @@ using MMDebug;
 
 public class EventController {
 
-    public enum Type { None = 0, LastStep, GameAction, Stats, EventEffects, Player, Audio, Network, FirstStep }
+    public enum Type { None = 0, LastStep, GameAction, Stats, EventEffects, Player, Audio, Report, Network, FirstStep }
     public enum Status { Begin, End }
     public bool handlingEvents = false; // worth it?
 

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RuneInfo {
 
-    public string title, category;
+    public string tagTitle, title, category;
     public string[] keywords;
     public int deckCount;
     public string desc;
@@ -65,7 +65,9 @@ public class RuneInfo {
         
         // I feel like this isn't the proper way to do this
         JsonConvert.PopulateObject(o[rune].ToString(), info);
-        info.title = rune;
+        info.tagTitle = rune;
+        if (info.title == null)
+            info.title = rune;
 
         return info;
     }
@@ -92,7 +94,7 @@ public class RuneInfo {
         var list = new List<string>();
         foreach (var rune in runes) {
             if (rune.category == category)
-                list.Add(category.Substring(0, 1) + "-" + rune.title);
+                list.Add(category.Substring(0, 1) + "-" + rune.tagTitle);
         }
         return list;
     }

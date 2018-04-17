@@ -72,16 +72,18 @@ public class Commish  {
             }
             
             if (i != 0) { // wait to drop next tile (anim purposes only)
-                yield return new WaitForSeconds(.15f);
+                yield return _mm.animCont.WaitForSeconds(.15f);
             }
 
-            Hex tb = _mm.hexMan.GenerateBasicTile(0, elems.Dequeue()); // should get own func?
+            TileBehav tb = _mm.hexMan.GenerateBasicTile(0, elems.Dequeue()); // should get own func?
             MMLog.Log_Commish("Dropping into col " + colQ.Peek());
 
             int col = colQ.Dequeue();
-            if (_mm.boardCheck.CheckColumn(col) >= 0)
-                _mm.DropTile(col, tb);
-            else {
+            if (_mm.boardCheck.CheckColumn(col) >= 0) {
+                //_mm.DropTile(tb, col);
+                _mm.CommishDrop(tb, col);
+                _mm.stats.Report("  # C-DROP " + tb.hextag + " col" + col, false);
+            } else {
                 MMLog.LogError("COMMISH: Tried to drop into a full column!");
                 break;
             }

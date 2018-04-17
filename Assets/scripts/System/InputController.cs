@@ -12,6 +12,7 @@ public class InputController : MonoBehaviour {
     private Targeting _targeting;
     private MonoBehaviour _mouseObj;
     private Reporter _reporter;
+    private bool _blocking = false;
 
     private bool _holdingHex = false;
     private Hex _heldHex;
@@ -33,6 +34,9 @@ public class InputController : MonoBehaviour {
     }
 
 	void Update(){
+        if (_blocking)
+            return;
+
         if (Input.GetMouseButton(0) || _lastClick) { // if left mouse is down
             _nowClick = true;
             if (Input.GetMouseButtonUp(0)) // if left mouse was JUST released
@@ -270,6 +274,8 @@ public class InputController : MonoBehaviour {
 
     bool PromptedSwap() { return _mm.MyTurn() && _mm.prompt.currentMode == Prompt.PromptMode.Swap; }
 
+    public void SetBlocking(bool blocking) { _blocking = blocking; }
+
     public void SetAllowHandDragging(bool allow) {
         ((StandardContext)_standardContext).allowHandDragging = allow; 
     }
@@ -480,7 +486,7 @@ public class InputController : MonoBehaviour {
                             if (_input.PromptedDrop())
                                 _mm.prompt.SetDrop(_input._heldHex, cb.col);
                             else
-                                _mm.PlayerDropTile(cb.col, _input._heldHex);
+                                _mm.PlayerDropTile(_input._heldHex, cb.col);
                             return InputStatus.PartiallyHandled;
                         }
                     }
@@ -618,7 +624,7 @@ public class InputController : MonoBehaviour {
         _myTurn = new MyTurnContext(_mm, this);
 
         _standardContext = new StandardContext(_mm, this);
-        MMLog.Log_InputCont("~~~~~~~~~~~~~~Contexts init!");
+        //MMLog.Log_InputCont("~~~~~~~~~~~~~~Contexts init!");
     }
 
     public void SetDebugInputMode(InputContext.ObjType type) {

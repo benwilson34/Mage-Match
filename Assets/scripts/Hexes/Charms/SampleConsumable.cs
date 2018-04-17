@@ -9,7 +9,7 @@ public class SampleConsumable : Charm {
             _mm.hexMan.RemoveTile(tbs[0].tile, false);
             tbs.RemoveAt(0);
             i--;
-            yield return new WaitForSeconds(.05f);
+            yield return _mm.animCont.WaitForSeconds(.05f);
         }
         yield return null;
     }

@@ -185,7 +185,6 @@ public abstract class Character {
 
     protected void InitSpells(CharacterInfo info) {
         _spells = new Spell[5];
-        Debug.Log("Core spell has a cost of " + info.core.cost);
         _spells[0] = new CoreSpell(0, info.core.title, CoreSpell, info.core.cost);
         _spells[0].Init(_mm);
         _spells[0].info = CharacterInfo.GetSpellInfo(info.core, true);
