@@ -18,7 +18,7 @@ public class CharacterSelect : MonoBehaviour {
     private MenuController _menu;
     private bool _singlePlayer;
 
-    void Start() {
+    void Awake() {
         //characterBlock = transform.Find("characterBlock");
         _charPortraitFrame = transform.Find("i_charPortraitFrame").GetComponent<Image>();
         _charPortrait = _charPortraitFrame.transform.Find("i_charPortrait").GetComponent<Image>();
@@ -33,7 +33,6 @@ public class CharacterSelect : MonoBehaviour {
     public void Init(bool singlePlayer) {
         _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
 
-        _charPortrait.enabled = false;
         _charName.text = "";        
         //charT.text = "";
         _bConfirm.interactable = false;
@@ -85,12 +84,17 @@ public class CharacterSelect : MonoBehaviour {
         _bConfirm.interactable = true;
     }
 
-    Sprite GetCharacterPortrait(Character.Ch ch) {
+    // TODO move to asset loader once I make that
+    public static Sprite GetCharacterPortrait(Character.Ch ch) {
         switch (ch) {
             case Character.Ch.Enfuego:
                 return Resources.Load<Sprite>("sprites/characters/enfuego");
             case Character.Ch.Gravekeeper:
                 return Resources.Load<Sprite>("sprites/characters/gravekeeper");
+            case Character.Ch.Valeria:
+                return Resources.Load<Sprite>("sprites/characters/valeria");
+            case Character.Ch.Sample:
+                return Resources.Load<Sprite>("sprites/characters/dummy");
             default:
                 return null;
         }

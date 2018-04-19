@@ -9,11 +9,13 @@ public class Prematch : Photon.PunBehaviour {
 
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
-    private bool _isConnecting;
-    private GameObject _controlPanel, _toggles;
+    //private GameObject _controlPanel, _toggles;
+    //private InputField _nameInput;
     private Text _statusText;
-    private InputField _nameInput;
+    private Image _p1portrait, _p2portrait;
+    private Text _p1username, _p2username;
 
+    private bool _isConnecting;
     private bool _allSettingsSynced = false;
 
     private GameSettings _gameSettings;
@@ -21,6 +23,14 @@ public class Prematch : Photon.PunBehaviour {
     public void Init(bool training) {
         _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         _statusText = transform.Find("t_status").GetComponent<Text>();
+
+        _p1portrait = transform.Find("i_localCharPortraitFrame")
+            .Find("i_charPortrait").GetComponent<Image>();
+        _p2portrait = transform.Find("i_oppCharPortraitFrame")
+            .Find("i_charPortrait").GetComponent<Image>();
+
+        _p1username = transform.Find("t_localName").GetComponent<Text>();
+        _p2username = transform.Find("t_oppName").GetComponent<Text>();
 
         if (training) {
             // Init GameSettings and DebugSettings
@@ -38,9 +48,9 @@ public class Prematch : Photon.PunBehaviour {
 
             PhotonNetwork.logLevel = Loglevel; // debug log level
 
-            _controlPanel = GameObject.Find("Control Panel");
-            _toggles = GameObject.Find("Toggles");
-            _nameInput = GameObject.Find("input_Name").GetComponent<InputField>();
+            //_controlPanel = GameObject.Find("Control Panel");
+            //_toggles = GameObject.Find("Toggles");
+            //_nameInput = GameObject.Find("input_Name").GetComponent<InputField>();
 
             //if (_rs.isNewRoom) {
             //    GameObject.Find("b_Play").transform.Find("Text").GetComponent<Text>().text = "Create room";
@@ -48,7 +58,7 @@ public class Prematch : Photon.PunBehaviour {
             //    _toggles.SetActive(false);
             //}
 
-            _controlPanel.SetActive(true);
+            //_controlPanel.SetActive(true);
 
             Connect();
         }
@@ -63,7 +73,10 @@ public class Prematch : Photon.PunBehaviour {
         _statusText.text = "Connecting...";
         _isConnecting = true;
 
-        _controlPanel.SetActive(false);
+        PhotonNetwork.autoJoinLobby = false;
+        PhotonNetwork.automaticallySyncScene = true;
+
+        //_controlPanel.SetActive(false);
 
         // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
         if (PhotonNetwork.connected) {
@@ -72,6 +85,7 @@ public class Prematch : Photon.PunBehaviour {
             //HandleRoomAction();
         } else {
             // #Critical, we must first and foremost connect to Photon Online Server.
+            Debug.Log("PREMATCH: About to connect to PUN...");
             PhotonNetwork.ConnectUsingSettings("1");
         }
     }
@@ -122,7 +136,7 @@ public class Prematch : Photon.PunBehaviour {
 
     public override void OnDisconnectedFromPhoton() {
         //_progressLabel.SetActive(false);
-        _controlPanel.SetActive(true);
+        //_controlPanel.SetActive(true);
         Debug.LogWarning("DemoAnimator/Launcher: OnDisconnectedFromPhoton() was called by PUN");
     }
 
@@ -150,10 +164,9 @@ public class Prematch : Photon.PunBehaviour {
         string pName = PlayerProfile.GetUsername();
         PhotonView photonView = PhotonView.Get(this);
 
-        GameSettings gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
         Debug.Log("id=" + id + ", name=" + pName);
 
-        photonView.RPC("SetPlayerInfo", PhotonTargets.All, id, pName, gameSettings.chosenChar);
+        photonView.RPC("SetPlayerInfo", PhotonTargets.All, id, pName, _gameSettings.chosenChar);
 
         if (id == 1) {
             //if (_toggles != null)
@@ -161,24 +174,25 @@ public class Prematch : Photon.PunBehaviour {
             //else
             //    gameSettings.turnTimerOn = false; // not really needed?
 
-            photonView.RPC("SetToggles", PhotonTargets.Others, gameSettings.turnTimerOn);
+            photonView.RPC("SetToggles", PhotonTargets.Others, _gameSettings.turnTimerOn);
         }
+
         yield return new WaitUntil(() => _allSettingsSynced); // wait for RPC
+
+
 
         StartCoroutine(ShowPrematchInfoBeforeLoad(false));
     }
 
     [PunRPC]
     public void SetPlayerInfo(int id, string pName, Character.Ch ch) {
-        GameSettings gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
-        gameSettings.SetPlayerInfo(id, pName, ch);
+        _gameSettings.SetPlayerInfo(id, pName, ch);
     }
 
     [PunRPC]
     public void SetToggles(bool turnTimerOn) {
         //Debug.Log("GAMESETTINGS: SetTurnTimer to " + b);
-        GameSettings gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
-        gameSettings.turnTimerOn = turnTimerOn;
+        _gameSettings.turnTimerOn = turnTimerOn;
         photonView.RPC("ConfirmAllSettingsSynced", PhotonTargets.All);
     }
 
@@ -189,7 +203,12 @@ public class Prematch : Photon.PunBehaviour {
 
     public IEnumerator ShowPrematchInfoBeforeLoad(bool training) {
         // TODO show both, audio, screen transition
-        for (int i = 5; i > 0; i--) {
+        _p1portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.p1char);
+        _p1username.text = _gameSettings.p1name;
+        _p2portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.p2char);
+        _p2username.text = _gameSettings.p2name;
+
+        for (int i = 3; i > 0; i--) {
             _statusText.text = "Starting game in " + i + "...";
             yield return new WaitForSeconds(1f);
         }
