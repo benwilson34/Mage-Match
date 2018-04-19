@@ -58,6 +58,8 @@ public class SyncManager : PunBehaviour {
             int[] replayRands = _mm.replay.GetSyncedRands();
             foreach (int r in replayRands)
                 _rands.Enqueue(r);
+        } else if (_mm.IsDebugMode()) {
+            HandleSyncRands(values);
         } else {
             PhotonView photonView = PhotonView.Get(this);
             if (id == _mm.myID) { // send/enqueue
@@ -95,6 +97,9 @@ public class SyncManager : PunBehaviour {
 
     // i don't think this works
     public IEnumerator Checkpoint() {
+        if (_mm.IsDebugMode())
+            yield break;
+
         PhotonView photonView = PhotonView.Get(this);
         photonView.RPC("HandleCheckpoint", PhotonTargets.Others, true);
 
@@ -108,7 +113,7 @@ public class SyncManager : PunBehaviour {
     }
 
     public void CheckHandContents(int id) {
-        if (id != _mm.myID)
+        if (_mm.IsDebugMode() || id != _mm.myID)
             return;
 
         List<string> tags = _mm.GetPlayer(id).hand.Debug_GetAllTags();
@@ -133,6 +138,9 @@ public class SyncManager : PunBehaviour {
     public IEnumerator OnDrawLocal(int id, string tag, bool playerAction, bool dealt) {
         //Debug.MMLog.Log_SyncMan("TURNMANAGER: id=" + id + " myID=" + mm.myID);
         //if ((playerAction || dealt) && id == _mm.myID) { // if local, send to remote
+        if (_mm.IsDebugMode())
+            yield break;
+
         if (playerAction && id == _mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDraw", PhotonTargets.Others, id, tag, playerAction, dealt);
@@ -150,6 +158,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public IEnumerator OnDropLocal(int id, bool playerAction, string tag, int col) {
+        if (_mm.IsDebugMode())
+            yield break;
+
         if (playerAction && id == _mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDrop", PhotonTargets.Others, id, tag, col);
@@ -163,6 +174,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public IEnumerator OnSwapLocal(int id, bool playerAction, int c1, int r1, int c2, int r2) {
+        if (_mm.IsDebugMode())
+            yield break;
+
         if (playerAction && id == _mm.myID) { // if local, send to remote
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleSwap", PhotonTargets.Others, id, c1, r1, c2, r2);
@@ -175,6 +189,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public void SendSpellCast(int spellNum) {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) { // not totally necessary...
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleSpellCast", PhotonTargets.Others, spellNum);
@@ -186,9 +203,12 @@ public class SyncManager : PunBehaviour {
     }
 
     public void TurnTimeout() {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) { // not totally necessary...
             PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleTimeout", PhotonTargets.All);
+            photonView.RPC("HandleTimeout", PhotonTargets.Others);
         }
     }
     [PunRPC]
@@ -199,6 +219,9 @@ public class SyncManager : PunBehaviour {
     // --------------- Targeting ----------------
 
     public void SendTBTarget(TileBehav tb) {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleTBTarget", PhotonTargets.Others, tb.tile.col, tb.tile.row);
@@ -210,6 +233,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public void SendCBTarget(CellBehav cb) {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleCBTarget", PhotonTargets.Others, cb.col, cb.row);
@@ -244,6 +270,9 @@ public class SyncManager : PunBehaviour {
     //}
 
     public void SendTBSelection(TileBehav tb) {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleTBSelection", PhotonTargets.Others, tb.tile.col, tb.tile.row);
@@ -255,6 +284,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public void SendCancelSelection() {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleCancelSelection", PhotonTargets.Others);
@@ -266,6 +298,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public void SendEndDragTarget() {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleEndDragTarget", PhotonTargets.Others);
@@ -277,6 +312,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public void SendDropSelection(Hex hex, int col) {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleDropSelection", PhotonTargets.Others, hex.hextag, col);
@@ -288,6 +326,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public void SendSwapSelection(int c1, int r1, int c2, int r2) {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleSwapSelection", PhotonTargets.Others, c1, r1, c2, r2);
@@ -299,6 +340,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public void SendKeepQuickdraw() {
+        if (_mm.IsDebugMode())
+            return;
+
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("HandleKeepQuickdraw", PhotonTargets.Others);

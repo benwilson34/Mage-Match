@@ -83,4 +83,6 @@ MonoBehaviour:
   - SyncSettings
   - HandleSyncRandomSeed
   - HandleKeepQuickdraw
+  - ConfirmAllSettingsSynced
+  - SetPlayerInfo
   DisableAutoOpenWizard: 1

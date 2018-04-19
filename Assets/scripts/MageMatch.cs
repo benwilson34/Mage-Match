@@ -56,7 +56,7 @@ public class MageMatch : MonoBehaviour {
         //CharacterInfo.Init();
 
         // set game to debug (single-client) mode if appropriate
-        GameObject debugObj = GameObject.Find("debugSettings");
+        GameObject debugObj = GameObject.Find("DebugSettings");
         if (debugObj != null) {
             debugSettings = debugObj.GetComponent<DebugSettings>();
             _isDebugMode = true;
@@ -69,8 +69,8 @@ public class MageMatch : MonoBehaviour {
 
             MMLog.LogWarning("This scene is in debug mode!!");
             PhotonNetwork.offlineMode = true;
-            PhotonNetwork.CreateRoom("debug");
-            PhotonNetwork.JoinRoom("debug");
+            //PhotonNetwork.CreateRoom("debug");
+            //PhotonNetwork.JoinRoom("debug");
         }
 
         _stateStack = new Stack<State>();
@@ -84,7 +84,7 @@ public class MageMatch : MonoBehaviour {
         EnterState(State.BeginningOfGame);
 
         _tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
-        gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
+        gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name + ",p1 char=" + gameSettings.p1char + ",p2="+gameSettings.p2name+",p2 char=" + gameSettings.p2char+",timer=" +gameSettings.turnTimerOn);
 
         if (IsDebugMode())
@@ -291,7 +291,10 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void OnTimeout(int id) {
-        syncManager.TurnTimeout();
+        if (id == myID) {
+            syncManager.TurnTimeout();
+            TurnTimeout();
+        }
     }
     #endregion
 

@@ -5,135 +5,84 @@ using UnityEngine.UI;
 
 public class CharacterSelect : MonoBehaviour {
 
-    private Transform localBlock, oppBlock, characterBlock;
-    private Image localCharPortrait, oppCharPortrait;
-    private Text localCharName, oppCharName, charT;
-    private Button bReady;
+    //private Transform characterBlock;
+    private Image _charPortraitFrame, _charPortrait;
+    private Text _charName, _charT;
+    private Button _bConfirm;
     private GameObject goldSelectionPF, redSelectionPF;
 
-    private GameSettings gameSettings;
-    private int myID;
-    private Character.Ch localChar = Character.Ch.Sample;
-    private bool thisPlayerLocked = false;
-    private bool otherPlayerLocked = false;
-    private bool otherCharacterSet = false;
+    private GameSettings _gameSettings;
+    private Character.Ch _localChar = Character.Ch.Sample;
+    private bool _thisPlayerLocked = false;
 
-    // TODO another turn timer
+    private MenuController _menu;
+    private bool _singlePlayer;
 
-    void Start () {
-        //CharacterInfo.Init();
+    void Start() {
+        //characterBlock = transform.Find("characterBlock");
+        _charPortraitFrame = transform.Find("i_charPortraitFrame").GetComponent<Image>();
+        _charPortrait = _charPortraitFrame.transform.Find("i_charPortrait").GetComponent<Image>();
+        _charName = transform.Find("t_charName").GetComponent<Text>();
+        //charT = transform.Find("t_charInfo").GetComponent<Text>();
 
-        localBlock = GameObject.Find("localBlock").transform;
-        oppBlock = GameObject.Find("opponentBlock").transform;
-        characterBlock = GameObject.Find("characterBlock").transform;
+        _bConfirm = transform.Find("b_confirm").GetComponent<Button>();
 
-        localCharPortrait = localBlock.Find("i_charPortrait").GetComponent<Image>();
-        localCharPortrait.enabled = false;
-        localCharName = localBlock.Find("t_charName").GetComponent<Text>();
-        localCharName.text = "Choose your fighter!";
-        oppCharPortrait = oppBlock.Find("i_charPortrait").GetComponent<Image>();
-        oppCharPortrait.enabled = false;
-        oppCharName = oppBlock.Find("t_charName").GetComponent<Text>();
-        oppCharName.text = "Choose your fighter!";
-
-        charT = GameObject.Find("t_charInfo").GetComponent<Text>();
-        charT.text = "";
-        bReady = GameObject.Find("b_ready").GetComponent<Button>();
-        bReady.enabled = false;
-
-        gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
-
-        myID = PhotonNetwork.player.ID;
-        //myID = 1; // testing
-        string localName, oppName;
-        if (myID == 1) {
-            localName = gameSettings.p1name;
-            oppName = gameSettings.p2name;
-        } else {
-            localName = gameSettings.p2name;
-            oppName = gameSettings.p1name;
-        }
-
-        localBlock.transform.Find("t_name").GetComponent<Text>().text = localName;
-        oppBlock.transform.Find("t_name").GetComponent<Text>().text = oppName;
-	}
-
-    public void OnLocked() { StartCoroutine(ThisPlayerLocked()); }
-    private IEnumerator ThisPlayerLocked() {
-        // store chosen char and loadout
-        gameSettings.SetLocalChar(myID, localChar);
-
-        // disable button & change background to green
-        bReady.interactable = false;
-        thisPlayerLocked = true;
-        Image i = localBlock.transform.Find("i_background").GetComponent<Image>();
-        i.color = Color.green;
-
-        // send lock
-        PhotonView view = PhotonView.Get(this);
-        view.RPC("OpponentLocked", PhotonTargets.Others);
-
-        // then wait for other player to lock in also
-        yield return new WaitUntil(() => otherPlayerLocked);
-        Debug.Log("Moving forward!!!");
-
-        // then sync chosen character and loadout
-        //gameSettings.SyncChar(myID);
-
-        //yield return new WaitUntil(() => otherCharacterSet);
-        // then load Game Screen
-        yield return new WaitForSeconds(1f);
-
-        Destroy(gameObject.GetComponent<PhotonView>());
-
-        if (PhotonNetwork.isMasterClient) {
-            PhotonNetwork.LoadLevel("Game Screen (Landscape)");
-        }
+        _menu = GameObject.Find("world ui").GetComponent<MenuController>();
     }
 
-    [PunRPC]
-    public void OpponentLocked() {
-        oppBlock.transform.Find("i_background").GetComponent<Image>().color = Color.green;
-        otherPlayerLocked = true;
+    public void Init(bool singlePlayer) {
+        _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
+
+        _charPortrait.enabled = false;
+        _charName.text = "";        
+        //charT.text = "";
+        _bConfirm.interactable = false;
+
+        _singlePlayer = singlePlayer;
+        Text tGamemode = transform.Find("t_gameMode").GetComponent<Text>();
+        if (_singlePlayer)
+            tGamemode.text = "Select character for Training";
+        else
+            tGamemode.text = "Select character for Online Battle";
+    }
+
+    public void OnConfirm() {
+        // store chosen char and loadout
+        //gameSettings.SetLocalChar(myID, localChar);
+        _gameSettings.chosenChar = _localChar;
+
+        // disable button & change background to green
+        _bConfirm.interactable = false;
+        _thisPlayerLocked = true;
+        _charPortraitFrame.color = Color.green;
+
+        _menu.ChangeToPrematch(_singlePlayer);
     }
 
     public void OnChooseEnfuego() {
-        if(!thisPlayerLocked)
-            LocalCharacterChosen(Character.Ch.Enfuego);
+        if (!_thisPlayerLocked)
+            CharacterChosen(Character.Ch.Enfuego);
     }
 
     public void OnChooseGravekeeper() {
-        if(!thisPlayerLocked)
-            LocalCharacterChosen(Character.Ch.Gravekeeper);
+        if (!_thisPlayerLocked)
+            CharacterChosen(Character.Ch.Gravekeeper);
     }
 
     public void OnChooseValeria() {
-        if (!thisPlayerLocked)
-            LocalCharacterChosen(Character.Ch.Valeria);
+        if (!_thisPlayerLocked)
+            CharacterChosen(Character.Ch.Valeria);
     }
 
-    void LocalCharacterChosen(Character.Ch ch) {
+    void CharacterChosen(Character.Ch ch) {
         Debug.Log("CharacterSelect: local char chosen is " + ch);
-        localChar = ch;
-        localCharName.text = CharacterInfo.GetCharacterInfoObj(ch).name;
-        localCharPortrait.enabled = true;
-        localCharPortrait.sprite = GetCharacterPortrait(ch);
-        string info = CharacterInfo.GetCharacterInfo(ch);
-        charT.text = info;
-        bReady.enabled = true;
-
-        PhotonView view = PhotonView.Get(this);
-        view.RPC("OpponentCharacterChosen", PhotonTargets.Others, ch);
-    }
-
-    [PunRPC]
-    public void OpponentCharacterChosen(Character.Ch ch) {
-        Debug.Log("CharacterSelect: opponent char chosen is " + ch);
-        oppCharPortrait.enabled = true;
-        oppCharPortrait.sprite = GetCharacterPortrait(ch);
-        oppCharName.text = "" + ch;
-        gameSettings.SetOpponentChar(myID, ch);
-        //otherCharacterSet = true;
+        _localChar = ch;
+        _charName.text = CharacterInfo.GetCharacterInfoObj(ch).name;
+        _charPortrait.enabled = true;
+        _charPortrait.sprite = GetCharacterPortrait(ch);
+        //string info = CharacterInfo.GetCharacterInfo(ch);
+        //charT.text = info;
+        _bConfirm.interactable = true;
     }
 
     Sprite GetCharacterPortrait(Character.Ch ch) {
