@@ -516,6 +516,7 @@
     <Compile Include="Assets\scripts\Menu\old\SettingsSync.cs" />
     <Compile Include="Assets\scripts\Menu\old\UpdateValue.cs" />
     <Compile Include="Assets\scripts\Menu\Prematch.cs" />
+    <Compile Include="Assets\scripts\Menu\TestLauncher.cs" />
     <Compile Include="Assets\scripts\Menu\Training.cs" />
     <Compile Include="Assets\scripts\Network\Db.cs" />
     <Compile Include="Assets\scripts\Network\PlayerProfile.cs" />

@@ -31,9 +31,12 @@ public class CharacterSelect : MonoBehaviour {
     }
 
     public void Init(bool singlePlayer) {
+        _thisPlayerLocked = false;
         _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
 
-        _charName.text = "";        
+        _charName.text = "";
+        _charPortraitFrame.color = Color.clear;
+        _charPortrait.enabled = false;
         //charT.text = "";
         _bConfirm.interactable = false;
 

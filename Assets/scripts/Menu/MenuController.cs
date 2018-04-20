@@ -18,6 +18,7 @@ public class MenuController : MonoBehaviour {
         ChangeScreens(Screen.MainMenu);
 	}
 
+    public void ChangeToMainMenu() { ChangeScreens(Screen.MainMenu); }
     public void ChangeToTraining() { ChangeScreens(Screen.Training); }
     public void ChangeToMultiplayer() { ChangeScreens(Screen.Multiplayer); }
     public void ChangeToPlayerProfile() { ChangeScreens(Screen.PlayerProfile); }
@@ -48,14 +49,25 @@ public class MenuController : MonoBehaviour {
     public void GoBack() {
         Screen current = backStack.Pop();
         if (current == Screen.CharacterSelect) { // don't really like this
-            Destroy(GameObject.Find("GameSettings"));
-            var go = GameObject.Find("DebugSettings");
-            if (go != null)
-                Destroy(go);
+            ClearSettingsObjs();
         }
 
         Screen back = backStack.Peek();
         ActivateScreen(back);
+    }
+
+    public void ClearSettingsObjs() {
+        Destroy(GameObject.Find("GameSettings"));
+        var go = GameObject.Find("DebugSettings");
+        if (go != null)
+            Destroy(go);
+    }
+
+    public void CancelFromPrematch() {
+        backStack.Pop();
+        backStack.Pop();
+        ActivateScreen(backStack.Peek());
+        ClearSettingsObjs();
     }
 
 }

@@ -11,6 +11,7 @@ public class Prematch : Photon.PunBehaviour {
 
     //private GameObject _controlPanel, _toggles;
     //private InputField _nameInput;
+    private GameObject _cancelButton;
     private Text _statusText;
     private Image _p1portrait, _p2portrait;
     private Text _p1username, _p2username;
@@ -18,11 +19,15 @@ public class Prematch : Photon.PunBehaviour {
     private bool _isConnecting;
     private bool _allSettingsSynced = false;
 
+    private MenuController _menus;
     private GameSettings _gameSettings;
 
     public void Init(bool training) {
+        _menus = GameObject.Find("world ui").GetComponent<MenuController>();
         _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         _statusText = transform.Find("t_status").GetComponent<Text>();
+
+        _cancelButton = transform.Find("b_cancel").gameObject;
 
         _p1portrait = transform.Find("i_localCharPortraitFrame")
             .Find("i_charPortrait").GetComponent<Image>();
@@ -61,6 +66,9 @@ public class Prematch : Photon.PunBehaviour {
             //_controlPanel.SetActive(true);
 
             Connect();
+
+            _p1portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.chosenChar);
+            _p1username.text = PlayerProfile.GetUsername();
         }
     } 
     /// <summary>
@@ -208,6 +216,8 @@ public class Prematch : Photon.PunBehaviour {
         _p2portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.p2char);
         _p2username.text = _gameSettings.p2name;
 
+        _cancelButton.SetActive(false);
+
         for (int i = 3; i > 0; i--) {
             _statusText.text = "Starting game in " + i + "...";
             yield return new WaitForSeconds(1f);
@@ -222,6 +232,9 @@ public class Prematch : Photon.PunBehaviour {
     }
 
     public void OnCancel() {
-        // TODO
+        if(PhotonNetwork.connected)
+            PhotonNetwork.Disconnect();
+
+        _menus.CancelFromPrematch();
     }
 }
