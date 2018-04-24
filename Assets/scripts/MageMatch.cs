@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
@@ -53,6 +53,7 @@ public class MageMatch : MonoBehaviour {
 
     void Start() {
         MMLog.Init(debugLogLevel);
+        UserData.Init();
         //CharacterInfo.Init();
 
         // set game to debug (single-client) mode if appropriate
@@ -146,7 +147,7 @@ public class MageMatch : MonoBehaviour {
             for (int pid = 1; pid <= 2; pid++) {
                 //yield return GetPlayer(p).DealHex();
                 yield return _Deal(pid);
-                yield return animCont.WaitForSeconds(.1f);
+                yield return animCont.WaitForSeconds(.05f);
             }
         }
 
@@ -245,6 +246,7 @@ public class MageMatch : MonoBehaviour {
         else return false;
     }
 
+    public bool IsCommishTurn() { return currentTurn == Turn.CommishTurn; }
 
 
     #region Event callbacks
@@ -704,5 +706,15 @@ public class MageMatch : MonoBehaviour {
 
     public bool IsEnded() { return _endGame; }
 
-    public bool IsCommishTurn() { return currentTurn == Turn.CommishTurn; }
+    public void QuitGame() {
+        // PUN leave room? Idk if it will complain
+
+        // clear settings objs
+        Destroy(GameObject.Find("GameSettings"));
+        var go = GameObject.Find("DebugSettings");
+        if (go != null)
+            Destroy(go);
+
+        SceneManager.LoadScene("Menu");
+    }
 }

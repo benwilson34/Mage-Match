@@ -47,7 +47,7 @@ public class AudioController {
         if (mm.IsDebugMode() && mm.debugSettings.midiMode)
             InitMIDI();
 
-        AudioListener.volume = .6f;
+        AudioListener.volume = UserData.GetData().masterVolume / 100;
 
 
         // ----- hexes -----

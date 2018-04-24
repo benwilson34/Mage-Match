@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class Prematch : Photon.PunBehaviour {
+public class Prematch : Photon.PunBehaviour, MenuScreen {
 
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
@@ -22,7 +22,11 @@ public class Prematch : Photon.PunBehaviour {
     private MenuController _menus;
     private GameSettings _gameSettings;
 
-    public void Init(bool training) {
+    public void OnLoad() {
+        // TODO
+    }
+
+    public void OnShowScreen() {
         _menus = GameObject.Find("world ui").GetComponent<MenuController>();
         _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         _statusText = transform.Find("t_status").GetComponent<Text>();
@@ -37,9 +41,9 @@ public class Prematch : Photon.PunBehaviour {
         _p1username = transform.Find("t_localName").GetComponent<Text>();
         _p2username = transform.Find("t_oppName").GetComponent<Text>();
 
-        if (training) {
+        if (_gameSettings.trainingMode) {
             // Init GameSettings and DebugSettings
-            _gameSettings.p1name = PlayerProfile.GetUsername();
+            _gameSettings.p1name = UserData.GetData().username;
             _gameSettings.p1char = _gameSettings.chosenChar;
             _gameSettings.p2name = "Training Dummy";
             _gameSettings.p2char = Character.Ch.Sample;
@@ -68,7 +72,7 @@ public class Prematch : Photon.PunBehaviour {
             Connect();
 
             _p1portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.chosenChar);
-            _p1username.text = PlayerProfile.GetUsername();
+            _p1username.text = UserData.GetData().username;
         }
     } 
     /// <summary>
@@ -169,7 +173,7 @@ public class Prematch : Photon.PunBehaviour {
     public void SyncSettings() { StartCoroutine(Settings()); }
     public IEnumerator Settings() {
         int id = PhotonNetwork.player.ID;
-        string pName = PlayerProfile.GetUsername();
+        string pName = UserData.GetData().username;
         PhotonView photonView = PhotonView.Get(this);
 
         Debug.Log("id=" + id + ", name=" + pName);

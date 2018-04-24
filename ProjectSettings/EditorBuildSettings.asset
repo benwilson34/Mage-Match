@@ -5,20 +5,8 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/scenes/Lobby.unity
-    guid: 2838837528bfaae498f42cc730a48708
-  - enabled: 0
-    path: Assets/scenes/menu/Quickstart Launcher.unity
-    guid: bf50c968a1f811442bf6c4d5afbc3cb2
-  - enabled: 0
-    path: Assets/scenes/menu/Launcher.unity
-    guid: 772aeaebb9b5ff44db2b4f275d5fd032
-  - enabled: 0
-    path: Assets/scenes/menu/Character Select.unity
-    guid: 40eed47d2f32efa4b8256e4dbf936a5e
   - enabled: 1
-    path: Assets/scenes/menu/Menu.unity
+    path: Assets/scenes/Menu.unity
     guid: b8bb287fcffeec346be36a7f57cecbdd
   - enabled: 1
     path: Assets/scenes/Game Screen (Landscape).unity

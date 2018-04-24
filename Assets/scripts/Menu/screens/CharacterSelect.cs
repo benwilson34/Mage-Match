@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CharacterSelect : MonoBehaviour {
+public class CharacterSelect : MonoBehaviour, MenuScreen {
 
     //private Transform characterBlock;
     private Image _charPortraitFrame, _charPortrait;
@@ -16,9 +16,8 @@ public class CharacterSelect : MonoBehaviour {
     private bool _thisPlayerLocked = false;
 
     private MenuController _menu;
-    private bool _singlePlayer;
 
-    void Awake() {
+    public void OnLoad() {
         //characterBlock = transform.Find("characterBlock");
         _charPortraitFrame = transform.Find("i_charPortraitFrame").GetComponent<Image>();
         _charPortrait = _charPortraitFrame.transform.Find("i_charPortrait").GetComponent<Image>();
@@ -30,7 +29,7 @@ public class CharacterSelect : MonoBehaviour {
         _menu = GameObject.Find("world ui").GetComponent<MenuController>();
     }
 
-    public void Init(bool singlePlayer) {
+    public void OnShowScreen() {
         _thisPlayerLocked = false;
         _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
 
@@ -40,9 +39,8 @@ public class CharacterSelect : MonoBehaviour {
         //charT.text = "";
         _bConfirm.interactable = false;
 
-        _singlePlayer = singlePlayer;
         Text tGamemode = transform.Find("t_gameMode").GetComponent<Text>();
-        if (_singlePlayer)
+        if (_gameSettings.trainingMode)
             tGamemode.text = "Select character for Training";
         else
             tGamemode.text = "Select character for Online Battle";
@@ -58,7 +56,7 @@ public class CharacterSelect : MonoBehaviour {
         _thisPlayerLocked = true;
         _charPortraitFrame.color = Color.green;
 
-        _menu.ChangeToPrematch(_singlePlayer);
+        _menu.ChangeToPrematch();
     }
 
     public void OnChooseEnfuego() {

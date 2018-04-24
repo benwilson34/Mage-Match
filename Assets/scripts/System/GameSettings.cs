@@ -12,6 +12,8 @@ public class GameSettings : PunBehaviour {
     public Character.Ch p2char = Character.Ch.Enfuego;
     public bool turnTimerOn;
 
+    public bool trainingMode;
+
     void Start () {
         DontDestroyOnLoad(this);
     }
