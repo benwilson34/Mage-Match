@@ -268,7 +268,7 @@ public abstract class Character {
     //public string GetHexTag() { return genHexTag; }
 
     public static Character Load(MageMatch mm, int id) {
-        Ch myChar = mm.gameSettings.GetLocalChar(id);
+        Ch myChar = mm.gameSettings.GetChar(id);
         switch (myChar) {
             case Ch.Sample:
                 return new SampleChar(mm, id);

@@ -8,18 +8,6 @@
     "desc": "Each swap Enfuego makes deals 4 damage for each swap he has made so far this turn."
   },
 
-  "runes": [
-    "DanceShoes",
-    "BurningBracers",
-    "Molotov",
-    "Brushfire",
-    "ShuffleGem"
-  ],
-
-  "unused runes": [
-    "FiveAlarmBell"
-  ],
-
   "core": {
     "title": "Fiery Fandango",
     "cost": 1,

@@ -69,9 +69,9 @@ public class DebugTools : MonoBehaviour {
             string[] ddTileOptions = { "B-F", "B-W", "B-E", "B-A", "B-M" };
             _ddTileOptions = new List<string>(ddTileOptions);
             // TODO append list of rune tiles
-            _ddTileOptions.AddRange(RuneInfo.GetTileList());
+            _ddTileOptions.AddRange(RuneInfoLoader.GetTileList());
 
-            _ddCharmOptions = new List<string>(RuneInfo.GetCharmList());
+            _ddCharmOptions = new List<string>(RuneInfoLoader.GetCharmList());
 
             //_ddPropertyOptions = new List<string>();
 

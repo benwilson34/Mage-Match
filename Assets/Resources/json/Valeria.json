@@ -8,17 +8,6 @@
     "desc": "Valéria heals for 7 health every time she performs a swap."
   },
 
-  "runes": [
-    "Bandages",
-    "WaterLily",
-    "Leeches",
-   	"WhiteWater",
-	"ShuffleGem"
-  ],
-
-  "unused runes": [
-  ],
-
   "core": {
     "title": "Whirlpool Spin",
     "cost": 1,

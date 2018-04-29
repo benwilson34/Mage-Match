@@ -14,7 +14,6 @@ public class CharacterInfo {
     public string name, keyElements;
     public int health;
     public int[] deck;
-    public string[] runes;
     public SpellInfo passive, core, spell1, spell2, spell3, signature, altSpell;
 
     public static string GetCharacterInfo(Character.Ch ch) {

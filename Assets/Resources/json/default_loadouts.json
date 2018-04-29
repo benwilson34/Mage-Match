@@ -1,0 +1,34 @@
+{
+	"Valeria": {
+		"name": "Valeria Default",
+		 "runes": [
+	    "Bandages",
+	    "WaterLily",
+	    "Leeches",
+	   	"WhiteWater",
+			"ShuffleGem"
+  	]
+	},
+
+	"Gravekeeper": {
+		"name": "GraveK Default",
+		"runes": [
+			"HRForm",
+	    "PartySnacks",
+	    "ProteinPills",
+	    "Leeches",
+	    "MuscleMass"
+		]
+	},
+
+	"Enfuego": {
+		"name": "Enfuego Default",
+		"runes": [
+	    "DanceShoes",
+	    "BurningBracers",
+	    "Molotov",
+	    "Brushfire",
+	    "ShuffleGem"
+  	]
+	}
+}

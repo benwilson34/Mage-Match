@@ -8,6 +8,11 @@ using Newtonsoft.Json.Linq;
 
 public class UserData {
 
+    public class LoadoutData {
+        public string name;
+        public string[] runes;
+    }
+
     // this should all be done with a JObject?
     public string username;
     public int masterVolume, soundFXVolume;
@@ -34,6 +39,7 @@ public class UserData {
     static JObject GetJObject() {
         StreamReader file = File.OpenText(_filepath);
         JObject job = (JObject)JToken.ReadFrom(new JsonTextReader(file));
+        file.Close();
         return job;
     }
 
@@ -53,5 +59,39 @@ public class UserData {
 
     public static void SaveData(UserData data) {
         File.WriteAllText(_filepath, JsonConvert.SerializeObject(data));
+    }
+
+    public static LoadoutData[] GetLoadoutList(Character.Ch ch) {
+        string path = Application.persistentDataPath + "/user_loadouts.json";
+        StreamReader file = File.OpenText(path);
+        JObject job = (JObject)JToken.ReadFrom(new JsonTextReader(file));
+        LoadoutData data;
+
+        List<LoadoutData> loadouts = new List<LoadoutData>();
+        if (job[ch.ToString()] != null) {
+            Debug.Log("Found loadouts for " + ch.ToString());
+            JArray charLoadouts = (JArray)job[ch.ToString()];
+
+            foreach (var prop in charLoadouts.Children()) {
+                Debug.Log("USERDATA: Read " + prop.ToString());
+                data = new LoadoutData();
+                JsonConvert.PopulateObject(prop.ToString(), data);
+                loadouts.Add(data);
+            }
+        }
+        file.Close();
+
+        string json = (Resources.Load("json/default_loadouts") as TextAsset).text;
+        JObject o = JObject.Parse(json);
+
+        data = new LoadoutData();
+        JsonConvert.PopulateObject(o[ch.ToString()].ToString(), data);
+        loadouts.Add(data);
+
+        return loadouts.ToArray();
+    }
+
+    public static void SaveLoadout() {
+        
     }
 }

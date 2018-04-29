@@ -45,8 +45,10 @@ public class Prematch : Photon.PunBehaviour, MenuScreen {
             // Init GameSettings and DebugSettings
             _gameSettings.p1name = UserData.GetData().username;
             _gameSettings.p1char = _gameSettings.chosenChar;
+            _gameSettings.p1loadout = _gameSettings.chosenLoadout;
             _gameSettings.p2name = "Training Dummy";
             _gameSettings.p2char = Character.Ch.Sample;
+            _gameSettings.p2loadout = new string[0];
 
             StartCoroutine(ShowPrematchInfoBeforeLoad(true));
         } else {
@@ -179,6 +181,7 @@ public class Prematch : Photon.PunBehaviour, MenuScreen {
         Debug.Log("id=" + id + ", name=" + pName);
 
         photonView.RPC("SetPlayerInfo", PhotonTargets.All, id, pName, _gameSettings.chosenChar);
+        photonView.RPC("SetPlayerLoadout", PhotonTargets.All, id, _gameSettings.chosenLoadout);
 
         if (id == 1) {
             //if (_toggles != null)
@@ -199,6 +202,11 @@ public class Prematch : Photon.PunBehaviour, MenuScreen {
     [PunRPC]
     public void SetPlayerInfo(int id, string pName, Character.Ch ch) {
         _gameSettings.SetPlayerInfo(id, pName, ch);
+    }
+
+    [PunRPC]
+    public void SetPlayerLoadout(int id, string[] runes) {
+        _gameSettings.SetPlayerLoadout(id, runes);
     }
 
     [PunRPC]

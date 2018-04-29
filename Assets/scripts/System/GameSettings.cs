@@ -10,6 +10,7 @@ public class GameSettings : PunBehaviour {
     public Character.Ch chosenChar;
     public Character.Ch p1char = Character.Ch.Valeria;
     public Character.Ch p2char = Character.Ch.Enfuego;
+    public string[] chosenLoadout, p1loadout, p2loadout;
     public bool turnTimerOn;
 
     public bool trainingMode;
@@ -31,6 +32,13 @@ public class GameSettings : PunBehaviour {
         }
     }
 
+    public void SetPlayerLoadout(int id, string[] runes) {
+        if (id == 1)
+            p1loadout = runes;
+        else
+            p2loadout = runes;
+    }
+
 
     // ----- character -----
 
@@ -48,11 +56,18 @@ public class GameSettings : PunBehaviour {
     //        p1char = ch;
     //}
 
-    public Character.Ch GetLocalChar(int id) {
+    public Character.Ch GetChar(int id) {
         if (id == 1)
             return p1char;
         else
             return p2char;
+    }
+
+    public string[] GetLoadout(int id) {
+        if (id == 1)
+            return p1loadout;
+        else
+            return p2loadout;
     }
 
 }

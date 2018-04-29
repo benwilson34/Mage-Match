@@ -7,19 +7,19 @@ public class Options : MonoBehaviour, MenuScreen {
 
     private Slider _slMaster, _slSoundFX;
     private Text _tMasterAmt, _tSoundFXAmt;
+    private MenuController _menus;
 
 	public void OnLoad() {
         _slMaster = transform.Find("slider_master").GetComponent<Slider>();
         _slSoundFX = transform.Find("slider_soundFX").GetComponent<Slider>();
         _tMasterAmt = transform.Find("t_masterAmt").GetComponent<Text>();
         _tSoundFXAmt = transform.Find("t_soundFXAmt").GetComponent<Text>();
-        Debug.Log("Options done Start()");
+
+        _menus = GameObject.Find("world ui").GetComponent<MenuController>();
     }
 
     public void OnShowScreen() {
         UserData data = UserData.GetData();
-        if (_slMaster == null)
-            Debug.Log("Slider is null??");
         _slMaster.value = data.masterVolume;
         _tMasterAmt.text = data.masterVolume + "";
 
@@ -40,5 +40,6 @@ public class Options : MonoBehaviour, MenuScreen {
         data.masterVolume = (int)_slMaster.value;
         data.soundFXVolume = (int)_slSoundFX.value;
         UserData.SaveData(data);
+        _menus.GoBack();
     }
 }

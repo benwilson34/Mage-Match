@@ -88,6 +88,8 @@ public class MageMatch : MonoBehaviour {
         gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name + ",p1 char=" + gameSettings.p1char + ",p2="+gameSettings.p2name+",p2 char=" + gameSettings.p2char+",timer=" +gameSettings.turnTimerOn);
 
+        RuneInfoLoader.InitInGameRuneInfo(gameSettings);
+
         if (IsDebugMode())
             myID = 1;
         else

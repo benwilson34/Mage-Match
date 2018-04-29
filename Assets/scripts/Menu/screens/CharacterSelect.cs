@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,10 +10,12 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
     private Image _charPortraitFrame, _charPortrait;
     private Text _charName, _charT;
     private Button _bConfirm;
+    private Dropdown _ddLoadouts;
+    private UserData.LoadoutData[] _loadouts;
     private GameObject goldSelectionPF, redSelectionPF;
 
     private GameSettings _gameSettings;
-    private Character.Ch _localChar = Character.Ch.Sample;
+    private Character.Ch _localChar;
     private bool _thisPlayerLocked = false;
 
     private MenuController _menu;
@@ -26,6 +29,8 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
 
         _bConfirm = transform.Find("b_confirm").GetComponent<Button>();
 
+        _ddLoadouts = transform.Find("dd_loadouts").GetComponent<Dropdown>();
+
         _menu = GameObject.Find("world ui").GetComponent<MenuController>();
     }
 
@@ -38,25 +43,14 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
         _charPortrait.enabled = false;
         //charT.text = "";
         _bConfirm.interactable = false;
+        _ddLoadouts.ClearOptions();
+        _ddLoadouts.interactable = false;
 
         Text tGamemode = transform.Find("t_gameMode").GetComponent<Text>();
         if (_gameSettings.trainingMode)
             tGamemode.text = "Select character for Training";
         else
             tGamemode.text = "Select character for Online Battle";
-    }
-
-    public void OnConfirm() {
-        // store chosen char and loadout
-        //gameSettings.SetLocalChar(myID, localChar);
-        _gameSettings.chosenChar = _localChar;
-
-        // disable button & change background to green
-        _bConfirm.interactable = false;
-        _thisPlayerLocked = true;
-        _charPortraitFrame.color = Color.green;
-
-        _menu.ChangeToPrematch();
     }
 
     public void OnChooseEnfuego() {
@@ -82,6 +76,12 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
         _charPortrait.sprite = GetCharacterPortrait(ch);
         //string info = CharacterInfo.GetCharacterInfo(ch);
         //charT.text = info;
+
+        _loadouts = UserData.GetLoadoutList(ch);
+        _ddLoadouts.ClearOptions();
+        _ddLoadouts.AddOptions((from loadout in _loadouts select loadout.name).ToList());
+        _ddLoadouts.interactable = true;
+
         _bConfirm.interactable = true;
     }
 
@@ -99,5 +99,25 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
             default:
                 return null;
         }
+    }
+
+    public void OnConfirm() {
+        _bConfirm.interactable = false;
+        StartCoroutine(Confirm());
+    }
+    IEnumerator Confirm() {
+        // store chosen char and loadout
+        _gameSettings.chosenChar = _localChar;
+        _gameSettings.chosenLoadout = _loadouts[_ddLoadouts.value].runes;
+
+        // disable button & change background to green
+        _bConfirm.interactable = false;
+        _thisPlayerLocked = true;
+        _charPortraitFrame.color = Color.green;
+
+        yield return new WaitForSeconds(1);
+
+        _menu.ChangeToPrematch();
+        yield return null;
     }
 }

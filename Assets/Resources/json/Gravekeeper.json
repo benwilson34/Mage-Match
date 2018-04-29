@@ -8,17 +8,6 @@
     "desc": "Each of The Gravekeeper's Zombies can Attack a random adjacent non-Zombie tile. When Zombies Attack another tile they Zombify their victim. If their victim is a muscle tile, they will destroy it instead, healing The Gravekeeper for 15 health and dealing 15 damage to the opponent."
   },
 
-  "runes": [
-    "HRForm",
-    "PartySnacks",
-    "ProteinPills",
-    "Leeches",
-    "MuscleMass"
-  ],
-
-  "unused runes": [
-  ],
-
   "core": {
     "title": "Business in the Front",
     "cost": 1,

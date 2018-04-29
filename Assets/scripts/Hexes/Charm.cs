@@ -15,7 +15,7 @@ public abstract class Charm : Hex {
 
     public override string GetTooltipInfo() {
         string title = TagTitle(hextag);
-        return GetTooltipInfo(title, "Charm", RuneInfo.GetRuneInfo(title).desc);
+        return GetTooltipInfo(title, "Charm", RuneInfoLoader.GetPlayerRuneInfo(_playerId, title).desc);
     }
 
     public Character ThisCharacter() {
