@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -589,4 +588,5 @@ public class UIController : MonoBehaviour {
     public void ToggleLoadingText(bool on) {
         loadingText.SetActive(on);
     }
+
 }

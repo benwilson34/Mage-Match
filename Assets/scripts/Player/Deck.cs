@@ -27,8 +27,8 @@ public class Deck {
             }
         }
 
-        foreach (string rune in info.runes) {
-            var runeInfo = RuneInfo.GetRuneInfo(rune);
+        foreach (string rune in _mm.gameSettings.GetLoadout(_player.id)) {
+            var runeInfo = RuneInfoLoader.GetPlayerRuneInfo(_player.id, rune);
             string cat = runeInfo.category.Substring(0, 1);
             for (int i = 0; i < runeInfo.deckCount; i++) {
                 list.Add("p" + _player.id + "-" + cat + "-" + runeInfo.tagTitle);
