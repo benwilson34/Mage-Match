@@ -232,7 +232,11 @@ MonoBehaviour:
   chosenChar: 0
   p1char: 3
   p2char: 1
+  chosenLoadout: []
+  p1loadout: []
+  p2loadout: []
   turnTimerOn: 0
+  trainingMode: 0
 --- !u!4 &1446082146
 Transform:
   m_ObjectHideFlags: 0

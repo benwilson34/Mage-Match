@@ -52,7 +52,7 @@ public class Hand {
                 slot.SetHex(hex);
                 hex.transform.position = slot.transform.position;
                 _mm.animCont.PlayAnim(_mm.animCont._Draw(hex));
-                _mm.audioCont.Trigger(AudioController.HexSoundEffect.Draw, hex.GetComponent<AudioSource>());
+                _mm.audioCont.Trigger(AudioController.HexSoundEffect.Draw);
                 MMLog.Log("HAND", "black", "Added hex with tag " + hex.hextag);
                 break;
             }

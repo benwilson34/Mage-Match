@@ -12,10 +12,30 @@ public class TestLauncher : MonoBehaviour {
 
         gameSettings.p1name = "Test boi";
         gameSettings.p1char = testCharacter;
+        gameSettings.p1loadout = new string[7] {
+            "DanceShoes",
+            "BurningBracers",
+            "Molotov",
+            "Brushfire",
+            "ShuffleGem",
+            "MuscleMass",
+            "MuscleMass"
+        };
+
         gameSettings.p2name = "Training Dummy";
         gameSettings.p2char = Character.Ch.Sample;
+        gameSettings.p2loadout = new string[7] {
+            "SampleCharm",
+            "SampleCharm",
+            "SampleCharm",
+            "SampleCharm",
+            "SampleCharm",
+            "SampleCharm",
+            "SampleCharm"
+        };
 
-        // TODO settings
+        // TODO other settings
+        gameSettings.trainingMode = true;
 
         SceneManager.LoadScene("Game Screen (Landscape)");
     }

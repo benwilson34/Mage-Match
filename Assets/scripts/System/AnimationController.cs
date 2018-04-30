@@ -133,7 +133,7 @@ public class AnimationController : MonoBehaviour {
         float height = t.position.y - newPos.y;
 
         yield return Animate(t.DOMove(newPos, .04f * height).SetEase(Ease.InQuad));
-        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Grav, t.GetComponent<AudioSource>());
+        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Grav);
 
         // bounce anim
         // TODO .SetLoops(2, LoopType.Yoyo);
