@@ -6,7 +6,9 @@
 	    "WaterLily",
 	    "Leeches",
 	   	"WhiteWater",
-			"ShuffleGem"
+			"ShuffleGem",
+      "MuscleMass",
+      "MuscleMass"
   	]
 	},
 
@@ -17,7 +19,9 @@
 	    "PartySnacks",
 	    "ProteinPills",
 	    "Leeches",
-	    "MuscleMass"
+	    "MuscleMass",
+      "MuscleMass",
+      "MuscleMass"
 		]
 	},
 
@@ -28,7 +32,9 @@
 	    "BurningBracers",
 	    "Molotov",
 	    "Brushfire",
-	    "ShuffleGem"
+	    "ShuffleGem",
+      "MuscleMass",
+      "MuscleMass"
   	]
 	}
 }

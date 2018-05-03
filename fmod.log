@@ -9,7 +9,7 @@
 [LOG] Thread::initThread                       : Init FMOD stream thread. Priority: 2, Stack Size: 65536, Semaphore: No, Sleep Time: 10, Looping: Yes.
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] Thread::initThread                       : Init FMOD mixer thread. Priority: 3, Stack Size: 49152, Semaphore: No, Sleep Time: 0, Looping: Yes.
-[LOG] AsyncManager::init                       : manager 000000003A82DA78 isAsync 1 updatePeriod 0.02
+[LOG] AsyncManager::init                       : manager 000000004CFA36B8 isAsync 1 updatePeriod 0.02
 [LOG] Thread::initThread                       : Init FMOD Studio update thread. Priority: 0, Stack Size: 65536, Semaphore: No, Sleep Time: 1, Looping: No.
 [LOG] AsyncManager::init                       : done
 [LOG] PlaybackSystem::init                     : 
@@ -27,14 +27,14 @@
 [LOG] SystemI::createSoundInternal             : exinfo->length             = 2093280
 [LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 64896
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 00000000493BF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005090F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FED0FBE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FED0FBE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FED0FBE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FED0FBE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003AD0FDB8
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FED48EE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FED48EE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FED48EE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FED48EE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003C9F3BC8
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Game Start 5', format=2, channels=2, frequency=48000, lengthbytes=47840, lengthpcm=195840, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.999900.

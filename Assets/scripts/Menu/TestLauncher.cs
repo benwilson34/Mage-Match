@@ -12,15 +12,7 @@ public class TestLauncher : MonoBehaviour {
 
         gameSettings.p1name = "Test boi";
         gameSettings.p1char = testCharacter;
-        gameSettings.p1loadout = new string[7] {
-            "DanceShoes",
-            "BurningBracers",
-            "Molotov",
-            "Brushfire",
-            "ShuffleGem",
-            "MuscleMass",
-            "MuscleMass"
-        };
+        gameSettings.p1loadout = UserData.GetDefaultLoadout(testCharacter).runes;
 
         gameSettings.p2name = "Training Dummy";
         gameSettings.p2char = Character.Ch.Sample;

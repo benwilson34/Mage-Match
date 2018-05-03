@@ -63,6 +63,13 @@ public class UserData {
 
     public static LoadoutData[] GetLoadoutList(Character.Ch ch) {
         string path = Application.persistentDataPath + "/user_loadouts.json";
+
+        if (!File.Exists(path)) {
+            StreamWriter newFile = File.CreateText(path);
+            newFile.WriteLine("{}");
+            newFile.Close();
+        }
+
         StreamReader file = File.OpenText(path);
         JObject job = (JObject)JToken.ReadFrom(new JsonTextReader(file));
         LoadoutData data;
@@ -81,14 +88,18 @@ public class UserData {
         }
         file.Close();
 
+        loadouts.Add(GetDefaultLoadout(ch));
+
+        return loadouts.ToArray();
+    }
+
+    public static LoadoutData GetDefaultLoadout(Character.Ch ch) {
         string json = (Resources.Load("json/default_loadouts") as TextAsset).text;
         JObject o = JObject.Parse(json);
 
-        data = new LoadoutData();
+        LoadoutData data = new LoadoutData();
         JsonConvert.PopulateObject(o[ch.ToString()].ToString(), data);
-        loadouts.Add(data);
-
-        return loadouts.ToArray();
+        return data;
     }
 
     public static void SaveLoadout() {
