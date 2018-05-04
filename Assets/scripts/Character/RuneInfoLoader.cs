@@ -63,9 +63,9 @@ public class RuneInfoLoader {
 
             foreach (string rune in settings.GetLoadout(id)) {
                 if (neutralRunes[rune] != null) {
-                    runeList.Add(GetRuneInfo(neutralRunes, rune));
+                    runeList.Add(GetRuneInfo(rune, (JObject)neutralRunes[rune]));
                 } else if (charRunes[rune] != null) {
-                    runeList.Add(GetRuneInfo(charRunes, rune));
+                    runeList.Add(GetRuneInfo(rune, (JObject)charRunes[rune]));
                 } else {
                     MMDebug.MMLog.LogError("RuneInfoLoader: Couldn't find info for \"" + rune + "\"");
                 }
@@ -81,17 +81,19 @@ public class RuneInfoLoader {
         JObject o = GetRuneJObject();
 
         _allRunes = new List<RuneInfo>();
-        foreach (JProperty cat in o.Properties()) {
-            foreach (JProperty prop in ((JObject)cat.Value).Properties()) {
-                //string cat = prop.Value.ToObject<JObject>()["category"].ToString().Substring(0, 1);
-                //runes.Add(cat + "-" + prop.Name);
-                var info = new RuneInfo();
-                // I feel like this isn't the proper way to do this
-                JsonConvert.PopulateObject(prop.Value.ToString(), info);
-                if(info.title == null)
-                    info.title = prop.Name;
+        foreach (JProperty charGroup in o.Properties()) {
+            foreach (JProperty rune in ((JObject)charGroup.Value).Properties()) {
+                ////string cat = prop.Value.ToObject<JObject>()["category"].ToString().Substring(0, 1);
+                ////runes.Add(cat + "-" + prop.Name);
+                //var info = new RuneInfo();
+                //// I feel like this isn't the proper way to do this
+                //JsonConvert.PopulateObject(prop.Value.ToString(), info);
+                //info.tagTitle = 
 
-                _allRunes.Add(info);
+                //if(info.title == null)
+                //    info.title = prop.Name;
+
+                _allRunes.Add(GetRuneInfo(rune.Name, (JObject)rune.Value));
             }
         }
     }
@@ -105,18 +107,14 @@ public class RuneInfoLoader {
 
     static JObject GetRuneJObject() {
         string json = (Resources.Load("json/runes") as TextAsset).text;
-        //MMDebug.MMLog.Log("RuneInfo", "black", "json for "+rune+": " + json);
-
-        JObject o = JObject.Parse(json);
-        //MMDebug.MMLog.Log("RuneInfo", "black", "parsed: " + o[rune].ToString());
-        return o;
+        return JObject.Parse(json);
     }
 
-    static RuneInfo GetRuneInfo(JObject obj, string rune) {
+    static RuneInfo GetRuneInfo(string rune, JObject runeObj) {
         RuneInfo info = new RuneInfo();
-        
+
         // I feel like this isn't the proper way to do this
-        JsonConvert.PopulateObject(obj[rune].ToString(), info);
+        JsonConvert.PopulateObject(runeObj.ToString(), info);
         info.tagTitle = rune;
 
         if (info.title == null)
