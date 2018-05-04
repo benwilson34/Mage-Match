@@ -8,7 +8,7 @@ public class AudioController {
     public enum EnfuegoSoundEffect { BurningEnchant, BurningDamage, BurningTimeout, FieryFandango, Baila, Incinerate, WHCK };
     public enum GraveKSoundEffect { ZombieEnchant, ZombieAttack, ZombieGulp, PartyInTheBack, OogieBoogie, PartyCrashers, Motorcycle, SigBell1, SigDrop, SigEffect, SigBell2 };
     public enum ValeriaSoundEffect { SwirlingWater, Healing, Mariposa, RainDance, Bubbles1, Bubbles2, SigCut, SigWaveCrash, ThunderFar, ThunderClose, Rain };
-    public enum OtherSoundEffect { GameStart, GameEnd, APGain, LowHealthWarning, FullMeter, TurnTimerWarning, TurnTimeout, UIButton, ChooseTarget, CrowdGasp };
+    public enum OtherSoundEffect { BackgroundMusic, GameStart, GameEnd, APGain, LowHealthWarning, FullMeter, TurnTimerWarning, TurnTimeout, UIButton, ChooseTarget, CrowdGasp };
 
     private MageMatch _mm;
     private Dictionary<System.Enum, string> clips;
@@ -20,6 +20,7 @@ public class AudioController {
         MMLog.Log_AudioCont("Volume = " + volume);
 
         FMODUnity.RuntimeManager.GetVCA("vca:/SoundFX").setVolume(volume);
+        FMODUnity.RuntimeManager.GetVCA("vca:/Music").setVolume(volume);
 
         clips = new Dictionary<System.Enum, string>();
 
@@ -78,6 +79,7 @@ public class AudioController {
 
 
         // ----- other -----
+        clips.Add(OtherSoundEffect.BackgroundMusic, "event:/Other/GameStart");
         clips.Add(OtherSoundEffect.GameStart, "event:/Other/GameStart");
         clips.Add(OtherSoundEffect.GameEnd, "event:/Other/GameEnd");
 
@@ -92,25 +94,14 @@ public class AudioController {
         clips.Add(OtherSoundEffect.ChooseTarget, "event:/Other/ChooseTarget");
 
 
+        // TODO trigger bg music before the rest of the match finishes loading
+        Trigger(OtherSoundEffect.BackgroundMusic);
         Trigger(OtherSoundEffect.GameStart);
     }
 
     public void InitEvents() {
         _mm.eventCont.playerHealthChange += LowHealthWarning;
         _mm.eventCont.timeout += TurnTimeout;
-    }
-
-    AudioClip GetRandom(AudioClip[] clips) {
-        return clips[Random.Range(0, clips.Length)];
-    }
-
-    public void Trigger(System.Enum sound) {
-        if (_mm.IsReplayMode() && !_mm.debugSettings.animateReplay) // should be shell method
-            return;
-
-        string clip = clips[sound];
-
-        FMODUnity.RuntimeManager.PlayOneShot(clip);
     }
 
     public void LowHealthWarning(int id, int amount, int newHealth, bool dealt) {
@@ -124,5 +115,14 @@ public class AudioController {
 
     public void TurnTimeout(int id) {
         Trigger(OtherSoundEffect.TurnTimeout);
+    }
+
+    public void Trigger(System.Enum sound) {
+        if (_mm.IsReplayMode() && !_mm.debugSettings.animateReplay) // should be shell method
+            return;
+
+        string clip = clips[sound];
+
+        FMODUnity.RuntimeManager.PlayOneShot(clip);
     }
 }

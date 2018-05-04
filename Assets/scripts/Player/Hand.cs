@@ -215,7 +215,7 @@ public class Hand {
             _placeholderSlot.ClearHex();
         _placeholderSlot = newSlot;
 
-        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Pickup);
+        //_mm.audioCont.Trigger(AudioController.HexSoundEffect.Pickup);
 
         //MMDebug.MMLog.Log("HAND", "black", "After:");
         //NumFullSlots();
