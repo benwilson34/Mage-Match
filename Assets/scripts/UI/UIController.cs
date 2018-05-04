@@ -268,7 +268,7 @@ public class UIController : MonoBehaviour {
 
     void UpdateAP(Player p) {
         var APimage = GetPinfo(p.id).Find("i_AP").GetComponent<Image>();
-        APimage.fillAmount = (float)p.AP / Player.MAX_AP;
+        APimage.fillAmount = (float) p.GetAP() / Player.MAX_AP;
     }
 
     IEnumerator UpdateHealthbar(Player p) {

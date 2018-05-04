@@ -278,8 +278,8 @@ public class MageMatch : MonoBehaviour {
         if (currentTurn != Turn.CommishTurn) { //?
             //Debug.Log("MAGEMATCH: OnGameAction called!");
             if (costsAP)
-                _activep.AP--;
-            if (_activep.AP == 0) {
+                _activep.DecrementAP();
+            if (_activep.OutOfAP()) {
                 uiCont.SetDrawButton(false);
                 StartCoroutine(TurnSystem());
             }
@@ -306,7 +306,7 @@ public class MageMatch : MonoBehaviour {
 
     public void TurnTimeout() {
         Player p = GetPlayer(_activep.id);
-        MMLog.Log_MageMatch(p.name + "'s turn just timed out! They had " + p.AP + " AP left.");
+        MMLog.Log_MageMatch(p.name + "'s turn just timed out!");
         uiCont.SetDrawButton(false);
         StartCoroutine(TurnSystem());
     }
@@ -560,7 +560,7 @@ public class MageMatch : MonoBehaviour {
         Player p = _activep;
         uiCont.SetDrawButton(false);
         Spell spell = p.character.GetSpell(spellNum);
-        if (p.AP >= spell.APcost) { // maybe do this check before boardcheck so the button isn't on
+        if (p.GetAP() >= spell.APcost) { // maybe do this check before boardcheck so the button isn't on
             MMLog.Log_MageMatch("spell cast spellNum=" + spellNum + ", spell count=" + _spellsOnBoard[spellNum].Count);
 
             uiCont.TurnOffSpellButtonsDuringCast(_activep.id, spellNum);

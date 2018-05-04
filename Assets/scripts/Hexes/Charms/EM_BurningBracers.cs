@@ -15,7 +15,7 @@ public class EM_BurningBracers : Charm {
     }
 
     public override IEnumerator DropEffect() {
-        _mm.GetPlayer(TagPlayer(hextag)).AP += 1;
+        _mm.GetPlayer(TagPlayer(hextag)).IncreaseAP();
         yield return null;
     }
 }

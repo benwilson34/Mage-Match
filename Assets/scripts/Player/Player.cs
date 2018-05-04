@@ -9,7 +9,6 @@ public class Player {
 
     public int id; // auto
     public string name; // auto
-    public int AP; // private w/ methods
     public Character character;
     public Hand hand;
     public Deck deck;
@@ -17,10 +16,11 @@ public class Player {
     private const int INIT_AP = 4;
 
     private MageMatch _mm;
+    private int _ap;
     //private MatchEffect _matchEffect;
 
     public Player(int playerId) {
-        AP = 0;
+        _ap = 0;
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
         id = playerId;
         hand = new Hand(_mm, this);
@@ -90,7 +90,18 @@ public class Player {
 
     public bool ThisIsLocal() { return _mm.myID == id; }
 
-    public void InitAP() { AP = INIT_AP; }
+    public void InitAP() { _ap = INIT_AP; }
+
+    public void DecrementAP() { _ap--; }
+
+    public bool OutOfAP() { return _ap == 0; }
+
+    public void IncreaseAP(int amount = 1) {
+        _ap += amount;
+        _mm.audioCont.Trigger(AudioController.OtherSoundEffect.APGain);
+    }
+
+    public int GetAP() { return _ap; }
 
     public void ApplySpellCosts(Spell spell) {
         bool applyAPcost = true;
@@ -99,7 +110,7 @@ public class Player {
         }
         if (applyAPcost) {
             MMLog.Log_Player("Applying AP cost...which is " + spell.APcost);
-            AP -= spell.APcost;
+            _ap -= spell.APcost;
         }
 
 
