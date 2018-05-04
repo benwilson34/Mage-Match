@@ -12,18 +12,18 @@ public class HexGrid {
 
     private MageMatch _mm;
 	private TileBehav[,] _tileGrid;
-    private Vector3[,] _cellPositions;
-    private float _bbLeft, _bbRight, _bbBottom, _bbBottomLeft, _bbTop;
-	// TODO public static List<TileBehav> tilesOnBoard?
+    private CellBehav[,] _cells;
+    //private float _bbLeft, _bbRight, _bbBottom, _bbBottomLeft, _bbTop;
+	// TODO private List<TileBehav> _tilesOnBoard?
 
 	public HexGrid(){
 		_tileGrid = new TileBehav[NUM_COLS, NUM_ROWS];
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
 
-        _cellPositions = new Vector3[NUM_COLS, NUM_ROWS];
+        _cells = new CellBehav[NUM_COLS, NUM_ROWS];
         for (int c = 0; c < NUM_COLS; c++) {
             for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) {
-                _cellPositions[c, r] = GameObject.Find("cell" + c + r).transform.position; // maybe slow?
+                _cells[c, r] = GameObject.Find("cell" + c + r).GetComponent<CellBehav>(); // maybe slow?
             }
         }
     }
@@ -132,15 +132,15 @@ public class HexGrid {
     }
 
 	public Vector3 GridCoordToPos(int col, int row){
-        return _cellPositions[col, row];
+        return _cells[col, row].transform.position;
 	}
 
 	public float GridColToPos(int col){
-        return _cellPositions[col, 3].x;
+        return _cells[col, 3].transform.position.x;
 	}
 
 	public float GridRowToPos(int col, int row) {
-        return _cellPositions[col, row].y;
+        return _cells[col, row].transform.position.y;
     }
 
     public bool CanSwap(int c1, int r1, int c2, int r2) {
@@ -167,6 +167,16 @@ public class HexGrid {
 		CheckGrav ();
 		return true;
 	}
+
+    public List<CellBehav> GetAllCellBehavs() {
+        List<CellBehav> returnList = new List<CellBehav>();
+        for (int c = 0; c < NUM_COLS; c++) { // for each col
+            for (int r = BottomOfColumn(c); r <= TopOfColumn(c); r++) { // for each row
+                returnList.Add(_cells[c, r]);
+            }
+        }
+        return returnList;
+    }
 
 	public List<TileBehav> GetPlacedTiles(TileSeq skip = null){
 		List<TileBehav> returnList = new List<TileBehav> ();

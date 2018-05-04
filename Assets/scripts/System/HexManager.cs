@@ -41,7 +41,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         // TODO load only the tokens + consumables that either player will use??
         //_stonePF = Resources.Load("prefabs/hexes/token_stone") as GameObject;
         //_emberPF = Resources.Load("prefabs/hexes/token_ember") as GameObject;
-        _t_tombstone = Resources.Load("prefabs/hexes/token_tombstone") as GameObject;
+        _t_tombstone = Resources.Load("prefabs/hexes/t_tombstone") as GameObject;
 
 
         _c_sample = Resources.Load("prefabs/hexes/c_sample") as GameObject;

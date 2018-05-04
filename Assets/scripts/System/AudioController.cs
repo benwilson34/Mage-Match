@@ -55,7 +55,7 @@ public class AudioController {
         clips.Add(GraveKSoundEffect.OogieBoogie, "event:/Gravekeeper/Gra_OogieBoogie");
         clips.Add(GraveKSoundEffect.PartyCrashers, "event:/Gravekeeper/Gra_PartyCrashers");
 
-        clips.Add(GraveKSoundEffect.Motorcycle, "event:/Gravekeeper/Gra_MotorcycleSkid");
+        clips.Add(GraveKSoundEffect.Motorcycle, "event:/Gravekeeper/Gra_Motorcycle");
         clips.Add(GraveKSoundEffect.SigBell1, "event:/Gravekeeper/Gra_TSBell");
         clips.Add(GraveKSoundEffect.SigDrop, "event:/Gravekeeper/Gra_TSDrop");
         clips.Add(GraveKSoundEffect.SigEffect, "event:/Gravekeeper/Gra_TSEffect");

@@ -163,7 +163,7 @@ public class Targeting {
     }
 
     // TODO
-    public IEnumerator WaitForCellTarget(int count) {
+    public IEnumerator WaitForCellTarget(int count, List<CellBehav> cbs = null) {
         currentTMode = TargetMode.Cell;
         _targetsLeft = count;
         _targetCBs = new List<CellBehav>();
@@ -171,26 +171,58 @@ public class Targeting {
         //Debug.Log ("targets = " + targetsLeft);
 
         // TODO filter cells
+        if (cbs == null)
+            cbs = _mm.hexGrid.GetAllCellBehavs();
+
+        _validCBs = cbs;
+
         yield return TargetingScreen();
     }
 
     public void OnCBTarget(CellBehav cb) {
-        //Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
-        foreach (CellBehav ccb in _targetCBs) // prevent targeting a tile that's already targeted
-            if (ccb.HasSamePos(cb))
+        ////Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
+        //foreach (CellBehav ccb in _targetCBs) // prevent targeting a tile that's already targeted
+        //    if (ccb.HasSamePos(cb))
+        //        return;
+        //// TODO if targetable
+        //// TODO check validCBs
+
+        //_mm.syncManager.SendCBTarget(cb);
+
+        //_mm.stats.Report(string.Format("$ TARGET CELL ({0},{1})", cb.col, cb.row), false);
+
+        //_mm.uiCont.OutlineTarget(cb.col, cb.row);
+        //_targetCBs.Add(cb);
+        //DecTargets();
+        //_mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
+        //MMLog.Log_Targeting("Targeted cell (" + cb.col + ", " + cb.row + ")");
+
+        foreach (CellBehav ccb in _targetCBs) // prevent targeting a cell that's already targeted
+            if (cb.EqualsCoord(ccb))
                 return;
+
+        bool valid = false;
+        for (int i = 0; i < _validCBs.Count; i++) {
+            CellBehav ccb = _validCBs[i];
+            if (cb.EqualsCoord(ccb)) {
+                valid = true;
+                _validCBs.RemoveAt(i);
+                break;
+            }
+        }
+        if (!valid)
+            return;
         // TODO if targetable
-        // TODO check validCBs
 
         _mm.syncManager.SendCBTarget(cb);
+        _mm.audioCont.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
 
-        _mm.stats.Report(string.Format("$ TARGET CELL ({0},{1})", cb.col, cb.row), false);
+        _mm.stats.Report("$ TARGET CELL " + cb.PrintCoord(), false);
 
-        _mm.uiCont.OutlineTarget(cb.col, cb.row);
         _targetCBs.Add(cb);
         DecTargets();
         _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
-        MMLog.Log_Targeting("Targeted cell (" + cb.col + ", " + cb.row + ")");
+        MMLog.Log_Targeting("Targeted cell " + cb.PrintCoord());
     }
 
     IEnumerator TargetingScreen() {
