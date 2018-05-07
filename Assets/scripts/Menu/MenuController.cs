@@ -9,7 +9,10 @@ public class MenuController : MonoBehaviour {
 
     public GameObject[] screens;
 
-    private Stack<Screen> backStack;
+    private string[] _screenTitles;
+    private Text _tTitle;
+    private GameObject _backButton;
+    private Stack<Screen> _backStack;
 
 	void Start () {
         UserData.Init();
@@ -17,8 +20,11 @@ public class MenuController : MonoBehaviour {
         foreach (GameObject go in screens)
             go.GetComponent<MenuScreen>().OnLoad();
 
-        backStack = new Stack<Screen>();
-        ChangeScreens(Screen.MainMenu);
+        _tTitle = GameObject.Find("t_title").GetComponent<Text>();
+        _backButton = GameObject.Find("b_back");
+
+        _backStack = new Stack<Screen>();
+        ChangeToMainMenu();
 	}
 
     public void ChangeToMainMenu() { ChangeScreens(Screen.MainMenu); }
@@ -40,7 +46,7 @@ public class MenuController : MonoBehaviour {
     }
 
     void ChangeScreens(Screen screen) {
-        backStack.Push(screen);
+        _backStack.Push(screen);
         ActivateScreen(screen);
         GetMenuScreen(screen).OnShowScreen();
     }
@@ -49,15 +55,56 @@ public class MenuController : MonoBehaviour {
         foreach (Screen s in Screen.GetValues(typeof(Screen))) {
             GetScreenObj(s).SetActive(s == screen);
         }
+
+        switch (screen) {
+            case Screen.MainMenu:
+                SetScreenBarActive(false);
+                break;
+            case Screen.Training:
+                SetScreenBarActive(true, "Training!!");
+                break;
+            case Screen.Multiplayer:
+                SetScreenBarActive(true, "Multiplayer!!");
+                break;
+            case Screen.Runebuilding:
+                SetScreenBarActive(true, "Runebuilding!!");
+                break;
+            case Screen.PlayerProfile:
+                SetScreenBarActive(true, "Player Profile!!");
+                break;
+            case Screen.Store:
+                SetScreenBarActive(true, "Store!!");
+                break;
+            case Screen.Options:
+                SetScreenBarActive(true, "Options!!");
+                break;
+            case Screen.CharacterSelect:
+                SetScreenBarActive(true, "Character Select!!");
+                break;
+            case Screen.Prematch:
+                SetScreenBarActive(false);
+                break;
+            default:
+                break;
+        }
+    }
+
+    void SetScreenBarActive(bool on, string title = "") {
+        _tTitle.gameObject.SetActive(on);
+        _backButton.SetActive(on);
+
+        if (on)
+            _tTitle.text = title;
     }
 
     public void GoBack() {
-        Screen current = backStack.Pop();
+        Screen current = _backStack.Pop();
         if (current == Screen.CharacterSelect) { // don't really like this
             ClearSettingsObjs();
         }
 
-        Screen back = backStack.Peek();
+        Screen back = _backStack.Peek();
+
         ActivateScreen(back);
     }
 
@@ -69,9 +116,9 @@ public class MenuController : MonoBehaviour {
     }
 
     public void CancelFromPrematch() {
-        backStack.Pop();
-        backStack.Pop();
-        ActivateScreen(backStack.Peek());
+        _backStack.Pop();
+        _backStack.Pop();
+        ActivateScreen(_backStack.Peek());
         ClearSettingsObjs();
     }
 
