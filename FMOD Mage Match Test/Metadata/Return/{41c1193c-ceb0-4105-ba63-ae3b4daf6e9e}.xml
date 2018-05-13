@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="MixerReturn" id="{41c1193c-ceb0-4105-ba63-ae3b4daf6e9e}">
+        <property name="name">
+            <value>Long Reverb</value>
+        </property>
+        <relationship name="effectChain">
+            <destination>{c2680b83-80f5-4bf3-ac15-f955f7ce4783}</destination>
+        </relationship>
+        <relationship name="panner">
+            <destination>{ad633d2f-4914-4b12-9691-dc14038bf268}</destination>
+        </relationship>
+        <relationship name="output">
+            <destination>{6fce2842-4356-44f1-9885-54042a82a4b7}</destination>
+        </relationship>
+    </object>
+    <object class="MixerBusEffectChain" id="{c2680b83-80f5-4bf3-ac15-f955f7ce4783}">
+        <relationship name="effects">
+            <destination>{d9efd4db-d273-45c7-8f08-256571812831}</destination>
+            <destination>{1c8bfdb7-0566-497c-98d8-6edc6a7a7848}</destination>
+        </relationship>
+    </object>
+    <object class="MixerBusPanner" id="{ad633d2f-4914-4b12-9691-dc14038bf268}"/>
+    <object class="MixerBusFader" id="{d9efd4db-d273-45c7-8f08-256571812831}"/>
+    <object class="SFXReverbEffect" id="{1c8bfdb7-0566-497c-98d8-6edc6a7a7848}">
+        <property name="decayTime">
+            <value>3300</value>
+        </property>
+        <property name="earlyDelay">
+            <value>5.5</value>
+        </property>
+        <property name="lateDelay">
+            <value>27</value>
+        </property>
+        <property name="HFReference">
+            <value>8500</value>
+        </property>
+        <property name="HFDecayRatio">
+            <value>51.5</value>
+        </property>
+        <property name="diffusion">
+            <value>75.5</value>
+        </property>
+        <property name="lowShelfFrequency">
+            <value>730</value>
+        </property>
+        <property name="lowShelfGain">
+            <value>-6</value>
+        </property>
+        <property name="highCut">
+            <value>6500</value>
+        </property>
+        <property name="earlyLateMix">
+            <value>34</value>
+        </property>
+        <property name="wetLevel">
+            <value>-0.5</value>
+        </property>
+        <property name="dryLevel">
+            <value>-80</value>
+        </property>
+    </object>
+</objects>

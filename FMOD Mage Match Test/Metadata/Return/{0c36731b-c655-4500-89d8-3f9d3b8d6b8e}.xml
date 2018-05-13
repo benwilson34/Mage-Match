@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="MixerReturn" id="{0c36731b-c655-4500-89d8-3f9d3b8d6b8e}">
+        <property name="overridingInputFormat">
+            <value>2</value>
+        </property>
+        <property name="inputFormatOverridden">
+            <value>true</value>
+        </property>
+        <property name="name">
+            <value>Reverb</value>
+        </property>
+        <relationship name="effectChain">
+            <destination>{76f4fc6f-9002-4628-a68d-3f9979fb33a2}</destination>
+        </relationship>
+        <relationship name="panner">
+            <destination>{4c34c3ea-9727-4d69-8656-6dffb9fc2cee}</destination>
+        </relationship>
+        <relationship name="output">
+            <destination>{6fce2842-4356-44f1-9885-54042a82a4b7}</destination>
+        </relationship>
+    </object>
+    <object class="MixerBusEffectChain" id="{76f4fc6f-9002-4628-a68d-3f9979fb33a2}">
+        <relationship name="effects">
+            <destination>{4894a993-96ca-481e-8cb8-8a25fd721eb7}</destination>
+            <destination>{70de4fd0-6e99-4ca7-8b23-09944b9cfde1}</destination>
+            <destination>{e215674b-5695-4526-a878-f51c607a6665}</destination>
+        </relationship>
+    </object>
+    <object class="MixerBusPanner" id="{4c34c3ea-9727-4d69-8656-6dffb9fc2cee}"/>
+    <object class="SFXReverbEffect" id="{4894a993-96ca-481e-8cb8-8a25fd721eb7}">
+        <property name="decayTime">
+            <value>1100</value>
+        </property>
+        <property name="earlyDelay">
+            <value>11</value>
+        </property>
+        <property name="HFDecayRatio">
+            <value>35</value>
+        </property>
+        <property name="lowShelfFrequency">
+            <value>470</value>
+        </property>
+        <property name="highCut">
+            <value>20000</value>
+        </property>
+        <property name="earlyLateMix">
+            <value>42</value>
+        </property>
+        <property name="wetLevel">
+            <value>0.5</value>
+        </property>
+        <property name="dryLevel">
+            <value>-80</value>
+        </property>
+    </object>
+    <object class="MixerSend" id="{70de4fd0-6e99-4ca7-8b23-09944b9cfde1}">
+        <property name="inputFormat">
+            <value>2</value>
+        </property>
+        <relationship name="mixerReturn">
+            <destination>{0c36731b-c655-4500-89d8-3f9d3b8d6b8e}</destination>
+        </relationship>
+    </object>
+    <object class="MixerBusFader" id="{e215674b-5695-4526-a878-f51c607a6665}"/>
+</objects>
