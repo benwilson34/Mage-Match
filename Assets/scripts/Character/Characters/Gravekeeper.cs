@@ -16,8 +16,8 @@ public class Gravekeeper : Character {
         _objFX = mm.hexFX;
 
         _altCoreSpell = new CoreSpell(0, "Party in the Back", PartyInTheBack);
-        CharacterInfo info = CharacterInfo.GetCharacterInfoObj(Ch.Gravekeeper);
-        _altCoreSpell.info = CharacterInfo.GetSpellInfo(info.altSpell, true);
+        CharacterInfo info = CharacterInfo.GetCharacterInfo(Ch.Gravekeeper);
+        _altCoreSpell.info = CharacterInfo.GetSpellInfoString(info.altSpell, true);
     }
 
     // ----- spells -----

@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CharacterSelect : MonoBehaviour, MenuScreen {
+public class CharacterSelect : MenuScreen {
 
     //private Transform characterBlock;
     private Image _charPortraitFrame, _charPortrait;
     private Text _charName, _charT;
     private Button _bConfirm;
     private Dropdown _ddLoadouts;
-    private UserData.LoadoutData[] _loadouts;
+    private LoadoutData[] _loadouts;
     private GameObject goldSelectionPF, redSelectionPF;
 
     private GameSettings _gameSettings;
@@ -20,7 +20,7 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
 
     private MenuController _menu;
 
-    public void OnLoad() {
+    public override void OnLoad() {
         //characterBlock = transform.Find("characterBlock");
         _charPortraitFrame = transform.Find("i_charPortraitFrame").GetComponent<Image>();
         _charPortrait = _charPortraitFrame.transform.Find("i_charPortrait").GetComponent<Image>();
@@ -34,7 +34,9 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
         _menu = GameObject.Find("world ui").GetComponent<MenuController>();
     }
 
-    public void OnShowScreen() {
+    public override void OnPass(object o) { }
+
+    public override void OnShowScreen() {
         _thisPlayerLocked = false;
         _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
 
@@ -71,13 +73,13 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
     void CharacterChosen(Character.Ch ch) {
         Debug.Log("CharacterSelect: local char chosen is " + ch);
         _localChar = ch;
-        _charName.text = CharacterInfo.GetCharacterInfoObj(ch).name;
+        _charName.text = CharacterInfo.GetCharacterInfo(ch).name;
         _charPortrait.enabled = true;
         _charPortrait.sprite = GetCharacterPortrait(ch);
         //string info = CharacterInfo.GetCharacterInfo(ch);
         //charT.text = info;
 
-        _loadouts = UserData.GetLoadoutList(ch);
+        _loadouts = LoadoutData.GetLoadoutList(ch);
         _ddLoadouts.ClearOptions();
         _ddLoadouts.AddOptions((from loadout in _loadouts select loadout.name).ToList());
         _ddLoadouts.interactable = true;
@@ -94,7 +96,7 @@ public class CharacterSelect : MonoBehaviour, MenuScreen {
                 return Resources.Load<Sprite>("sprites/characters/gravekeeper");
             case Character.Ch.Valeria:
                 return Resources.Load<Sprite>("sprites/characters/valeria");
-            case Character.Ch.Sample:
+            case Character.Ch.Neutral:
                 return Resources.Load<Sprite>("sprites/characters/dummy");
             default:
                 return null;

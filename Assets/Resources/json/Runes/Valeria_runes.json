@@ -1,0 +1,15 @@
+{
+  "Bandages": {
+    "category": "Charm",
+    "keywords": ["Buff"],
+    "deckCount": 4,
+    "desc": "Heal yourself for 60-80 health and gain a stacking 2-turn buff that reduces the damage you take by 10%."
+  },
+  "WaterLily": {
+    "title": "Water Lily",
+    "category": "Charm",
+    "keywords": [],
+    "deckCount": 7,
+    "desc": "Add 4 Water tiles into the board in random columns."
+  }
+}

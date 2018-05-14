@@ -1,40 +1,40 @@
 {
 	"Valeria": {
 		"name": "Valeria Default",
-		 "runes": [
-	    "Bandages",
-	    "WaterLily",
-	    "Leeches",
-	   	"WhiteWater",
+		"runes": [
+		    "Bandages",
+		    "WaterLily",
+		    "Leeches",
+		   	"WhiteWater",
 			"ShuffleGem",
-      "MuscleMass",
-      "MuscleMass"
-  	]
+		    "RainDrops",
+		    "SampleCharm"
+  		]
 	},
 
 	"Gravekeeper": {
 		"name": "GraveK Default",
 		"runes": [
 			"HRForm",
-	    "PartySnacks",
-	    "ProteinPills",
-	    "Leeches",
-	    "MuscleMass",
-      "MuscleMass",
-      "MuscleMass"
+		    "PartySnacks",
+		    "ProteinPills",
+		    "Leeches",
+		    "MuscleMass",
+		    "RainDrops",
+		    "SampleCharm"
 		]
 	},
 
 	"Enfuego": {
 		"name": "Enfuego Default",
 		"runes": [
-	    "DanceShoes",
-	    "BurningBracers",
-	    "Molotov",
-	    "Brushfire",
-	    "ShuffleGem",
-      "MuscleMass",
-      "MuscleMass"
-  	]
+		    "DanceShoes",
+		    "BurningBracers",
+		    "Molotov",
+		    "Brushfire",
+		    "ShuffleGem",
+		    "RainDrops",
+		    "SampleCharm"
+  		]
 	}
 }

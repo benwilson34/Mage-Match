@@ -19,7 +19,7 @@ public class Deck {
     string[] GetInitHextags() {
         MMDebug.MMLog.Log("DECK", "black", "Init player " + _player.id);
         var list = new List<string>();
-        var info = CharacterInfo.GetCharacterInfoObj(_player.character.ch);
+        var info = CharacterInfo.GetCharacterInfo(_player.character.ch);
         for(int d = 0; d < 5; d++) {
             Tile.Element elem = (Tile.Element)(d + 1);
             for (int i = 0; i < info.deck[d]; i++) {

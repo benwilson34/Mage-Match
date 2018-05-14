@@ -188,6 +188,9 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             case "WaterLily":
                 go = GameObject.Instantiate(_c_waterLily);
                 break;
+            case "RainDrops":
+                go = GameObject.Instantiate(_c_waterLily); // <-- TODO
+                break;
             case "ShuffleGem":
                 go = GameObject.Instantiate(_c_shuffleGem);
                 break;

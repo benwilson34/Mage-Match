@@ -1,8 +1,13 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+public class Rune {
+    public enum NeutralRune {  };
+}
 
 public class RuneInfoLoader {
 
@@ -13,59 +18,25 @@ public class RuneInfoLoader {
         public string desc;
     }
 
-    private static List<RuneInfo> _p1runes, _p2runes; // for in-game rune info
-    private static List<RuneInfo> _allRunes; // all runes
+    private static Dictionary<string, RuneInfo> _p1runes, _p2runes; // for in-game rune info
+    //private static List<RuneInfo> _allRunes; // all runes
     // TODO need something for character select screen (since user will still get tooltips)
-    private static Dictionary<string, RuneInfo> allRuneInfo; // for Runebuilding
-
-
-    //public static string GetCharacterInfo(Character.Ch ch) {
-    //    string s = "";
-    //    CharacterInfo c = GetCharacterInfoObj(ch);
-    //    s += string.Format("{0} | elements: {1} | health: {2}", c.name, c.keyElements, c.health);
-    //    s += string.Format("{0}F/{1}W/{2}E/{3}A/{4}M - \n", c.deck[0], c.deck[1], c.deck[2], c.deck[3], c.deck[4]);
-
-    //    s += string.Format("Passive - {0}: {1}\nSignature: {2} - {3}/{4} - {5}\n", c.passive.title, c.passive.desc, c.signature.title, c.signature.prereq, c.signature.type, c.signature.desc);
-    //    s += string.Format("Core Spell: {0} - {1}-turn cooldown/{2} - {3}", c.core.title, c.core.cooldown, c.core.type, c.core.desc);
-
-    //    s += GetSpellInfo(c.spell1, false) + "\n" + GetSpellInfo(c.spell2, false) + "\n" + GetSpellInfo(c.spell3, false);
-
-    //    return s;
-    //}
-
-    //public static string GetSpellInfo(SpellInfo spell, bool formatted) {
-    //    return GetSpellInfoJSON(spell.title, spell.prereq, spell.type, spell.desc, formatted);
-    //}
-
-    //public static string GetSpellInfoJSON(string title, string prereq, string type, string desc, bool formatted) {
-    //    // title, prereq, type, desc
-    //    string format = "{0} - {1}/{2} - {3}\n";
-    //    if (formatted)
-    //        format = "<b>{0}</b>\n{1}/{2}\n\n{3}\n";
-
-    //    return string.Format(format,
-    //        title,
-    //        prereq,
-    //        type,
-    //        desc
-    //    );
-    //}
+    private static Dictionary<Character.Ch, Dictionary<string, RuneInfo>> _allRuneInfo; // for Runebuilding
 
     public static void InitInGameRuneInfo(GameSettings settings) {
-        JObject o = GetRuneJObject();
-        JObject neutralRunes = o["Neutral"].ToObject<JObject>();
+        JObject neutralRunes = GetCharacterJObject(Character.Ch.Neutral);
 
         for (int id = 1; id <= 2; id++) {
-            List<RuneInfo> runeList = new List<RuneInfo>();
-            JObject charRunes = null;
-            if(o[settings.GetChar(id).ToString()] != null)
-                charRunes = o[settings.GetChar(id).ToString()].Value<JObject>();
+            Dictionary<string, RuneInfo> runeList = new Dictionary<string, RuneInfo>();
+            JObject charRunes = GetCharacterJObject(settings.GetChar(id));
+            //if(o[settings.GetChar(id).ToString()] != null)
+            //    charRunes = o[settings.GetChar(id).ToString()].Value<JObject>();
 
             foreach (string rune in settings.GetLoadout(id)) {
                 if (neutralRunes[rune] != null) {
-                    runeList.Add(GetRuneInfo(rune, (JObject)neutralRunes[rune]));
+                    runeList.Add(rune, GetRuneInfo(rune, (JObject)neutralRunes[rune]));
                 } else if (charRunes[rune] != null) {
-                    runeList.Add(GetRuneInfo(rune, (JObject)charRunes[rune]));
+                    runeList.Add(rune, GetRuneInfo(rune, (JObject)charRunes[rune]));
                 } else {
                     MMDebug.MMLog.LogError("RuneInfoLoader: Couldn't find info for \"" + rune + "\"");
                 }
@@ -74,39 +45,32 @@ public class RuneInfoLoader {
         }
 
         if (settings.trainingMode)
-            InitRuneList();
+            InitAllRuneInfo();
     }
 
-    static void InitRuneList() {
-        JObject o = GetRuneJObject();
-
-        _allRunes = new List<RuneInfo>();
-        foreach (JProperty charGroup in o.Properties()) {
-            foreach (JProperty rune in ((JObject)charGroup.Value).Properties()) {
-                ////string cat = prop.Value.ToObject<JObject>()["category"].ToString().Substring(0, 1);
-                ////runes.Add(cat + "-" + prop.Name);
-                //var info = new RuneInfo();
-                //// I feel like this isn't the proper way to do this
-                //JsonConvert.PopulateObject(prop.Value.ToString(), info);
-                //info.tagTitle = 
-
-                //if(info.title == null)
-                //    info.title = prop.Name;
-
-                _allRunes.Add(GetRuneInfo(rune.Name, (JObject)rune.Value));
+    public static void InitAllRuneInfo() {
+        //_allRunes = new List<RuneInfo>();
+        _allRuneInfo = new Dictionary<Character.Ch, Dictionary<string, RuneInfo>>();
+        //foreach (JProperty charGroup in o.Properties()) {
+        foreach (Character.Ch ch in Enum.GetValues(typeof(Character.Ch))) {
+            var charDict = new Dictionary<string, RuneInfo>();
+            foreach (JProperty rune in GetCharacterJObject(ch).Properties()) {
+                //_allRunes.Add(GetRuneInfo(rune.Name, (JObject)rune.Value));
+                charDict.Add(rune.Name, GetRuneInfo(rune.Name, (JObject)rune.Value));
             }
+            _allRuneInfo.Add(ch, charDict);
         }
     }
 
-    static void SetInGameInfoList(List<RuneInfo> list, int id) {
+    static void SetInGameInfoList(Dictionary<string, RuneInfo> info, int id) {
         if (id == 1)
-            _p1runes = list;
+            _p1runes = info;
         else
-            _p2runes = list;
+            _p2runes = info;
     }
 
-    static JObject GetRuneJObject() {
-        string json = (Resources.Load("json/runes") as TextAsset).text;
+    static JObject GetCharacterJObject(Character.Ch ch) {
+        string json = (Resources.Load("json/Runes/" + ch.ToString() + "_runes") as TextAsset).text;
         return JObject.Parse(json);
     }
 
@@ -123,42 +87,27 @@ public class RuneInfoLoader {
         return info;
     }
 
-    public static RuneInfo GetPlayerRuneInfo(int id, string rune) {
-        List<RuneInfo> runeList;
-        if (id == 1)
-            runeList = _p1runes;
+    public static RuneInfo GetRuneInfo(Character.Ch ch, string rune) {
+        if (_allRuneInfo[ch].ContainsKey(rune))
+            return _allRuneInfo[ch][rune];
         else
-            runeList = _p2runes;
-
-        foreach (RuneInfo info in runeList) {
-            if (info.tagTitle == rune)
-                return info;
-        }
-        MMDebug.MMLog.LogError("RuneInfoLoader: Couldn't get info for \"" + rune + "\"");
-        return null;
+            return _allRuneInfo[Character.Ch.Neutral][rune];
     }
 
-    //public static RuneInfo GetRuneInfo(string rune) {
-    //    JObject o = GetRuneJObject();
-    //    if (o[rune] == null) {
-    //        MMDebug.MMLog.LogError("RuneInfo: Couldn't find info for \"" + rune + "\"");
-    //    }
+    public static RuneInfo GetPlayerRuneInfo(int id, string rune) {
+        Dictionary<string, RuneInfo> info;
+        if (id == 1)
+            info = _p1runes;
+        else
+            info = _p2runes;
 
-    //    //json = o[rune].ToObject<string>();
-    //    //MMDebug.MMLog.Log("RuneInfo", "black", "json for "+rune+": " + json);
-
-    //    RuneInfo info = new RuneInfo();
-        
-    //    // I feel like this isn't the proper way to do this
-    //    JsonConvert.PopulateObject(o[rune].ToString(), info);
-    //    info.tagTitle = rune;
-    //    if (info.title == null)
-    //        info.title = rune;
-
-    //    return info;
-    //}
-
-    // This is only for DebugTools right now, but will be adapted in time
+        if (info.ContainsKey(rune)) {
+            return info[rune];
+        } else {
+            MMDebug.MMLog.LogError("RuneInfoLoader: Couldn't get info for \"" + rune + "\"");
+            return null;
+        }
+    }
 
     public static List<string> GetTileList() {
         return GetCatList("Tile");
@@ -170,10 +119,24 @@ public class RuneInfoLoader {
 
     static List<string> GetCatList(string category) {
         var list = new List<string>();
-        foreach (var rune in _allRunes) {
-            if (rune.category == category)
-                list.Add(category.Substring(0, 1) + "-" + rune.tagTitle);
+        foreach (var charDict in _allRuneInfo.Values) {
+            foreach (var rune in charDict.Values) {
+                if (rune.category == category)
+                    list.Add(category.Substring(0, 1) + "-" + rune.tagTitle);
+            }
         }
         return list;
+    }
+
+    public static List<RuneInfo> GetRuneList(Character.Ch ch) {
+        List<RuneInfo> runeList = new List<RuneInfo>();
+        runeList.AddRange(_allRuneInfo[ch].Values);
+        runeList.AddRange(_allRuneInfo[Character.Ch.Neutral].Values);
+        return runeList;
+    }
+
+    public static Sprite GetRuneSprite(Character.Ch ch, string rune) {
+        RuneInfo info = GetRuneInfo(ch, rune);
+        return Resources.Load<Sprite>("sprites/hexes/" + info.category + "/" + info.tagTitle);
     }
 }

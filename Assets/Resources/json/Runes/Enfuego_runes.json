@@ -1,0 +1,16 @@
+{
+  "DanceShoes": {
+    "title": "Dance Shoes",
+    "category": "Charm",
+    "keywords": ["Swap Prompt"],
+    "deckCount": 5,
+    "desc": "Perform a swap. Inflict Burning on both tiles swapped."
+  },
+  "BurningBracers": {
+    "title": "Burning Bracers",
+    "category": "Charm",
+    "keywords": [],
+    "deckCount": 4,
+    "desc": "Gain 1 AP. Has Quickdraw if more than 9 tiles are burning."
+  }
+}

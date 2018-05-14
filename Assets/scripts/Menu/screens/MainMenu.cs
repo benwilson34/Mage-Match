@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainMenu : MonoBehaviour, MenuScreen {
+public class MainMenu : MenuScreen {
 
-    public void OnLoad() { }
+    //public void OnLoad() { }
 
-    public void OnShowScreen() { }
+    //public void OnPass(object o) { }
+
+    //public void OnShowScreen() { }
 }

@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class Prematch : Photon.PunBehaviour, MenuScreen {
+public class Prematch : MenuScreen {
 
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
 
@@ -22,11 +22,11 @@ public class Prematch : Photon.PunBehaviour, MenuScreen {
     private MenuController _menus;
     private GameSettings _gameSettings;
 
-    public void OnLoad() {
+    public override void OnLoad() {
         // TODO
     }
 
-    public void OnShowScreen() {
+    public override void OnShowScreen() {
         _menus = GameObject.Find("world ui").GetComponent<MenuController>();
         _gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         _statusText = transform.Find("t_status").GetComponent<Text>();
@@ -47,7 +47,7 @@ public class Prematch : Photon.PunBehaviour, MenuScreen {
             _gameSettings.p1char = _gameSettings.chosenChar;
             _gameSettings.p1loadout = _gameSettings.chosenLoadout;
             _gameSettings.p2name = "Training Dummy";
-            _gameSettings.p2char = Character.Ch.Sample;
+            _gameSettings.p2char = Character.Ch.Neutral;
             _gameSettings.p2loadout = new string[0];
 
             StartCoroutine(ShowPrematchInfoBeforeLoad(true));

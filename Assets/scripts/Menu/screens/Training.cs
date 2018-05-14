@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Training : MonoBehaviour, MenuScreen {
+public class Training : MenuScreen {
 
     private MenuController _menus;
 
-    public void OnLoad() {
+    public override void OnLoad() {
         _menus = GameObject.Find("world ui").GetComponent<MenuController>();
     }
 
-    public void OnShowScreen() { }
+    //public void OnPass(object o) { }
+
+    //public void OnShowScreen() { }
 
     public void StartTutorial() {
         // TODO

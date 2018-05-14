@@ -16,25 +16,7 @@ public class CharacterInfo {
     public int[] deck;
     public SpellInfo passive, core, spell1, spell2, spell3, signature, altSpell;
 
-    public static string GetCharacterInfo(Character.Ch ch) {
-        string s = "";
-        CharacterInfo c = GetCharacterInfoObj(ch);
-        s += string.Format("{0} | elements: {1} | health: {2}\n", c.name, c.keyElements, c.health);
-        s += string.Format("{0}F/{1}W/{2}E/{3}A/{4}M - \n", c.deck[0], c.deck[1], c.deck[2], c.deck[3], c.deck[4]);
-
-        s += string.Format("Passive - {0}: {1}\nSignature: {2} - {3}/{4} - {5}\n", c.passive.title, c.passive.desc, c.signature.title, c.signature.prereq, c.signature.keywords, c.signature.desc);
-        s += string.Format("Core Spell: {0} - {1} - {2}\n", c.core.title, c.core.keywords, c.core.desc);
-
-        s += GetSpellInfo(c.spell1, false) + "\n" + GetSpellInfo(c.spell2, false) + "\n" + GetSpellInfo(c.spell3, false);
-
-        return s;
-    }
-
-    public static string GetSpellInfo(SpellInfo spell, bool formatted) {
-        return GetSpellInfoJSON(spell.title, spell.prereq, spell.keywords, spell.desc, formatted);
-    }
-
-    public static string GetSpellInfoJSON(string title, string prereq, string[] keywords, string desc, bool formatted) {
+    public static string GetSpellInfoString(SpellInfo spell, bool formatted) {
         // title, prereq, type, desc
         string format = "{0} - {1}/{2} - {3}\n";
         if (formatted) {
@@ -45,15 +27,15 @@ public class CharacterInfo {
         }
 
         return string.Format(format,
-            title,
-            prereq,
-            keywords != null ? string.Join(", ", keywords) : "",
-            desc
+            spell.title,
+            spell.prereq,
+            spell.keywords != null ? string.Join(", ", spell.keywords) : "",
+            spell.desc
         );
     }
 
-    public static CharacterInfo GetCharacterInfoObj(Character.Ch ch) {
-        TextAsset ta = Resources.Load("json/" + ch.ToString()) as TextAsset;
+    public static CharacterInfo GetCharacterInfo(Character.Ch ch) {
+        TextAsset ta = Resources.Load("json/Characters/" + ch.ToString()) as TextAsset;
 
         string json = ta.text;
         //Debug.Log("Got json: " + json);
@@ -63,5 +45,19 @@ public class CharacterInfo {
         //if (info.core != null)
         //    Debug.Log(">>>>> coreSpell is not null. title=" + info.core.title);
         return info;
+    }
+
+    public static string GetCharacterDesc(Character.Ch ch) {
+        string s = "";
+        CharacterInfo c = GetCharacterInfo(ch);
+        s += string.Format("{0} | elements: {1} | health: {2}\n", c.name, c.keyElements, c.health);
+        s += string.Format("{0}F/{1}W/{2}E/{3}A/{4}M - \n", c.deck[0], c.deck[1], c.deck[2], c.deck[3], c.deck[4]);
+
+        s += string.Format("Passive - {0}: {1}\nSignature: {2} - {3}/{4} - {5}\n", c.passive.title, c.passive.desc, c.signature.title, c.signature.prereq, c.signature.keywords, c.signature.desc);
+        s += string.Format("Core Spell: {0} - {1} - {2}\n", c.core.title, c.core.keywords, c.core.desc);
+
+        s += GetSpellInfoString(c.spell1, false) + "\n" + GetSpellInfoString(c.spell2, false) + "\n" + GetSpellInfoString(c.spell3, false);
+
+        return s;
     }
 }

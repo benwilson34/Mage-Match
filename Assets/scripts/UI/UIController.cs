@@ -254,7 +254,7 @@ public class UIController : MonoBehaviour {
                 healthImg.color = Color.blue;
                 break;
 
-            case Character.Ch.Sample:
+            case Character.Ch.Neutral:
                 healthImg.color = Color.gray;
                 break;
         }

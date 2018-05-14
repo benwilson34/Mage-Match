@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 
-public class PlayerProfile : MonoBehaviour, MenuScreen {
+public class PlayerProfile : MenuScreen {
 
     //public Sprite[] frames, backgrounds, foregrounds;
 
@@ -15,13 +15,13 @@ public class PlayerProfile : MonoBehaviour, MenuScreen {
     private InputField _inputName;
     private Button _bConfirmName;
 
-    public void OnLoad() {
+    public override void OnLoad() {
         _tName = transform.Find("t_name").GetComponent<Text>();
         _inputName = transform.Find("input_name").GetComponent<InputField>();
         _bConfirmName = transform.Find("b_changeName").GetComponent<Button>();
     }
 
-    public void OnShowScreen() {
+    public override void OnShowScreen() {
         ShowUsername();
     }
 

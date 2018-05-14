@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Store : MonoBehaviour, MenuScreen {
+public class Store : MenuScreen {
 
-    public void OnLoad() {
+    //public void OnLoad() { }
 
-    }
+    //public void OnPass(object o) { }
 
-    public void OnShowScreen() {
-
-    }
+    //public void OnShowScreen() { }
 }

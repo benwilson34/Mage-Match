@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour {
 
-    public enum Screen { MainMenu, Training, Multiplayer, Runebuilding, PlayerProfile, Store, Options, CharacterSelect, Prematch };
+    public enum Screen { MainMenu, Training, Multiplayer, Runebuilding_CharList, Runebuilding_LoadoutList, Runebuilding_EditLoadout, PlayerProfile, Store, Options, CharacterSelect, Prematch };
 
     public GameObject[] screens;
 
@@ -20,8 +20,9 @@ public class MenuController : MonoBehaviour {
         foreach (GameObject go in screens)
             go.GetComponent<MenuScreen>().OnLoad();
 
-        _tTitle = GameObject.Find("t_title").GetComponent<Text>();
-        _backButton = GameObject.Find("b_back");
+        Transform menus = GameObject.Find("scrolling").transform;
+        _tTitle = menus.Find("t_title").GetComponent<Text>();
+        _backButton = menus.Find("b_back").gameObject;
 
         _backStack = new Stack<Screen>();
         ChangeToMainMenu();
@@ -29,7 +30,13 @@ public class MenuController : MonoBehaviour {
 
     public void ChangeToMainMenu() { ChangeScreens(Screen.MainMenu); }
     public void ChangeToTraining() { ChangeScreens(Screen.Training); }
-    public void ChangeToRunebuilding() { ChangeScreens(Screen.Runebuilding); }
+    public void ChangeToRunebuilding() { ChangeScreens(Screen.Runebuilding_CharList); }
+    public void ChangeToRunebuilding_LoadoutList(Character.Ch ch) {
+        ChangeScreens(Screen.Runebuilding_LoadoutList, ch);
+    }
+    public void ChangeToRunebuilding_EditLoadout(Character.Ch ch, LoadoutData loadout) {
+        ChangeScreens(Screen.Runebuilding_EditLoadout, new object[2] { ch, loadout });
+    }
     public void ChangeToMultiplayer() { ChangeScreens(Screen.Multiplayer); }
     public void ChangeToPlayerProfile() { ChangeScreens(Screen.PlayerProfile); }
     public void ChangeToStore() { ChangeScreens(Screen.Store); }
@@ -45,10 +52,15 @@ public class MenuController : MonoBehaviour {
         return screens[(int)screen].GetComponent<MenuScreen>();
     }
 
-    void ChangeScreens(Screen screen) {
+    void ChangeScreens(Screen screen, object pass = null) {
         _backStack.Push(screen);
         ActivateScreen(screen);
-        GetMenuScreen(screen).OnShowScreen();
+
+        MenuScreen ms = GetMenuScreen(screen);
+        if (pass != null)
+            ms.OnPass(pass);
+        ms.OnShowScreen();
+
     }
 
     void ActivateScreen(Screen screen) {
@@ -66,7 +78,13 @@ public class MenuController : MonoBehaviour {
             case Screen.Multiplayer:
                 SetScreenBarActive(true, "Multiplayer!!");
                 break;
-            case Screen.Runebuilding:
+            case Screen.Runebuilding_CharList:
+                SetScreenBarActive(true, "Runebuilding!!");
+                break;
+            case Screen.Runebuilding_LoadoutList:
+                SetScreenBarActive(true, "Runebuilding!!");
+                break;
+            case Screen.Runebuilding_EditLoadout:
                 SetScreenBarActive(true, "Runebuilding!!");
                 break;
             case Screen.PlayerProfile:
@@ -106,6 +124,7 @@ public class MenuController : MonoBehaviour {
         Screen back = _backStack.Peek();
 
         ActivateScreen(back);
+        GetMenuScreen(back).OnBack();
     }
 
     public void ClearSettingsObjs() {
@@ -128,7 +147,9 @@ public class MenuController : MonoBehaviour {
 
 
 
-public interface MenuScreen {
-    void OnLoad();
-    void OnShowScreen();
+public class MenuScreen : Photon.PunBehaviour {
+    public virtual void OnLoad() { }
+    public virtual void OnPass(object o) { }
+    public virtual void OnShowScreen() { }
+    public virtual void OnBack() { }
 }

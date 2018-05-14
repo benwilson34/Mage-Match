@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Options : MonoBehaviour, MenuScreen {
+public class Options : MenuScreen {
 
     private Slider _slMaster, _slSoundFX;
     private Text _tMasterAmt, _tSoundFXAmt;
     private MenuController _menus;
 
-	public void OnLoad() {
+	public override void OnLoad() {
         _slMaster = transform.Find("slider_master").GetComponent<Slider>();
         _slSoundFX = transform.Find("slider_soundFX").GetComponent<Slider>();
         _tMasterAmt = transform.Find("t_masterAmt").GetComponent<Text>();
@@ -18,7 +18,7 @@ public class Options : MonoBehaviour, MenuScreen {
         _menus = GameObject.Find("world ui").GetComponent<MenuController>();
     }
 
-    public void OnShowScreen() {
+    public override void OnShowScreen() {
         UserData data = UserData.GetData();
         _slMaster.value = data.masterVolume;
         _tMasterAmt.text = data.masterVolume + "";

@@ -12,10 +12,10 @@ public class TestLauncher : MonoBehaviour {
 
         gameSettings.p1name = "Test boi";
         gameSettings.p1char = testCharacter;
-        gameSettings.p1loadout = UserData.GetDefaultLoadout(testCharacter).runes;
+        gameSettings.p1loadout = LoadoutData.GetDefaultLoadout(testCharacter).runes;
 
         gameSettings.p2name = "Training Dummy";
-        gameSettings.p2char = Character.Ch.Sample;
+        gameSettings.p2char = Character.Ch.Neutral;
         gameSettings.p2loadout = new string[7] {
             "SampleCharm",
             "SampleCharm",

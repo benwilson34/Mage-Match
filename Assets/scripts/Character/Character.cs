@@ -5,7 +5,7 @@ using MMDebug;
 
 public abstract class Character {
 
-    public enum Ch { Sample = 0, Enfuego, Gravekeeper, Valeria };
+    public enum Ch { Neutral = 0, Enfuego, Gravekeeper, Valeria };
     public Ch ch;
 
     public string characterName;
@@ -40,7 +40,7 @@ public abstract class Character {
         mm.onEffectContReady += OnEffectContLoad;
         mm.onEventContReady += OnEventContLoad;
 
-        CharacterInfo info = CharacterInfo.GetCharacterInfoObj(ch);
+        CharacterInfo info = CharacterInfo.GetCharacterInfo(ch);
         characterName = info.name;
         _healthMax = info.health;
         _health = _healthMax;
@@ -187,23 +187,23 @@ public abstract class Character {
         _spells = new Spell[5];
         _spells[0] = new CoreSpell(0, info.core.title, CoreSpell, info.core.cost);
         _spells[0].Init(_mm);
-        _spells[0].info = CharacterInfo.GetSpellInfo(info.core, true);
+        _spells[0].info = CharacterInfo.GetSpellInfoString(info.core, true);
 
         _spells[1] = new Spell(1, info.spell1.title, info.spell1.prereq, Spell1, info.spell1.cost);
         _spells[1].Init(_mm);
-        _spells[1].info = CharacterInfo.GetSpellInfo(info.spell1, true);
+        _spells[1].info = CharacterInfo.GetSpellInfoString(info.spell1, true);
 
         _spells[2] = new Spell(2, info.spell2.title, info.spell2.prereq, Spell2, info.spell2.cost);
         _spells[2].Init(_mm);
-        _spells[2].info = CharacterInfo.GetSpellInfo(info.spell2, true);
+        _spells[2].info = CharacterInfo.GetSpellInfoString(info.spell2, true);
 
         _spells[3] = new Spell(3, info.spell3.title, info.spell3.prereq, Spell3, info.spell3.cost);
         _spells[3].Init(_mm);
-        _spells[3].info = CharacterInfo.GetSpellInfo(info.spell3, true);
+        _spells[3].info = CharacterInfo.GetSpellInfoString(info.spell3, true);
 
         _spells[4] = new SignatureSpell(4, info.signature.title, info.signature.prereq, SignatureSpell, info.signature.cost, info.signature.meterCost);
         _spells[4].Init(_mm);
-        _spells[4].info = CharacterInfo.GetSpellInfo(info.signature, true);
+        _spells[4].info = CharacterInfo.GetSpellInfoString(info.signature, true);
 
     }
 
@@ -270,7 +270,7 @@ public abstract class Character {
     public static Character Load(MageMatch mm, int id) {
         Ch myChar = mm.gameSettings.GetChar(id);
         switch (myChar) {
-            case Ch.Sample:
+            case Ch.Neutral:
                 return new SampleChar(mm, id);
             case Ch.Enfuego:
                 return new Enfuego(mm, id);
@@ -289,7 +289,7 @@ public abstract class Character {
 
 
 public class SampleChar : Character {
-    public SampleChar(MageMatch mm, int id) : base(mm, Ch.Sample, id) {
+    public SampleChar(MageMatch mm, int id) : base(mm, Ch.Neutral, id) {
         _objFX = mm.hexFX;
     }
 

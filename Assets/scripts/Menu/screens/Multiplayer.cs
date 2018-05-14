@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Multiplayer : MonoBehaviour, MenuScreen {
+public class Multiplayer : MenuScreen {
 
     private MenuController _menus;
 
-    public void OnLoad() {
+    public override void OnLoad() {
         _menus = GameObject.Find("world ui").GetComponent<MenuController>();
     }
 
-    public void OnShowScreen() { }
+    public override void OnPass(object o) { }
+
+    public override void OnShowScreen() { }
 
     public void QuickMatch() {
         GameSettings settings = new GameObject("GameSettings").AddComponent<GameSettings>();

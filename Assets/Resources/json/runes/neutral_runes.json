@@ -8,60 +8,9 @@
   },
 
 
-
-
-
-  "HRForm": {
-    "title": "HR Form",
-    "category": "Charm",
-    "keywords": ["Area Target"],
-    "deckCount": 3,
-    "desc": "Zombify all Muscle tiles in a small area."
-  },
-  "PartySnacks": {
-    "title": "Party Snacks",
-    "category": "Charm",
-    "keywords": ["Tile Target"],
-    "deckCount": 3,
-    "desc": "Target Zombie explodes, destroying itself and 2 random adjacent tiles, and dealing 60-80 damage."
-  },
-
-  "Bandages": {
-    "category": "Charm",
-    "keywords": ["Buff"],
-    "deckCount": 4,
-    "desc": "Heal yourself for 60-80 health and gain a stacking 2-turn buff that reduces the damage you take by 10%."
-  },
-  "WaterLily": {
-    "title": "Water Lily",
-    "category": "Charm",
-    "keywords": [],
-    "deckCount": 7,
-    "desc": "Add 4 Water tiles into the board in random columns."
-  },
-
-  "DanceShoes": {
-    "title": "Dance Shoes",
-    "category": "Charm",
-    "keywords": ["Swap Prompt"],
-    "deckCount": 5,
-    "desc": "Perform a swap. Inflict Burning on both tiles swapped."
-  },
-  "BurningBracers": {
-    "title": "Burning Bracers",
-    "category": "Charm",
-    "keywords": [],
-    "deckCount": 4,
-    "desc": "Gain 1 AP. Has Quickdraw if more than 9 tiles are burning."
-  },
-
-
-
-
-
   "MuscleMass": {
     "title": "Muscle Mass",
-    "category": "Tile",
+    "category": "Charm",
     "keywords": ["Duplicate"],
     "deckCount": 9,
     "desc": "Basic Muscle tile with Duplicate."
