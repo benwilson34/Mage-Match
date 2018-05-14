@@ -16,11 +16,13 @@ public class AudioController {
     public AudioController(MageMatch mm) {
         this._mm = mm;
 
-        float volume = UserData.GetData().masterVolume / 100f;
-        MMLog.Log_AudioCont("Volume = " + volume);
+        float masterVolume = UserData.MasterVolume;
+        MMLog.Log_AudioCont("Volume = " + masterVolume);
+        float sfxVolume = UserData.SFXVolume * masterVolume;
+        float musicVolume = UserData.MusicVolume * masterVolume;
 
-        FMODUnity.RuntimeManager.GetVCA("vca:/SoundFX").setVolume(volume);
-        FMODUnity.RuntimeManager.GetVCA("vca:/Music").setVolume(volume);
+        FMODUnity.RuntimeManager.GetVCA("vca:/SoundFX").setVolume(sfxVolume);
+        FMODUnity.RuntimeManager.GetVCA("vca:/Music").setVolume(musicVolume);
 
         clips = new Dictionary<System.Enum, string>();
 

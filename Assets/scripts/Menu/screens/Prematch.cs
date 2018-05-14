@@ -43,7 +43,7 @@ public class Prematch : MenuScreen {
 
         if (_gameSettings.trainingMode) {
             // Init GameSettings and DebugSettings
-            _gameSettings.p1name = UserData.GetData().username;
+            _gameSettings.p1name = UserData.Username;
             _gameSettings.p1char = _gameSettings.chosenChar;
             _gameSettings.p1loadout = _gameSettings.chosenLoadout;
             _gameSettings.p2name = "Training Dummy";
@@ -74,7 +74,7 @@ public class Prematch : MenuScreen {
             Connect();
 
             _p1portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.chosenChar);
-            _p1username.text = UserData.GetData().username;
+            _p1username.text = UserData.Username;
         }
     } 
     /// <summary>
@@ -175,7 +175,7 @@ public class Prematch : MenuScreen {
     public void SyncSettings() { StartCoroutine(Settings()); }
     public IEnumerator Settings() {
         int id = PhotonNetwork.player.ID;
-        string pName = UserData.GetData().username;
+        string pName = UserData.Username;
         PhotonView photonView = PhotonView.Get(this);
 
         Debug.Log("id=" + id + ", name=" + pName);
