@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{80871073-e9e3-4f2b-bb08-4722c53dfd0d}">
         <relationship name="selectables">
-            <destination>{86173997-0b04-42f7-b6be-ef9c0f4a8036}</destination>
+            <destination>{d60a287e-a336-4f74-b6fa-1031e317c874}</destination>
         </relationship>
         <relationship name="uiLastParameterSelection">
             <destination>{6e1a288b-c6b9-4cba-a1c6-3951d4610768}</destination>
@@ -29,13 +29,13 @@
     </object>
     <object class="MixerBusEffectChain" id="{01eb2e67-6c64-4922-a74a-66a4250ad627}"/>
     <object class="MixerBusPanner" id="{9d7d545c-2b87-4b94-98d7-08f945f9edc9}"/>
-    <object class="SingleSound" id="{157da6c0-938b-4411-a651-10b932954502}"/>
+    <object class="SingleSound" id="{8b14073b-57d1-4d36-9a27-da5b30b03229}"/>
     <object class="EventMixerGroup" id="{81eece18-3060-450a-99cd-80128d00ea10}"/>
     <object class="AutomationTrack" id="{d47931e6-6140-4ddb-8b73-634ec72ae1f0}"/>
-    <object class="SingleSound" id="{fcb3a593-252a-4d41-a472-824b8eb1aeb3}"/>
+    <object class="SingleSound" id="{b00237a5-122f-4c6f-8cc8-ad1240477986}"/>
     <object class="EventMixerGroup" id="{01379e25-a8a1-4181-babb-aa73ba828664}"/>
     <object class="AutomationTrack" id="{ec49e781-1187-4298-ab0c-3fb81376d2d9}"/>
-    <object class="SingleSound" id="{c4553d79-8563-4d91-a796-e80c69c62855}"/>
+    <object class="SingleSound" id="{d60a287e-a336-4f74-b6fa-1031e317c874}"/>
     <object class="EventMixerGroup" id="{0d58a6df-47d3-4f4f-90bc-e1e73bbce825}"/>
     <object class="MixerBusEffectChain" id="{489de27a-3837-48e9-9654-ca5dba0d90e1}"/>
     <object class="MixerBusPanner" id="{4353b466-5eea-4d5e-b04b-3afc767711c9}"/>

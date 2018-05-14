@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{1439b404-ad7a-45e1-9bca-2eb2da0d48b6}">
+        <relationship name="selectables">
+            <destination>{28f20e9c-f8cf-4e31-9a4b-a379d12afb68}</destination>
+        </relationship>
         <relationship name="uiLastParameterSelection">
             <destination>{42dc1375-8af3-4ebd-8695-deebb46e3fc3}</destination>
         </relationship>
@@ -22,15 +25,15 @@
     </object>
     <object class="MixerBusEffectChain" id="{57b95558-01d2-49d9-aacd-df33c2b5d7fc}"/>
     <object class="MixerBusPanner" id="{ccbcd254-a778-48c7-816b-855a32ada1ae}"/>
-    <object class="MultiSound" id="{54560e8e-05fd-4954-973d-e636fb685200}"/>
+    <object class="MultiSound" id="{28f20e9c-f8cf-4e31-9a4b-a379d12afb68}"/>
     <object class="EventMixerGroup" id="{1a7a4ae9-9317-4b8e-a9ab-65eb34528576}"/>
     <object class="MixerBusEffectChain" id="{d64e8d91-a61e-4792-839c-810173d68ada}"/>
     <object class="MixerBusPanner" id="{c112e4bc-7606-4313-a6fe-4bb23d359c7e}"/>
     <object class="MixerBusFader" id="{8117c38a-2d9d-45d0-a959-cd3f0b325459}"/>
-    <object class="SingleSound" id="{91052551-567c-4965-9fce-d61363286563}"/>
-    <object class="SingleSound" id="{4d923abd-8373-499f-9fd9-c1f886b13cf8}"/>
-    <object class="SingleSound" id="{8e0158fe-938d-4653-aa6d-34df6db88926}"/>
-    <object class="SingleSound" id="{eccc33c1-902f-4412-bc01-269b4826a3fc}"/>
+    <object class="SingleSound" id="{1ebee7c8-1b62-4277-ad7f-760a35b78a10}"/>
+    <object class="SingleSound" id="{70b08b6d-01f6-40ee-a263-5efb599f2cde}"/>
+    <object class="SingleSound" id="{331ce7d8-a5d4-4cc1-b9db-10d7fe209def}"/>
+    <object class="SingleSound" id="{39ff452a-6719-40e2-9987-912af5353b3c}"/>
     <object class="MixerBusEffectChain" id="{62ddfeac-a4e4-4988-964c-5dfc21bdcd92}"/>
     <object class="MixerBusPanner" id="{b68d9791-d990-476e-a9fd-9b6a35c2ae82}"/>
     <object class="MixerBusFader" id="{01451c60-7256-4cf2-aba3-0ca34eb398ae}"/>
