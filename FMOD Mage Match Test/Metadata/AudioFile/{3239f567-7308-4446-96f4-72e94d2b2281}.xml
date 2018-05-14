@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{3239f567-7308-4446-96f4-72e94d2b2281}">
+        <property name="assetPath">
+            <value>Alpha SFX/Alpha SFX Howling wind Pelting rain-2.wav</value>
+        </property>
+        <property name="isStreaming">
+            <value>true</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>48</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>10.1119375</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{0e7a862c-576d-481b-989e-149ea9351a5b}</destination>
+        </relationship>
+    </object>
+</objects>

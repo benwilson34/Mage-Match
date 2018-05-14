@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{f076cb2e-01c9-4576-baa4-d137403dd525}">
+        <property name="assetPath">
+            <value>Alpha SFX/Alpha SFC Zombify Components-6.wav</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>48</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>0.8530833333333333</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{0e7a862c-576d-481b-989e-149ea9351a5b}</destination>
+        </relationship>
+    </object>
+</objects>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{b418fbfe-51d4-4d44-8ef8-10214539aa1c}">
+        <property name="assetPath">
+            <value>Alpha SFX Mariposa -4.wav</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>48</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>3.7538541666666667</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{0e7a862c-576d-481b-989e-149ea9351a5b}</destination>
+        </relationship>
+    </object>
+</objects>

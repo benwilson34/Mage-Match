@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{c59f9840-f14b-4a70-bf47-90040d43c7bc}">
+        <property name="assetPath">
+            <value>Plastic Button Toy_TS 02.ogg</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>48</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>0.19312499999999999</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{0e7a862c-576d-481b-989e-149ea9351a5b}</destination>
+        </relationship>
+    </object>
+</objects>

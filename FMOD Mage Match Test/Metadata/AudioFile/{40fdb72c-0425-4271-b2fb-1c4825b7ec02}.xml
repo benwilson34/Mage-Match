@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{40fdb72c-0425-4271-b2fb-1c4825b7ec02}">
+        <property name="assetPath">
+            <value>Alpha SFX/Alpha SFX Party Crasher Cheer-3.wav</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>48</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>8.4948958333333326</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{0e7a862c-576d-481b-989e-149ea9351a5b}</destination>
+        </relationship>
+    </object>
+</objects>
