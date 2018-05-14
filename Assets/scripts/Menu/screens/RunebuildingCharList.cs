@@ -7,21 +7,14 @@ public class RunebuildingCharList : MenuScreen {
 
     private Transform _scrCharList;
     private GameObject _itemPF;
-    private bool _loadedRuneInfo;
 
     public override void OnLoad() {
         _scrCharList = transform.Find("scr_char").Find("Viewport").Find("Content");
         _itemPF = Resources.Load("prefabs/menu/runebuildingCharListItem") as GameObject;
-        _loadedRuneInfo = false;
     }
 
-    public override void OnPass(object o) { }
-
     public override void OnShowScreen() {
-        if (!_loadedRuneInfo) {
-            RuneInfoLoader.InitAllRuneInfo();
-            _loadedRuneInfo = true;
-        }
+        MenuController.LoadRuneInfo();
 
         foreach (Transform child in _scrCharList)
             GameObject.Destroy(child.gameObject);

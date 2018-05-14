@@ -149,6 +149,9 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             case "MuscleMass":
                 go = GameObject.Instantiate(_td_muscleMass);
                 break;
+            case "RainDrops":
+                go = GameObject.Instantiate(_td_muscleMass); // <-- TODO
+                break;
 
             default:
                 MMLog.LogError("HEXMAN: Tried to init a token with bad name=" + type);
@@ -162,6 +165,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return tb;
     }
 
+    // TODO use a dynamically populated Dictionary for this!!
     public Charm GenerateCharm(int id, string type) {
         GameObject go;
         switch (type) {
@@ -188,9 +192,6 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             case "WaterLily":
                 go = GameObject.Instantiate(_c_waterLily);
                 break;
-            case "RainDrops":
-                go = GameObject.Instantiate(_c_waterLily); // <-- TODO
-                break;
             case "ShuffleGem":
                 go = GameObject.Instantiate(_c_shuffleGem);
                 break;
@@ -209,7 +210,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
                 break;
 
             default:
-                MMLog.LogError("HEXMAN: Tried to init a consumable with bad type=" + type);
+                MMLog.LogError("HEXMAN: Tried to init a charm with bad type=" + type);
                 return null;
         }
 

@@ -9,7 +9,7 @@ public class CharacterSelect : MenuScreen {
     //private Transform characterBlock;
     private Image _charPortraitFrame, _charPortrait;
     private Text _charName, _charT;
-    private Button _bConfirm;
+    private Button _bEditLoadout, _bConfirm;
     private Dropdown _ddLoadouts;
     private LoadoutData[] _loadouts;
     private GameObject goldSelectionPF, redSelectionPF;
@@ -27,14 +27,13 @@ public class CharacterSelect : MenuScreen {
         _charName = transform.Find("t_charName").GetComponent<Text>();
         //charT = transform.Find("t_charInfo").GetComponent<Text>();
 
+        _bEditLoadout = transform.Find("b_editLoadout").GetComponent<Button>();
         _bConfirm = transform.Find("b_confirm").GetComponent<Button>();
 
         _ddLoadouts = transform.Find("dd_loadouts").GetComponent<Dropdown>();
 
         _menu = GameObject.Find("world ui").GetComponent<MenuController>();
     }
-
-    public override void OnPass(object o) { }
 
     public override void OnShowScreen() {
         _thisPlayerLocked = false;
@@ -44,6 +43,7 @@ public class CharacterSelect : MenuScreen {
         _charPortraitFrame.color = Color.clear;
         _charPortrait.enabled = false;
         //charT.text = "";
+        _bEditLoadout.interactable = false;
         _bConfirm.interactable = false;
         _ddLoadouts.ClearOptions();
         _ddLoadouts.interactable = false;
@@ -53,6 +53,10 @@ public class CharacterSelect : MenuScreen {
             tGamemode.text = "Select character for Training";
         else
             tGamemode.text = "Select character for Online Battle";
+    }
+
+    public override void OnBack() {
+        UpdateLoadoutDropdown(false);
     }
 
     public void OnChooseEnfuego() {
@@ -79,12 +83,24 @@ public class CharacterSelect : MenuScreen {
         //string info = CharacterInfo.GetCharacterInfo(ch);
         //charT.text = info;
 
-        _loadouts = LoadoutData.GetLoadoutList(ch);
+        UpdateLoadoutDropdown();
+    }
+
+    void UpdateLoadoutDropdown(bool resetValue = true) {
+        _loadouts = LoadoutData.GetLoadoutList(_localChar);
         _ddLoadouts.ClearOptions();
         _ddLoadouts.AddOptions((from loadout in _loadouts select loadout.name).ToList());
         _ddLoadouts.interactable = true;
 
+        if (resetValue)
+            _ddLoadouts.value = 0;
+        OnLoadoutDropdownChange();
+
         _bConfirm.interactable = true;
+    }
+
+    public void OnLoadoutDropdownChange() {
+        _bEditLoadout.interactable = !_loadouts[_ddLoadouts.value].isDefault;
     }
 
     // TODO move to asset loader once I make that
@@ -101,6 +117,11 @@ public class CharacterSelect : MenuScreen {
             default:
                 return null;
         }
+    }
+
+    public void OnLoadoutEditClick() {
+        MenuController.LoadRuneInfo();
+        _menu.ChangeToRunebuilding_EditLoadout(_localChar, _loadouts[_ddLoadouts.value]);
     }
 
     public void OnConfirm() {

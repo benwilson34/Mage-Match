@@ -14,6 +14,8 @@ public class MenuController : MonoBehaviour {
     private GameObject _backButton;
     private Stack<Screen> _backStack;
 
+    private static bool _loadedRuneInfo = false;
+
 	void Start () {
         UserData.Init();
 
@@ -27,6 +29,13 @@ public class MenuController : MonoBehaviour {
         _backStack = new Stack<Screen>();
         ChangeToMainMenu();
 	}
+
+    public static void LoadRuneInfo() {
+        if (!_loadedRuneInfo) {
+            RuneInfoLoader.InitAllRuneInfo();
+            _loadedRuneInfo = true;
+        }
+    }
 
     public void ChangeToMainMenu() { ChangeScreens(Screen.MainMenu); }
     public void ChangeToTraining() { ChangeScreens(Screen.Training); }

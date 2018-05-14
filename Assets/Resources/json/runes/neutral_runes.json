@@ -10,7 +10,7 @@
 
   "MuscleMass": {
     "title": "Muscle Mass",
-    "category": "Charm",
+    "category": "Tile",
     "keywords": ["Duplicate"],
     "deckCount": 9,
     "desc": "Basic Muscle tile with Duplicate."
@@ -39,7 +39,7 @@
   },
   "RainDrops": {
     "title": "Rain Drops",
-    "category": "Charm",
+    "category": "Tile",
     "keywords": ["Duplicate"],
     "deckCount": 9,
     "desc": "Basic Water tile with Duplicate."
