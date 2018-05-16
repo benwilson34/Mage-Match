@@ -2,6 +2,18 @@ Library/
 obj/
 build/
 Temp/
+
+[Ee]xported[Oo]bj/
+.vs/
+/*.userprefs
+/*.csproj
+/*.pidb
+*.pidb.meta
+/*.suo
+/*.user
+/*.tmp
+/*.svd
+
 Assets/Photon Unity Networking/Demos
 MMDebug/MMDebug/bin/Debug/MMDebug.dll.mdb
 *.zip

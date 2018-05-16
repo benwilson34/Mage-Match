@@ -151,7 +151,7 @@ public class MageMatch : MonoBehaviour {
 
 
         // TODO animate beginning of game
-        yield return new WaitForSeconds(5);
+        //yield return new WaitForSeconds(5);
         uiCont.AnimateBeginningOfGame();
 
         for (int i = 0; i < 7; i++) {
