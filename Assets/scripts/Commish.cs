@@ -13,10 +13,10 @@ public class Commish  {
         _mm = mm;
     }
 
-    public void InitEvents() {
+    //public void InitEvents() {
         //_mm.eventCont.commishMatch += OnCommishMatch;
         //mm.eventCont.match += OnMatch;
-    }
+    //}
 
     //public void OnCommishMatch(string[] seqs) {
     //    int sum = 0;

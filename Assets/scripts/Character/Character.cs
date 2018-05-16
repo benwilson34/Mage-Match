@@ -37,8 +37,9 @@ public abstract class Character {
         _hexMan = mm.hexMan;
         _runes = new List<string>();
 
-        mm.onEffectContReady += OnEffectContLoad;
-        mm.onEventContReady += OnEventContLoad;
+        _mm.AddEffectContLoadEvent(OnEffectContLoad);
+        _mm.AddEventContLoadEvent(InitEvents);
+        _mm.AddEventContLoadEvent(OnEventContLoad);
 
         CharacterInfo info = CharacterInfo.GetCharacterInfo(ch);
         characterName = info.name;
@@ -219,47 +220,12 @@ public abstract class Character {
         return new List<Spell>(_spells);
     }
 
-    public List<TileSeq> GetTileSeqList() {
-        List<TileSeq> outlist = new List<TileSeq>();
-        foreach (Spell s in _spells)
-            outlist.Add(s.GetTileSeq());
-        return outlist;
-    }
-
-    
-    // ----------  DECK  ----------
-
-    //protected void SetDeckElements(int[] fweam) {
-    //    _basicDeck = fweam;
+    //public List<TileSeq> GetTileSeqList() {
+    //    List<TileSeq> outlist = new List<TileSeq>();
+    //    foreach (Spell s in _spells)
+    //        outlist.Add(s.GetTileSeq());
+    //    return outlist;
     //}
-
-    //// eventually we will need to generate a deck so this won't be needed.
-    //public Tile.Element GetDeckBasicTile() {
-    //    int rand = Random.Range(0, DECK_BASIC_COUNT);
-
-    //    for (int e = 1; e <= 5; e++) {
-    //        int threshold = 0;
-    //        for (int i = 0; i < e; i++)
-    //            threshold += _basicDeck[i];
-    //        if (rand < threshold)
-    //            return (Tile.Element)e;
-    //    }
-    //    MMDebug.MMLog.LogError("CHARACTER: Generating a tile from the deck didn't work?");
-    //    return Tile.Element.None;
-    //}
-
-    //public string GenerateHexTag() {
-    //    int total = 50 + (_runes.Count * 10);
-    //    int rand = Random.Range(0, total);
-
-    //    if (rand < 50)
-    //        return "p" + _playerId + "-B-" + GetDeckBasicTile().ToString().Substring(0, 1); // + "-" ?
-    //    else {
-    //        int index = Mathf.CeilToInt((rand - 50) / 10f); 
-    //        return _runes[index]; // + "-" ?
-    //    }
-    //}
-
 
     public Player ThisPlayer() {
         return _mm.GetPlayer(_playerId);

@@ -19,9 +19,9 @@ public class Player {
     private int _ap;
     //private MatchEffect _matchEffect;
 
-    public Player(int playerId) {
+    public Player(MageMatch mm, int playerId) {
         _ap = 0;
-        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _mm = mm;
         id = playerId;
         hand = new Hand(_mm, this);
 
@@ -39,9 +39,11 @@ public class Player {
 
         character = Character.Load(_mm, id);
         deck = new Deck(_mm, this);
+
+        _mm.AddEventContLoadEvent(OnEventContLoaded);
     }
 
-    public void InitEvents() {
+    public void OnEventContLoaded() {
         character.InitEvents();
         _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Player);
     }

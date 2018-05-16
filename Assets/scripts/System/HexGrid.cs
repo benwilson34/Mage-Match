@@ -16,9 +16,9 @@ public class HexGrid {
     //private float _bbLeft, _bbRight, _bbBottom, _bbBottomLeft, _bbTop;
 	// TODO private List<TileBehav> _tilesOnBoard?
 
-	public HexGrid(){
+	public HexGrid(MageMatch mm){
 		_tileGrid = new TileBehav[NUM_COLS, NUM_ROWS];
-        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+        _mm = mm;
 
         _cells = new CellBehav[NUM_COLS, NUM_ROWS];
         for (int c = 0; c < NUM_COLS; c++) {

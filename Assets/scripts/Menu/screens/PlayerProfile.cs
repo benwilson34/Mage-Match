@@ -32,15 +32,13 @@ public class PlayerProfile : MenuScreen {
     public void OnConfirmChangeName() {
         string newName = _inputName.text;
         Debug.Log("Changing name to " + newName);
-        UserData data = UserData.GetData();
-        data.username = newName;
-        UserData.SaveData(data);
+        UserData.Username = newName;
 
         _inputName.text = "";
         ShowUsername();
     }
 
     void ShowUsername() {
-        _tName.text = "Name: " + UserData.GetData().username;
+        _tName.text = "Name: " + UserData.Username;
     }
 }

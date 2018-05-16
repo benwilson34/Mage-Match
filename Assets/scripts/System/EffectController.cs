@@ -27,9 +27,11 @@ public class EffectController {
         _swapEffects = new List<SwapEffect>();
         _healthEffects = new List<HealthModEffect>();
         _tagDict = new Dictionary<string, int>();
+
+        _mm.AddEventContLoadEvent(OnEventContLoaded);
     }
 
-    public void InitEvents() {
+    public void OnEventContLoaded() {
         _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.EventEffects);
         _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.EventEffects);
         //mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.EventEffects);

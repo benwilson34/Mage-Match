@@ -1,4 +1,17 @@
 {
+	"Neutral": {
+		"name": "Sample",
+		"runes": [
+		    "MuscleMass",
+		    "Brushfire",
+		    "Leeches",
+		   	"WhiteWater",
+			"ShuffleGem",
+		    "RainDrops",
+		    "SampleCharm"
+  		]
+	},
+
 	"Valeria": {
 		"name": "Valeria Default",
 		"runes": [

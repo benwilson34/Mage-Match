@@ -9,7 +9,6 @@ using System.Collections;
 public class InputController : MonoBehaviour {
 
 	private MageMatch _mm;
-    private Targeting _targeting;
     private MonoBehaviour _mouseObj;
     private Reporter _reporter;
     private bool _blocking = false;
@@ -25,12 +24,14 @@ public class InputController : MonoBehaviour {
     private bool _validClick = true;
 
 	void Start() {
-		_mm = GameObject.Find ("board").GetComponent<MageMatch> ();
-        _targeting = _mm.targeting;
-        InitContexts();
         GameObject reporterGO = GameObject.Find("Reporter");
         if (reporterGO != null)
             _reporter = reporterGO.GetComponent<Reporter>();
+    }
+
+    public void Init(MageMatch mm) {
+        _mm = mm;
+        InitContexts();
     }
 
 	void Update(){
@@ -634,18 +635,28 @@ public class InputController : MonoBehaviour {
     public void SwitchContext(MageMatch.State state) {
         MMLog.Log_InputCont("Switching context with state=" + state);
         switch (state) {
+            case MageMatch.State.Normal:
+                // check for my turn?
+                MMLog.Log_InputCont("Normal context set.");
+                _currentContext = _myTurn;
+                break;
+
+            case MageMatch.State.BeginningOfGame:
+                _currentContext = _block;
+                break;
+
+            case MageMatch.State.Selecting:
+                _currentContext = _selection;
+                break;
+
             case MageMatch.State.Targeting:
-                Targeting.TargetMode tMode = _targeting.currentTMode;
+                Targeting.TargetMode tMode = _mm.targeting.currentTMode;
                 if (tMode == Targeting.TargetMode.Drag)
                     _currentContext = _target_drag;
                 else if (tMode == Targeting.TargetMode.Tile || tMode == Targeting.TargetMode.TileArea)
                     _currentContext = _target_tile;
                 else
                     _currentContext = _target_cell;
-                break;
-
-            case MageMatch.State.Selecting:
-                _currentContext = _selection;
                 break;
 
             case MageMatch.State.NewsfeedMenu:
@@ -657,12 +668,6 @@ public class InputController : MonoBehaviour {
                     _currentContext = _debugMenu;
                 } else
                     _currentContext = _block;
-                break;
-
-            case MageMatch.State.Normal:
-                // check for my turn?
-                MMLog.Log_InputCont("Normal context set.");
-                _currentContext = _myTurn;
                 break;
 
             case MageMatch.State.TurnSwitching:
