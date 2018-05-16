@@ -8,6 +8,12 @@ public class AudioController {
     public enum EnfuegoSoundEffect { BurningEnchant, BurningDamage, BurningTimeout, FieryFandango, Baila, Incinerate, WHCK };
     public enum GraveKSoundEffect { ZombieEnchant, ZombieAttack, ZombieGulp, PartyInTheBack, OogieBoogie, PartyCrashers, Motorcycle, SigBell1, SigDrop, SigEffect, SigBell2 };
     public enum ValeriaSoundEffect { SwirlingWater, Healing, Mariposa, RainDance, Bubbles1, Bubbles2, SigCut, SigWaveCrash, ThunderFar, ThunderClose, Rain };
+
+    public enum Rune_NeutralSFX { SampleCharm, ProteinPills, Leeches, ShuffleGem, Molotov, FiveAlarmBell }
+    public enum Rune_EnfuegoSFX { DanceShoes, BurningBracers }
+    public enum Rune_GravekeeperSFX { HRForm, PartySnacks }
+    public enum Rune_ValeriaSFX { Bandages, WaterLily }
+
     public enum OtherSoundEffect { BackgroundMusic, GameStart, GameEnd, APGain, LowHealthWarning, FullMeter, TurnTimerWarning, TurnTimeout, UIButton, ChooseTarget, CrowdGasp };
 
     private MageMatch _mm;
@@ -36,46 +42,64 @@ public class AudioController {
 
 
         // ----- enfuego -----
-        clips.Add(EnfuegoSoundEffect.BurningEnchant, "event:/Enfuego/Burning_Enchant");
-        clips.Add(EnfuegoSoundEffect.BurningDamage, "event:/Enfuego/Burning_Damage");
-        clips.Add(EnfuegoSoundEffect.BurningTimeout, "event:/Enfuego/Burning_Timeout");
+        clips.Add(EnfuegoSoundEffect.BurningEnchant, "event:/CharacterSpells/Enfuego/Burning_Enchant");
+        clips.Add(EnfuegoSoundEffect.BurningDamage, "event:/CharacterSpells/Enfuego/Burning_Damage");
+        clips.Add(EnfuegoSoundEffect.BurningTimeout, "event:/CharacterSpells/Enfuego/Burning_Timeout");
 
-        clips.Add(EnfuegoSoundEffect.FieryFandango, "event:/Enfuego/Enf_FieryFandango");
-        clips.Add(EnfuegoSoundEffect.Baila, "event:/Enfuego/Enf_Baila");
-        clips.Add(EnfuegoSoundEffect.Incinerate, "event:/Enfuego/Enf_Incinerate");
-        clips.Add(EnfuegoSoundEffect.WHCK, "event:/Enfuego/Enf_WHCK");
+        clips.Add(EnfuegoSoundEffect.FieryFandango, "event:/CharacterSpells/Enfuego/Enf_FieryFandango");
+        clips.Add(EnfuegoSoundEffect.Baila, "event:/CharacterSpells/Enfuego/Enf_Baila");
+        clips.Add(EnfuegoSoundEffect.Incinerate, "event:/CharacterSpells/Enfuego/Enf_Incinerate");
+        clips.Add(EnfuegoSoundEffect.WHCK, "event:/CharacterSpells/Enfuego/Enf_WHCK");
 
         
         // ----- gravekeeper -----
-        clips.Add(GraveKSoundEffect.ZombieEnchant, "event:/Gravekeeper/Zombie_Enchant");
-        clips.Add(GraveKSoundEffect.ZombieAttack, "event:/Gravekeeper/Zombie_Attack");
-        clips.Add(GraveKSoundEffect.ZombieGulp, "event:/Gravekeeper/Zombie_Gulp");
+        clips.Add(GraveKSoundEffect.ZombieEnchant, "event:/CharacterSpells/Gravekeeper/Zombie_Enchant");
+        clips.Add(GraveKSoundEffect.ZombieAttack, "event:/CharacterSpells/Gravekeeper/Zombie_Attack");
+        clips.Add(GraveKSoundEffect.ZombieGulp, "event:/CharacterSpells/Gravekeeper/Zombie_Gulp");
 
-        clips.Add(GraveKSoundEffect.PartyInTheBack, "event:/Gravekeeper/Gra_PartyInTheBack");
-        clips.Add(GraveKSoundEffect.OogieBoogie, "event:/Gravekeeper/Gra_OogieBoogie");
-        clips.Add(GraveKSoundEffect.PartyCrashers, "event:/Gravekeeper/Gra_PartyCrashers");
+        clips.Add(GraveKSoundEffect.PartyInTheBack, "event:/CharacterSpells/Gravekeeper/Gra_PartyInTheBack");
+        clips.Add(GraveKSoundEffect.OogieBoogie, "event:/CharacterSpells/Gravekeeper/Gra_OogieBoogie");
+        clips.Add(GraveKSoundEffect.PartyCrashers, "event:/CharacterSpells/Gravekeeper/Gra_PartyCrashers");
 
-        clips.Add(GraveKSoundEffect.Motorcycle, "event:/Gravekeeper/Gra_Motorcycle");
-        clips.Add(GraveKSoundEffect.SigBell1, "event:/Gravekeeper/Gra_TSBell");
-        clips.Add(GraveKSoundEffect.SigDrop, "event:/Gravekeeper/Gra_TSDrop");
-        clips.Add(GraveKSoundEffect.SigEffect, "event:/Gravekeeper/Gra_TSEffect");
-        clips.Add(GraveKSoundEffect.SigBell2, "event:/Gravekeeper/Gra_ChurchBell");
+        clips.Add(GraveKSoundEffect.Motorcycle, "event:/CharacterSpells/Gravekeeper/Gra_Motorcycle");
+        clips.Add(GraveKSoundEffect.SigBell1, "event:/CharacterSpells/Gravekeeper/Gra_TSBell");
+        clips.Add(GraveKSoundEffect.SigDrop, "event:/CharacterSpells/Gravekeeper/Gra_TSDrop");
+        clips.Add(GraveKSoundEffect.SigEffect, "event:/CharacterSpells/Gravekeeper/Gra_TSEffect");
+        clips.Add(GraveKSoundEffect.SigBell2, "event:/CharacterSpells/Gravekeeper/Gra_ChurchBell");
 
 
         // ----- valeria -----
-        clips.Add(ValeriaSoundEffect.SwirlingWater, "event:/Valeria/Val_SwirlingWater");
-        clips.Add(ValeriaSoundEffect.Healing, "event:/Valeria/Val_Healing");
-        clips.Add(ValeriaSoundEffect.Mariposa, "event:/Valeria/Val_Mariposa");
-        clips.Add(ValeriaSoundEffect.RainDance, "event:/Valeria/Val_RainDance");
-        clips.Add(ValeriaSoundEffect.Bubbles1, "event:/Valeria/Val_Bubbles1");
-        clips.Add(ValeriaSoundEffect.Bubbles2, "event:/Valeria/Val_Bubbles2");
+        clips.Add(ValeriaSoundEffect.SwirlingWater, "event:/CharacterSpells/Valeria/Val_SwirlingWater");
+        clips.Add(ValeriaSoundEffect.Healing, "event:/CharacterSpells/Valeria/Val_Healing");
+        clips.Add(ValeriaSoundEffect.Mariposa, "event:/CharacterSpells/Valeria/Val_Mariposa");
+        clips.Add(ValeriaSoundEffect.RainDance, "event:/CharacterSpells/Valeria/Val_RainDance");
+        clips.Add(ValeriaSoundEffect.Bubbles1, "event:/CharacterSpells/Valeria/Val_Bubbles1");
+        clips.Add(ValeriaSoundEffect.Bubbles2, "event:/CharacterSpells/Valeria/Val_Bubbles2");
 
-        clips.Add(ValeriaSoundEffect.SigCut, "event:/Valeria/Val_SigCut");
-        clips.Add(ValeriaSoundEffect.SigWaveCrash, "event:/Valeria/Val_SigWaveCrash");
+        clips.Add(ValeriaSoundEffect.SigCut, "event:/CharacterSpells/Valeria/Val_SigCut");
+        clips.Add(ValeriaSoundEffect.SigWaveCrash, "event:/CharacterSpells/Valeria/Val_SigWaveCrash");
 
-        clips.Add(ValeriaSoundEffect.ThunderFar, "event:/Valeria/Val_SigThunderFar");
-        clips.Add(ValeriaSoundEffect.ThunderClose, "event:/Valeria/Val_SigThunderClose");
-        clips.Add(ValeriaSoundEffect.Rain, "event:/Valeria/Val_SigRain");
+        clips.Add(ValeriaSoundEffect.ThunderFar, "event:/CharacterSpells/Valeria/Val_SigThunderFar");
+        clips.Add(ValeriaSoundEffect.ThunderClose, "event:/CharacterSpells/Valeria/Val_SigThunderClose");
+        clips.Add(ValeriaSoundEffect.Rain, "event:/CharacterSpells/Valeria/Val_SigRain");
+
+
+        // ----- runes -----
+        clips.Add(Rune_NeutralSFX.SampleCharm, "event:/Runes/Neutral/SampleCharm");
+        clips.Add(Rune_NeutralSFX.ProteinPills, "event:/Runes/Neutral/ProteinPills");
+        clips.Add(Rune_NeutralSFX.Leeches, "event:/Runes/Neutral/Leeches");
+        clips.Add(Rune_NeutralSFX.ShuffleGem, "event:/Runes/Neutral/ShuffleGem");
+        clips.Add(Rune_NeutralSFX.Molotov, "event:/Runes/Neutral/Molotov");
+        clips.Add(Rune_NeutralSFX.FiveAlarmBell, "event:/Runes/Neutral/FiveAlarmBell");
+
+        clips.Add(Rune_EnfuegoSFX.DanceShoes, "event:/Runes/Enfuego/DanceShoes");
+        clips.Add(Rune_EnfuegoSFX.BurningBracers, "event:/Runes/Enfuego/Val_SigRain");
+
+        clips.Add(Rune_GravekeeperSFX.HRForm, "event:/Runes/Valeria/Val_SigRain");
+        clips.Add(Rune_GravekeeperSFX.PartySnacks, "event:/Runes/Valeria/BurningBracers");
+
+        clips.Add(Rune_ValeriaSFX.Bandages, "event:/Runes/Valeria/Bandages");
+        clips.Add(Rune_ValeriaSFX.WaterLily, "event:/Runes/Valeria/WaterLily");
 
 
         // ----- other -----

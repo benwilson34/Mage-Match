@@ -8,6 +8,8 @@ public class VA_Bandages : Charm {
         int rand = _mm.syncManager.GetRand();
         ThisCharacter().Heal(rand);
 
+        _mm.audioCont.Trigger(AudioController.Rune_ValeriaSFX.Bandages);
+
         // mult, receiving
         HealthModEffect buff = new HealthModEffect(_playerId, Bandages_HE, false, true, 2);
         _mm.effectCont.AddHealthEffect(buff, "Bandg");

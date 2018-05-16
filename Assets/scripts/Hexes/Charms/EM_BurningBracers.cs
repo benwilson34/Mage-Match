@@ -16,6 +16,7 @@ public class EM_BurningBracers : Charm {
 
     public override IEnumerator DropEffect() {
         _mm.GetPlayer(TagPlayer(hextag)).IncreaseAP();
+        _mm.audioCont.Trigger(AudioController.Rune_EnfuegoSFX.BurningBracers);
         yield return null;
     }
 }

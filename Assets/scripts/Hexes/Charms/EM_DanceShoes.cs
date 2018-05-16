@@ -14,6 +14,8 @@ public class EM_DanceShoes : Charm {
             if(tbs[i].CanSetEnch(Enchantment.Type.Burning))
                 yield return _mm.hexFX.Ench_SetBurning(TagPlayer(hextag), tbs[i]);
         }
+
+        _mm.audioCont.Trigger(AudioController.Rune_EnfuegoSFX.DanceShoes);
         yield return _mm.prompt.ContinueSwap();
     }
 }

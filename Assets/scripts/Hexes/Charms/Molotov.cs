@@ -8,6 +8,8 @@ public class Molotov : Charm {
         ThisCharacter().DealDamage(30);
         yield return _mm.targeting.WaitForTileAreaTarget(false);
 
+        _mm.audioCont.Trigger(AudioController.Rune_NeutralSFX.Molotov);
+
         int id = TagPlayer(hextag);
         var tbs = _mm.targeting.GetTargetTBs();
         tbs = TileFilter.FilterByAbleEnch(tbs, Enchantment.Type.Burning);

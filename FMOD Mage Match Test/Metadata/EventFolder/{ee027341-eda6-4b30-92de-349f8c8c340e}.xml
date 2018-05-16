@@ -5,7 +5,7 @@
             <value>Enfuego</value>
         </property>
         <relationship name="folder">
-            <destination>{f69f200e-60a3-4fe8-8423-f2c7b30bc84d}</destination>
+            <destination>{e56f5afd-284c-4bd4-9a45-636ac54de7ef}</destination>
         </relationship>
     </object>
 </objects>

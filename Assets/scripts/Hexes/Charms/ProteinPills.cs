@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class ProteinPills : Charm {
     public override IEnumerator DropEffect() {
+        _mm.audioCont.Trigger(AudioController.Rune_NeutralSFX.ProteinPills);
+
         HealthModEffect buffDealing = new HealthModEffect(_playerId, PP_BuffDeal, false, true, 2);
         _mm.effectCont.AddHealthEffect(buffDealing, "PPdea");
         HealthModEffect buffReceiving = new HealthModEffect(_playerId, PP_BuffDeal, false, false, 2);

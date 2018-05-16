@@ -9,6 +9,8 @@ public class FiveAlarmBell : Charm {
     public override IEnumerator DropEffect() {
         yield return _mm.targeting.WaitForDragTarget(5);
 
+        _mm.audioCont.Trigger(AudioController.Rune_NeutralSFX.FiveAlarmBell);
+
         int id = TagPlayer(hextag);
         foreach (var tb in _mm.targeting.GetTargetTBs()) {
             _mm.hexFX.Ench_SetBurning(id, tb);
