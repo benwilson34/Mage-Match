@@ -355,7 +355,6 @@
     <None Include="Assets\Plugins\FMOD\LICENSE.TXT" />
     <None Include="Assets\Plugins\Photon3Unity3D.xml" />
     <None Include="Assets\Plugins\release_history.txt" />
-    <None Include="Assets\Resources\json\spanish.txt" />
     <None Include="Assets\StreamingAssets\build_info.txt" />
     <None Include="Assets\fonts\OpenSans\License!.txt" />
   </ItemGroup>

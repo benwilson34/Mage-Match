@@ -13,9 +13,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: FMOD\FMOD.fspro
-  SourceProjectPathUnformatted: FMOD\FMOD.fspro
-  SourceBankPathUnformatted: FMOD\Build
+  sourceProjectPath: FMOD Mage Match Test\FMOD Mage Match Test.fspro
+  SourceProjectPathUnformatted: FMOD Mage Match Test\FMOD Mage Match Test.fspro
+  SourceBankPathUnformatted: FMOD Mage Match Test\Build
   AutomaticEventLoading: 1
   AutomaticSampleLoading: 0
   ImportType: 0

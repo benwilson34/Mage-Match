@@ -5,7 +5,7 @@
             <value>Val_SigWaveCrash</value>
         </property>
         <property name="outputFormat">
-            <value>1</value>
+            <value>0</value>
         </property>
         <relationship name="folder">
             <destination>{540ce8e9-a53d-48dd-a1b6-f352c2d64d57}</destination>
@@ -95,10 +95,6 @@
         <property name="length">
             <value>6.1130624999999998</value>
         </property>
-        <relationship name="sounds">
-            <destination>{df85a638-bbad-40dd-ab87-e050638dd9f6}</destination>
-            <destination>{466aff5a-5049-4360-9d0d-5cd264f6fec5}</destination>
-        </relationship>
     </object>
     <object class="EventMixerGroup" id="{f9cf9d0f-270b-46ba-bf78-a7e302bcbda8}">
         <property name="name">
@@ -121,16 +117,6 @@
     </object>
     <object class="MixerBusPanner" id="{ab78ae34-4e08-40ac-b0aa-edcd453bc11e}"/>
     <object class="MixerBusFader" id="{1693785d-3664-49d3-97bb-e50d0b20664b}"/>
-    <object class="SingleSound" id="{df85a638-bbad-40dd-ab87-e050638dd9f6}">
-        <relationship name="audioFile">
-            <destination>{f2195cf2-c35d-4f74-8bac-bec837b8c24d}</destination>
-        </relationship>
-    </object>
-    <object class="SingleSound" id="{466aff5a-5049-4360-9d0d-5cd264f6fec5}">
-        <relationship name="audioFile">
-            <destination>{af88640f-dca2-4a92-b479-cdb6a3db9dfa}</destination>
-        </relationship>
-    </object>
     <object class="MixerBusEffectChain" id="{accbeb66-a57e-4e46-ac1d-f5918d880316}">
         <relationship name="effects">
             <destination>{e47041cf-309c-4ec6-adb9-c80890221f0c}</destination>
