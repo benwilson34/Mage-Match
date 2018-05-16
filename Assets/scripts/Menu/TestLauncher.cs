@@ -16,15 +16,7 @@ public class TestLauncher : MonoBehaviour {
 
         gameSettings.p2name = "Training Dummy";
         gameSettings.p2char = Character.Ch.Neutral;
-        gameSettings.p2loadout = new string[7] {
-            "SampleCharm",
-            "SampleCharm",
-            "SampleCharm",
-            "SampleCharm",
-            "SampleCharm",
-            "SampleCharm",
-            "SampleCharm"
-        };
+        gameSettings.p2loadout = LoadoutData.GetDefaultLoadout(Character.Ch.Neutral).runes;
 
         // TODO other settings
         gameSettings.trainingMode = true;

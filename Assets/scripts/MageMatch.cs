@@ -48,10 +48,18 @@ public class MageMatch : MonoBehaviour {
     private bool _isDebugMode = false, _isReplayMode = false;
 
     public delegate void LoadEvent();
-    public event LoadEvent onEffectContReady;
-    public event LoadEvent onEventContReady;
+    private List<LoadEvent> _onEffectContLoaded;
+    private List<LoadEvent> _onEventContLoaded;
+    private List<LoadEvent> _onPlayersLoaded;
 
     void Start() {
+        StartCoroutine(InitGame());
+    }
+
+    public IEnumerator InitGame() {
+        _onEffectContLoaded = new List<LoadEvent>();
+        _onEventContLoaded = new List<LoadEvent>();
+        _onPlayersLoaded = new List<LoadEvent>();
         MMLog.Init(debugLogLevel);
         UserData.Init();
         //CharacterInfo.Init();
@@ -74,62 +82,61 @@ public class MageMatch : MonoBehaviour {
             //PhotonNetwork.JoinRoom("debug");
         }
 
-        _stateStack = new Stack<State>();
+        myID = IsDebugMode() ? 1 : PhotonNetwork.player.ID;
 
-        StartCoroutine(Reset());
-    }
-
-    public IEnumerator Reset() {
         inputCont = GetComponent<InputController>();
+        inputCont.Init(this);
+        uiCont = GameObject.Find("world ui").GetComponent<UIController>();
+        uiCont.Init(this);
+
+        _stateStack = new Stack<State>();
         EnterState(State.Normal);
         EnterState(State.BeginningOfGame);
 
         _tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
         gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
-        MMLog.Log_MageMatch("gamesettings: p1="+gameSettings.p1name + ",p1 char=" + gameSettings.p1char + ",p2="+gameSettings.p2name+",p2 char=" + gameSettings.p2char+",timer=" +gameSettings.turnTimerOn);
+        MMLog.Log_MageMatch(gameSettings.SettingsToString());
 
         RuneInfoLoader.InitInGameRuneInfo(gameSettings);
 
-        if (IsDebugMode())
-            myID = 1;
-        else
-            myID = PhotonNetwork.player.ID;
-
-        uiCont = GameObject.Find("world ui").GetComponent<UIController>();
-        uiCont.Init();
         timer = gameObject.GetComponent<TurnTimer>();
         
         targeting = new Targeting(this);
         prompt = new Prompt(this);
         audioCont = new AudioController(this);
         animCont = GetComponent<AnimationController>();
+        animCont.Init(this);
+
+        eventCont = new EventController(this);
+        EventContLoaded();
+        InitEvents();
 
         syncManager = GetComponent<SyncManager>();
         syncManager.Init(this);
-        //yield return syncManager.SyncRandomSeed(Random.Range(0, 255));
 
-        hexGrid = new HexGrid();
+        stats = new Stats(this); // depends on Players, EventCont
+
+        hexGrid = new HexGrid(this);
         hexMan = new HexManager(this);
-        TileFilter.Init(hexGrid);
+        TileFilter.Init(hexGrid); // depends on HexGrid
 
         debugTools = GameObject.Find("Debug").GetComponent<DebugTools>();
         debugTools.Init(this);
 
-        uiCont.GetCellOverlays();
+        uiCont.GetCellOverlays(); // depends on HexGrid
         boardCheck = new BoardCheck(this);
-        hexFX = new ObjectEffects(this);
+        hexFX = new ObjectEffects(this); // depends on HexMan, HexGrid, Targeting
 
         _endGame = false;
 
-        _p1 = new Player(1);
-        _p2 = new Player(2);
-        _activep = _p1;
-
         commish = new Commish(this);
+        _p1 = new Player(this, 1);
+        _p2 = new Player(this, 2);
+        _activep = _p1;
+        PlayersLoaded();
 
         effectCont = new EffectController(this);
         EffectContLoaded();
-        InitEvents();
 
         currentTurn = Turn.PlayerTurn;
         //uiCont.SetDrawButton(true);
@@ -138,13 +145,15 @@ public class MageMatch : MonoBehaviour {
         if(!IsDebugMode())
             yield return syncManager.Checkpoint(); // idk if this is really doing anything
 
-        uiCont.Reset();
-        stats = new Stats(_p1, _p2);
-
         yield return _p1.deck.Shuffle();
         yield return _p2.deck.Shuffle();
 
+
+
         // TODO animate beginning of game
+        yield return new WaitForSeconds(5);
+        uiCont.AnimateBeginningOfGame();
+
         for (int i = 0; i < 7; i++) {
             for (int pid = 1; pid <= 2; pid++) {
                 //yield return GetPlayer(p).DealHex();
@@ -174,9 +183,6 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void InitEvents() {
-        eventCont = new EventController(this);
-        EventContLoaded();
-
         eventCont.boardAction += OnBoardAction;
         eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction, EventController.Status.End); // checking
         eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction, EventController.Status.End); // checking
@@ -186,30 +192,43 @@ public class MageMatch : MonoBehaviour {
 
         if (gameSettings.turnTimerOn)
             eventCont.timeout += OnTimeout;
-
-        syncManager.InitEvents(eventCont);
-        audioCont.InitEvents();
-        effectCont.InitEvents();
-        commish.InitEvents();
-        uiCont.InitEvents();
-        debugTools.InitEvents();
-        _p1.InitEvents();
-        _p2.InitEvents();
-
-        animCont.Init(this);
     }
 
-    public void EffectContLoaded() {
-        if(onEffectContReady != null)
-            onEffectContReady();
+    public void AddEffectContLoadEvent(LoadEvent ev) {
+        AddLoadEvent(ref _onEffectContLoaded, ev);
+    }
+    void EffectContLoaded() {
+        OnLoadEvent(ref _onEffectContLoaded);
     }
 
-    public void EventContLoaded() {
-        if(onEventContReady != null)
-            onEventContReady();
+    public void AddEventContLoadEvent(LoadEvent ev) {
+        AddLoadEvent(ref _onEventContLoaded, ev);
+    }
+    void EventContLoaded() {
+        OnLoadEvent(ref _onEventContLoaded);
     }
 
-    
+    public void AddPlayersLoadEvent(LoadEvent ev) {
+        AddLoadEvent(ref _onPlayersLoaded, ev);
+    }
+    void PlayersLoaded() {
+        OnLoadEvent(ref _onPlayersLoaded);
+    }
+
+    void AddLoadEvent(ref List<LoadEvent> evList, LoadEvent ev) {
+        if (evList == null) // null when the Load in question has already happened; call ev immediately
+            ev();
+        else                // otherwise, add the ev to the callback list and it'll get called on Load
+            evList.Add(ev);
+    }
+
+    void OnLoadEvent(ref List<LoadEvent> evList) {
+        foreach (LoadEvent ev in evList)
+            ev();
+        evList = null;
+    }
+
+
 
     // GAME STATE
 

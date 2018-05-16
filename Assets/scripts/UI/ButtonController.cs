@@ -125,7 +125,8 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void ShowSpellInfo() {
-        Spell currentSpell = _mm.GetPlayer(_playerId).character.GetSpell(spellNum);
+        Spell currentSpell = _mm.GetPlayer(_playerId)
+            .character.GetSpell(spellNum);
         Transform t = transform.Find("main");
 
         Text spellName = t.Find("t_spellName").GetComponent<Text>();

@@ -16,7 +16,7 @@ public class UIController : MonoBehaviour {
     [HideInInspector]
     public Newsfeed newsfeed;
 
-    public GameObject alertbar, quickdrawButton, loadingText; 
+    public GameObject alertbar, quickdrawButton, loadingText, loadingScreen; 
 
     private ButtonController _drawButton;
     private Text _tDeckCount, _tRemovedCount;
@@ -37,9 +37,11 @@ public class UIController : MonoBehaviour {
     private const float ALERT_DIS = 55f, ALERT_DELAY = 3f;
     private bool _alertShowing = false;
 
-    public void Init(){
+    public void Init(MageMatch mm){
+        loadingScreen.SetActive(true);
+
+        _mm = mm;
         _board = GameObject.Find("cells").transform;
-        _mm = GameObject.Find("board").GetComponent<MageMatch>();
         _screenScroll = GameObject.Find("scrolling");
 
         //slidingText = GameObject.Find("Text_Sliding").GetComponent<Text>();
@@ -90,9 +92,12 @@ public class UIController : MonoBehaviour {
 
         alertbar.transform.Translate(0, ALERT_DIS, 0);
         alertbar.SetActive(true);
+
+        _mm.AddEventContLoadEvent(OnEventContLoaded);
+        _mm.AddPlayersLoadEvent(OnPlayersLoaded);
     }
 
-    public void InitEvents() {
+    public void OnEventContLoaded() {
         _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
         _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
         _mm.eventCont.gameAction += OnGameAction;
@@ -160,9 +165,7 @@ public class UIController : MonoBehaviour {
     }
     #endregion
 
-    public void Reset() {
-        ShowAlertText("Fight!!");
-
+    public void OnPlayersLoaded() {
         if (!_mm.MyTurn())
             SetDrawButton(false);
 
@@ -180,6 +183,24 @@ public class UIController : MonoBehaviour {
             DeactivateAllSpellButtons(id); // not needed now
             UpdateAP(p);
 
+        }
+
+        // camera position relative to center of the board
+        camOffset = Camera.main.transform.position.x;
+        camOffset = GameObject.Find("s_board").transform.position.x - camOffset;
+        if (!_mm.MyTurn() ^ _localOnRight) // because it's currently relative, only shift if needed
+            StartCoroutine(ShiftScreen());
+    }
+
+    public void AnimateBeginningOfGame() {
+        loadingScreen.SetActive(false);
+
+        ShowAlertText("Fight!!");
+
+        for (int id = 1; id <= 2; id++) {
+            Player p = _mm.GetPlayer(id);
+            Transform pinfo = GetPinfo(id);
+
             // start health from zero so it animates
             pinfo.Find("i_healthbar").GetComponent<Image>().fillAmount = 0f;
             pinfo.Find("t_health").GetComponent<Text>().text = "0";
@@ -188,12 +209,6 @@ public class UIController : MonoBehaviour {
             // maybe just set it to empty?
             StartCoroutine(UpdateMeterbar(p));
         }
-
-        // camera position relative to center of the board
-        camOffset = Camera.main.transform.position.x;
-        camOffset = GameObject.Find("s_board").transform.position.x - camOffset;
-        if (!_mm.MyTurn() ^ _localOnRight) // because it's currently relative, only do this if needed
-            StartCoroutine(ShiftScreen());
     }
 
     float camOffset;
@@ -267,6 +282,7 @@ public class UIController : MonoBehaviour {
     //} 
 
     void UpdateAP(Player p) {
+        MMLog.Log_UICont("Updating AP for p" + p.id);
         var APimage = GetPinfo(p.id).Find("i_AP").GetComponent<Image>();
         APimage.fillAmount = (float) p.GetAP() / Player.MAX_AP;
     }

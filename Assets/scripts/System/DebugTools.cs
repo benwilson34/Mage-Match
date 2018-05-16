@@ -6,6 +6,9 @@ using MMDebug;
 
 public class DebugTools : MonoBehaviour {
 
+    private enum Submenu { System = 1, Report, Tools };
+    private Submenu _submenu;
+
     public enum ToolMode { Insert, Destroy, Enchant, Properties, Clear, AddToHand, Discard, ChangeHealth, ChangeMeter };
     public ToolMode mode = ToolMode.Insert;
 
@@ -83,9 +86,11 @@ public class DebugTools : MonoBehaviour {
 
         ShowPane(1);
         menus.SetActive(false);
+
+        _mm.AddEventContLoadEvent(OnEventContLoaded);
     }
 
-    public void InitEvents() {
+    public void OnEventContLoaded() {
         _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
         _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
         _mm.eventCont.gameAction += OnGameAction;
@@ -106,6 +111,8 @@ public class DebugTools : MonoBehaviour {
     }
 
     public void ShowPane(int p) {
+        _submenu = (Submenu)p;
+
         switch (p) {
             case 1:
                 SetPanesActive(true, false, false);
@@ -367,6 +374,9 @@ public class DebugTools : MonoBehaviour {
     }
 
     public void HandleInput(MonoBehaviour obj) {
+        if (_submenu != Submenu.Tools)
+            return;
+
         switch (mode) {
             case ToolMode.Insert:
                 InsertMode_OnClick((CellBehav)obj);
@@ -525,7 +535,7 @@ public class DebugTools : MonoBehaviour {
     }
 
     void ChangeMeterMode_OnClick() {
-        int amt = int.Parse(_input.text);
+        int amt = int.Parse(_input.text) * 10; // so you can just type in percentage
         int pid = GetPlayerId();
         ChangeMeter(pid, amt);
     }

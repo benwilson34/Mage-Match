@@ -23,19 +23,13 @@ public class Stats {
 
     private PlayerStat _ps1, _ps2;
 
-    public Stats(Player p1, Player p2) {
-        _mm = GameObject.Find("board").GetComponent<MageMatch>();
-        _ps1 = new PlayerStat() {
-            name = p1.name,
-            character = p1.character.ch.ToString()
-        };
-        _ps2 = new PlayerStat() {
-            name = p2.name,
-            character = p2.character.ch.ToString()
-        };
+    public Stats(MageMatch mm) {
+        _mm = mm;
+        _mm.AddPlayersLoadEvent(OnPlayersLoaded);
+        _mm.AddEventContLoadEvent(OnEventContLoaded);
+    }
 
-        InitReport();
-
+    public void OnEventContLoaded() {
         _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Report);
         _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
         _mm.eventCont.timeout += OnTimeout;
@@ -52,6 +46,21 @@ public class Stats {
         //mm.eventCont.cascade += OnCascade;
         _mm.eventCont.tileRemove += OnTileRemove;
         _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+    }
+
+    public void OnPlayersLoaded() {
+        Player p = _mm.GetPlayer(1);
+        _ps1 = new PlayerStat() {
+            name = p.name,
+            character = p.character.ch.ToString()
+        };
+        p = _mm.GetPlayer(2);
+        _ps2 = new PlayerStat() {
+            name = p.name,
+            character = p.character.ch.ToString()
+        };
+
+        InitReport();
     }
 
     void InitReport() {

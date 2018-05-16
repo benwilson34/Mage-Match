@@ -10,15 +10,11 @@ public class TurnTimer : MonoBehaviour {
     private float _timeRemaining;
     private bool _pause = false, _playedWarningSound = false;
 
-	void Start () {
-        _mm = GameObject.Find("board").GetComponent<MageMatch>();
+    public void Init(MageMatch mm) {
+        _mm = mm;
         _pause = true;
         InvokeRepeating("DecreaseTimeRemaining", .1f, .1f);
-	}
-
-	//void Update () {
-	//	// ?
-	//}
+    }
 
     public void Pause() {
         _pause = true;

@@ -13,12 +13,13 @@ public class SyncManager : PunBehaviour {
     public void Init(MageMatch mm) {
         _rands = new Queue<int>();
         _mm = mm;
+        _mm.AddEventContLoadEvent(OnEventContLoaded);
     }
 
-    public void InitEvents(EventController eventCont) {
-        eventCont.AddDrawEvent(OnDrawLocal, EventController.Type.Network, EventController.Status.Begin);
-        eventCont.AddDropEvent(OnDropLocal, EventController.Type.Network, EventController.Status.Begin);
-        eventCont.AddSwapEvent(OnSwapLocal, EventController.Type.Network, EventController.Status.Begin);
+    public void OnEventContLoaded() {
+        _mm.eventCont.AddDrawEvent(OnDrawLocal, EventController.Type.Network, EventController.Status.Begin);
+        _mm.eventCont.AddDropEvent(OnDropLocal, EventController.Type.Network, EventController.Status.Begin);
+        _mm.eventCont.AddSwapEvent(OnSwapLocal, EventController.Type.Network, EventController.Status.Begin);
         //eventCont.AddDiscardEvent(OnDiscardLocal, EventController.Type.Network);
         //eventCont.commishDrop += OnCommishDrop;
         //eventCont.commishTurnDone += OnCommishTurnDone;
