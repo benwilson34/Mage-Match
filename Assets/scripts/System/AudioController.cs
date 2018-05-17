@@ -105,7 +105,7 @@ public class AudioController {
 
 
         // ----- other -----
-        _clips.Add(OtherSoundEffect.BackgroundMusic, "event:/Other/GameStart");
+        _clips.Add(OtherSoundEffect.BackgroundMusic, "event:/Other/BackgroundMusic");
         _clips.Add(OtherSoundEffect.GameStart, "event:/Other/GameStart");
         _clips.Add(OtherSoundEffect.GameEnd, "event:/Other/GameEnd");
 
