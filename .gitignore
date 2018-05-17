@@ -17,5 +17,10 @@ Temp/
 Assets/Photon Unity Networking/Demos
 MMDebug/MMDebug/bin/Debug/MMDebug.dll.mdb
 *.zip
+
 FMOD/.*/
 FMOD Mage Match Test/.*/
+/Assets/FMODStudioCache.asset
+/Assets/FMODStudioCache.asset.meta
+fmod.log
+fmod_editor.log
