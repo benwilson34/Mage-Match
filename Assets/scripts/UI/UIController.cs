@@ -16,7 +16,7 @@ public class UIController : MonoBehaviour {
     [HideInInspector]
     public Newsfeed newsfeed;
 
-    public GameObject alertbar, quickdrawButton, loadingText, loadingScreen; 
+    public GameObject alertbar, quickdrawButton, loadingText, loadingScreen, gameStartScreen; 
 
     private ButtonController _drawButton;
     private Text _tDeckCount, _tRemovedCount;
@@ -39,6 +39,7 @@ public class UIController : MonoBehaviour {
 
     public void Init(MageMatch mm){
         loadingScreen.SetActive(true);
+        gameStartScreen.SetActive(false);
 
         _mm = mm;
         _board = GameObject.Find("cells").transform;
@@ -192,8 +193,42 @@ public class UIController : MonoBehaviour {
             StartCoroutine(ShiftScreen());
     }
 
-    public void AnimateBeginningOfGame() {
+    public IEnumerator AnimateBeginningOfGame() {
+        yield return new WaitForEndOfFrame();
+
+        RectTransform leftSide = gameStartScreen.transform
+            .Find("LeftSide").GetComponent<RectTransform>();
+        RectTransform rightSide = gameStartScreen.transform
+            .Find("RightSide").GetComponent<RectTransform>();
+
+        leftSide.Find("i_char").GetComponent<Image>().sprite =
+            Resources.Load<Sprite>("sprites/characters/" + _mm.gameSettings.p1char);
+        leftSide.Find("t_name").GetComponent<Text>().text = _mm.gameSettings.p1name;
+
+        rightSide.Find("i_char").GetComponent<Image>().sprite =
+            Resources.Load<Sprite>("sprites/characters/" + _mm.gameSettings.p2char);
+        rightSide.Find("t_name").GetComponent<Text>().text = _mm.gameSettings.p2name;
+
+        //float leftPos = -1215, rightPos = 1150;
+        float origLeft = leftSide.position.x, origRight = rightSide.position.x;
+        //Debug.Log("origLeft=" + origLeft + " origRight=" + origRight);
+        leftSide.position = new Vector2(origLeft - 1200, leftSide.position.y);
+        rightSide.position = new Vector2(origRight + 1200, rightSide.position.y);
+
+        gameStartScreen.SetActive(true);
+
+        leftSide.DOMoveX(origLeft, 1f);
+        yield return rightSide.DOMoveX(origRight, 1f).WaitForCompletion();
+
         loadingScreen.SetActive(false);
+        yield return new WaitForSeconds(2.3f);
+
+        leftSide.DOMoveX(origLeft - 1200, .6f);
+        yield return rightSide.DOMoveX(origRight + 1200, .6f).WaitForCompletion();
+
+        gameStartScreen.SetActive(false);
+
+
 
         ShowAlertText("Fight!!");
 

@@ -2,13 +2,14 @@
 [LOG] SystemI::setOutputInternal               : Setting output to 'FMOD WASAPI Output'
 [LOG] Manager::init                            : maxchannels = 1024 studioflags = 00000009 flags 00000000 extradriverdata 0000000000000000.
 [LOG] SystemI::init                            : Initialize version=11005 (94661), maxchannels=1024, flags=0x00030000
-[LOG] OutputWASAPI::init                       : Mix Format (WAVEFORMATEX): wFormatTag=0xFFFE, nChannels=2, nSamplesPerSec=48000, nAvgBytesPerSec=384000, nBlockAlign=8, wBitsPerSample=32, cbSize=22.
+[LOG] OutputWASAPI::init                       : Mix Format (WAVEFORMATEX): wFormatTag=0xFFFE, nChannels=2, nSamplesPerSec=44100, nAvgBytesPerSec=352800, nBlockAlign=8, wBitsPerSample=32, cbSize=22.
 [LOG] OutputWASAPI::init                       : Mix Format (WAVEFORMATEXTENSIBLE): wValidBitsPerSample=32, dwChannelMask=0x00000003, SubFormat=00000003-0000-0010-8000-00AA00389B71.
-[LOG] OutputWASAPI::init                       : Output buffer size: 4096 samples, latency: 10.67ms, period: 10.00ms, DSP buffer: 1024 * 4
+[LOG] OutputWASAPI::init                       : Output buffer size: 3760 samples, latency: 11.61ms, period: 10.16ms, DSP buffer: 1024 * 4
+[WRN] SystemI::init                            : Output requires a sample rate of 44100Hz, resampling will occur.
 [LOG] Thread::initThread                       : Init FMOD stream thread. Priority: 2, Stack Size: 65536, Semaphore: No, Sleep Time: 10, Looping: Yes.
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] Thread::initThread                       : Init FMOD mixer thread. Priority: 3, Stack Size: 49152, Semaphore: No, Sleep Time: 0, Looping: Yes.
-[LOG] AsyncManager::init                       : manager 00000000618D2C38 isAsync 1 updatePeriod 0.02
+[LOG] AsyncManager::init                       : manager 00000000003E71F8 isAsync 1 updatePeriod 0.02
 [LOG] Thread::initThread                       : Init FMOD Studio update thread. Priority: 0, Stack Size: 65536, Semaphore: No, Sleep Time: 1, Looping: No.
 [LOG] AsyncManager::init                       : done
 [LOG] PlaybackSystem::init                     : 
@@ -23,454 +24,293 @@
 [LOG] PlaybackSystem::acquireMasterBus         : Setting master channel group format to 6
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003AAD6EA8
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Game Start 5', format=2, channels=2, frequency=48000, lengthbytes=47360, lengthpcm=195840, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.999969.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Draw-5', format=2, channels=2, frequency=48000, lengthbytes=10560, lengthpcm=47978, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.948639.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003AAD6EA8
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Draw-12', format=2, channels=2, frequency=48000, lengthbytes=8864, lengthpcm=32556, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.907288.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Draw-7', format=2, channels=2, frequency=48000, lengthbytes=9824, lengthpcm=52944, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.968445.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003AAD6EA8
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Draw-4', format=2, channels=2, frequency=48000, lengthbytes=9472, lengthpcm=47978, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.999969.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003AAD6EA8
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Draw-3', format=2, channels=2, frequency=48000, lengthbytes=9952, lengthpcm=41124, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.996765.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Draw-6', format=2, channels=2, frequency=48000, lengthbytes=9760, lengthpcm=42997, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.922577.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Pickup n Rearange-7', format=2, channels=2, frequency=48000, lengthbytes=6144, lengthpcm=20562, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.962402.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Pickup n Rearange-5', format=2, channels=2, frequency=48000, lengthbytes=5280, lengthpcm=20562, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.889404.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Pickup n Rearange-8', format=2, channels=2, frequency=48000, lengthbytes=5952, lengthpcm=20562, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.999969.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Pickup n Rearange-13', format=2, channels=2, frequency=48000, lengthbytes=4928, lengthpcm=20562, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.999969.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Pickup n Rearange-14', format=2, channels=2, frequency=48000, lengthbytes=4192, lengthpcm=13708, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.982697.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Pickup n Rearange', format=2, channels=2, frequency=48000, lengthbytes=6688, lengthpcm=20562, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.999969.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Grav drop-9', format=2, channels=2, frequency=48000, lengthbytes=5216, lengthpcm=20562, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.942932.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Grav drop-1', format=2, channels=2, frequency=48000, lengthbytes=5344, lengthpcm=20562, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.960144.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
 [LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 Tile Grav drop-8', format=2, channels=2, frequency=48000, lengthbytes=5120, lengthpcm=20562, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.999969.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Shuffle gem shatter solo-1', format=2, channels=2, frequency=48000, lengthbytes=30400, lengthpcm=105738, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.825287.
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Plastic Button 04', format=2, channels=2, frequency=48000, lengthbytes=5120, lengthpcm=19451, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.933807.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Shuffle Gem Power up Full-2', format=2, channels=2, frequency=48000, lengthbytes=30784, lengthpcm=118106, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.916718.
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Plastic Button 08', format=2, channels=2, frequency=48000, lengthbytes=2080, lengthpcm=11270, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.878418.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Shuffle gem shatter solo-3', format=2, channels=2, frequency=48000, lengthbytes=31200, lengthpcm=117486, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.985107.
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Plastic Button 07', format=2, channels=2, frequency=48000, lengthbytes=1216, lengthpcm=5642, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.964050.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Shuffle Gem Power up Full-1', format=2, channels=2, frequency=48000, lengthbytes=28512, lengthpcm=115713, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.886078.
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Tile Ignition-4', format=2, channels=2, frequency=48000, lengthbytes=15968, lengthpcm=82247, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.884827.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Shuffle gem shatter solo-2', format=2, channels=2, frequency=48000, lengthbytes=27840, lengthpcm=116616, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.948181.
-[LOG] SoundI::release                          :  (000000002F341B88)
-[LOG] SoundI::release                          :     Game Start 5 (000000003387D228)
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Tile Ignition-18', format=2, channels=2, frequency=48000, lengthbytes=21696, lengthpcm=109662, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.932648.
 [LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
 [LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 2008224
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 80320
 [LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 000000005AF1F5FC
 [LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
 [LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FECFCCE4B0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FECFCCE480
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FECFCCE580
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FECFCCE640
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 000000003A4A3A28
 [LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
 [LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 New Swap-2', format=2, channels=2, frequency=48000, lengthbytes=7072, lengthpcm=47978, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.949799.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 New Swap-7', format=2, channels=2, frequency=48000, lengthbytes=9696, lengthpcm=41124, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.950226.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 New Swap-8', format=2, channels=2, frequency=48000, lengthbytes=8928, lengthpcm=41124, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.941895.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 232
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 6304544
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 95072
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000000079CDF5FC
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 000007FEC8ABE4B0
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 000007FEC8ABE480
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 000007FEC8ABE580
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 000007FEC8ABE640
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 00000000619A4798
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX 2 New Swap-5', format=2, channels=2, frequency=48000, lengthbytes=7776, lengthpcm=47978, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.918793.
-[LOG] SoundI::release                          :  (000000002F3418A8)
-[LOG] SoundI::release                          :     Alpha SFX Draw-3 (00000000618D3968)
-[LOG] SoundI::release                          :  (000000002F341E68)
-[LOG] SoundI::release                          :     Alpha SFX Draw-4 (000000003387D3C8)
-[LOG] SoundI::release                          :  (000000002F341FD8)
-[LOG] SoundI::release                          :     Alpha SFX Draw-12 (000000003387CD48)
-[LOG] SoundI::release                          :  (000000002F3415C8)
-[LOG] SoundI::release                          :     Alpha SFX Draw-5 (000000003387D568)
-[LOG] SoundI::release                          :  (000000002F342148)
-[LOG] SoundI::release                          :     Alpha SFX Draw-6 (00000000618D3B08)
-[LOG] SoundI::release                          :  (000000002F341CF8)
-[LOG] SoundI::release                          :     Alpha SFX Draw-7 (000000003387D708)
-[LOG] SoundI::release                          :  (00000000618D5208)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Grav drop-1 (00000000039AFF88)
-[LOG] SoundI::release                          :  (00000000618D5378)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Grav drop-8 (00000000039B0128)
-[LOG] SoundI::release                          :  (00000000618D5098)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Grav drop-9 (00000000618D4668)
-[LOG] SoundI::release                          :  (00000000618D4968)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange-5 (00000000618D3E48)
-[LOG] SoundI::release                          :  (000000002F341A18)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange-7 (00000000618D3CA8)
-[LOG] SoundI::release                          :  (00000000618D4AD8)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange-8 (00000000618D3FE8)
-[LOG] SoundI::release                          :  (00000000618D4F28)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange (00000000618D44C8)
-[LOG] SoundI::release                          :  (00000000618D4C48)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange-13 (00000000618D4188)
-[LOG] SoundI::release                          :  (00000000618D4DB8)
-[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange-14 (00000000618D4328)
-[LOG] SoundI::release                          :  (0000000061E70A58)
-[LOG] SoundI::release                          :     Shuffle Gem Power up Full-1 (00000000039B07A8)
-[LOG] SoundI::release                          :  (00000000618D5658)
-[LOG] SoundI::release                          :     Shuffle Gem Power up Full-2 (00000000039B0468)
-[LOG] SoundI::release                          :  (00000000618D54E8)
-[LOG] SoundI::release                          :     Shuffle gem shatter solo-1 (00000000039B02C8)
-[LOG] SoundI::release                          :  (0000000061E70BC8)
-[LOG] SoundI::release                          :     Shuffle gem shatter solo-2 (00000000039B0948)
-[LOG] SoundI::release                          :  (0000000061E708E8)
-[LOG] SoundI::release                          :     Shuffle gem shatter solo-3 (00000000039B0608)
-[LOG] SoundI::release                          :  (000000002F341B88)
-[LOG] SoundI::release                          :     Alpha SFX 2 New Swap-2 (000000003387D228)
-[LOG] SoundI::release                          :  (0000000061E71018)
-[LOG] SoundI::release                          :     Alpha SFX 2 New Swap-5 (0000000061E6BFA8)
-[LOG] SoundI::release                          :  (0000000061E70D38)
-[LOG] SoundI::release                          :     Alpha SFX 2 New Swap-7 (00000000039B0AE8)
-[LOG] SoundI::release                          :  (0000000061E70EA8)
-[LOG] SoundI::release                          :     Alpha SFX 2 New Swap-8 (00000000039B0C88)
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Alpha SFX Tile Ignition-17', format=2, channels=2, frequency=48000, lengthbytes=20800, lengthpcm=99382, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.925537.
+[WRN] EventInstance::update                    : Event {e78bd9cb-9182-49ef-823e-e0382a3ebc0b} waited 234 milliseconds for sample data to load.  Preload sample data to avoid this delay.
+[LOG] SoundI::release                          :  (000000000F113788)
+[LOG] SoundI::release                          :     Game Start 5 (0000000011469098)
+[LOG] SoundI::release                          :  (000000000F1138F8)
+[LOG] SoundI::release                          :     Alpha SFX Draw-3 (00000000114693D8)
+[LOG] SoundI::release                          :  (000000000F113A68)
+[LOG] SoundI::release                          :     Alpha SFX Draw-4 (0000000011468EF8)
+[LOG] SoundI::release                          :  (000000000F113D48)
+[LOG] SoundI::release                          :     Alpha SFX Draw-12 (0000000011469238)
+[LOG] SoundI::release                          :  (000000003A8484B8)
+[LOG] SoundI::release                          :     Alpha SFX 2 Tile Grav drop-1 (000000003AAC73C8)
+[LOG] SoundI::release                          :  (000000003A848628)
+[LOG] SoundI::release                          :     Alpha SFX 2 Tile Grav drop-8 (000000003AAC7568)
+[LOG] SoundI::release                          :  (000000003A848348)
+[LOG] SoundI::release                          :     Alpha SFX 2 Tile Grav drop-9 (000000003AAC7228)
+[LOG] SoundI::release                          :  (000000003A8481D8)
+[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange (000000003AAC7088)
+[LOG] SoundI::release                          :  (000000003A847EF8)
+[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange-13 (0000000011469578)
+[LOG] SoundI::release                          :  (000000003A848068)
+[LOG] SoundI::release                          :     Alpha SFX 2 Tile Pickup n Rearange-14 (0000000011469718)
+[LOG] SoundI::release                          :  (000000003A848798)
+[LOG] SoundI::release                          :     Plastic Button 04 (000000003AAC7708)
+[LOG] SoundI::release                          :  (000000003A848A78)
+[LOG] SoundI::release                          :     Plastic Button 07 (000000003AAC7A48)
+[LOG] SoundI::release                          :  (000000003A848908)
+[LOG] SoundI::release                          :     Plastic Button 08 (000000003AAC78A8)
+[LOG] SoundI::release                          :  (000000003A848BE8)
+[LOG] SoundI::release                          :     Alpha SFX Tile Ignition-4 (000000003AAC7BE8)
+[LOG] SoundI::release                          :  (000000003A60A8B8)
+[LOG] SoundI::release                          :     Alpha SFX Tile Ignition-17 (000000003AB77C08)
+[LOG] SoundI::release                          :  (000000003A60A748)
+[LOG] SoundI::release                          :     Alpha SFX Tile Ignition-18 (000000003AAC7D88)
 [LOG] Thread::callback                         : FMOD Studio update thread finished.
 [LOG] Thread::callback                         : FMOD Studio bank load thread finished.
 [LOG] Profile::disconnectAll                   : Profiler disconnecting all clients
