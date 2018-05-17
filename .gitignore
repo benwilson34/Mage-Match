@@ -13,6 +13,7 @@ Temp/
 /*.user
 /*.tmp
 /*.svd
+Assets/StreamingAssets/build_info.txt
 
 Assets/Photon Unity Networking/Demos
 MMDebug/MMDebug/bin/Debug/MMDebug.dll.mdb
