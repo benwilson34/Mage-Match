@@ -95,6 +95,9 @@
         <property name="length">
             <value>1.0488958333333334</value>
         </property>
+        <property name="pitch">
+            <value>-4</value>
+        </property>
         <relationship name="sounds">
             <destination>{d8f0dbd4-df40-44b2-b00a-735a6814d0a3}</destination>
             <destination>{bf2f51cd-5b3d-44b3-8f4a-ccb1835bfd7c}</destination>

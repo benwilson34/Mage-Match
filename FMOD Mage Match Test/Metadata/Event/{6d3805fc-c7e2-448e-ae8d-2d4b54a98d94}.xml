@@ -72,7 +72,7 @@
     </object>
     <object class="GroupTrack" id="{52859bbc-d292-4fb7-9e53-939885a37e89}">
         <relationship name="modules">
-            <destination>{4b1e20e8-5924-43eb-81db-682f07393a45}</destination>
+            <destination>{730a0f06-e7bf-4437-8316-850c49bb6854}</destination>
         </relationship>
         <relationship name="mixerGroup">
             <destination>{c8d830fe-a319-4c25-beeb-fc106950a3f0}</destination>
@@ -81,7 +81,7 @@
     <object class="Timeline" id="{bd61591a-c8a6-4aa2-a32d-2134fc02a275}">
         <relationship name="modules">
             <destination>{6b079fb9-5593-4eff-9e31-f6b95fee7989}</destination>
-            <destination>{4b1e20e8-5924-43eb-81db-682f07393a45}</destination>
+            <destination>{730a0f06-e7bf-4437-8316-850c49bb6854}</destination>
         </relationship>
     </object>
     <object class="EventMixerMaster" id="{54e2aaa5-4a50-4ee2-b849-9a89a7c5a275}">
@@ -126,10 +126,14 @@
             <destination>{54e2aaa5-4a50-4ee2-b849-9a89a7c5a275}</destination>
         </relationship>
     </object>
-    <object class="MultiSound" id="{4b1e20e8-5924-43eb-81db-682f07393a45}">
+    <object class="MultiSound" id="{730a0f06-e7bf-4437-8316-850c49bb6854}">
         <property name="length">
             <value>1.6564375</value>
         </property>
+        <relationship name="sounds">
+            <destination>{cd7a74a4-7dcc-4eae-8d3a-6e7601e2fb80}</destination>
+            <destination>{aab6f06a-68b2-4f5b-a4a3-08561d79255d}</destination>
+        </relationship>
     </object>
     <object class="EventMixerGroup" id="{c8d830fe-a319-4c25-beeb-fc106950a3f0}">
         <property name="name">
@@ -160,6 +164,16 @@
         </relationship>
     </object>
     <object class="MixerBusPanner" id="{1b1139e8-3094-4e6d-bd54-47c287d88d2d}"/>
+    <object class="SingleSound" id="{cd7a74a4-7dcc-4eae-8d3a-6e7601e2fb80}">
+        <relationship name="audioFile">
+            <destination>{fb53588b-2b6c-4499-8d38-0e616a50a5b4}</destination>
+        </relationship>
+    </object>
+    <object class="SingleSound" id="{aab6f06a-68b2-4f5b-a4a3-08561d79255d}">
+        <relationship name="audioFile">
+            <destination>{100ea129-0172-4f3f-ab7f-6d7fc49be381}</destination>
+        </relationship>
+    </object>
     <object class="MixerBusEffectChain" id="{7ec0f106-4788-4e5d-a38b-40f2d1788f7b}">
         <relationship name="effects">
             <destination>{823c92f8-13db-4a5a-936f-4bd78bb5ee59}</destination>
