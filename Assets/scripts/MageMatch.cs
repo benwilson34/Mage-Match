@@ -738,4 +738,11 @@ public class MageMatch : MonoBehaviour {
 
         SceneManager.LoadScene("Menu");
     }
+
+
+
+    public void DEBUG_ShiftScreen() {
+        _activep = GetOpponent(_activep.id);
+        StartCoroutine(uiCont.ShiftScreen());
+    }
 }

@@ -105,18 +105,7 @@ public class CharacterSelect : MenuScreen {
 
     // TODO move to asset loader once I make that
     public static Sprite GetCharacterPortrait(Character.Ch ch) {
-        switch (ch) {
-            case Character.Ch.Enfuego:
-                return Resources.Load<Sprite>("sprites/characters/enfuego");
-            case Character.Ch.Gravekeeper:
-                return Resources.Load<Sprite>("sprites/characters/gravekeeper");
-            case Character.Ch.Valeria:
-                return Resources.Load<Sprite>("sprites/characters/valeria");
-            case Character.Ch.Neutral:
-                return Resources.Load<Sprite>("sprites/characters/dummy");
-            default:
-                return null;
-        }
+        return Resources.Load<Sprite>("sprites/characters/" + ch.ToString());
     }
 
     public void OnLoadoutEditClick() {

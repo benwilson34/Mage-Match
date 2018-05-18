@@ -29,7 +29,9 @@ public class UIController : MonoBehaviour {
     private GameObject _screenScroll;
     private List<GameObject> _outlines, _spellOutlines;
     private SpriteRenderer[,] _cellOverlays;
-    private Vector3 _slidingTextStart;
+
+    private const float SHIFT_DUR = .4f;
+    private float camOffset, _spellSlidingOffset;
     private bool _localOnRight = false;
 
     private GameObject _hexGlow;
@@ -183,12 +185,31 @@ public class UIController : MonoBehaviour {
             ShowAllSpellInfo(id);
             DeactivateAllSpellButtons(id); // not needed now
             UpdateAP(p);
-
         }
 
         // camera position relative to center of the board
         camOffset = Camera.main.transform.position.x;
         camOffset = GameObject.Find("s_board").transform.position.x - camOffset;
+
+        float boardPos = GameObject.Find("s_board").transform.position.x;
+
+        RectTransform leftPlayerSpells = transform.Find("Spells")
+            .Find("LeftPlayer_Spells").GetComponent<RectTransform>();
+
+        float leftSpellGap = boardPos - leftPlayerSpells.position.x;
+
+        RectTransform rightPlayerSpells = transform.Find("Spells")
+            .Find("RightPlayer_Spells").GetComponent<RectTransform>();
+        float rightSpellGap = rightPlayerSpells.position.x - boardPos;
+
+        //Debug.Log("spelloffset leftSpellPos=" + leftSpellGap +
+        //    ", boardPos=" + boardPos +
+        //    ", rightSpellPos=" + rightSpellGap);
+
+        _spellSlidingOffset =  rightSpellGap - leftSpellGap + .3f; // spell towers aren't quite centered
+
+        //Debug.Log("camOffset=" + camOffset + ", spellOffset=" + _spellSlidingOffset);
+
         if (!_mm.MyTurn() ^ _localOnRight) // because it's currently relative, only shift if needed
             StartCoroutine(ShiftScreen());
     }
@@ -246,17 +267,16 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    float camOffset;
-
     public IEnumerator ShiftScreen() {
-        //RectTransform rect = screenScroll.GetComponent<RectTransform>();
-
         Transform camPos = Camera.main.transform;
+        Transform spellSliding = transform.Find("Spells");
         
         if (_mm.MyTurn() ^ _localOnRight) { // left side
-            yield return camPos.DOMoveX(camPos.position.x - (2*camOffset), .3f).WaitForCompletion();
+            spellSliding.DOMoveX(spellSliding.position.x + ( _spellSlidingOffset), SHIFT_DUR);
+            yield return camPos.DOMoveX(camPos.position.x - (2* camOffset), SHIFT_DUR).WaitForCompletion();
         } else { // right side
-            yield return camPos.DOMoveX(camPos.position.x + (2*camOffset), .3f).WaitForCompletion();
+            spellSliding.DOMoveX(spellSliding.position.x - ( _spellSlidingOffset), SHIFT_DUR);
+            yield return camPos.DOMoveX(camPos.position.x + (2*camOffset), SHIFT_DUR).WaitForCompletion();
         }
         yield return null;
     }
