@@ -121,21 +121,33 @@
     <object class="MixerBusPanner" id="{8b5dcf01-a377-4011-9035-06dc2413ad06}"/>
     <object class="MixerBusFader" id="{57da47a0-f4cd-45f1-8e89-a3ac67c1e68d}"/>
     <object class="SingleSound" id="{1dce64ea-86e0-494b-adf7-cbe38ff26e45}">
+        <property name="volume">
+            <value>-2</value>
+        </property>
         <relationship name="audioFile">
             <destination>{c9e0f2ef-afed-43fd-a307-a81a2f1d3560}</destination>
         </relationship>
     </object>
     <object class="SingleSound" id="{d37cfa33-08dc-40b9-ab63-e35f1ce498e0}">
+        <property name="volume">
+            <value>-2.5</value>
+        </property>
         <relationship name="audioFile">
             <destination>{2c1111be-1778-4326-ba00-c6434e1a2ea4}</destination>
         </relationship>
     </object>
     <object class="SingleSound" id="{db476577-b080-4167-8255-2cb699fc98b6}">
+        <property name="volume">
+            <value>-6.5</value>
+        </property>
         <relationship name="audioFile">
             <destination>{8750f9a3-4605-4fa7-938b-2d2ed3ad24f7}</destination>
         </relationship>
     </object>
     <object class="SingleSound" id="{fd3d33d7-4047-4d72-b5d8-d821075ae341}">
+        <property name="volume">
+            <value>-2</value>
+        </property>
         <relationship name="audioFile">
             <destination>{3fe419fb-f24c-4d98-8737-d86bd077ae70}</destination>
         </relationship>
