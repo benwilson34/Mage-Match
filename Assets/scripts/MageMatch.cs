@@ -7,7 +7,7 @@ using MMDebug;
 public class MageMatch : MonoBehaviour {
 
     // how to handle performing action here? also better name for Normal?
-    public enum State { Normal, BeginningOfGame, Selecting, Targeting, NewsfeedMenu, DebugMenu, TurnSwitching };
+    public enum State { Normal, BeginningOfGame, EndOfGame, Selecting, Targeting, NewsfeedMenu, DebugMenu, TurnSwitching };
     private Stack<State> _stateStack;
 
     public enum Turn { PlayerTurn, CommishTurn }; // MyTurn, OppTurn?
@@ -715,14 +715,17 @@ public class MageMatch : MonoBehaviour {
         eventCont.BoardAction();
     }
 
-    public void EndTheGame() {
+    public void EndTheGame(int losingPlayerId) {
         _endGame = true;
-        audioCont.Trigger(AudioController.OtherSoundEffect.GameEnd);
-        uiCont.ShowAlertText("Wow!! " + _activep.name + " has won!!");
-        uiCont.DeactivateAllSpellButtons(1);
-        uiCont.DeactivateAllSpellButtons(2);
-        eventCont.boardAction -= OnBoardAction; //?
         timer.Pause();
+        audioCont.Trigger(AudioController.OtherSoundEffect.GameEnd);
+        EnterState(State.EndOfGame);
+        uiCont.TriggerEndOfMatchScreens(losingPlayerId);
+
+        //uiCont.ShowAlertText("Wow!! " + _activep.name + " has won!!");
+        //uiCont.DeactivateAllSpellButtons(1);
+        //uiCont.DeactivateAllSpellButtons(2);
+        //eventCont.boardAction -= OnBoardAction; //?
     }
 
     public bool IsEnded() { return _endGame; }
@@ -744,5 +747,9 @@ public class MageMatch : MonoBehaviour {
     public void DEBUG_ShiftScreen() {
         _activep = GetOpponent(_activep.id);
         StartCoroutine(uiCont.ShiftScreen());
+    }
+
+    public void DEBUG_EndGame() {
+        EndTheGame(2);
     }
 }

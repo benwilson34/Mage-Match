@@ -8,49 +8,61 @@ using Newtonsoft.Json.Linq;
 
 public class UserData {
 
-    enum Pref { MasterVolume, SFXVolume, MusicVolume, Username };
+    enum Pref { Username, MasterVolume, SFXVolume, MusicVolume, MMCoin };
 
     public static string Username {
-        get { return PlayerPrefs.GetString(Pref.Username.ToString()); }
+        get { return ZPlayerPrefs.GetString(Pref.Username.ToString()); }
         set {
-            PlayerPrefs.SetString(Pref.Username.ToString(), value);
-            PlayerPrefs.Save();
+            ZPlayerPrefs.SetString(Pref.Username.ToString(), value);
+            ZPlayerPrefs.Save();
         }
     }
     public static float MasterVolume {
-        get { return PlayerPrefs.GetFloat(Pref.MasterVolume.ToString()); }
+        get { return ZPlayerPrefs.GetFloat(Pref.MasterVolume.ToString()); }
         set {
-            PlayerPrefs.SetFloat(Pref.MasterVolume.ToString(), value);
-            PlayerPrefs.Save();
+            ZPlayerPrefs.SetFloat(Pref.MasterVolume.ToString(), value);
+            ZPlayerPrefs.Save();
         }
     }
     public static float SFXVolume {
-        get { return PlayerPrefs.GetFloat(Pref.SFXVolume.ToString()); }
+        get { return ZPlayerPrefs.GetFloat(Pref.SFXVolume.ToString()); }
         set {
-            PlayerPrefs.SetFloat(Pref.SFXVolume.ToString(), value);
-            PlayerPrefs.Save();
+            ZPlayerPrefs.SetFloat(Pref.SFXVolume.ToString(), value);
+            ZPlayerPrefs.Save();
         }
     }
     public static float MusicVolume {
-        get { return PlayerPrefs.GetFloat(Pref.MusicVolume.ToString()); }
+        get { return ZPlayerPrefs.GetFloat(Pref.MusicVolume.ToString()); }
         set {
-            PlayerPrefs.SetFloat(Pref.MusicVolume.ToString(), value);
-            PlayerPrefs.Save();
+            ZPlayerPrefs.SetFloat(Pref.MusicVolume.ToString(), value);
+            ZPlayerPrefs.Save();
+        }
+    }
+    public static int MMCoin{
+        get { return ZPlayerPrefs.GetInt(Pref.MMCoin.ToString()); }
+        set {
+            ZPlayerPrefs.SetInt(Pref.MMCoin.ToString(), value);
+            ZPlayerPrefs.Save();
         }
     }
 
     public static void Init() {
-        if (!PlayerPrefs.HasKey(Pref.Username.ToString()))
-            PlayerPrefs.SetString(Pref.Username.ToString(), Environment.UserName);
+        ZPlayerPrefs.Initialize("idk some password", "fweamforever!!~");
 
-        if (!PlayerPrefs.HasKey(Pref.MasterVolume.ToString()))
-            PlayerPrefs.SetFloat(Pref.MasterVolume.ToString(), .3f);
+        if (!ZPlayerPrefs.HasKey(Pref.Username.ToString()))
+            ZPlayerPrefs.SetString(Pref.Username.ToString(), Environment.UserName);
 
-        if (!PlayerPrefs.HasKey(Pref.SFXVolume.ToString()))
-            PlayerPrefs.SetFloat(Pref.SFXVolume.ToString(), .99f);
+        if (!ZPlayerPrefs.HasKey(Pref.MasterVolume.ToString()))
+            ZPlayerPrefs.SetFloat(Pref.MasterVolume.ToString(), .3f);
 
-        if (!PlayerPrefs.HasKey(Pref.MusicVolume.ToString()))
-            PlayerPrefs.SetFloat(Pref.MusicVolume.ToString(), .99f);
+        if (!ZPlayerPrefs.HasKey(Pref.SFXVolume.ToString()))
+            ZPlayerPrefs.SetFloat(Pref.SFXVolume.ToString(), .99f);
+
+        if (!ZPlayerPrefs.HasKey(Pref.MusicVolume.ToString()))
+            ZPlayerPrefs.SetFloat(Pref.MusicVolume.ToString(), .99f);
+
+        if (!ZPlayerPrefs.HasKey(Pref.MMCoin.ToString()))
+            ZPlayerPrefs.SetInt(Pref.MMCoin.ToString(), 0);
     }
 
 }

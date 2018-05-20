@@ -13,10 +13,12 @@ public class UIController : MonoBehaviour {
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
     [HideInInspector]
     public TooltipManager tooltipMan;
-    [HideInInspector]
-    public Newsfeed newsfeed;
 
-    public GameObject alertbar, quickdrawButton, loadingText, loadingScreen, gameStartScreen; 
+    public Newsfeed newsfeed;
+    public ResultScreen resultsScreen;
+
+    public GameObject alertbar, quickdrawButton, loadingText, loadingScreen;
+    public GameObject gameStartScreen, knockoutScreen; 
 
     private ButtonController _drawButton;
     private Text _tDeckCount, _tRemovedCount;
@@ -79,8 +81,10 @@ public class UIController : MonoBehaviour {
 
 
         // newsfeed
-        newsfeed = GameObject.Find("Newsfeed").GetComponent<Newsfeed>();
         newsfeed.Init(_mm);
+
+        // results screen
+        resultsScreen.Init(_mm);
 
 
         // other
@@ -658,6 +662,20 @@ public class UIController : MonoBehaviour {
 
     public void ToggleLoadingText(bool on) {
         loadingText.SetActive(on);
+    }
+
+    public void TriggerEndOfMatchScreens(int losingPlayerId) {
+        StartCoroutine(EndOfGame(losingPlayerId));
+    }
+    IEnumerator EndOfGame(int losingPlayerId) {
+        knockoutScreen.SetActive(true);
+        // TODO animate KO text 1 and 2
+
+        yield return new WaitForSeconds(2f);
+        //knockoutScreen.SetActive(false);
+
+        // show result screen
+        yield return resultsScreen.Display(losingPlayerId);
     }
 
 }

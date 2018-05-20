@@ -121,7 +121,7 @@ public abstract class Character {
         _mm.eventCont.PlayerHealthChange(_playerId, amount, _health, dealt);
 
         if (_health == 0)
-            _mm.EndTheGame();
+            _mm.EndTheGame(_playerId);
     }
 
 
