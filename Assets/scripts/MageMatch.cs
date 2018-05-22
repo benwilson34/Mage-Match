@@ -7,7 +7,7 @@ using MMDebug;
 public class MageMatch : MonoBehaviour {
 
     // how to handle performing action here? also better name for Normal?
-    public enum State { Normal, BeginningOfGame, Selecting, Targeting, NewsfeedMenu, DebugMenu, TurnSwitching };
+    public enum State { Normal, BeginningOfGame, EndOfGame, Selecting, Targeting, NewsfeedMenu, DebugMenu, TurnSwitching };
     private Stack<State> _stateStack;
 
     public enum Turn { PlayerTurn, CommishTurn }; // MyTurn, OppTurn?
@@ -299,7 +299,7 @@ public class MageMatch : MonoBehaviour {
             if (costsAP)
                 _activep.DecrementAP();
             if (_activep.OutOfAP()) {
-                uiCont.SetDrawButton(false);
+                uiCont.SetDrawButton(_activep.id, false);
                 StartCoroutine(TurnSystem());
             }
         }
@@ -326,7 +326,7 @@ public class MageMatch : MonoBehaviour {
     public void TurnTimeout() {
         Player p = GetPlayer(_activep.id);
         MMLog.Log_MageMatch(p.name + "'s turn just timed out!");
-        uiCont.SetDrawButton(false);
+        uiCont.SetDrawButton(_activep.id, false);
         StartCoroutine(TurnSystem());
     }
 
@@ -345,7 +345,7 @@ public class MageMatch : MonoBehaviour {
         yield return eventCont.TurnEnd();
 
         uiCont.DeactivateAllSpellButtons(_activep.id); //? These should be part of any boardaction...
-        uiCont.SetDrawButton(false);
+        uiCont.SetDrawButton(_activep.id, false);
 
         currentTurn = Turn.CommishTurn;
         yield return commish.CTurn();
@@ -577,7 +577,7 @@ public class MageMatch : MonoBehaviour {
         syncManager.SendSpellCast(spellNum);
 
         Player p = _activep;
-        uiCont.SetDrawButton(false);
+        uiCont.SetDrawButton(_activep.id, false);
         Spell spell = p.character.GetSpell(spellNum);
         if (p.GetAP() >= spell.APcost) { // maybe do this check before boardcheck so the button isn't on
             MMLog.Log_MageMatch("spell cast spellNum=" + spellNum + ", spell count=" + _spellsOnBoard[spellNum].Count);
@@ -591,7 +591,7 @@ public class MageMatch : MonoBehaviour {
             uiCont.ShowAlertText("Not enough AP to cast!");
         }
 
-        uiCont.SetDrawButton(true);
+        uiCont.SetDrawButton(_activep.id, true);
         MMLog.Log_MageMatch("   ---------- CAST SPELL END ----------");
         _actionsPerforming--;
     }
@@ -715,14 +715,17 @@ public class MageMatch : MonoBehaviour {
         eventCont.BoardAction();
     }
 
-    public void EndTheGame() {
+    public void EndTheGame(int losingPlayerId) {
         _endGame = true;
-        audioCont.Trigger(AudioController.OtherSoundEffect.GameEnd);
-        uiCont.ShowAlertText("Wow!! " + _activep.name + " has won!!");
-        uiCont.DeactivateAllSpellButtons(1);
-        uiCont.DeactivateAllSpellButtons(2);
-        eventCont.boardAction -= OnBoardAction; //?
         timer.Pause();
+        audioCont.Trigger(AudioController.OtherSoundEffect.GameEnd);
+        EnterState(State.EndOfGame);
+        uiCont.TriggerEndOfMatchScreens(losingPlayerId);
+
+        //uiCont.ShowAlertText("Wow!! " + _activep.name + " has won!!");
+        //uiCont.DeactivateAllSpellButtons(1);
+        //uiCont.DeactivateAllSpellButtons(2);
+        //eventCont.boardAction -= OnBoardAction; //?
     }
 
     public bool IsEnded() { return _endGame; }
@@ -744,5 +747,9 @@ public class MageMatch : MonoBehaviour {
     public void DEBUG_ShiftScreen() {
         _activep = GetOpponent(_activep.id);
         StartCoroutine(uiCont.ShiftScreen());
+    }
+
+    public void DEBUG_EndGame() {
+        EndTheGame(2);
     }
 }

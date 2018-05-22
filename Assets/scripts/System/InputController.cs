@@ -645,6 +645,10 @@ public class InputController : MonoBehaviour {
                 _currentContext = _block;
                 break;
 
+            case MageMatch.State.EndOfGame:
+                _currentContext = _block;
+                break;
+
             case MageMatch.State.Selecting:
                 _currentContext = _selection;
                 break;

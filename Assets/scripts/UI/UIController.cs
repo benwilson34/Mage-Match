@@ -13,13 +13,13 @@ public class UIController : MonoBehaviour {
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
     [HideInInspector]
     public TooltipManager tooltipMan;
-    [HideInInspector]
+
     public Newsfeed newsfeed;
+    public ResultScreen resultsScreen;
 
-    public GameObject alertbar, quickdrawButton, loadingText, loadingScreen, gameStartScreen; 
+    public GameObject alertbar, quickdrawButton, loadingText, loadingScreen;
+    public GameObject gameStartScreen, knockoutScreen; 
 
-    private ButtonController _drawButton;
-    private Text _tDeckCount, _tRemovedCount;
     private MageMatch _mm;
     private Transform _leftPinfo, _rightPinfo, _leftPspells, _rightPspells, _board;
     private GameObject _spellOutlineEnd, _spellOutlineMid;
@@ -31,12 +31,19 @@ public class UIController : MonoBehaviour {
     private SpriteRenderer[,] _cellOverlays;
 
     private const float SHIFT_DUR = .4f;
-    private float camOffset, _spellSlidingOffset;
-    private bool _localOnRight = false;
+    private float _camOffset, _spellSlidingOffset;
+    private bool _shiftedLeft = true, _localOnRight = false;
+    private Transform _leftPportrait, _rightPportrait;
+    private float _portraitOffset;
+
+    private ButtonController _leftDrawButtonCont, _rightDrawButtonCont;
+    private Transform _leftDrawButton, _rightDrawButton;
+    private float _drawButtonOffset;
 
     private GameObject _hexGlow;
 
-    private const float ALERT_DIS = 55f, ALERT_DELAY = 3f;
+    private const float ALERT_DELAY = 3f;
+    private float _alertbarOffset;
     private bool _alertShowing = false;
 
     public void Init(MageMatch mm){
@@ -71,16 +78,32 @@ public class UIController : MonoBehaviour {
                 }
             }
         }
-        Transform drawT = GameObject.Find("b_draw").transform;
-        _drawButton = drawT.GetComponent<ButtonController>();
-        _drawButton.Init(_mm, _mm.myID);
-        _tDeckCount = drawT.Find("t_deckCount").GetComponent<Text>();
-        _tRemovedCount = drawT.Find("t_removedCount").GetComponent<Text>();
+
+        _leftDrawButton = GameObject.Find("LeftPlayer_Draw").transform;
+        _leftDrawButtonCont = _leftDrawButton.GetComponent<ButtonController>();
+        _leftDrawButtonCont.Init(_mm, _mm.myID);
+
+        _rightDrawButton = GameObject.Find("RightPlayer_Draw").transform;
+        _rightDrawButtonCont = _rightDrawButton.GetComponent<ButtonController>();
+        _rightDrawButtonCont.Init(_mm, _mm.myID);
+
+        // TODO get the right number for this
+        //_drawButtonOffset = Camera.main.transform.position.y;
+        //_drawButtonOffset += Screen.height / 2;
+        _drawButtonOffset = Camera.main.ScreenToWorldPoint(Vector3.zero).y;
+        Debug.Log("_drawButtonOffset=" + _drawButtonOffset);
+        _drawButtonOffset = Camera.main
+            .ScreenToWorldPoint(_leftDrawButton.GetComponent<RectTransform>().rect.size).y
+            - _drawButtonOffset;
+        _drawButtonOffset *= 1.5f;
+        Debug.Log("_drawButtonOffset=" + _drawButtonOffset);
+        _rightDrawButton.Translate(0, _drawButtonOffset, 0);
 
 
-        // newsfeed
-        newsfeed = GameObject.Find("Newsfeed").GetComponent<Newsfeed>();
+        // scripts
         newsfeed.Init(_mm);
+        resultsScreen.Init(_mm);
+        tooltipMan = GetComponent<TooltipManager>();
 
 
         // other
@@ -89,12 +112,24 @@ public class UIController : MonoBehaviour {
 
         LoadPrefabs();
 
-        tooltipMan = GetComponent<TooltipManager>();
-
         quickdrawButton.SetActive(false);
 
-        alertbar.transform.Translate(0, ALERT_DIS, 0);
+
+        // alert bar offset
+
+        //_alertbarOffset = loadingScreen.GetComponent<RectTransform>().rect.yMax;
+        //_alertbarOffset = GameObject.Find("static ui").GetComponent<RectTransform>().rect.yMax;
+        _alertbarOffset = Camera.main.WorldToScreenPoint(Camera.main.transform.position).y;
+        _alertbarOffset += Screen.height / 2;
+        //GameObject.Find("TEST").transform.position = new Vector3(0, _alertbarOffset);
+        Debug.Log("alertBarOffset=" + _alertbarOffset);
+        _alertbarOffset -= alertbar.transform.position.y;
+        Debug.Log("alertBarOffset=" + _alertbarOffset);
+        _alertbarOffset *= 3; // only needs to be 2 but for some reason that's not quite enough?
+        Debug.Log("alertBarOffset=" + _alertbarOffset);
+        alertbar.transform.Translate(0, _alertbarOffset, 0);
         alertbar.SetActive(true);
+
 
         _mm.AddEventContLoadEvent(OnEventContLoaded);
         _mm.AddPlayersLoadEvent(OnPlayersLoaded);
@@ -132,7 +167,7 @@ public class UIController : MonoBehaviour {
             ShowAlertText(_mm.ActiveP().name + ", make your move!");
             //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
 
-            SetDrawButton(true);
+            SetDrawButton(_mm.myID, true);
         }
         UpdateAP(_mm.GetPlayer(id));
 
@@ -154,7 +189,7 @@ public class UIController : MonoBehaviour {
     public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
         // TODO update button
         if (_mm.GetPlayer(id).hand.IsFull())
-            _drawButton.Deactivate();
+            GetDrawButtonCont(id).Deactivate();
         yield return null;
     }
 
@@ -170,32 +205,44 @@ public class UIController : MonoBehaviour {
 
     public void OnPlayersLoaded() {
         if (!_mm.MyTurn())
-            SetDrawButton(false);
+            SetDrawButton(_mm.myID, false);
+
+        _leftPportrait = GameObject.Find("LeftPlayer_Portrait").transform;
+        // TODO
+        //_leftPportrait.Find("i_portrait").GetComponent<Image>().sprite = ;
+        _rightPportrait = GameObject.Find("RightPlayer_Portrait").transform;
 
         for (int id = 1; id <= 2; id++) {
             Player p = _mm.GetPlayer(id);
             Transform pinfo = GetPinfo(id);
 
-            Text nameText = pinfo.Find("t_name").GetComponent<Text>();
-            nameText.text = p.name;
+            Transform gameStartSide = GetGameStartSide(id);
+            gameStartSide.Find("i_char").GetComponent<Image>().sprite =
+                Resources.Load<Sprite>("sprites/characters/" + p.character.ch.ToString());
+            gameStartSide.Find("t_name").GetComponent<Text>().text = p.name;
+
+            pinfo.Find("t_name").GetComponent<Text>().text = p.name;
             SetPinfoColor(id);
             //if (id == _mm.myID)
             //    nameText.text += " (ME!)";
 
             ShowAllSpellInfo(id);
             DeactivateAllSpellButtons(id); // not needed now
+            GetPortrait(id).Find("i_portrait").GetComponent<Image>().sprite =
+                Resources.Load<Sprite>("sprites/character-thumbs/" + p.character.ch.ToString());
+
             UpdateAP(p);
         }
 
+
         // camera position relative to center of the board
-        camOffset = Camera.main.transform.position.x;
-        camOffset = GameObject.Find("s_board").transform.position.x - camOffset;
+        _camOffset = Camera.main.transform.position.x;
+        _camOffset = GameObject.Find("s_board").transform.position.x - _camOffset;
 
         float boardPos = GameObject.Find("s_board").transform.position.x;
 
         RectTransform leftPlayerSpells = transform.Find("Spells")
             .Find("LeftPlayer_Spells").GetComponent<RectTransform>();
-
         float leftSpellGap = boardPos - leftPlayerSpells.position.x;
 
         RectTransform rightPlayerSpells = transform.Find("Spells")
@@ -208,44 +255,51 @@ public class UIController : MonoBehaviour {
 
         _spellSlidingOffset =  rightSpellGap - leftSpellGap + .3f; // spell towers aren't quite centered
 
-        //Debug.Log("camOffset=" + camOffset + ", spellOffset=" + _spellSlidingOffset);
+        float camCenter = Camera.main.WorldToScreenPoint(Camera.main.transform.position).x;
+        _portraitOffset = (camCenter - _leftPportrait.position.x) 
+            - (_rightPportrait.position.x - camCenter);
+
+        //Debug.Log("camOffset=" + _camOffset + ", portraitOffset=" + _portraitOffset);
 
         if (!_mm.MyTurn() ^ _localOnRight) // because it's currently relative, only shift if needed
             StartCoroutine(ShiftScreen());
     }
 
     public IEnumerator AnimateBeginningOfGame() {
-        yield return new WaitForEndOfFrame();
+        //yield return new WaitForEndOfFrame();
 
+        // TODO correct sides for both players
         RectTransform leftSide = gameStartScreen.transform
             .Find("LeftSide").GetComponent<RectTransform>();
         RectTransform rightSide = gameStartScreen.transform
             .Find("RightSide").GetComponent<RectTransform>();
 
-        leftSide.Find("i_char").GetComponent<Image>().sprite =
-            Resources.Load<Sprite>("sprites/characters/" + _mm.gameSettings.p1char);
-        leftSide.Find("t_name").GetComponent<Text>().text = _mm.gameSettings.p1name;
+        //leftSide.Find("i_char").GetComponent<Image>().sprite =
+        //    Resources.Load<Sprite>("sprites/characters/" + _mm.gameSettings.p1char);
+        //leftSide.Find("t_name").GetComponent<Text>().text = _mm.gameSettings.p1name;
 
-        rightSide.Find("i_char").GetComponent<Image>().sprite =
-            Resources.Load<Sprite>("sprites/characters/" + _mm.gameSettings.p2char);
-        rightSide.Find("t_name").GetComponent<Text>().text = _mm.gameSettings.p2name;
+        //rightSide.Find("i_char").GetComponent<Image>().sprite =
+        //    Resources.Load<Sprite>("sprites/characters/" + _mm.gameSettings.p2char);
+        //rightSide.Find("t_name").GetComponent<Text>().text = _mm.gameSettings.p2name;
 
         //float leftPos = -1215, rightPos = 1150;
         float origLeft = leftSide.position.x, origRight = rightSide.position.x;
         //Debug.Log("origLeft=" + origLeft + " origRight=" + origRight);
-        leftSide.position = new Vector2(origLeft - 1200, leftSide.position.y);
-        rightSide.position = new Vector2(origRight + 1200, rightSide.position.y);
+        //leftSide.position = new Vector2(origLeft, leftSide.position.y);
+        //rightSide.position = new Vector2(origRight, rightSide.position.y);
+
+        float center = Camera.main.WorldToScreenPoint(Camera.main.transform.position).x;
 
         gameStartScreen.SetActive(true);
 
-        leftSide.DOMoveX(origLeft, 1f);
-        yield return rightSide.DOMoveX(origRight, 1f).WaitForCompletion();
+        leftSide.DOMoveX(center, 1f);
+        yield return rightSide.DOMoveX(center, 1f).WaitForCompletion();
 
         loadingScreen.SetActive(false);
         yield return new WaitForSeconds(2.3f);
 
-        leftSide.DOMoveX(origLeft - 1200, .6f);
-        yield return rightSide.DOMoveX(origRight + 1200, .6f).WaitForCompletion();
+        leftSide.DOMoveX(origLeft, .6f);
+        yield return rightSide.DOMoveX(origRight, .6f).WaitForCompletion();
 
         gameStartScreen.SetActive(false);
 
@@ -270,15 +324,39 @@ public class UIController : MonoBehaviour {
     public IEnumerator ShiftScreen() {
         Transform camPos = Camera.main.transform;
         Transform spellSliding = transform.Find("Spells");
-        
-        if (_mm.MyTurn() ^ _localOnRight) { // left side
-            spellSliding.DOMoveX(spellSliding.position.x + ( _spellSlidingOffset), SHIFT_DUR);
-            yield return camPos.DOMoveX(camPos.position.x - (2* camOffset), SHIFT_DUR).WaitForCompletion();
-        } else { // right side
+
+        Debug.Log("alertBarOffset=" + GameObject.Find("static ui").GetComponent<RectTransform>().rect.yMax);
+        //GameObject.Find("TEST").transform.position = new Vector3(0, _alertbarOffset);
+
+        StartCoroutine(SlidePortrait(!_shiftedLeft, false));
+        StartCoroutine(SlideDrawButton(_shiftedLeft, false));
+        StartCoroutine(SlideDrawButton(!_shiftedLeft, true));
+
+        if (_shiftedLeft) { // shift to right side
             spellSliding.DOMoveX(spellSliding.position.x - ( _spellSlidingOffset), SHIFT_DUR);
-            yield return camPos.DOMoveX(camPos.position.x + (2*camOffset), SHIFT_DUR).WaitForCompletion();
+            yield return camPos.DOMoveX(camPos.position.x + (2*_camOffset), SHIFT_DUR).WaitForCompletion();
+        } else { // shift to left side
+            spellSliding.DOMoveX(spellSliding.position.x + ( _spellSlidingOffset), SHIFT_DUR);
+            yield return camPos.DOMoveX(camPos.position.x - (2* _camOffset), SHIFT_DUR).WaitForCompletion();
         }
-        yield return null;
+
+        yield return SlidePortrait(_shiftedLeft, true);
+
+        _shiftedLeft = !_shiftedLeft;
+    }
+
+    IEnumerator SlidePortrait(bool left, bool active) {
+        Transform portrait = left ? _leftPportrait : _rightPportrait;
+        float amt = portrait.position.x;
+        amt += left ^ active ? -1 * _portraitOffset : _portraitOffset;
+        yield return portrait.DOMoveX(amt, SHIFT_DUR).WaitForCompletion();
+    }
+
+    IEnumerator SlideDrawButton(bool left, bool active) {
+        Transform deck = left ? _leftDrawButton : _rightDrawButton;
+        float amt = deck.position.y;
+        amt += active ? -1 * _drawButtonOffset : _drawButtonOffset;
+        yield return deck.DOMoveY(amt, SHIFT_DUR).WaitForCompletion();
     }
 
     public void ShowLocalAlertText(int id, string str) {
@@ -295,7 +373,7 @@ public class UIController : MonoBehaviour {
         if (!_alertShowing) {
             _alertShowing = true;
             float posY = t.position.y;
-            yield return t.DOMoveY(posY - ALERT_DIS, .25f).WaitForCompletion();
+            yield return t.DOMoveY(posY - _alertbarOffset, .25f).WaitForCompletion();
             yield return _mm.animCont.WaitForSeconds(ALERT_DELAY);
             yield return t.DOMoveY(posY, .25f).WaitForCompletion();
             _alertShowing = false;
@@ -409,6 +487,11 @@ public class UIController : MonoBehaviour {
 		for (int i = 0; i < 5; i++)
             GetButtonCont(id, i).ShowSpellInfo();
 	}
+
+    Transform GetPortrait(int id) {
+        return _mm.myID == id ^ _localOnRight ? _leftPportrait : _rightPportrait;
+
+    }
     #endregion
 
 
@@ -560,13 +643,13 @@ public class UIController : MonoBehaviour {
         int id = _mm.ActiveP().id;
         TurnAllSpellButtons(id, !on);
         if (on) {
-            _drawButton.Deactivate();
+            GetDrawButtonCont(id).Deactivate();
 
             Vector3 newPos = hex.transform.position;
             newPos.y += 1;
             quickdrawButton.transform.position = newPos;
         } else {
-            _drawButton.Activate();
+            GetDrawButtonCont(id).Activate();
         }
     }
 
@@ -576,28 +659,38 @@ public class UIController : MonoBehaviour {
 
 
     #region ----- BUTTONS -----
-    public void SetDrawButton(bool interactable) {
+    public void SetDrawButton(int id, bool interactable) {
         if (_mm.MyTurn()) {
             if (interactable)
-                _drawButton.Activate();
+                GetDrawButtonCont(id).Activate();
             else
-                _drawButton.Deactivate();
+                GetDrawButtonCont(id).Deactivate();
         }
     }
 
-    public void UpdateDeckCount(int count) {
-        _tDeckCount.text = count + "";
+    public void UpdateDeckCount(int id, int count) {
+        Text deckCount = GetDrawButton(id).Find("t_deckCount").GetComponent<Text>();
+        deckCount.text = count + "";
     }
 
-    public void UpdateRemovedCount(int count) {
-        _tRemovedCount.text = count + "";
+    public void UpdateRemovedCount(int id, int count) {
+        Text removedCount = GetDrawButton(id).Find("t_removedCount").GetComponent<Text>();
+        removedCount.text = count + "";
     }
 
-    public Transform GetPspells(int id) {
+    Transform GetPspells(int id) {
         if (id == _mm.myID ^ _localOnRight)
             return _leftPspells;
         else
             return _rightPspells;
+    }
+
+    Transform GetDrawButton(int id) {
+        return id == _mm.myID ^ _localOnRight ? _leftDrawButton : _rightDrawButton;
+    }
+
+    ButtonController GetDrawButtonCont(int id) {
+        return GetDrawButton(id).GetComponent<ButtonController>();
     }
 
     public ButtonController GetButtonCont(int id, int index) {
@@ -656,8 +749,34 @@ public class UIController : MonoBehaviour {
     #endregion
 
 
+    #region ----- BEGINNING AND END SCREENS -----
+
     public void ToggleLoadingText(bool on) {
         loadingText.SetActive(on);
     }
+
+    public void TriggerEndOfMatchScreens(int losingPlayerId) {
+        StartCoroutine(EndOfGame(losingPlayerId));
+    }
+    IEnumerator EndOfGame(int losingPlayerId) {
+        knockoutScreen.SetActive(true);
+        // TODO animate KO text 1 and 2
+
+        yield return new WaitForSeconds(2f);
+        //knockoutScreen.SetActive(false);
+
+        // show result screen
+        yield return resultsScreen.Display(losingPlayerId);
+    }
+
+    Transform GetGameStartSide(int id) {
+        if (id == _mm.myID ^ _localOnRight)
+            return gameStartScreen.transform
+            .Find("LeftSide").GetComponent<RectTransform>();
+        else
+            return gameStartScreen.transform
+            .Find("RightSide").GetComponent<RectTransform>();
+    }
+    #endregion
 
 }

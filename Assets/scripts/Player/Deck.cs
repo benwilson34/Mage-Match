@@ -88,13 +88,13 @@ public class Deck {
         if (_deckQ.Count == 0) {
             yield return Shuffle(_removeList.ToArray());
             _removeList.Clear();
-            _mm.uiCont.UpdateRemovedCount(0);
+            _mm.uiCont.UpdateRemovedCount(_player.id, 0);
         }
 
         Debug.Log("DECK: Next hex is " + _deckQ.Peek());
         string nextHex = _deckQ.Dequeue();
 
-        _mm.uiCont.UpdateDeckCount(_deckQ.Count);
+        _mm.uiCont.UpdateDeckCount(_player.id, _deckQ.Count);
 
         PrintDeck();
         _nextHexTag = nextHex; // + "-" ?
@@ -104,7 +104,7 @@ public class Deck {
 
     public void AddHextagToRemoveList(string hextag) {
         _removeList.Add(hextag);
-        _mm.uiCont.UpdateRemovedCount(_removeList.Count);
+        _mm.uiCont.UpdateRemovedCount(_player.id, _removeList.Count);
     }
 
     public int GetRemoveListCount() { return _removeList.Count; }
