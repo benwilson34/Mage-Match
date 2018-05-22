@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{78ad116e-f0ca-4725-b5e6-c2d8bd374c40}">
         <property name="name">
-            <value>Gra_TSBell</value>
+            <value>Sig_Bell</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

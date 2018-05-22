@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{74524084-0c20-4abd-8cc6-ab8da7497361}">
         <property name="name">
-            <value>Enf_Incinerate</value>
+            <value>Incinerate</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

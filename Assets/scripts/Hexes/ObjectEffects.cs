@@ -90,7 +90,7 @@ public class ObjectEffects {
         // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
         //		Debug.MMLog.Log_EnchantFx("SPELLEFFECTS: Setting burning...");
         yield return _mm.animCont._Burning(tb);
-        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.BurningEnchant);
+        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.BurningEnchant);
 
         Enchantment ench = new Enchantment(id, 5, Enchantment.Type.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
         ench.TriggerEffectEveryTurn();
@@ -102,13 +102,13 @@ public class ObjectEffects {
     IEnumerator Ench_Burning_TEffect(int id, TileBehav tb) {
         MMLog.Log_EnchantFx("Burning TurnEffect at " + tb.PrintCoord());
         yield return _mm.animCont._Burning_Turn(_mm.GetOpponent(id), tb);
-        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.BurningDamage);
+        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.BurningDamage);
         _mm.GetPC(id).DealDamage(3);
         //yield return null; // for now
     }
     IEnumerator Ench_Burning_End(int id, TileBehav tb) {
         _mm.GetPC(id).DealDamage(6);
-        _mm.audioCont.Trigger(AudioController.EnfuegoSoundEffect.BurningTimeout);
+        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.BurningTimeout);
         yield return null; // for now
     }
 
@@ -133,7 +133,7 @@ public class ObjectEffects {
     public IEnumerator Ench_SetZombie(int id, TileBehav tb, bool skip = false, bool anim = true) {
         if (anim) {
             yield return _mm.animCont._Zombify(tb);
-            _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.ZombieEnchant);
+            _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieEnchant);
         }
 
         Enchantment ench = new Enchantment(id, Enchantment.Type.Zombie, Effect.Type.Enchant, Ench_Zombie_TEffect, null);
@@ -186,13 +186,13 @@ public class ObjectEffects {
 
         if (selectTB.tile.element == Tile.Element.Muscle) {
             yield return _hexMan._RemoveTile(selectTB, true); // maybe?
-            _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.ZombieGulp);
+            _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieGulp);
 
             _mm.GetPC(id).DealDamage(10);
             _mm.GetPC(id).Heal(10);
         } else {
             yield return Ench_SetZombie(id, selectTB, true, false);
-            _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.ZombieAttack);
+            _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieAttack);
         }
 
         yield return _mm.animCont._Zombify_Back(tb.transform); // anim 2

@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{7d28dd63-5e59-484c-a3b9-38ff971118aa}">
         <property name="name">
-            <value>Enf_WHCK</value>
+            <value>Sig_WHCK</value>
         </property>
         <property name="outputFormat">
             <value>1</value>
@@ -102,6 +102,9 @@
         </relationship>
     </object>
     <object class="EventMixerGroup" id="{538e57a0-65d5-4a77-96f3-873b0548cce3}">
+        <property name="volume">
+            <value>-1.5</value>
+        </property>
         <property name="name">
             <value>Audio 1</value>
         </property>

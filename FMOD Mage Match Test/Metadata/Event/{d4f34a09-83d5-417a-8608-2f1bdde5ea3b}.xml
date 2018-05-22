@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{d4f34a09-83d5-417a-8608-2f1bdde5ea3b}">
         <property name="name">
-            <value>Gra_PartyCrashers</value>
+            <value>PartyCrashers</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

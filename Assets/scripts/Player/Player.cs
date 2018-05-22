@@ -74,7 +74,7 @@ public class Player {
     public IEnumerator Discard(Hex hex) {
         _mm.eventCont.Discard(id, hex.hextag);
 
-        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Discard);
+        _mm.audioCont.Trigger(AudioController.HexSFX.Discard);
         yield return _mm.animCont._DiscardTile(hex.transform);
         hand.Remove(hex);
         GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan

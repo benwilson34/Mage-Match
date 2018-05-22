@@ -557,7 +557,7 @@ public class MageMatch : MonoBehaviour {
 
         TileBehav tb1 = hexGrid.GetTileBehavAt(c1, r1);
         TileBehav tb2 = hexGrid.GetTileBehavAt(c2, r2);
-        audioCont.Trigger(AudioController.HexSoundEffect.Swap);
+        audioCont.Trigger(AudioController.HexSFX.Swap);
 
         hexGrid.Swap(c1, r1, c2, r2);
         tb1.ChangePos(c2, r2);

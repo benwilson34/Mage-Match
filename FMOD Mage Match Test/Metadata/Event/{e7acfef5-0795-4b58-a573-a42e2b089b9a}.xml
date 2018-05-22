@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{e7acfef5-0795-4b58-a573-a42e2b089b9a}">
         <property name="name">
-            <value>Val_SigWaveCrash</value>
+            <value>Sig_WaveCrash</value>
         </property>
         <property name="outputFormat">
             <value>0</value>

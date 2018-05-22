@@ -27,7 +27,7 @@ public class Valeria : Character {
 
     public IEnumerator Passive_Swap(int id, int c1, int r1, int c2, int r2) {
         Heal(7);
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.Healing);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.Healing);
         yield return null;
     }
 
@@ -41,7 +41,7 @@ public class Valeria : Character {
 
     // Whirlpool Spin
     protected override IEnumerator CoreSpell(TileSeq seq) {
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.SwirlingWater);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.SwirlingWater);
 
         int dmg = 0, swaps = 0;
         switch (seq.GetSeqLength()) {
@@ -69,7 +69,7 @@ public class Valeria : Character {
             yield return _mm.prompt.WaitForSwap(seq);
             if (_mm.prompt.WasSuccessful()) {
                 yield return _mm.prompt.ContinueSwap();
-                _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.Bubbles2);
+                _mm.audioCont.Trigger(AudioController.ValeriaSFX.Bubbles2);
             }
         }
 
@@ -95,7 +95,7 @@ public class Valeria : Character {
         // move first to second and destroy second
         int secCol = second.tile.col, secRow = second.tile.row;
         yield return _hexMan._RemoveTile(second, false);
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.Mariposa);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.Mariposa);
         yield return first._ChangePos(secCol, secRow, 0.3f);
 
         // put new water tile in first's place
@@ -108,15 +108,15 @@ public class Valeria : Character {
 
     // Rain Dance
     protected override IEnumerator Spell2(TileSeq prereq) {
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.Rain);
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.ThunderFar);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.Rain);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.ThunderFar);
 
         TurnEffect te = new TurnEffect(_playerId, 5, Effect.Type.Add, RainDance_T, null);
         _mm.effectCont.AddBeginTurnEffect(te, "rainD");
         yield return null;
     }
     public IEnumerator RainDance_T(int id) {
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.RainDance);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.RainDance);
 
         yield return _mm.syncManager.SyncRand(_playerId, Random.Range(3, 6));
         int dropCount = _mm.syncManager.GetRand();
@@ -128,7 +128,7 @@ public class Valeria : Character {
         yield return _mm.syncManager.SyncRand(_playerId, Random.Range(15, 26));
         int healing = _mm.syncManager.GetRand();
         Heal(healing);
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.Healing);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.Healing);
 
         yield return null;
     }
@@ -158,7 +158,7 @@ public class Valeria : Character {
 
     // Balanco
     protected override IEnumerator Spell3(TileSeq prereq) {
-        // TODO splashing sound fx
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.Balanco);
 
         DropEffect de = new DropEffect(_playerId, Balanco_Drop, 3);
         de.isGlobal = true;
@@ -190,8 +190,8 @@ public class Valeria : Character {
 
     // Hurricane Cutter
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.ThunderClose);
-        _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.Rain);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.ThunderClose);
+        _mm.audioCont.Trigger(AudioController.ValeriaSFX.Rain);
 
         yield return HandleMatchesOnBoard();
 
@@ -202,7 +202,7 @@ public class Valeria : Character {
                 break;
 
             yield return _mm.prompt.ContinueSwap();
-            _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.SigCut);
+            _mm.audioCont.Trigger(AudioController.ValeriaSFX.SigCut);
 
             yield return HandleMatchesOnBoard();
         }
@@ -239,7 +239,7 @@ public class Valeria : Character {
                 DealDamage(dmg);
                 yield return DropWaterIntoRandomCols(dropCount);
             }
-            _mm.audioCont.Trigger(AudioController.ValeriaSoundEffect.SigWaveCrash);
+            _mm.audioCont.Trigger(AudioController.ValeriaSFX.SigWaveCrash);
 
             // wait for board to update...will this work?
             yield return _mm.BoardChecking(false);

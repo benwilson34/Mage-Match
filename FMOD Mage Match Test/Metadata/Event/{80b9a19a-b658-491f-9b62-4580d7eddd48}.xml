@@ -143,9 +143,75 @@
     <object class="MixerBusEffectChain" id="{ab2c0bd8-6de9-4aec-9b52-2bb2711563bc}">
         <relationship name="effects">
             <destination>{ffcabdb6-7b03-4eb1-9a3a-f62388adac93}</destination>
+            <destination>{e95167db-3f7e-4d4b-a186-a6f632423cf9}</destination>
+            <destination>{63e3bc79-7555-4186-8bf7-6ccf77172720}</destination>
         </relationship>
     </object>
     <object class="MixerBusPanner" id="{8c21274c-29b9-4825-9643-1d0bc9d50652}"/>
     <object class="MixerBusFader" id="{c8439879-b90d-4737-8566-0e8242afcb98}"/>
     <object class="MixerBusFader" id="{ffcabdb6-7b03-4eb1-9a3a-f62388adac93}"/>
+    <object class="MultibandEqEffect" id="{e95167db-3f7e-4d4b-a186-a6f632423cf9}">
+        <property name="filterTypeA">
+            <value>8</value>
+        </property>
+        <property name="filterTypeB">
+            <value>9</value>
+        </property>
+        <property name="filterTypeC">
+            <value>9</value>
+        </property>
+        <property name="filterTypeD">
+            <value>6</value>
+        </property>
+        <property name="frequencyA">
+            <value>5721.8877</value>
+        </property>
+        <property name="frequencyB">
+            <value>2948.47095</value>
+        </property>
+        <property name="frequencyC">
+            <value>720.641174</value>
+        </property>
+        <property name="frequencyD">
+            <value>58.7403564</value>
+        </property>
+        <property name="qualityB">
+            <value>0.340000004</value>
+        </property>
+        <property name="qualityC">
+            <value>0.399999976</value>
+        </property>
+        <property name="qualityD">
+            <value>1.28662062</value>
+        </property>
+        <property name="gainA">
+            <value>6.20689631</value>
+        </property>
+        <property name="gainB">
+            <value>1.55172586</value>
+        </property>
+        <property name="gainC">
+            <value>-6.20689583</value>
+        </property>
+        <property name="gainD">
+            <value>3.10344815</value>
+        </property>
+    </object>
+    <object class="CompressorEffect" id="{63e3bc79-7555-4186-8bf7-6ccf77172720}">
+        <property name="threshold">
+            <value>-17.5</value>
+        </property>
+        <property name="ratio">
+            <value>5.4000001</value>
+        </property>
+        <property name="attackTime">
+            <value>58</value>
+        </property>
+        <property name="releaseTime">
+            <value>58</value>
+        </property>
+        <property name="gain">
+            <value>1.5</value>
+        </property>
+    </object>
 </objects>

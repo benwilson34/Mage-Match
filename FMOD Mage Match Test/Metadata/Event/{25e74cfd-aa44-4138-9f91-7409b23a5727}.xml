@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{25e74cfd-aa44-4138-9f91-7409b23a5727}">
         <property name="name">
-            <value>Val_ThunderClose</value>
+            <value>ThunderClose</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

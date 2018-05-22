@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{30c6ec88-eae8-4c0a-bbb7-6f7e3911fd1a}">
         <property name="name">
-            <value>Val_ThunderFar</value>
+            <value>ThunderFar</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

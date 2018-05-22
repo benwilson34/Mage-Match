@@ -22,11 +22,11 @@ public class TombstoneTile : TileBehav {
         TileBehav tb = _mm.hexMan.GenerateBasicTile(id, elem);
         yield return _mm.hexFX.Ench_SetZombie(id, tb);
         _mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
-        _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.SigEffect);
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.SigEffect);
     }
 
     public IEnumerator Tombstone_TEnd(int id) {
         yield return _mm.hexMan._RemoveTile(this, false); // remove itself
-        _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.SigBell2);
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.SigBell2);
     }
 }
