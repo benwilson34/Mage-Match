@@ -31,10 +31,7 @@ public class GameSettings : PunBehaviour {
     }
 
     public Character.Ch GetChar(int id) {
-        if (id == 1)
-            return p1char;
-        else
-            return p2char;
+        return id == 1 ? p1char : p2char;
     }
 
     public void SetPlayerLoadout(int id, string[] runes) {
@@ -45,10 +42,7 @@ public class GameSettings : PunBehaviour {
     }
 
     public string[] GetLoadout(int id) {
-        if (id == 1)
-            return p1loadout;
-        else
-            return p2loadout;
+        return id == 1 ? p1loadout : p2loadout;
     }
 
     public string SettingsToString() {

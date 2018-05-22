@@ -299,7 +299,7 @@ public class MageMatch : MonoBehaviour {
             if (costsAP)
                 _activep.DecrementAP();
             if (_activep.OutOfAP()) {
-                uiCont.SetDrawButton(false);
+                uiCont.SetDrawButton(_activep.id, false);
                 StartCoroutine(TurnSystem());
             }
         }
@@ -326,7 +326,7 @@ public class MageMatch : MonoBehaviour {
     public void TurnTimeout() {
         Player p = GetPlayer(_activep.id);
         MMLog.Log_MageMatch(p.name + "'s turn just timed out!");
-        uiCont.SetDrawButton(false);
+        uiCont.SetDrawButton(_activep.id, false);
         StartCoroutine(TurnSystem());
     }
 
@@ -345,7 +345,7 @@ public class MageMatch : MonoBehaviour {
         yield return eventCont.TurnEnd();
 
         uiCont.DeactivateAllSpellButtons(_activep.id); //? These should be part of any boardaction...
-        uiCont.SetDrawButton(false);
+        uiCont.SetDrawButton(_activep.id, false);
 
         currentTurn = Turn.CommishTurn;
         yield return commish.CTurn();
@@ -577,7 +577,7 @@ public class MageMatch : MonoBehaviour {
         syncManager.SendSpellCast(spellNum);
 
         Player p = _activep;
-        uiCont.SetDrawButton(false);
+        uiCont.SetDrawButton(_activep.id, false);
         Spell spell = p.character.GetSpell(spellNum);
         if (p.GetAP() >= spell.APcost) { // maybe do this check before boardcheck so the button isn't on
             MMLog.Log_MageMatch("spell cast spellNum=" + spellNum + ", spell count=" + _spellsOnBoard[spellNum].Count);
@@ -591,7 +591,7 @@ public class MageMatch : MonoBehaviour {
             uiCont.ShowAlertText("Not enough AP to cast!");
         }
 
-        uiCont.SetDrawButton(true);
+        uiCont.SetDrawButton(_activep.id, true);
         MMLog.Log_MageMatch("   ---------- CAST SPELL END ----------");
         _actionsPerforming--;
     }
