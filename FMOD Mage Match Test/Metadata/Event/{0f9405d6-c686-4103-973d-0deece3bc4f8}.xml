@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{0f9405d6-c686-4103-973d-0deece3bc4f8}">
         <property name="name">
-            <value>Val_SigCut</value>
+            <value>Sig_Cut</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

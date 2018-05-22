@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{85d769d7-5feb-4297-a104-9d7486cf7fa3}">
         <property name="name">
-            <value>Val_Mariposa</value>
+            <value>Mariposa</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

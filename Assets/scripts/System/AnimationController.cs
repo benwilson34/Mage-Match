@@ -81,7 +81,7 @@ public class AnimationController : MonoBehaviour {
         //Tween swellTween = tb.transform.DOScale(new Vector3(1.25f, 1.25f), .15f);
         Tween colorTween = tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 0, 0, 0), .15f);
         //Camera.main.DOShakePosition(.1f, 1.5f, 20, 90, false); // heh
-        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Invoke);
+        _mm.audioCont.Trigger(AudioController.HexSFX.Invoke);
 
         //yield return swellTween.WaitForCompletion();
         yield return Animate(colorTween);
@@ -94,7 +94,7 @@ public class AnimationController : MonoBehaviour {
         Tween tween = tb.transform.DOMoveY(yPos - 1, .25f);
         tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .25f);
         //Camera.main.DOShakePosition(.1f, 1.5f, 20, 90, false); // heh
-        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Destroy);
+        _mm.audioCont.Trigger(AudioController.HexSFX.Destroy);
 
         yield return Animate(tween);
         _animating--;
@@ -133,7 +133,7 @@ public class AnimationController : MonoBehaviour {
         float height = t.position.y - newPos.y;
 
         yield return Animate(t.DOMove(newPos, .04f * height).SetEase(Ease.InQuad));
-        _mm.audioCont.Trigger(AudioController.HexSoundEffect.Grav);
+        _mm.audioCont.Trigger(AudioController.HexSFX.Grav);
 
         // bounce anim
         // TODO .SetLoops(2, LoopType.Yoyo);

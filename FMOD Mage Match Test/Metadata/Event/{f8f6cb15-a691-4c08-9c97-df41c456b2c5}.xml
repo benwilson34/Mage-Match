@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{f8f6cb15-a691-4c08-9c97-df41c456b2c5}">
         <property name="name">
-            <value>Val_Bubbles2</value>
+            <value>Bubbles2</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

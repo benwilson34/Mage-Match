@@ -57,7 +57,7 @@ public class Gravekeeper : Character {
 
     // alt core spell - Party in the Back
     public IEnumerator PartyInTheBack(TileSeq seq) {
-        _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.PartyInTheBack);
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.PartyInTheBack);
 
         int dmg = 0;
         switch (seq.GetSeqLength()) {
@@ -104,7 +104,7 @@ public class Gravekeeper : Character {
 
     // The Oogie Boogie
     protected override IEnumerator Spell1(TileSeq prereq) {
-        _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.OogieBoogie);
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.OogieBoogie);
 
 
         var zombs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
@@ -128,7 +128,7 @@ public class Gravekeeper : Character {
 
     // Party Crashers
     protected override IEnumerator Spell2(TileSeq prereq) {
-        _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.PartyCrashers);
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.PartyCrashers);
 
         for (int i = 0; i < 2; i++) {
             yield return _mm.prompt.WaitForDropTile();
@@ -154,7 +154,7 @@ public class Gravekeeper : Character {
 
     // Undead Union
     protected override IEnumerator Spell3(TileSeq prereq) {
-        // TODO zombie groan sound fx?
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.UndeadUnion);
 
         var tbs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
         MMLog.Log_Gravekeeper(tbs.Count + " zombs on the board...");
@@ -181,8 +181,8 @@ public class Gravekeeper : Character {
 
     // Tombstone
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.SigBell1);
-        _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.Motorcycle);
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.SigBell1);
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.Motorcycle);
 
         DealDamage(225);
 
@@ -205,7 +205,7 @@ public class Gravekeeper : Character {
 
         _mm.DropTile(tomb, col); // idk how to animate this one yet
 
-        _mm.audioCont.Trigger(AudioController.GraveKSoundEffect.SigDrop);
+        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.SigDrop);
     }
 
     //public IEnumerator CompanyLuncheon() {

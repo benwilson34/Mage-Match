@@ -4,10 +4,10 @@ using MMDebug;
 
 public class AudioController {
 
-    public enum HexSoundEffect { Draw, Pickup, Discard, Grav, Swap, Destroy, Invoke };
-    public enum EnfuegoSoundEffect { BurningEnchant, BurningDamage, BurningTimeout, FieryFandango, Baila, Incinerate, WHCK };
-    public enum GraveKSoundEffect { ZombieEnchant, ZombieAttack, ZombieGulp, PartyInTheBack, OogieBoogie, PartyCrashers, Motorcycle, SigBell1, SigDrop, SigEffect, SigBell2 };
-    public enum ValeriaSoundEffect { SwirlingWater, Healing, Mariposa, RainDance, Bubbles1, Bubbles2, SigCut, SigWaveCrash, ThunderFar, ThunderClose, Rain };
+    public enum HexSFX { Draw, Pickup, Discard, Grav, Swap, Destroy, Invoke };
+    public enum EnfuegoSFX { BurningEnchant, BurningDamage, BurningTimeout, FieryFandango, Baila, Incinerate, WHCK };
+    public enum GravekeeperSFX { ZombieEnchant, ZombieAttack, ZombieGulp, PartyInTheBack, OogieBoogie, PartyCrashers, UndeadUnion, Motorcycle, SigBell1, SigDrop, SigEffect, SigBell2 };
+    public enum ValeriaSFX { SwirlingWater, Healing, Mariposa, RainDance, Bubbles1, Bubbles2, Balanco, SigCut, SigWaveCrash, ThunderFar, ThunderClose, Rain };
 
     public enum Rune_NeutralSFX { SampleCharm, ProteinPills, Leeches, ShuffleGem, Molotov, FiveAlarmBell }
     public enum Rune_EnfuegoSFX { DanceShoes, BurningBracers }
@@ -33,57 +33,59 @@ public class AudioController {
         _clips = new Dictionary<System.Enum, string>();
 
         // ----- hexes -----
-        _clips.Add(HexSoundEffect.Draw, "event:/Hexes/Hex_Draw");
-        _clips.Add(HexSoundEffect.Pickup, "event:/Hexes/Hex_Pickup");
-        _clips.Add(HexSoundEffect.Discard, "event:/Hexes/Hex_Discard");
+        _clips.Add(HexSFX.Draw, "event:/Hexes/Hex_Draw");
+        _clips.Add(HexSFX.Pickup, "event:/Hexes/Hex_Pickup");
+        _clips.Add(HexSFX.Discard, "event:/Hexes/Hex_Discard");
 
-        _clips.Add(HexSoundEffect.Grav, "event:/Hexes/Tile_Grav");
-        _clips.Add(HexSoundEffect.Swap, "event:/Hexes/Tile_Swap");
-        _clips.Add(HexSoundEffect.Destroy, "event:/Hexes/Tile_Destroy");
-        _clips.Add(HexSoundEffect.Invoke, "event:/Hexes/Tile_Invoke");
+        _clips.Add(HexSFX.Grav, "event:/Hexes/Tile_Grav");
+        _clips.Add(HexSFX.Swap, "event:/Hexes/Tile_Swap");
+        _clips.Add(HexSFX.Destroy, "event:/Hexes/Tile_Destroy");
+        _clips.Add(HexSFX.Invoke, "event:/Hexes/Tile_Invoke");
 
 
         // ----- enfuego -----
-        _clips.Add(EnfuegoSoundEffect.BurningEnchant, "event:/CharacterSpells/Enfuego/Burning_Enchant");
-        _clips.Add(EnfuegoSoundEffect.BurningDamage, "event:/CharacterSpells/Enfuego/Burning_Damage");
-        _clips.Add(EnfuegoSoundEffect.BurningTimeout, "event:/CharacterSpells/Enfuego/Burning_Timeout");
+        _clips.Add(EnfuegoSFX.BurningEnchant, "event:/CharacterSpells/Enfuego/Burning_Enchant");
+        _clips.Add(EnfuegoSFX.BurningDamage, "event:/CharacterSpells/Enfuego/Burning_Damage");
+        _clips.Add(EnfuegoSFX.BurningTimeout, "event:/CharacterSpells/Enfuego/Burning_Timeout");
 
-        _clips.Add(EnfuegoSoundEffect.FieryFandango, "event:/CharacterSpells/Enfuego/Enf_FieryFandango");
-        _clips.Add(EnfuegoSoundEffect.Baila, "event:/CharacterSpells/Enfuego/Enf_Baila");
-        _clips.Add(EnfuegoSoundEffect.Incinerate, "event:/CharacterSpells/Enfuego/Enf_Incinerate");
-        _clips.Add(EnfuegoSoundEffect.WHCK, "event:/CharacterSpells/Enfuego/Enf_WHCK");
+        _clips.Add(EnfuegoSFX.FieryFandango, "event:/CharacterSpells/Enfuego/FieryFandango");
+        _clips.Add(EnfuegoSFX.Baila, "event:/CharacterSpells/Enfuego/Baila");
+        _clips.Add(EnfuegoSFX.Incinerate, "event:/CharacterSpells/Enfuego/Incinerate");
+        _clips.Add(EnfuegoSFX.WHCK, "event:/CharacterSpells/Enfuego/Sig_WHCK");
 
         
         // ----- gravekeeper -----
-        _clips.Add(GraveKSoundEffect.ZombieEnchant, "event:/CharacterSpells/Gravekeeper/Zombie_Enchant");
-        _clips.Add(GraveKSoundEffect.ZombieAttack, "event:/CharacterSpells/Gravekeeper/Zombie_Attack");
-        _clips.Add(GraveKSoundEffect.ZombieGulp, "event:/CharacterSpells/Gravekeeper/Zombie_Gulp");
+        _clips.Add(GravekeeperSFX.ZombieEnchant, "event:/CharacterSpells/Gravekeeper/Zombie_Enchant");
+        _clips.Add(GravekeeperSFX.ZombieAttack, "event:/CharacterSpells/Gravekeeper/Zombie_Attack");
+        _clips.Add(GravekeeperSFX.ZombieGulp, "event:/CharacterSpells/Gravekeeper/Zombie_Gulp");
 
-        _clips.Add(GraveKSoundEffect.PartyInTheBack, "event:/CharacterSpells/Gravekeeper/Gra_PartyInTheBack");
-        _clips.Add(GraveKSoundEffect.OogieBoogie, "event:/CharacterSpells/Gravekeeper/Gra_OogieBoogie");
-        _clips.Add(GraveKSoundEffect.PartyCrashers, "event:/CharacterSpells/Gravekeeper/Gra_PartyCrashers");
+        _clips.Add(GravekeeperSFX.PartyInTheBack, "event:/CharacterSpells/Gravekeeper/PartyInTheBack");
+        _clips.Add(GravekeeperSFX.OogieBoogie, "event:/CharacterSpells/Gravekeeper/OogieBoogie");
+        _clips.Add(GravekeeperSFX.PartyCrashers, "event:/CharacterSpells/Gravekeeper/PartyCrashers");
+        _clips.Add(GravekeeperSFX.UndeadUnion, "event:/CharacterSpells/Gravekeeper/UndeadUnion");
 
-        _clips.Add(GraveKSoundEffect.Motorcycle, "event:/CharacterSpells/Gravekeeper/Gra_Motorcycle");
-        _clips.Add(GraveKSoundEffect.SigBell1, "event:/CharacterSpells/Gravekeeper/Gra_TSBell");
-        _clips.Add(GraveKSoundEffect.SigDrop, "event:/CharacterSpells/Gravekeeper/Gra_TSDrop");
-        _clips.Add(GraveKSoundEffect.SigEffect, "event:/CharacterSpells/Gravekeeper/Gra_TSEffect");
-        _clips.Add(GraveKSoundEffect.SigBell2, "event:/CharacterSpells/Gravekeeper/Gra_ChurchBell");
+        _clips.Add(GravekeeperSFX.Motorcycle, "event:/CharacterSpells/Gravekeeper/Sig_Motorcycle");
+        _clips.Add(GravekeeperSFX.SigBell1, "event:/CharacterSpells/Gravekeeper/Sig_Bell");
+        _clips.Add(GravekeeperSFX.SigDrop, "event:/CharacterSpells/Gravekeeper/Sig_TSDrop");
+        _clips.Add(GravekeeperSFX.SigEffect, "event:/CharacterSpells/Gravekeeper/Sig_TSEffect");
+        _clips.Add(GravekeeperSFX.SigBell2, "event:/CharacterSpells/Gravekeeper/ChurchBell");
 
 
         // ----- valeria -----
-        _clips.Add(ValeriaSoundEffect.SwirlingWater, "event:/CharacterSpells/Valeria/Val_SwirlingWater");
-        _clips.Add(ValeriaSoundEffect.Healing, "event:/CharacterSpells/Valeria/Val_Healing");
-        _clips.Add(ValeriaSoundEffect.Mariposa, "event:/CharacterSpells/Valeria/Val_Mariposa");
-        _clips.Add(ValeriaSoundEffect.RainDance, "event:/CharacterSpells/Valeria/Val_RainDance");
-        _clips.Add(ValeriaSoundEffect.Bubbles1, "event:/CharacterSpells/Valeria/Val_Bubbles1");
-        _clips.Add(ValeriaSoundEffect.Bubbles2, "event:/CharacterSpells/Valeria/Val_Bubbles2");
+        _clips.Add(ValeriaSFX.SwirlingWater, "event:/CharacterSpells/Valeria/Val_SwirlingWater");
+        _clips.Add(ValeriaSFX.Healing, "event:/CharacterSpells/Valeria/Healing");
+        _clips.Add(ValeriaSFX.Mariposa, "event:/CharacterSpells/Valeria/Mariposa");
+        _clips.Add(ValeriaSFX.Rain, "event:/CharacterSpells/Valeria/Rain");
+        _clips.Add(ValeriaSFX.RainDance, "event:/CharacterSpells/Valeria/RainDance");
+        _clips.Add(ValeriaSFX.Bubbles1, "event:/CharacterSpells/Valeria/Bubbles1");
+        _clips.Add(ValeriaSFX.Bubbles2, "event:/CharacterSpells/Valeria/Bubbles2");
+        _clips.Add(ValeriaSFX.Balanco, "event:/CharacterSpells/Valeria/Balanco");
 
-        _clips.Add(ValeriaSoundEffect.SigCut, "event:/CharacterSpells/Valeria/Val_SigCut");
-        _clips.Add(ValeriaSoundEffect.SigWaveCrash, "event:/CharacterSpells/Valeria/Val_SigWaveCrash");
+        _clips.Add(ValeriaSFX.SigCut, "event:/CharacterSpells/Valeria/Sig_Cut");
+        _clips.Add(ValeriaSFX.SigWaveCrash, "event:/CharacterSpells/Valeria/Sig_WaveCrash");
 
-        _clips.Add(ValeriaSoundEffect.ThunderFar, "event:/CharacterSpells/Valeria/Val_SigThunderFar");
-        _clips.Add(ValeriaSoundEffect.ThunderClose, "event:/CharacterSpells/Valeria/Val_SigThunderClose");
-        _clips.Add(ValeriaSoundEffect.Rain, "event:/CharacterSpells/Valeria/Val_SigRain");
+        _clips.Add(ValeriaSFX.ThunderFar, "event:/CharacterSpells/Valeria/ThunderFar");
+        _clips.Add(ValeriaSFX.ThunderClose, "event:/CharacterSpells/Valeria/ThunderClose");
 
 
         // ----- runes -----
@@ -95,10 +97,10 @@ public class AudioController {
         _clips.Add(Rune_NeutralSFX.FiveAlarmBell, "event:/Runes/Neutral/FiveAlarmBell");
 
         _clips.Add(Rune_EnfuegoSFX.DanceShoes, "event:/Runes/Enfuego/DanceShoes");
-        _clips.Add(Rune_EnfuegoSFX.BurningBracers, "event:/Runes/Enfuego/Val_SigRain");
+        _clips.Add(Rune_EnfuegoSFX.BurningBracers, "event:/Runes/Enfuego/BurningBracers");
 
-        _clips.Add(Rune_GravekeeperSFX.HRForm, "event:/Runes/Valeria/Val_SigRain");
-        _clips.Add(Rune_GravekeeperSFX.PartySnacks, "event:/Runes/Valeria/BurningBracers");
+        _clips.Add(Rune_GravekeeperSFX.HRForm, "event:/Runes/Gravekeeper/HRForm");
+        _clips.Add(Rune_GravekeeperSFX.PartySnacks, "event:/Runes/Gravekeeper/PartySnacks");
 
         _clips.Add(Rune_ValeriaSFX.Bandages, "event:/Runes/Valeria/Bandages");
         _clips.Add(Rune_ValeriaSFX.WaterLily, "event:/Runes/Valeria/WaterLily");

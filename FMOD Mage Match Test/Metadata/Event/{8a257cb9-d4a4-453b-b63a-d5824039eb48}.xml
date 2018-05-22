@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{8a257cb9-d4a4-453b-b63a-d5824039eb48}">
         <property name="name">
-            <value>Gra_TSDrop</value>
+            <value>Sig_TSDrop</value>
         </property>
         <property name="outputFormat">
             <value>1</value>
