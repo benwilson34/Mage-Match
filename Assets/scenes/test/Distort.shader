@@ -52,6 +52,8 @@
 				float4 col = tex2D(_MainTex, i.uv + disp);
 				_Color = (_Color.r, _Color.g, _Color.b, _Color.a - (_Time.y % 1));
 				return col * _Color;
+				//col.a = col.a - (_Time.y % 1);
+				//return col;
 			}
 			ENDCG
 		}
