@@ -132,7 +132,6 @@ public class MageMatch : MonoBehaviour {
         commish = new Commish(this);
         _p1 = new Player(this, 1);
         _p2 = new Player(this, 2);
-        _activep = _p1;
         PlayersLoaded();
 
         effectCont = new EffectController(this);
@@ -154,15 +153,21 @@ public class MageMatch : MonoBehaviour {
         //yield return new WaitForSeconds(5);
         yield return uiCont.AnimateBeginningOfGame();
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < Hand.MAX_HAND_SIZE; i++) {
             for (int pid = 1; pid <= 2; pid++) {
                 //yield return GetPlayer(p).DealHex();
-                yield return _Deal(pid);
-                yield return animCont.WaitForSeconds(.05f);
+                if (i == Hand.MAX_HAND_SIZE - 1 && pid == 2)
+                    yield return _Deal(pid);
+                else
+                    StartCoroutine(_Deal(pid));
+                yield return animCont.WaitForSeconds(.03f);
             }
         }
 
-        //yield return _Deal(_activep.id);
+        if (!IsDebugMode())
+            yield return CoinFlip();
+        else
+            _activep = _p1;
 
         timer.StartTimer();
 
@@ -226,6 +231,15 @@ public class MageMatch : MonoBehaviour {
         foreach (LoadEvent ev in evList)
             ev();
         evList = null;
+    }
+
+    IEnumerator CoinFlip() {
+        yield return syncManager.SyncRand(1, Random.Range(1, 3));
+        int firstTurnId = syncManager.GetRand();
+
+        _activep = GetPlayer(firstTurnId);
+
+        yield return uiCont.AnimateCoinFlip();
     }
 
 
@@ -320,7 +334,6 @@ public class MageMatch : MonoBehaviour {
         }
     }
     #endregion
-
 
 
     public void TurnTimeout() {
@@ -428,7 +441,7 @@ public class MageMatch : MonoBehaviour {
         } else {
             //MMLog.Log_Player("p" + id + " drawing with genTag=" + genTag);
             for (int i = 0; i < count && !p.hand.IsFull(); i++) {
-                yield return p.deck.ReadyNextHextag();
+                //yield return p.deck.ReadyNextHextag();
                 string hextag = p.deck.GetNextHextag();
                 Hex hex = hexMan.GenerateHex(id, hextag);
                 hex.putBackIntoDeck = true;

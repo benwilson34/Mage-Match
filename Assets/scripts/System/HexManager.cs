@@ -340,7 +340,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         int id = Hex.TagPlayer(hextag);
         if (id != 0 && hex.putBackIntoDeck) { // don't do this for tiles added by the Commish
             MMLog.Log("HEXMAN", "orange", "Removing " + hextag + " and adding it to their remove list.");
-            _mm.GetPlayer(id).deck.AddHextagToRemoveList(hextag);
+            _mm.GetPlayer(id).deck.AddHextagToGraveyard(hextag);
         }
     }
 }
