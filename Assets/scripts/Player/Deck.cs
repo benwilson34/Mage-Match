@@ -7,13 +7,12 @@ public class Deck {
     private MageMatch _mm;
     private Player _player;
     private Queue<string> _deckQ;
-    private List<string> _removeList;
-    private string _nextHexTag;
+    private List<string> _graveyard;
 
     public Deck(MageMatch mm, Player p) {
         _mm = mm;
         _player = p;
-        _removeList = new List<string>();
+        _graveyard = new List<string>();
     }
 
     string[] GetInitHextags() {
@@ -84,11 +83,25 @@ public class Deck {
 
     public int GetDeckCount() { return _deckQ.Count; }
 
-    public IEnumerator ReadyNextHextag() {
+    //public IEnumerator ReadyNextHextag() {
+    //    if (_deckQ.Count == 0) {
+    //        yield return Shuffle(_graveyard.ToArray());
+    //        _graveyard.Clear();
+    //        _mm.uiCont.UpdateRemovedCount(_player.id, 0);
+    //    }
+
+    //    Debug.Log("DECK: Next hex is " + _deckQ.Peek());
+    //    string nextHex = _deckQ.Dequeue();
+
+    //    _mm.uiCont.UpdateDeckCount(_player.id, _deckQ.Count);
+
+    //    PrintDeck();
+    //    _nextHexTag = nextHex; // + "-" ?
+    //}
+
+    public string GetNextHextag() {
         if (_deckQ.Count == 0) {
-            yield return Shuffle(_removeList.ToArray());
-            _removeList.Clear();
-            _mm.uiCont.UpdateRemovedCount(_player.id, 0);
+            // TODO damage for trying to overdraw
         }
 
         Debug.Log("DECK: Next hex is " + _deckQ.Peek());
@@ -97,15 +110,13 @@ public class Deck {
         _mm.uiCont.UpdateDeckCount(_player.id, _deckQ.Count);
 
         PrintDeck();
-        _nextHexTag = nextHex; // + "-" ?
+        return nextHex;
     }
 
-    public string GetNextHextag() { return _nextHexTag; }
-
-    public void AddHextagToRemoveList(string hextag) {
-        _removeList.Add(hextag);
-        _mm.uiCont.UpdateRemovedCount(_player.id, _removeList.Count);
+    public void AddHextagToGraveyard(string hextag) {
+        _graveyard.Add(hextag);
+        _mm.uiCont.UpdateRemovedCount(_player.id, _graveyard.Count);
     }
 
-    public int GetRemoveListCount() { return _removeList.Count; }
+    //public int GetRemoveListCount() { return _graveyard.Count; }
 }

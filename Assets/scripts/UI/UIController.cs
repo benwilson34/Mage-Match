@@ -18,7 +18,7 @@ public class UIController : MonoBehaviour {
     public ResultScreen resultsScreen;
 
     public GameObject alertbar, quickdrawButton, loadingText, loadingScreen;
-    public GameObject gameStartScreen, knockoutScreen; 
+    public GameObject gameStartScreen, coinFlip, knockoutScreen; 
 
     private MageMatch _mm;
     private Transform _leftPinfo, _rightPinfo, _leftPspells, _rightPspells, _board;
@@ -114,6 +114,8 @@ public class UIController : MonoBehaviour {
 
         quickdrawButton.SetActive(false);
 
+        coinFlip.SetActive(false);
+
 
         // alert bar offset
 
@@ -204,8 +206,7 @@ public class UIController : MonoBehaviour {
     #endregion
 
     public void OnPlayersLoaded() {
-        if (!_mm.MyTurn())
-            SetDrawButton(_mm.myID, false);
+        
 
         _leftPportrait = GameObject.Find("LeftPlayer_Portrait").transform;
         // TODO
@@ -261,33 +262,19 @@ public class UIController : MonoBehaviour {
 
         //Debug.Log("camOffset=" + _camOffset + ", portraitOffset=" + _portraitOffset);
 
-        if (!_mm.MyTurn() ^ _localOnRight) // because it's currently relative, only shift if needed
-            StartCoroutine(ShiftScreen());
+        
     }
 
     public IEnumerator AnimateBeginningOfGame() {
         //yield return new WaitForEndOfFrame();
 
-        // TODO correct sides for both players
+        // Game start screen
         RectTransform leftSide = gameStartScreen.transform
             .Find("LeftSide").GetComponent<RectTransform>();
         RectTransform rightSide = gameStartScreen.transform
             .Find("RightSide").GetComponent<RectTransform>();
 
-        //leftSide.Find("i_char").GetComponent<Image>().sprite =
-        //    Resources.Load<Sprite>("sprites/characters/" + _mm.gameSettings.p1char);
-        //leftSide.Find("t_name").GetComponent<Text>().text = _mm.gameSettings.p1name;
-
-        //rightSide.Find("i_char").GetComponent<Image>().sprite =
-        //    Resources.Load<Sprite>("sprites/characters/" + _mm.gameSettings.p2char);
-        //rightSide.Find("t_name").GetComponent<Text>().text = _mm.gameSettings.p2name;
-
-        //float leftPos = -1215, rightPos = 1150;
         float origLeft = leftSide.position.x, origRight = rightSide.position.x;
-        //Debug.Log("origLeft=" + origLeft + " origRight=" + origRight);
-        //leftSide.position = new Vector2(origLeft, leftSide.position.y);
-        //rightSide.position = new Vector2(origRight, rightSide.position.y);
-
         float center = Camera.main.WorldToScreenPoint(Camera.main.transform.position).x;
 
         gameStartScreen.SetActive(true);
@@ -319,6 +306,29 @@ public class UIController : MonoBehaviour {
             // maybe just set it to empty?
             StartCoroutine(UpdateMeterbar(p));
         }
+    }
+
+    public IEnumerator AnimateCoinFlip() {
+        // TODO animate spinner sliding from top of screen
+        coinFlip.SetActive(true);
+        Transform spinningArrow = coinFlip.transform.Find("i_spinningArrow");
+        Transform tFirstTurn = coinFlip.transform.Find("t_firstTurn");
+        tFirstTurn.gameObject.SetActive(false);
+
+        Vector3 endRot = new Vector3(0, 0, 1800);
+        endRot.z += !_mm.MyTurn() ^ _localOnRight ? 180 : 0;
+        yield return spinningArrow.DORotate(endRot, 1.5f, RotateMode.LocalAxisAdd).WaitForCompletion();
+
+        tFirstTurn.gameObject.SetActive(true);
+        yield return new WaitForSeconds(1f);
+
+        if (!_mm.MyTurn())
+            SetDrawButton(_mm.myID, false);
+
+        if (!_mm.MyTurn() ^ _localOnRight) // because it's currently relative, only shift if needed
+            StartCoroutine(ShiftScreen());
+
+        coinFlip.SetActive(false);
     }
 
     public IEnumerator ShiftScreen() {
