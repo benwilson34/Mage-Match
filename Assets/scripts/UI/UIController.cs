@@ -46,6 +46,8 @@ public class UIController : MonoBehaviour {
     private float _alertbarOffset;
     private bool _alertShowing = false;
 
+    #region ---------- INIT ----------
+
     public void Init(MageMatch mm){
         loadingScreen.SetActive(true);
         gameStartScreen.SetActive(false);
@@ -135,12 +137,14 @@ public class UIController : MonoBehaviour {
 
         _mm.AddEventContLoadEvent(OnEventContLoaded);
         _mm.AddPlayersLoadEvent(OnPlayersLoaded);
+
+        Application.logMessageReceived += Debug_OnError;
     }
 
     public void OnEventContLoaded() {
         _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
         _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
-        _mm.eventCont.gameAction += OnGameAction;
+        //_mm.eventCont.gameAction += OnGameAction;
         _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.LastStep, EventController.Status.Begin);
         //_mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
         _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
@@ -163,54 +167,8 @@ public class UIController : MonoBehaviour {
         miniMuscle = minitiles[4];
     }
 
-    #region EventCont calls
-    public IEnumerator OnTurnBegin(int id) {
-        if (_mm.MyTurn()) {
-            ShowAlertText(_mm.ActiveP().name + ", make your move!");
-            //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
-
-            SetDrawButton(_mm.myID, true);
-        }
-        UpdateAP(_mm.GetPlayer(id));
-
-        //ChangePinfoColor(id, new Color(0, 1, 0, .4f));
-        //PinfoColorTween(id, CorrectPinfoColor(id));
-        yield return null;
-    }
-
-    public IEnumerator OnTurnEnd(int id) {
-        newsfeed.UpdateTurnCount(_mm.stats.turns);
-        //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
-        yield return null;
-    }
-
-    public void OnGameAction(int id, bool costsAP) {
-        UpdateAP(_mm.GetPlayer(id));
-    }
-
-    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
-        // TODO update button
-        if (_mm.GetPlayer(id).hand.IsFull())
-            GetDrawButtonCont(id).Deactivate();
-        yield return null;
-    }
-
-    public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
-        StartCoroutine(UpdateHealthbar(_mm.GetPlayer(id)));
-        StartCoroutine(DamageAnim(_mm.GetPlayer(id), amount));
-    }
-
-    public void OnPlayerMeterChange(int id, int amount, int newMeter) {
-        StartCoroutine(UpdateMeterbar(_mm.GetPlayer(id)));
-    }
-    #endregion
-
     public void OnPlayersLoaded() {
-        
-
         _leftPportrait = GameObject.Find("LeftPlayer_Portrait").transform;
-        // TODO
-        //_leftPportrait.Find("i_portrait").GetComponent<Image>().sprite = ;
         _rightPportrait = GameObject.Find("RightPlayer_Portrait").transform;
 
         for (int id = 1; id <= 2; id++) {
@@ -261,8 +219,6 @@ public class UIController : MonoBehaviour {
             - (_rightPportrait.position.x - camCenter);
 
         //Debug.Log("camOffset=" + _camOffset + ", portraitOffset=" + _portraitOffset);
-
-        
     }
 
     public IEnumerator AnimateBeginningOfGame() {
@@ -330,6 +286,53 @@ public class UIController : MonoBehaviour {
 
         coinFlip.SetActive(false);
     }
+    #endregion
+
+    
+    #region EventCont callbacks
+    public IEnumerator OnTurnBegin(int id) {
+        if (_mm.MyTurn()) {
+            ShowAlertText(_mm.ActiveP().name + ", make your move!");
+            //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
+
+            SetDrawButton(_mm.myID, true);
+        }
+        //UpdateAP(_mm.GetPlayer(id));
+
+        //ChangePinfoColor(id, new Color(0, 1, 0, .4f));
+        //PinfoColorTween(id, CorrectPinfoColor(id));
+        yield return null;
+    }
+
+    public IEnumerator OnTurnEnd(int id) {
+        newsfeed.UpdateTurnCount(_mm.stats.turns);
+        //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
+        yield return null;
+    }
+
+    //public void OnGameAction(int id, bool costsAP) {
+    //    UpdateAP(_mm.GetPlayer(id));
+    //}
+
+    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
+        // TODO update button
+        if (_mm.GetPlayer(id).hand.IsFull())
+            GetDrawButtonCont(id).Deactivate();
+        yield return null;
+    }
+
+    public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
+        StartCoroutine(UpdateHealthbar(_mm.GetPlayer(id)));
+        StartCoroutine(DamageAnim(_mm.GetPlayer(id), amount));
+    }
+
+    public void OnPlayerMeterChange(int id, int amount, int newMeter) {
+        StartCoroutine(UpdateMeterbar(_mm.GetPlayer(id)));
+    }
+    #endregion
+
+
+    #region ---------- SLIDING ELEMENTS ----------
 
     public IEnumerator ShiftScreen() {
         Transform camPos = Camera.main.transform;
@@ -389,9 +392,10 @@ public class UIController : MonoBehaviour {
             _alertShowing = false;
         }
     }
+    #endregion
 
 
-    #region ----- PLAYER INFO -----
+    #region ---------- PLAYER INFO ----------
     public Transform GetPinfo(int id) {
         if (id == _mm.myID ^ _localOnRight)
             return _leftPinfo;
@@ -424,7 +428,7 @@ public class UIController : MonoBehaviour {
     //        .SetEase(Ease.InOutQuad).SetLoops(7, LoopType.Yoyo);
     //} 
 
-    void UpdateAP(Player p) {
+    public void UpdateAP(Player p) {
         MMLog.Log_UICont("Updating AP for p" + p.id);
         var APimage = GetPinfo(p.id).Find("i_AP").GetComponent<Image>();
         APimage.fillAmount = (float) p.GetAP() / Player.MAX_AP;
@@ -494,8 +498,9 @@ public class UIController : MonoBehaviour {
 
 	void ShowAllSpellInfo(int id){
         // for each spell
-		for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++) {
             GetButtonCont(id, i).ShowSpellInfo();
+        }
 	}
 
     Transform GetPortrait(int id) {
@@ -505,7 +510,7 @@ public class UIController : MonoBehaviour {
     #endregion
 
 
-    #region ----- TARGETING -----
+    #region ---------- TARGETING ----------
     public void ShowSpellSeqs(List<TileSeq> seqs) {
         foreach (TileSeq seq in seqs) {
             MMLog.Log_UICont("showing " + seqs.Count + " seqs");
@@ -643,6 +648,7 @@ public class UIController : MonoBehaviour {
 
     #endregion
 
+
     public void ToggleQuickdrawUI(bool on, Hex hex = null) {
         if (!_mm.MyTurn())
             return;
@@ -668,7 +674,7 @@ public class UIController : MonoBehaviour {
     }
 
 
-    #region ----- BUTTONS -----
+    #region ---------- BUTTONS ----------
     public void SetDrawButton(int id, bool interactable) {
         if (_mm.MyTurn()) {
             if (interactable)
@@ -759,7 +765,7 @@ public class UIController : MonoBehaviour {
     #endregion
 
 
-    #region ----- BEGINNING AND END SCREENS -----
+    #region ---------- BEGINNING AND END SCREENS ----------
 
     public void ToggleLoadingText(bool on) {
         loadingText.SetActive(on);
@@ -788,5 +794,18 @@ public class UIController : MonoBehaviour {
             .Find("RightSide").GetComponent<RectTransform>();
     }
     #endregion
+
+    public void Debug_OnError(string logString, string stackTrace, LogType type) {
+        if (type == LogType.Error)
+            newsfeed.ShowErrorButton();
+    }
+
+    public void Debug_OnErrorClick() {
+        GameObject reporterGO = GameObject.Find("Reporter");
+        if (reporterGO != null) {
+            Reporter reporter = reporterGO.GetComponent<Reporter>();
+            reporter.doShow();
+        }
+    }
 
 }

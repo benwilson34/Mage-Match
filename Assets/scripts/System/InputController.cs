@@ -45,8 +45,10 @@ public class InputController : MonoBehaviour {
 
             InputStatus status = InputStatus.Unhandled;
             MouseState state = GetMouseState();
-            if (state == MouseState.Down)
+            if (state == MouseState.Down) {
+                //MMLog.LogWarning("Checking for object... current context type="+_currentContext.type);
                 _mouseObj = GetObject(state, _currentContext.type);
+            }
 
             //if (mouseObj == null)
             //    return;
@@ -119,12 +121,17 @@ public class InputController : MonoBehaviour {
         return true;
     }
 
+
+    #region ---------- OBJECT UNDER MOUSE ----------
+
     MonoBehaviour GetObject(MouseState state, InputContext.ObjType type) {
         if (state == MouseState.Down) {
             MonoBehaviour obj = null;
                 // if type == none, break?
             if (type == InputContext.ObjType.Hex) {
                 obj = GetMouseHex();
+                //if (obj != null)
+                //    MMLog.LogWarning("There's a hex under the mouse: " + obj.gameObject.name);
             } else if (_currentContext.type == InputContext.ObjType.Cell) {
                 obj = GetMouseCell();
             }
@@ -141,8 +148,12 @@ public class InputController : MonoBehaviour {
     }
 
 	Hex GetMouseHex(RaycastHit2D[] hits){
-		foreach (RaycastHit2D hit in hits) {
-			TileBehav tb = hit.collider.GetComponent<TileBehav> ();
+        //MMLog.LogWarning("Checking for object from " + hits.Length + " objs");
+
+        foreach (RaycastHit2D hit in hits) {
+            //MMLog.LogWarning("hit: " + hit.collider.gameObject.name);
+
+            TileBehav tb = hit.collider.GetComponent<TileBehav> ();
             if (tb != null) {
                 if (tb.wasInvoked)
                     return null;
@@ -153,7 +164,9 @@ public class InputController : MonoBehaviour {
             if (hex != null)
                 return hex;
         }
-		return null;
+
+        //MMLog.LogWarning("Didn't find anything...");
+        return null;
 	}
 
     CellBehav GetMouseCell() {
@@ -226,8 +239,10 @@ public class InputController : MonoBehaviour {
         gr.Raycast(ped, results);
         return results;
     }
+    #endregion
 
-	void SwapCheck(TileBehav tb){
+
+    void SwapCheck(TileBehav tb){
 		Tile tile = tb.tile;
 		Vector3 mouse = Input.mousePosition;
 		if(Vector3.Distance(mouse, _dragHexPos) > 50 && _dragging){ // if dragged more than 50 px away
@@ -263,8 +278,10 @@ public class InputController : MonoBehaviour {
 		}
 	}
 
-    bool DropCheck(int col) {
-        return _mm.boardCheck.CheckColumn(col) >= 0;
+    bool DropCheck(Hex hex, int col) {
+        if (hex is TileBehav && _mm.boardCheck.CheckColumn(col) == -1)
+            return false;
+        return _mm.GetPlayer(hex.PlayerId).GetAP() >= hex.cost;
     }
 
     bool PromptedDrop() {
@@ -287,15 +304,15 @@ public class InputController : MonoBehaviour {
 
     // This idea might be worth echoing throughout some of the implementation.
     // Slightly more work for the spell programmer, but more control.
-    public void RestrictInteractableHexes(List<Hex> ignoredHexes) {
-        var sc = (StandardContext)_standardContext;
-        sc.restrictInteractableHexes = true;
-        sc.ignoredHexes = ignoredHexes;
-    }
+    //public void RestrictInteractableHexes(List<Hex> ignoredHexes) {
+    //    var sc = (StandardContext)_standardContext;
+    //    sc.restrictInteractableHexes = true;
+    //    sc.ignoredHexes = ignoredHexes;
+    //}
 
-    public void EndRestrictInteractableHexes() {
-        ((StandardContext)_standardContext).restrictInteractableHexes = false;
-    }
+    //public void EndRestrictInteractableHexes() {
+    //    ((StandardContext)_standardContext).restrictInteractableHexes = false;
+    //}
 
 
 
@@ -447,10 +464,9 @@ public class InputController : MonoBehaviour {
             Hex hex = (Hex)obj;
             //MMLog.Log_InputCont("MyTurn mouse down, hex state="+hex.currentState);
             if (hex.currentState == Hex.State.Placed) {
-                    _input._dragging = true;
-                    _input._dragHexPos = Camera.main.WorldToScreenPoint(hex.transform.position);
-                    return InputStatus.PartiallyHandled;
-
+                _input._dragging = true;
+                _input._dragHexPos = Camera.main.WorldToScreenPoint(hex.transform.position);
+                return InputStatus.PartiallyHandled;
             }
             return InputStatus.Unhandled;
         }
@@ -477,13 +493,16 @@ public class InputController : MonoBehaviour {
                     CellBehav cb = _input.GetMouseCell(hits); // get cell underneath
 
                     if ((!_mm.IsPerformingAction() || _input.PromptedDrop()) && cb != null) {
+                        if (!_input.DropCheck(hex, cb.col))
+                            return InputStatus.Unhandled;
+
                         if (Hex.IsCharm(_input._heldHex.hextag)) {
                             if (_input.PromptedDrop())
                                 _mm.prompt.SetDrop(_input._heldHex);
                             else
                                 _mm.PlayerDropCharm((Charm)_input._heldHex);
                             return InputStatus.PartiallyHandled;
-                        } else if (_input.DropCheck(cb.col)) {
+                        } else {
                             if (_input.PromptedDrop())
                                 _mm.prompt.SetDrop(_input._heldHex, cb.col);
                             else
@@ -499,9 +518,9 @@ public class InputController : MonoBehaviour {
 
     private class StandardContext : InputContext {
 
-        public bool allowHandDragging = true, allowHandRearrangement = true, 
-            restrictInteractableHexes = false;
-        public List<Hex> ignoredHexes;
+        public bool allowHandDragging = true, allowHandRearrangement = true;
+        //public bool restrictInteractableHexes = false;
+        //public List<Hex> ignoredHexes;
 
         private Tooltipable _tooltip;
         private Vector3 _mouseDownPos;
@@ -514,32 +533,35 @@ public class InputController : MonoBehaviour {
             this._tooltip = tooltip;
         }
 
-        bool AbleToInteract(Hex hex) {
-            if (restrictInteractableHexes) {
-                foreach (Hex h in ignoredHexes) {
-                    if (hex.EqualsTag(h))
-                        return false;
-                }
-                return true;
-            } else
-                return true;
-        }
+        //bool AbleToInteract(Hex hex) {
+        //    if (restrictInteractableHexes) {
+        //        foreach (Hex h in ignoredHexes) {
+        //            if (hex.EqualsTag(h))
+        //                return false;
+        //        }
+        //        return true;
+        //    } else
+        //        return true;
+        //}
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
             _mouseDownPos = Input.mousePosition;
             _mm.uiCont.tooltipMan.SetTooltip(_tooltip); // where to check for null?
 
-            if (obj == null)
+            if (obj == null) {
+                MMLog.LogWarning("Nothing under mouse in standard input");
                 return InputStatus.FullyHandled;
+            }
 
             Hex hex = (Hex)obj;
             MMLog.Log_InputCont("Standard mouse ; hex state="+hex.currentState);
 
             if (hex.currentState == Hex.State.Hand) {
-                if (_mm.LocalP().IsHexMine(hex) && allowHandDragging) {
+                if (_mm.LocalP().hand.IsHexMine(hex) && allowHandDragging) {
                     MMLog.Log_InputCont("Standard mouse down");
 
-                    if (!AbleToInteract(hex))
+                    //if (!AbleToInteract(hex))
+                    if (!hex.IsInteractable())
                         return InputStatus.Unhandled;
 
                     _input._holdingHex = true;
@@ -675,7 +697,7 @@ public class InputController : MonoBehaviour {
                 break;
 
             case MageMatch.State.TurnSwitching:
-                _currentContext = _block; // idk
+                _currentContext = _block; // idk there might be a better way
                 break;
         }
 

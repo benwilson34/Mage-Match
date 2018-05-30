@@ -15,6 +15,7 @@ public class RuneInfoLoader {
         public string tagTitle, title, category;
         public string[] keywords;
         public int deckCount;
+        public int cost = -1;
         public string desc;
     }
 
@@ -83,6 +84,9 @@ public class RuneInfoLoader {
 
         if (info.title == null)
             info.title = rune;
+
+        if (info.cost == -1)
+            info.cost = 1;
 
         return info;
     }

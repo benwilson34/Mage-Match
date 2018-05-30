@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class BasicTile : TileBehav {
     public override string GetTooltipInfo() {
-        string title = tile.element.ToString();
-        return GetTooltipInfo(title, "Basic Tile", "");
+        string ench = "";
+        if (HasEnchantment())
+            ench = "\nThis tile is enchanted with " + GetEnchType().ToString();
+        return GetTooltipInfo(Title, "Basic Tile", 1, ench);
     }
 }

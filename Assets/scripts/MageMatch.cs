@@ -52,6 +52,8 @@ public class MageMatch : MonoBehaviour {
     private List<LoadEvent> _onEventContLoaded;
     private List<LoadEvent> _onPlayersLoaded;
 
+
+    #region ---------- INIT ----------
     void Start() {
         StartCoroutine(InitGame());
     }
@@ -153,14 +155,15 @@ public class MageMatch : MonoBehaviour {
         //yield return new WaitForSeconds(5);
         yield return uiCont.AnimateBeginningOfGame();
 
-        for (int i = 0; i < Hand.MAX_HAND_SIZE; i++) {
+        const int initHandDraw = 4;
+        for (int i = 0; i < initHandDraw; i++) {
             for (int pid = 1; pid <= 2; pid++) {
                 //yield return GetPlayer(p).DealHex();
-                if (i == Hand.MAX_HAND_SIZE - 1 && pid == 2)
+                if (i == initHandDraw - 1 && pid == 2)
                     yield return _Deal(pid);
                 else
                     StartCoroutine(_Deal(pid));
-                yield return animCont.WaitForSeconds(.03f);
+                yield return animCont.WaitForSeconds(.05f);
             }
         }
 
@@ -174,6 +177,7 @@ public class MageMatch : MonoBehaviour {
         ExitState(); // end BeginningOfGame state
 
         yield return eventCont.TurnBegin(); // is this ok?
+        yield return _activep.OnTurnBegin();
 
         if (IsReplayMode()) {
             uiCont.ToggleLoadingText(true);
@@ -241,10 +245,10 @@ public class MageMatch : MonoBehaviour {
 
         yield return uiCont.AnimateCoinFlip();
     }
+    #endregion
 
 
-
-    // GAME STATE
+    #region ---------- GAME STATE ----------
 
     // could have event if there are other things that depend on this
     public void EnterState(State state) {
@@ -269,7 +273,7 @@ public class MageMatch : MonoBehaviour {
 
     // passthru function...not the best.
     public bool Debug_ApplyAPcost() {
-        if (debugSettings != null)
+        if (IsDebugMode())
             return debugSettings.applyAPcost;
         else return true;
     }
@@ -282,9 +286,10 @@ public class MageMatch : MonoBehaviour {
     }
 
     public bool IsCommishTurn() { return currentTurn == Turn.CommishTurn; }
+    #endregion
 
 
-    #region Event callbacks
+    #region EventCont callbacks
     public void OnBoardAction() {
         if (_checking == 0) { //?
             StartCoroutine(BoardChecking());
@@ -293,25 +298,34 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
         yield return BoardChecking(); // should go below? if done in a spell, should there be a similar event to this one OnSpellCast that checks the board once the spell resolves?
-        if(playerAction)
-            eventCont.GameAction(true);
+        if (playerAction) {
+            int cost = 1;
+            if (Hex.TagCat(tag) != Hex.Category.BasicTile)
+                cost = RuneInfoLoader.GetPlayerRuneInfo(id, Hex.TagTitle(tag)).cost;
+            eventCont.GameAction(cost);
+        }
         yield return null;
     }
 
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         yield return BoardChecking();
         if(playerAction)
-            eventCont.GameAction(true);
+            eventCont.GameAction(1);
     }
 
-    public void OnGameAction(int id, bool costsAP) { // eventually just pass in int for cost?
+    public void OnGameAction(int id, int cost) { // eventually just pass in int for cost?
         if (!Debug_ApplyAPcost())
             return;
 
         if (currentTurn != Turn.CommishTurn) { //?
             //Debug.Log("MAGEMATCH: OnGameAction called!");
-            if (costsAP)
-                _activep.DecrementAP();
+            if (cost > 0) {
+                _activep.DecreaseAP(cost);
+                //uiCont.UpdateAP(_activep);
+            }
+
+            //MMLog.LogWarning("player " + id + " ap=" + _activep.GetAP());
+
             if (_activep.OutOfAP()) {
                 uiCont.SetDrawButton(_activep.id, false);
                 StartCoroutine(TurnSystem());
@@ -373,9 +387,10 @@ public class MageMatch : MonoBehaviour {
         yield return eventCont.TurnBegin();
         SpellCheck();
         timer.StartTimer();
+        ExitState();
+        yield return _activep.OnTurnBegin(); // this h
 
         MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM END ----------</b>");
-        ExitState();
         switchingTurn = false;
     }
 
@@ -421,7 +436,7 @@ public class MageMatch : MonoBehaviour {
     }
 
 
-    #region ----- Game Actions -----
+    #region ---------- GAME ACTIONS ----------
 
     public IEnumerator _Deal(int id) {
         yield return _Draw(id, 1, false, true);
@@ -461,7 +476,7 @@ public class MageMatch : MonoBehaviour {
                 yield return eventCont.Draw(EventController.Status.End, id, hex.hextag, playerAction, dealt);
 
                 if (playerAction)
-                    eventCont.GameAction(true); //?
+                    eventCont.GameAction(1); //?
             }
             MMLog.Log_Player(">>>" + p.hand.NumFullSlots() + " slots filled...");
         }
@@ -521,12 +536,15 @@ public class MageMatch : MonoBehaviour {
             Charm cons = (Charm)hex;
 
             // TODO animate? what should it look like when you use it?
-            yield return cons.DropEffect();
+            yield return cons.DropEffect(); // could be popped out above
 
             hexMan.RemoveHex(cons);
         } else {
             hex.transform.SetParent(_tilesOnBoard);
             TileBehav tb = hex.GetComponent<TileBehav>();
+
+            yield return tb.OnDrop(); // could be popped out above
+
             tb.SetPlaced();
             yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
         }
@@ -675,6 +693,8 @@ public class MageMatch : MonoBehaviour {
     //    tb.ChangePos(col, row);
     //}
 
+
+    #region ---------- PLAYER ----------
     public Player ActiveP() {
         return _activep;
     }
@@ -713,16 +733,18 @@ public class MageMatch : MonoBehaviour {
     public bool MyTurn() { return _activep.id == myID; }
 
     public bool IsMe(int id) { return id == myID; }
+    #endregion
+
 
     // move to BoardCheck?
-    public string[] GetTileSeqs(List<TileSeq> seqs) {
-        string[] ss = new string[seqs.Count];
-        TileSeq seq = seqs[0];
-        for (int i = 0; i < seqs.Count; seq = seqs[i], i++) {
-            ss[i] = seq.SeqAsString();
-        }
-        return ss;
-    }
+    //public string[] GetTileSeqs(List<TileSeq> seqs) {
+    //    string[] ss = new string[seqs.Count];
+    //    TileSeq seq = seqs[0];
+    //    for (int i = 0; i < seqs.Count; seq = seqs[i], i++) {
+    //        ss[i] = seq.SeqAsString();
+    //    }
+    //    return ss;
+    //}
 
     public void BoardChanged() {
         eventCont.BoardAction();

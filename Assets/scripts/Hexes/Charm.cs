@@ -6,19 +6,13 @@ public abstract class Charm : Hex {
 
     public abstract IEnumerator DropEffect();
 
-    protected int _playerId;
-
-    public override void Init(MageMatch mm) {
-        base.Init(mm);
-        _playerId = Hex.TagPlayer(this.hextag);
+    public override IEnumerator OnDrop() {
+        yield return DropEffect();
     }
 
     public override string GetTooltipInfo() {
-        string title = TagTitle(hextag);
-        return GetTooltipInfo(title, "Charm", RuneInfoLoader.GetPlayerRuneInfo(_playerId, title).desc);
+        RuneInfoLoader.RuneInfo info = RuneInfoLoader.GetPlayerRuneInfo(PlayerId, Title);
+        return GetTooltipInfo(info.title, "Charm", info.cost, info.desc);
     }
 
-    public Character ThisCharacter() {
-        return _mm.GetPlayer(_playerId).character;
-    }
 }

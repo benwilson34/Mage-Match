@@ -4,9 +4,6 @@
         <property name="assetPath">
             <value>Alpha SFX Howling wind Pelting rain-1.ogg</value>
         </property>
-        <property name="isStreaming">
-            <value>true</value>
-        </property>
         <property name="frequencyInKHz">
             <value>48</value>
         </property>

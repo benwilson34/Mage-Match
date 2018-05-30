@@ -76,7 +76,7 @@ MonoBehaviour:
   - {fileID: 114827995920012050}
   MasterBankRef: {fileID: 114566299144524776}
   StringsBankRef: {fileID: 114388793628060022}
-  stringsBankWriteTime: 636620840616450441
+  stringsBankWriteTime: 636630096888047472
   cacheVersion: 2
 --- !u!114 &114000556981307052
 MonoBehaviour:
@@ -340,6 +340,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1656
+--- !u!114 &114041840994342156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Enfuego/Incinerate
+  guid: 84405274200cbd4a8cc6ab8da7497361
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 4476
 --- !u!114 &114042273829345976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -669,6 +691,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 941
+--- !u!114 &114071528143782046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/Sig_Motorcycle
+  guid: 066fcd07cd83b14bb8c633caa830437b
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 9459
 --- !u!114 &114071625317356178
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -734,6 +778,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 7318
+--- !u!114 &114076016097914298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/ChurchBell
+  guid: f815618c8bee544d9247daa148d9a8d0
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 7438
 --- !u!114 &114076364916976972
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -821,6 +887,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 15642
+--- !u!114 &114091622364816628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/Mariposa
+  guid: d769d785eb5f9742a1049d7486cf7fa3
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 6528
 --- !u!114 &114092703422632180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -909,6 +997,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 7552
+--- !u!114 &114114370161793480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/RainDance
+  guid: a201396da72def4aac3215780d816dd7
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 7600
 --- !u!114 &114116378056467072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -931,6 +1041,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1270
+--- !u!114 &114116445155967920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Enfuego/FieryFandango
+  guid: 02b16056c48b2e43b400c7545e86cfca
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1710
 --- !u!114 &114119654104926288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1365,6 +1497,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 4476
+--- !u!114 &114173602707360822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/ThunderFar
+  guid: 88ecc630e8ea0a4cbbb76f7e3911fd1a
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 5328
 --- !u!114 &114177483963732598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1643,6 +1797,28 @@ MonoBehaviour:
   - Name: Desktop
     Value: 2158784
   Exists: 0
+--- !u!114 &114215023350906960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/Rain
+  guid: 28fc429053a672408439276ba4d99b78
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 10113
 --- !u!114 &114215136964313888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1665,6 +1841,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 0
+--- !u!114 &114215378557213582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Enfuego/Baila
+  guid: bbe4894d4e37424eadb7344dac64008a
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1746
 --- !u!114 &114220357411660612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2664,6 +2862,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 6820
+--- !u!114 &114338115744213912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/ThunderClose
+  guid: fd4ce72544aa38419f917409b23a5727
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 6381
 --- !u!114 &114343045129142466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2808,6 +3028,28 @@ MonoBehaviour:
   guid: 2900b3540248c04e95d2e886cafa5c98
   Banks:
   - {fileID: 114623280597449964}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
+--- !u!114 &114369063081002488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/Sig_WaveCrash
+  guid: f5feace79507584ba573a42e2b089b9a
+  Banks:
+  - {fileID: 114566299144524776}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3091,11 +3333,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Path: FMOD Mage Match Test\Build\Desktop\Master Bank.strings.bank
-  lastModified: 636620840616450441
+  lastModified: 636630096888047472
   LoadResult: 0
   FileSizes:
   - Name: Desktop
-    Value: 3702
+    Value: 3788
   Exists: 1
 --- !u!114 &114388834195184122
 MonoBehaviour:
@@ -3162,6 +3404,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 5628
+--- !u!114 &114392149446253512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/Healing
+  guid: ae74a4872e27394e90e1a7d13c3b855a
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1285
 --- !u!114 &114396781252430020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3378,6 +3642,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 0
+--- !u!114 &114433217527119418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/Sig_TSEffect
+  guid: 1731de0150ac2f40b49a6994cca32077
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 3973
 --- !u!114 &114433996558606110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3444,6 +3730,50 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 0
+--- !u!114 &114438916074745426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/Sig_TSDrop
+  guid: b97c258aa4d43b45b63ad5824039eb48
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1711
+--- !u!114 &114442694021709658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/SwirlingWater
+  guid: 52f6f901543c3a43b51d8c4ba255d4e8
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 2763
 --- !u!114 &114449187795476220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4548,11 +4878,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: C:\Users\Ben\Documents\Unity projects\Mage-Match\FMOD Mage Match Test\Build\Desktop\Master
     Bank.bank
-  lastModified: 636620840616440440
+  lastModified: 636630096888027471
   LoadResult: 0
   FileSizes:
   - Name: Desktop
-    Value: 2088544
+    Value: 21871040
   Exists: 1
 --- !u!114 &114567646477006696
 MonoBehaviour:
@@ -4576,6 +4906,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 5013
+--- !u!114 &114567770746781550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/Sig_Cut
+  guid: d605940f86c60341973d0deece3bc4f8
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1270
 --- !u!114 &114569287188942226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5137,6 +5489,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 4839
+--- !u!114 &114644212589085522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/OogieBoogie
+  guid: 6b3fef04fa8a804198b098181f5542d6
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 8259
 --- !u!114 &114646234478462848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5203,6 +5577,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 0
+--- !u!114 &114658015346866816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/Bubbles1
+  guid: 04b439147aade1459bca2eb2da0d48b6
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1480
 --- !u!114 &114658557232457594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5268,6 +5664,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 9459
+--- !u!114 &114661084537760792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/PartyCrashers
+  guid: 094af3d4d5837a4186082f1bdde5ea3b
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 7318
 --- !u!114 &114665831478810082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5707,6 +6125,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 2227
+--- !u!114 &114726854459148940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/UndeadUnion
+  guid: 1206537a4fd31943be0d8404a832b3c2
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114727746979765258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6015,6 +6455,50 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1746
+--- !u!114 &114764367576367344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/Bubbles2
+  guid: 15cbf6f891a6084c9c97df41c456b2c5
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1048
+--- !u!114 &114777955281746230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/Sig_Bell
+  guid: 6e11ad78caf02547b5e6c2d8bd374c40
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 6550
 --- !u!114 &114778108527463568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6561,6 +7045,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 13280
+--- !u!114 &114852083209161146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Valeria/Balanco
+  guid: 52abb3e08b8b904a9b9044a08f6075ce
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114861959309167110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6648,6 +7154,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 2284
+--- !u!114 &114887769194424994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Enfuego/Sig_WHCK
+  guid: 63dd287d595e4c48a3b938ff971118aa
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1966
 --- !u!114 &114897590294173188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6689,6 +7217,28 @@ MonoBehaviour:
   - Name: Desktop
     Value: 2088544
   Exists: 0
+--- !u!114 &114908192711518702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/Gravekeeper/PartyInTheBack
+  guid: bb451b1e7a15db4fb0f01e7121e0adb3
+  Banks:
+  - {fileID: 114566299144524776}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 5013
 --- !u!114 &114912725842738360
 MonoBehaviour:
   m_ObjectHideFlags: 0

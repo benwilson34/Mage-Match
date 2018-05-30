@@ -44,11 +44,11 @@ public class TooltipManager : MonoBehaviour {
     }
 
     IEnumerator ShowTooltipAfterDelay() {
-            yield return new WaitForSeconds(TOOLTIP_SHOW_DELAY);
-            if (_obj != null) {
-                StartCoroutine(ShowTooltip());
-            }
+        yield return new WaitForSeconds(TOOLTIP_SHOW_DELAY);
+        if (_obj != null) {
+            StartCoroutine(ShowTooltip());
         }
+    }
 
     public IEnumerator ShowTooltip() {
         _currentTT.gameObject.SetActive(true);
@@ -105,7 +105,7 @@ public class TooltipManager : MonoBehaviour {
     }
 
     public void HideOrCancelTooltip() {
-        MMDebug.MMLog.Log("TooltipMan", "orange", ">>>Hiding/canceling the tooltip<<<");
+        //MMDebug.MMLog.Log("TooltipMan", "orange", ">>>Hiding/canceling the tooltip<<<");
         if (_obj != null) {
             if (_tooltipShowing) {
                 _tooltipShowing = false;

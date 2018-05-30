@@ -58,7 +58,7 @@ public class Valeria : Character {
                 break;
         }
 
-        if (seq.GetElementAt(0) == Tile.Element.Water) // not safe for multicolored tiles
+        if (seq.GetTileAt(0).IsElement(Tile.Element.Water))
             swaps++;
 
         DealDamage(dmg);
@@ -111,7 +111,7 @@ public class Valeria : Character {
         _mm.audioCont.Trigger(AudioController.ValeriaSFX.Rain);
         _mm.audioCont.Trigger(AudioController.ValeriaSFX.ThunderFar);
 
-        TurnEffect te = new TurnEffect(_playerId, 5, Effect.Type.Add, RainDance_T, null);
+        TurnEffect te = new TurnEffect(_playerId, Effect.Type.Add, RainDance_T, null, 5);
         _mm.effectCont.AddBeginTurnEffect(te, "rainD");
         yield return null;
     }
@@ -175,12 +175,12 @@ public class Valeria : Character {
         yield return null;    
     }
     public IEnumerator Balanco_Swap(int id, int c1, int r1, int c2, int r2) {
-        Tile.Element elem1 = _mm.hexGrid.GetTileAt(c1, r1).element;
-        Tile.Element elem2 = _mm.hexGrid.GetTileAt(c2, r2).element;
+        Tile tile1 = _mm.hexGrid.GetTileAt(c1, r1);
+        Tile tile2 = _mm.hexGrid.GetTileAt(c2, r2);
         int dmg = 0;
-        if (elem1 == Tile.Element.Water)
+        if (tile1.IsElement(Tile.Element.Water))
             dmg += 7;
-        if (elem2 == Tile.Element.Water)
+        if (tile2.IsElement(Tile.Element.Water))
             dmg += 7;
 
         if (dmg > 0)

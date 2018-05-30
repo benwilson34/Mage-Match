@@ -72,7 +72,7 @@ public class AudioController {
 
 
         // ----- valeria -----
-        _clips.Add(ValeriaSFX.SwirlingWater, "event:/CharacterSpells/Valeria/Val_SwirlingWater");
+        _clips.Add(ValeriaSFX.SwirlingWater, "event:/CharacterSpells/Valeria/SwirlingWater");
         _clips.Add(ValeriaSFX.Healing, "event:/CharacterSpells/Valeria/Healing");
         _clips.Add(ValeriaSFX.Mariposa, "event:/CharacterSpells/Valeria/Mariposa");
         _clips.Add(ValeriaSFX.Rain, "event:/CharacterSpells/Valeria/Rain");

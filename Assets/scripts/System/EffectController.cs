@@ -111,8 +111,12 @@ public class EffectController {
     }
 
     public void RemoveTurnEffect(Effect e) {
+        RemoveTurnEffect(e.tag);
+    }
+
+    public void RemoveTurnEffect(string tag) {
         List<Effect> list;
-        if (e.tag.Substring(0, 4) == "begt")
+        if (tag.Substring(0, 4) == "begt")
             list = _beginTurnEffects;
         else
             list = _endTurnEffects;
@@ -120,13 +124,13 @@ public class EffectController {
         int i;
         for (i = 0; i < list.Count; i++) {
             Effect listE = list[i];
-            if (listE.tag == e.tag) {
-                MMLog.Log_EffectCont("found effect with tag " + e.tag);
+            if (listE.tag == tag) {
+                MMLog.Log_EffectCont("found effect with tag " + tag);
                 list.RemoveAt(i); // can be moved up?
                 return;
             }
         }
-        MMLog.LogError("EFFECTCONT: Missed the remove! tag="+ e.tag);
+        MMLog.LogError("EFFECTCONT: Missed the remove! tag="+ tag);
     }
 
     // TODO generalize

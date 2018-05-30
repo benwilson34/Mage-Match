@@ -38,7 +38,7 @@ public class TileFilter {
     public static List<Hex> FilterByCategory(List<Hex> hexes, Hex.Category cat, bool inverse = false) {
         List<Hex> filtHexes = new List<Hex>();
         foreach (Hex hex in hexes) {
-            if (Hex.TagCat(hex.hextag) == cat ^ inverse)
+            if (hex.Cat == cat ^ inverse)
                 filtHexes.Add(hex);
         }
         return filtHexes;

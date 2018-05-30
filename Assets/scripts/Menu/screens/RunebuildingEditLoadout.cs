@@ -16,6 +16,7 @@ public class RunebuildingEditLoadout : MenuScreen {
     private Button _bSave;
     private Text _tLoadoutButton;
     private Image[] _slots;
+    private Sprite _emptySlot;
     private Image _deckCountMeter;
     private Text _deckCountText;
     private Transform _scrRuneList;
@@ -35,6 +36,7 @@ public class RunebuildingEditLoadout : MenuScreen {
         _slots = new Image[LoadoutData.RUNE_COUNT];
         for (int i = 0; i < LoadoutData.RUNE_COUNT; i++)
             _slots[i] = hexagram.GetChild(i).GetComponent<Image>();
+        _emptySlot = _slots[0].sprite;
 
         Transform meter = transform.Find("Meter");
         _deckCountMeter = meter.Find("i_meter").GetComponent<Image>();
@@ -125,7 +127,7 @@ public class RunebuildingEditLoadout : MenuScreen {
         for (int i = 0; i < _usedRunes.Length; i++) {
             if (_usedRunes[i] != null && _usedRunes[i].tagTitle == rune.tagTitle) {
                 _usedRunes[i] = null;
-                _slots[i].sprite = null;
+                _slots[i].sprite = _emptySlot;
                 _deckCount -= rune.deckCount;
                 UpdateDeckCountMeter();
                 _bSave.interactable = false;

@@ -6,11 +6,11 @@ using MMDebug;
 public class TileBehav : Hex {
 
 	public Tile tile;
-	public Tile.Element initElement;
+	public Tile.Element[] initElements;
 
     // all these should be auto?
 	public bool ableSwap = true, ableGrav = true, ableDestroy = true;
-	public bool ableInvoke = true, ableTarget = true;
+    public bool ableInvoke = true, ableTarget = true, ableEnchant = true;
     public bool wasInvoked = false;
 
 	private Enchantment _enchantment;
@@ -20,11 +20,14 @@ public class TileBehav : Hex {
     public override void Init(MageMatch mm) {
         base.Init(mm);
         _tileEffects = new List<TileEffect>(); // move to Init?
-        tile = new Tile(initElement);
+        tile = new Tile(initElements);
         currentState = State.Hand;
+
     }
 
-	public void ChangePos(int col, int row){
+
+    #region ---------- POSITION ----------
+    public void ChangePos(int col, int row){
         StartCoroutine(_ChangePos(col, row));
     }
 
@@ -77,14 +80,18 @@ public class TileBehav : Hex {
 	public bool IsInPosition(){
 		return _inPos;
 	}
+    #endregion
 
+
+    #region ---------- ENCHANTMENTS ----------
     public bool CanSetEnch(Enchantment.Type type) {
         if (type == GetEnchType()) {
             MMLog.Log_TileBehav("Tile has same enchant: " + type.ToString());
             return false;
         }
 
-        return (int)type >= GetEnchTier() && ableTarget;
+        //return (int)type >= GetEnchTier() && ableTarget;
+        return ableEnchant;
     }
 
 	public bool HasEnchantment(){ // just use GetEnchType?
@@ -98,9 +105,9 @@ public class TileBehav : Hex {
             return Enchantment.Type.None;
     }
 
-    int GetEnchTier() {
-        return Enchantment.GetEnchTier(GetEnchType());
-    }
+    //int GetEnchTier() {
+    //    return Enchantment.GetEnchTier(GetEnchType());
+    //}
 
     public IEnumerator TriggerEnchantment() {
         MMLog.Log_TileBehav("Triggering enchantment at " + tile.col + ", " + tile.row);
@@ -143,27 +150,44 @@ public class TileBehav : Hex {
 		}
 		return false;
 	}
+    #endregion
 
-    public void AddTileEffect(TileEffect te) { _tileEffects.Add(te); }
 
-    public void RemoveTileEffect(TileEffect te) { _tileEffects.Remove(te); }
+    #region ---------- TILE EFFECTS ----------
+    // Maybe not needed?
+
+    public void AddTileEffect(TileEffect te, string tag) {
+        te.SetEnchantee(this);
+        _mm.effectCont.AddEndTurnEffect(te, tag);
+        _tileEffects.Add(te);
+    }
+
+    public void RemoveTileEffect(TileEffect te) {
+        _mm.effectCont.RemoveTurnEffect(te);
+        _tileEffects.Remove(te);
+    }
 
     public void ClearTileEffects() {
         foreach (TileEffect te in _tileEffects) {
             _mm.effectCont.RemoveTurnEffect(te);
         }
+        _tileEffects.Clear();
     }
+    #endregion
+
 
     public string PrintCoord() {
         return tile.PrintCoord();
     }
 
     public override string GetTooltipInfo() {
-        string title = TagTitle(hextag);
+        string title = Title;
+        RuneInfoLoader.RuneInfo info = RuneInfoLoader.GetPlayerRuneInfo(PlayerId, Title);
+
         string ench = "";
         if (HasEnchantment())
-            ench = "This tile is enchanted with " + GetEnchType().ToString();
-        return GetTooltipInfo(title, "Tile", ench);
+            ench = "\nThis tile is enchanted with " + GetEnchType().ToString();
+        return GetTooltipInfo(info.title, "Tile", info.cost, info.desc + ench);
     }
 
 }

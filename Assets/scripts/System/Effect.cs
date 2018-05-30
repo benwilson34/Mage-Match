@@ -7,7 +7,7 @@ public abstract class Effect {
 
     public delegate IEnumerator MyEffect(int id); // move to TurnEffect?
     // rename to EffType?
-    public enum Type { None = 0, Damage, Healing, Buff, Destruct, Subtract, Add, Enchant, Movement }
+    public enum Type { None = 0, Damage, Healing, Buff, Destruct, Remove, Add, Enchant, Movement }
 
     public int playerID;
     public Type type; // protected eventually?
@@ -18,7 +18,7 @@ public abstract class Effect {
 
     public virtual IEnumerator TriggerEffect() { yield return null; }
     public virtual IEnumerator Turn() { yield return null; }
-    public virtual IEnumerator EndEffect() { yield return null; }
+    public virtual IEnumerator TriggerRemoveEffect() { yield return null; }
     public virtual void CancelEffect() { } // IEnumerator??
     public int TurnsLeft() { return _turnsLeft; }
     public virtual bool NeedRemove() { return _turnsLeft == 0; }
@@ -28,17 +28,16 @@ public abstract class Effect {
 
 public class TurnEffect : Effect {
 
-    private MyEffect _turnEffect, _endEffect, _cancelEffect;
+    private MyEffect _turnEffect, _endEffect;
 
     // TODO add infinite Constructor...or just pass in a negative for turns?
-    public TurnEffect(int id, int turns, Type t, MyEffect turnEffect, MyEffect endEffect, MyEffect cancelEffect = null) {
+    public TurnEffect(int id, Type t, MyEffect turnEffect, MyEffect endEffect = null, int turns = -1) {
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id;
         _turnsLeft = turns;
         this.type = t;
         this._turnEffect = turnEffect;
         this._endEffect = endEffect;
-        this._cancelEffect = cancelEffect;
     }
 
     public override IEnumerator Turn() {
@@ -46,7 +45,7 @@ public class TurnEffect : Effect {
         if (_turnsLeft != 0) {
             yield return TriggerEffect();
         } else {
-            yield return EndEffect();
+            yield return TriggerRemoveEffect();
         }
     }
 
@@ -55,14 +54,9 @@ public class TurnEffect : Effect {
             yield return _turnEffect(playerID);
     }
 
-    public override IEnumerator EndEffect() {
+    public override IEnumerator TriggerRemoveEffect() {
         if (_endEffect != null)
             yield return _endEffect(playerID);
-    }
-
-    public override void CancelEffect() {
-        if (_cancelEffect != null)
-            _cancelEffect(playerID);
     }
 }
 
@@ -72,23 +66,22 @@ public class TileEffect : Effect {
 
     public delegate IEnumerator MyTileEffect(int id, TileBehav tb);
 
-    private MyTileEffect _turnEffect, _endEffect, _cancelEffect;
+    private MyTileEffect _turnEffect, _removeEffect;
     private TileBehav _enchantee;
     private ObjectEffects _objFX; //?
-    protected bool _skip = false;
+    //protected bool _skip = false;
 
-    public TileEffect(int id, int turns, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) : this(id, type, turnEffect, endEffect, cancelEffect) {
+    public TileEffect(int id, int turns, Type type, MyTileEffect turnEffect, MyTileEffect endEffect) : this(id, type, turnEffect, endEffect) {
         _turnsLeft = turns;
     }
 
-    public TileEffect(int id, Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) {
+    public TileEffect(int id, Type type, MyTileEffect turnEffect, MyTileEffect removeEffect) {
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id;
         _turnsLeft = -1;
         this.type = type;
         this._turnEffect = turnEffect;
-        this._endEffect = endEffect;
-        this._cancelEffect = cancelEffect;
+        this._removeEffect = removeEffect;
     }
 
     public void SetEnchantee(TileBehav tb) {
@@ -99,20 +92,20 @@ public class TileEffect : Effect {
         return _enchantee;
     }
 
-    public void SkipCurrent() {
-        _skip = true;
-    }
+    //public void SkipCurrent() {
+    //    _skip = true;
+    //}
 
     public override IEnumerator Turn() {
         _turnsLeft--;
-        if (_skip) {
-            _skip = false;
-            yield break;
-        }
+        //if (_skip) {
+        //    _skip = false;
+        //    yield break;
+        //}
         if (_turnsLeft != 0) {
             yield return TriggerEffect();
         } else {
-            yield return EndEffect();
+            yield return TriggerRemoveEffect();
         }
     }
 
@@ -121,14 +114,9 @@ public class TileEffect : Effect {
             yield return _turnEffect(playerID, _enchantee);
     }
 
-    public override IEnumerator EndEffect() {
-        if (_endEffect != null)
-            yield return _endEffect(playerID, _enchantee);
-    }
-
-    public override void CancelEffect() {
-        if (_cancelEffect != null)
-            _cancelEffect(playerID, _enchantee);
+    public override IEnumerator TriggerRemoveEffect() {
+        if (_removeEffect != null)
+            yield return _removeEffect(playerID, _enchantee);
     }
 
 }
@@ -137,19 +125,19 @@ public class TileEffect : Effect {
 
 public class Enchantment : TileEffect {
 
-    public enum Type { None = 0, Burning, Zombie, Cherrybomb, ZombieTok, StoneTok }
+    public enum Type { None = 0, Burning, Zombie }
     public Type enchType; // private?
 
-    private MyTileEffect _turnEffect, _endEffect, _cancelEffect;
+    private MyTileEffect _turnEffect, _removeEffect;
     private TileBehav _enchantee;
     private ObjectEffects _objFX; //?
     private bool _hasTurnEffect = false;
 
-    public Enchantment(int id, int turns, Type enchType, Effect.Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :this(id, enchType, type, turnEffect, endEffect, cancelEffect) {
+    public Enchantment(int id, int turns, Type enchType, Effect.Type type, MyTileEffect turnEffect, MyTileEffect removeEffect) : this(id, enchType, type, turnEffect, removeEffect) {
         _turnsLeft = turns;
     }
 
-    public Enchantment(int id, Type enchType, Effect.Type type, MyTileEffect turnEffect, MyTileEffect endEffect, MyTileEffect cancelEffect = null) :base(id, type, turnEffect, endEffect) {
+    public Enchantment(int id, Type enchType, Effect.Type type, MyTileEffect turnEffect, MyTileEffect removeEffect) : base(id, type, turnEffect, removeEffect) {
         _mm = GameObject.Find("board").GetComponent<MageMatch>();
         playerID = id; // NO!!!
         _turnsLeft = -1;
@@ -160,26 +148,26 @@ public class Enchantment : TileEffect {
 
     public override IEnumerator Turn() {
         _turnsLeft--;
-        if (_skip) {
-            _skip = false;
-            yield break;
-        }
+        //if (_skip) {
+        //    _skip = false;
+        //    yield break;
+        //}
         if (_turnsLeft != 0 && _hasTurnEffect) { // important difference here
             yield return TriggerEffect();
         } else {
-            yield return EndEffect();
+            yield return TriggerRemoveEffect();
         }
     }
 
-    public static int GetEnchTier(Type enchType) {
-        if (enchType == Type.None)
-            return 0;
-        else if ((int)enchType < (int)Type.Cherrybomb)
-            return 1;
-        else
-            return 2;
-        // TODO handle tier 3 ench (like tombstone...or should those just have the ableEnchant flag off?
-    }
+    //public static int GetEnchTier(Type enchType) {
+    //    if (enchType == Type.None)
+    //        return 0;
+    //    else if ((int)enchType < (int)Type.Cherrybomb)
+    //        return 1;
+    //    else
+    //        return 2;
+    //    // TODO handle tier 3 ench (like tombstone...or should those just have the ableEnchant flag off?
+    //}
 }
 
 

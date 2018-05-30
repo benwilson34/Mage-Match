@@ -2,7 +2,7 @@
   "name": "Valéria",
   "keyElements": "W",
   "health": 1000,
-  "deck": [ 0, 12, 6, 0, 7 ],
+  "deck": [ 0, 13, 8, 0, 9 ],
   "passive": {
     "title": "Flow",
     "desc": "Valéria heals for 7 health every time she performs a swap."

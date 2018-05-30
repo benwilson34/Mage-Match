@@ -7,20 +7,20 @@ public class TileSeq {
 	public List<Tile> sequence; // TODO auto property?
 
 	public TileSeq(){
-		sequence = new List<Tile> ();
+		sequence = new List<Tile>();
 	}
 
 	public TileSeq (string seq){
-		char[] chars = seq.ToCharArray ();
-		this.sequence = new List<Tile> ();
+		char[] chars = seq.ToCharArray();
+		this.sequence = new List<Tile>();
 		foreach (char c in chars) {
 			this.sequence.Add (new Tile (c));
 		}
 	}
 
 	public TileSeq (Tile tile){
-		sequence = new List<Tile> ();
-		Tile t = new Tile (tile.element);
+		sequence = new List<Tile>();
+		Tile t = new Tile (tile.elements);
 		t.SetPos (tile.col, tile.row);
 		sequence.Add (t);
 	}
@@ -29,12 +29,20 @@ public class TileSeq {
 		return sequence.Count;
 	}
 
-	public Tile.Element GetElementAt(int index){
+	public Tile GetTileAt(int index){
 		if (index < sequence.Count)
-			return sequence [index].element;
+			return sequence [index];
 		else
-			return Tile.Element.None;
+			return null;
 	}
+
+    public Tile.Element GetElementAt(int index) {
+        Tile t = GetTileAt(index);
+        if (t != null)
+            return t.elements[0];
+        else
+            return Tile.Element.None;
+    }
 
 	public void SetPosAt(int index, int x, int y){
 		sequence [index].SetPos(x, y);
@@ -51,7 +59,7 @@ public class TileSeq {
 	public string SeqAsString(bool showLetters = true, bool showCoords = false){
 		string letters = "", coords = "";
         foreach (Tile t in sequence) {
-            letters += t.ThisElementToChar() + "";
+            letters += t.ElementsToString() + "";
             coords += t.PrintCoord() + " ";
         }
 		return (showLetters ? letters + " " : "") + (showCoords ? coords : "");

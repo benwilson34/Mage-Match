@@ -124,7 +124,7 @@ public class BoardCheck {
             returnList[i] = new List<TileSeq>();
         }
 
-        if (!_hexGrid.GetTileBehavAt (c, r).ableInvoke) // handle current tile not matchable
+        if (!_hexGrid.GetTileBehavAt (c, r).ableInvoke) // handle current tile not invokable
 			return returnList;
 
         List<Spell> shortList = new List<Spell>(spells);
@@ -134,10 +134,17 @@ public class BoardCheck {
             // TODO if Spell is CoreSpell, add the right sequence...
             if (shortList[i] is CoreSpell) {
                 //MMLog.Log_BoardCheck("Setting " + currentTile.element + " as current elem.", MMLog.LogLevel.Standard);
-                ((CoreSpell)shortList[i]).currentElem = currentTile.element;
+                CoreSpell coreSpell = (CoreSpell)shortList[i];
+                foreach (Tile.Element elem in currentTile.elements) {
+                    CoreSpell copySpell = new CoreSpell(coreSpell);
+                    copySpell.currentElem = elem;
+                    shortList.Insert(i, copySpell);
+                    i++;
+                }
+                //((CoreSpell)shortList[i]).currentElem = currentTile.element;
             } else {
                 TileSeq seq = shortList[i].GetTileSeq();
-                if (!currentTile.element.Equals(seq.GetElementAt(0))) { // remove any seqs that don't start with current color
+                if (!currentTile.IsElement(seq.GetElementAt(0))) { // remove any seqs that don't start with current color
                     shortList.RemoveAt(i);
                     i--;
                 }
@@ -213,7 +220,7 @@ public class BoardCheck {
                     } else
                         nextElem = s.GetTileSeq().GetElementAt(seqIndex);
 
-                    if (ctb.tile.element.Equals(nextElem)) { // if the next tile matches the next in the seq
+                    if (ctb.tile.IsElement(nextElem)) { // if the next tile matches the next in the seq
                         seqs[i].sequence.Add(ctb.tile);
                         //MMLog.Log_BoardCheck("Next tile matches! " + checkList[i].PrintSeq() + " length=" + seqs[i].GetSeqLength(), MMLog.LogLevel.Standard);
 

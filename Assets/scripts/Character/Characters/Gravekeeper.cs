@@ -38,7 +38,7 @@ public class Gravekeeper : Character {
         }
         DealDamage(dmg);
 
-        if (seq.GetElementAt(0) == Tile.Element.Earth) // not safe if there are multi-color tiles
+        if (seq.GetTileAt(0).IsElement(Tile.Element.Earth))
             zombs++;
 
         List<TileBehav> tbs = TileFilter.GetTilesByAbleEnch(Enchantment.Type.Zombie);
@@ -46,7 +46,7 @@ public class Gravekeeper : Character {
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
             yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, tbs.Count));
             int rand = _mm.syncManager.GetRand();
-            yield return _objFX.Ench_SetZombie(_playerId, tbs[rand], false); // skip?
+            yield return _objFX.Ench_SetZombie(_playerId, tbs[rand]); // skip?
             tbs.RemoveAt(rand);
         }
 
@@ -75,7 +75,7 @@ public class Gravekeeper : Character {
                 break;
         }
 
-        if (seq.GetElementAt(0) == Tile.Element.Muscle) // not safe if there are multi-color tiles
+        if (seq.GetTileAt(0).IsElement(Tile.Element.Earth))
             dmg += 20;
         DealDamage(dmg);
 
@@ -137,7 +137,7 @@ public class Gravekeeper : Character {
 
             TileBehav tb = (TileBehav) _mm.prompt.GetDropHex();
             MMLog.Log_Gravekeeper("Player " + _playerId + " dropped " + tb.hextag);
-            yield return _objFX.Ench_SetZombie(_playerId, tb, false);
+            yield return _objFX.Ench_SetZombie(_playerId, tb);
             int col = _mm.prompt.GetDropCol();
             int nextTBrow = _mm.boardCheck.CheckColumn(col) - 1; // next TB under, if any
 
@@ -191,10 +191,7 @@ public class Gravekeeper : Character {
         CellBehav cb = _targeting.GetTargetCBs()[0];
         int col = cb.col;
 
-        TombstoneTile tomb = (TombstoneTile)_hexMan.GenerateTile(_playerId, "Tombstone");
-        tomb.transform.SetParent(GameObject.Find("tilesOnBoard").transform);
-
-        _mm.effectCont.AddEndTurnEffect(new TurnEffect(_playerId, 5, Effect.Type.Add, tomb.Tombstone_Turn, tomb.Tombstone_TEnd), "tombs");
+        TileBehav tombstone = _hexMan.GenerateTile(_playerId, "Tombstone");
 
         // destroy tiles under token
         for (int row = _hexGrid.BottomOfColumn(col); row < _hexGrid.TopOfColumn(col); row++)
@@ -203,7 +200,7 @@ public class Gravekeeper : Character {
             else
                 break; // TODO handle floating tiles
 
-        _mm.DropTile(tomb, col); // idk how to animate this one yet
+        _mm.DropTile(tombstone, col); // idk how to animate this one yet
 
         _mm.audioCont.Trigger(AudioController.GravekeeperSFX.SigDrop);
     }

@@ -51,7 +51,7 @@ public class Spell {
 	}
 
 	public Tile.Element GetElementAt(int index){
-		return _seq.GetElementAt (index);
+		return _seq.GetElementAt(index);
 	}
 
 	public TileSeq GetTileSeq() { return _seq; }
@@ -72,6 +72,8 @@ public class CoreSpell : Spell {
         : base(index, name, effect, APcost) {
         _seq = new TileSeq(); // empty seq...be wary of errors...
     }
+
+    public CoreSpell(CoreSpell copySpell) : this(copySpell.index, copySpell.name, copySpell._effect) { }
 
     public override int GetLength() {
         return 5; // max core spell length

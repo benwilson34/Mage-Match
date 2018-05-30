@@ -7,6 +7,8 @@ public class Hand {
 
     public const int MAX_HAND_SIZE = 7;
 
+    public int Count { get { return _hexes.Count; } }
+
     private List<Hex> _hexes = null;
     private Transform _handPos = null;
     private HandSlot[] _slots;
@@ -40,6 +42,14 @@ public class Hand {
     }
 
     public Vector3 GetHandPos() { return _handPos.position; }
+
+    public bool IsHexMine(Hex hex) {
+        foreach (Hex handHex in _hexes) {
+            if (hex.hextag == handHex.hextag)
+                return true;
+        }
+        return false;
+    }
 
     public void Add(Hex hex) {
         hex.transform.SetParent(_handPos); // , false)?
@@ -78,7 +88,11 @@ public class Hand {
         }
     }
 
-    public TileBehav GetTile(int i) { return (TileBehav)_hexes[i]; }
+    // needed?
+    public TileBehav GetTile(int i) {
+        MMLog.Log("HAND", "black", "Found an object in hand -> " + _hexes[i].ToString());
+        return (TileBehav)_hexes[i];
+    }
 
     public Hex GetHex(string tag) {
         foreach (Hex obj in _hexes) {
@@ -91,6 +105,36 @@ public class Hand {
     }
 
     public List<Hex> GetAllHexes() { return _hexes; }
+
+    #region ----- Discard -----
+    public void Discard(Hex hex) {
+        _mm.StartCoroutine(_Discard(hex));
+    }
+
+    public IEnumerator _Discard(Hex hex) {
+        yield return _mm.eventCont.Discard(_p.id, hex.hextag);
+
+        _mm.audioCont.Trigger(AudioController.HexSFX.Discard);
+        Remove(hex);
+        yield return _mm.animCont._DiscardTile(hex.transform);
+        GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan
+    }
+
+    public IEnumerator _Discard(string tag) {
+        MMLog.Log_Player("Discarding " + tag);
+        yield return _Discard(GetHex(tag));
+
+    }
+
+    public IEnumerator _DiscardRandom(int count = 1) {
+        for (int i = 0; i < count && _hexes.Count > 0; i++) {
+            yield return _mm.syncManager.SyncRand(_p.id, Random.Range(0, _hexes.Count));
+            int rand = _mm.syncManager.GetRand();
+            Hex hex = _hexes[rand];
+            yield return _Discard(hex);
+        }
+    }
+    #endregion
 
     public List<string> Debug_GetAllTags() {
         List<string> tags = new List<string>();
@@ -114,8 +158,6 @@ public class Hand {
         return true;
     }
 
-    public int Count() { return _hexes.Count; }
-
     public bool IsEmpty() { return _hexes.Count == 0; }
 
     public bool IsFull() { return _hexes.Count == MAX_HAND_SIZE; }
@@ -130,7 +172,7 @@ public class Hand {
                 total++;
                 Hex hex = slot.GetHex();
                 if (hex is TileBehav)
-                    str += "[" + ((TileBehav)hex).tile.ThisElementToChar() + "] ";
+                    str += "[" + ((TileBehav)hex).tile.ElementsToString() + "] ";
                 else
                     str += "[?] ";
             } else
@@ -141,8 +183,7 @@ public class Hand {
     }
 
 
-    // -------------------- rearrangement -----------------------
-    // maybe kinda depends on tile tagging system?
+    #region ---------- REARRANGEMENT ----------
 
     // On MouseDown 
     public void GrabHex(Hex hex) {
@@ -238,4 +279,5 @@ public class Hand {
         GameObject.Destroy(_placeholder.gameObject);
         _placeholder = null; //?
     }
+    #endregion
 }

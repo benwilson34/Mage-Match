@@ -32,7 +32,7 @@ public class Prompt {
     }
 
 
-    // ----- DROP -----
+    #region ---------- DROP ----------
 
     public IEnumerator WaitForDrop() {
         _successful = false;
@@ -58,7 +58,7 @@ public class Prompt {
         if (ignoredHexes != null)
             ignCount = ignoredHexes.Count;
 
-        if (_mm.ActiveP().hand.Count() == ignCount) {
+        if (_mm.ActiveP().hand.Count == ignCount) {
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted DROP!!");
             yield break;
         }
@@ -70,7 +70,7 @@ public class Prompt {
             // flip unavailable ones
             foreach (Hex h in ignoredHexes)
                 h.Flip();
-            _mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+            //_mm.inputCont.RestrictInteractableHexes(ignoredHexes);
         }
 
         if (_mm.IsReplayMode())
@@ -84,7 +84,7 @@ public class Prompt {
             // flip back
             foreach (Hex h in ignoredHexes)
                 h.Flip();
-            _mm.inputCont.EndRestrictInteractableHexes();
+            //_mm.inputCont.EndRestrictInteractableHexes();
         }
     }
 
@@ -110,15 +110,16 @@ public class Prompt {
         _mm.ActiveP().hand.Remove(_dropHex);
         yield return _mm._Drop(_dropHex, _dropCol);
     }
+    #endregion
 
 
-    // ----- QUICKDRAW -----
+    #region ---------- QUICKDRAW ----------
 
     public IEnumerator WaitForQuickdrawAction(Hex hex) {
         _successful = false;
-        bool isCharm = Hex.IsCharm(hex.hextag);
 
-        if (!isCharm && _mm.hexGrid.IsBoardFull()) {
+        if (!Hex.IsCharm(hex.hextag) && _mm.hexGrid.IsBoardFull()) {
+            // can't be dropped in; quickdraw whiffs
             yield break;
         }
         Player p = _mm.ActiveP();
@@ -132,12 +133,16 @@ public class Prompt {
         // ignore every hex except this one
         var ignoredHexes = new List<Hex>();
         if (_mm.MyTurn()) {
-            foreach (Hex h in p.hand.GetAllHexes())
+            MMLog.Log("PROMPT", "orange", "My quickdraw tile, and my turn. " + hex.hextag);
+            foreach (Hex h in p.hand.GetAllHexes()) {
                 if (!h.EqualsTag(hex)) {
                     ignoredHexes.Add(h);
                     h.Flip();
                 }
-            _mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+            }
+            MMLog.Log("PROMPT", "orange", ignoredHexes.Count + " restricted tiles in hand.");
+
+            //_mm.inputCont.RestrictInteractableHexes(ignoredHexes);
         }
 
         if (_mm.IsReplayMode())
@@ -151,7 +156,7 @@ public class Prompt {
         if (_mm.MyTurn()) {
             foreach (Hex h in ignoredHexes)
                 h.Flip();
-            _mm.inputCont.EndRestrictInteractableHexes();
+            //_mm.inputCont.EndRestrictInteractableHexes();
         }
 
         if (!_quickdrawWentToHand) { // the player dropped it
@@ -172,9 +177,10 @@ public class Prompt {
         currentMode = PromptMode.None;
         _mm.stats.Report("$ PROMPT KEEP QUICKDRAW", false);
     }
+    #endregion
 
 
-    // ----- SWAP -----
+    #region ---------- SWAP ----------
 
     public IEnumerator WaitForSwap() {
         yield return WaitForSwap(new TileSeq()); // is this ok?
@@ -232,5 +238,6 @@ public class Prompt {
         Tile f = _swapTiles[0].tile, s = _swapTiles[1].tile;
         yield return _mm._SwapTiles(false, f.col, f.row, s.col, s.row);
     }
+    #endregion
 
 }

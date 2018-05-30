@@ -3,15 +3,16 @@
     "title": "HR Form",
     "category": "Charm",
     "keywords": ["Area Target"],
-    "deckCount": 3,
+    "deckCount": 5,
+    "cost": 2,
     "desc": "Zombify all Muscle tiles in a small area."
   },
   "PartySnacks": {
     "title": "Party Snacks",
     "category": "Charm",
     "keywords": ["Tile Target"],
-    "deckCount": 3,
-    "desc": "Target Zombie explodes, destroying itself and 2 random adjacent tiles, and dealing 60-80 damage."
+    "deckCount": 4,
+    "cost": 2,
+    "desc": "Target Zombie explodes, destroying itself and 4 random adjacent tiles. Deals 60-80 damage."
   }
-
 }

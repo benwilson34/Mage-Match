@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
 
-// TODO rename to EnchantEffects - will token stuff go here too?
+// TODO rename to EnchantEffects
 public class ObjectEffects {
 
     private MageMatch _mm;
@@ -36,59 +36,56 @@ public class ObjectEffects {
     //    mm.DropTile(cb.col, stone);
     //}
 
-    public IEnumerator LightningPalm(int id) {
-        yield return _targeting.WaitForTileTarget(1);
-        List<TileBehav> tbs = _targeting.GetTargetTBs();
-        if (tbs.Count != 1)
-            yield return null;
+    //public IEnumerator LightningPalm(int id) {
+    //    yield return _targeting.WaitForTileTarget(1);
+    //    List<TileBehav> tbs = _targeting.GetTargetTBs();
+    //    if (tbs.Count != 1)
+    //        yield return null;
 
-        Tile.Element elem = tbs[0].tile.element;
-        List<TileBehav> tileList = _hexGrid.GetPlacedTiles();
-        for (int i = 0; i < tileList.Count; i++) {
-            Tile tile = tileList[i].tile;
-            if (tile.element.Equals(elem)) {
-                _hexMan.RemoveTile(tile, true);
-                _mm.GetPC(id).DealDamage(15);
-            }
-        }
-    }
+    //    Tile.Element elem = tbs[0].tile.GetElements()[0];
+    //    List<TileBehav> tileList = _hexGrid.GetPlacedTiles();
+    //    for (int i = 0; i < tileList.Count; i++) {
+    //        Tile tile = tileList[i].tile;
+    //        if (tile.element.Equals(elem)) {
+    //            _hexMan.RemoveTile(tile, true);
+    //            _mm.GetPC(id).DealDamage(15);
+    //        }
+    //    }
+    //}
 
-    public IEnumerator Cherrybomb(TileSeq prereq) {
-        yield return _targeting.WaitForTileTarget(1);
+    //public IEnumerator Cherrybomb(TileSeq prereq) {
+    //    yield return _targeting.WaitForTileTarget(1);
 
-        List<TileBehav> tbs = _targeting.GetTargetTBs();
-        if (tbs.Count != 1)
-            yield return null;
+    //    List<TileBehav> tbs = _targeting.GetTargetTBs();
+    //    if (tbs.Count != 1)
+    //        yield return null;
 
-        TileBehav tb = _targeting.GetTargetTBs()[0];
-        Ench_SetCherrybomb(_mm.ActiveP().id, tb); // right id?
-    }
+    //    TileBehav tb = _targeting.GetTargetTBs()[0];
+    //    Ench_SetCherrybomb(_mm.ActiveP().id, tb); // right id?
+    //}
 
 
     // -------------------------------- ENCHANTMENTS --------------------------------------
 
-    // TODO IEnum types for animation
 
-    public void Ench_SetCherrybomb(int id, TileBehav tb) {
-        Enchantment ench = new Enchantment(id, Enchantment.Type.Cherrybomb, Effect.Type.Destruct, null, null, Ench_Cherrybomb_Remove);
-        tb.SetEnchantment(ench);
-        tb.GetComponent<SpriteRenderer>().color = new Color(.4f, .4f, .4f);
-    }
-    IEnumerator Ench_Cherrybomb_Remove(int id, TileBehav tb) {
-        MMLog.Log_EnchantFx("Resolving Cherrybomb at " + tb.PrintCoord());
-        _mm.GetPC(id).DealDamage(200);
+    //public void Ench_SetCherrybomb(int id, TileBehav tb) {
+    //    Enchantment ench = new Enchantment(id, Enchantment.Type.Cherrybomb, Effect.Type.Destruct, null, null, Ench_Cherrybomb_Remove);
+    //    tb.SetEnchantment(ench);
+    //    tb.GetComponent<SpriteRenderer>().color = new Color(.4f, .4f, .4f);
+    //}
+    //IEnumerator Ench_Cherrybomb_Remove(int id, TileBehav tb) {
+    //    MMLog.Log_EnchantFx("Resolving Cherrybomb at " + tb.PrintCoord());
+    //    _mm.GetPC(id).DealDamage(200);
 
-        List<TileBehav> tbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-        foreach (TileBehav ctb in tbs) {
-            //if (ctb.ableDestroy) // shouldn't have to check here...
-            _hexMan.RemoveTile(ctb.tile.col, ctb.tile.row, true);
-        }
-        yield return null; // for now
-    }
+    //    List<TileBehav> tbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+    //    foreach (TileBehav ctb in tbs) {
+    //        //if (ctb.ableDestroy) // shouldn't have to check here...
+    //        _hexMan.RemoveTile(ctb.tile.col, ctb.tile.row, true);
+    //    }
+    //    yield return null; // for now
+    //}
 
     public IEnumerator Ench_SetBurning(int id, TileBehav tb) {
-        // Burning does 3 dmg per tile per end-of-turn for 5 turns. It does double damage on expiration.
-        //		Debug.MMLog.Log_EnchantFx("SPELLEFFECTS: Setting burning...");
         yield return _mm.animCont._Burning(tb);
         _mm.audioCont.Trigger(AudioController.EnfuegoSFX.BurningEnchant);
 
@@ -112,35 +109,32 @@ public class ObjectEffects {
         yield return null; // for now
     }
 
-    public void Ench_SetStone(TileBehav tb) {
-        Enchantment ench = new Enchantment(5, Enchantment.Type.StoneTok, Effect.Type.Destruct, Ench_StoneTok_TEffect, Ench_StoneTok_End, null);
-        tb.SetEnchantment(ench);
-        _mm.effectCont.AddEndTurnEffect(ench, "stoT");
-    }
-    IEnumerator Ench_StoneTok_TEffect(int id, TileBehav tb) {
-        int c = tb.tile.col, r = tb.tile.row;
-        if (_hexGrid.CellExists(c, r - 1) && _hexGrid.IsCellFilled(c, r - 1)) {
-            _hexMan.RemoveTile(c, r - 1, false);
-        }
-        yield return null; // for now
-    }
-    IEnumerator Ench_StoneTok_End(int id, TileBehav tb) {
-        _hexMan.RemoveTile(tb.tile, false);
-        yield return null; // for now
-    }
+    //public void Ench_SetStone(TileBehav tb) {
+    //    Enchantment ench = new Enchantment(5, Enchantment.Type.StoneTok, Effect.Type.Destruct, Ench_StoneTok_, Ench_StoneTok_End);
+    //    tb.SetEnchantment(ench);
+    //    _mm.effectCont.AddEndTurnEffect(ench, "stoT");
+    //}
+    //IEnumerator Ench_StoneTok_OnTurnEnd(int id, TileBehav tb) {
+    //    int c = tb.tile.col, r = tb.tile.row;
+    //    if (_hexGrid.CellExists(c, r - 1) && _hexGrid.IsCellFilled(c, r - 1)) {
+    //        _hexMan.RemoveTile(c, r - 1, false);
+    //    }
+    //    yield return null; // for now
+    //}
+    //IEnumerator Ench_StoneTok_OnEffectRemove(int id, TileBehav tb) {
+    //    _hexMan.RemoveTile(tb.tile, false);
+    //    yield return null; // for now
+    //}
 
-    // TODO take skip out since Zombie doesn't have a turn effect anymore
-    public IEnumerator Ench_SetZombie(int id, TileBehav tb, bool skip = false, bool anim = true) {
+    public IEnumerator Ench_SetZombie(int id, TileBehav tb, bool anim = true) {
         if (anim) {
             yield return _mm.animCont._Zombify(tb);
             _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieEnchant);
         }
 
-        Enchantment ench = new Enchantment(id, Enchantment.Type.Zombie, Effect.Type.Enchant, Ench_Zombie_TEffect, null);
-        if (skip)
-            ench.SkipCurrent();
+        Enchantment ench = new Enchantment(id, Enchantment.Type.Zombie, Effect.Type.Enchant, Ench_Zombie_Trigger, null);
 
-        MMLog.Log("ObjEffects", "orange", "Zombify's enchtype is "+ench.enchType);
+        //MMLog.Log("ObjEffects", "orange", "Zombify's enchtype is "+ench.enchType);
 
         _mm.effectCont.AddEndTurnEffect(ench, "zomb");
 
@@ -148,30 +142,15 @@ public class ObjectEffects {
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
         yield return null;
     }
-    IEnumerator Ench_Zombie_TEffect(int id, TileBehav tb) {
-        //zombify_select = false; // only use if you're sloppy. 
+    IEnumerator Ench_Zombie_Trigger(int id, TileBehav tb) {
         if (tb == null)
             MMLog.LogError("SPELLFX: >>>>>Zombify called with a null tile!! Maybe it was removed?");
-        //MMLog.Log_EnchantFx("----- Zombify at " + tb.PrintCoord() + " starting -----");
 
         List<TileBehav> tbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-        //MMLog.Log_EnchantFx("Tile has " + tbs.Count + " tiles around it.");
-        for (int i = 0; i < tbs.Count; i++) {
-            TileBehav ctb = tbs[i];
-            if (!ctb.CanSetEnch(Enchantment.Type.Zombie)) { // other conditions where Zombify wouldn't work?
-                tbs.RemoveAt(i);
-                i--;
-                //MMLog.Log_EnchantFx("Ignoring tile at " + ctb.PrintCoord());
-            }
-        }
-        //MMLog.Log_EnchantFx("Tile now has " + tbs.Count + " available tiles around it.");
-
-        //yield return new WaitUntil(() => zombify_select);
-        //zombify_select = false;
+        tbs = TileFilter.FilterByAbleEnch(tbs, Enchantment.Type.Zombie);
 
         if (tbs.Count == 0) { // no targets
             //MMLog.Log_EnchantFx("Zombify at " + tb.PrintCoord() + " has no targets!");
-            //mm.syncManager.SendZombifySelect(id, -1, -1);
             yield break;
         }
 
@@ -180,18 +159,16 @@ public class ObjectEffects {
         TileBehav selectTB = tbs[_mm.syncManager.GetRand()];
         MMLog.Log_EnchantFx("Zombify attacking TB at " + selectTB.PrintCoord());
 
-        //mm.syncManager.SendZombifySelect(id, selectTB.tile.col, selectTB.tile.row);
-
         yield return _mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); // anim 1
 
-        if (selectTB.tile.element == Tile.Element.Muscle) {
+        if (selectTB.tile.IsElement(Tile.Element.Muscle)) {
             yield return _hexMan._RemoveTile(selectTB, true); // maybe?
             _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieGulp);
 
             _mm.GetPC(id).DealDamage(10);
             _mm.GetPC(id).Heal(10);
         } else {
-            yield return Ench_SetZombie(id, selectTB, true, false);
+            yield return Ench_SetZombie(id, selectTB, false);
             _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieAttack);
         }
 

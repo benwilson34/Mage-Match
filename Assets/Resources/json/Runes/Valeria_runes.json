@@ -2,14 +2,14 @@
   "Bandages": {
     "category": "Charm",
     "keywords": ["Buff"],
-    "deckCount": 4,
-    "desc": "Heal yourself for 60-80 health and gain a stacking 2-turn buff that reduces the damage you take by 10%."
+    "deckCount": 5,
+    "desc": "Duplicate: Gain 30-40 health. Gain a stacking buff that reduces the damage you take by 15%. Lasts 4 turns."
   },
   "WaterLily": {
     "title": "Water Lily",
-    "category": "Charm",
+    "category": "Tile",
     "keywords": [],
-    "deckCount": 7,
-    "desc": "Add 4 Water tiles into the board in random columns."
+    "deckCount": 5,
+    "desc": "Persist: Add 3 Water tiles into the board in random columns."
   }
 }

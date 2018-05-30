@@ -26,7 +26,6 @@ public abstract class Character {
     protected ObjectEffects _objFX; // needed here?
     protected int _playerId;
     protected List<string> _runes;
-    //protected string genHexTag;
 
     protected bool playedFullMeterSound = false;
 
@@ -65,7 +64,7 @@ public abstract class Character {
     public virtual void OnEffectContLoad() {}
 
 
-    // ----------  HEALTH  ----------
+    #region ----------  HEALTH  ----------
 
     public int GetHealth() { return _health; }
 
@@ -123,9 +122,10 @@ public abstract class Character {
         if (_health == 0)
             _mm.EndTheGame(_playerId);
     }
+    #endregion
 
 
-    // ----------  METER  ----------
+    #region ----------  METER  ----------
 
     public int GetMeter() { return _meter; }
 
@@ -180,9 +180,10 @@ public abstract class Character {
         if (id == _playerId)
             ChangeMeter(5);
     }
+    #endregion
 
-    
-    // ----------  SPELLS  ----------
+
+    #region ----------  SPELLS  ----------
 
     protected void InitSpells(CharacterInfo info) {
         _spells = new Spell[5];
@@ -226,12 +227,12 @@ public abstract class Character {
     //        outlist.Add(s.GetTileSeq());
     //    return outlist;
     //}
+    #endregion
 
     public Player ThisPlayer() {
         return _mm.GetPlayer(_playerId);
     }
 
-    //public string GetHexTag() { return genHexTag; }
 
     public static Character Load(MageMatch mm, int id) {
         Ch myChar = mm.gameSettings.GetChar(id);

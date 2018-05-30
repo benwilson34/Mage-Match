@@ -7,8 +7,8 @@
 		    "Leeches",
 		   	"WhiteWater",
 			"ShuffleGem",
-		    "RainDrops",
-		    "SampleCharm"
+		    "Raindrops",
+		    "PuffPendant"
   		]
 	},
 
@@ -17,37 +17,37 @@
 		"runes": [
 		    "Bandages",
 		    "WaterLily",
-		    "Leeches",
-		   	"WhiteWater",
 			"ShuffleGem",
-		    "RainDrops",
-		    "SampleCharm"
+		    "WhiteWater",
+		    "EvilDoll",
+		    "ComebackBrace",
+		    "Geode"
   		]
 	},
 
 	"Gravekeeper": {
 		"name": "GraveK Default",
 		"runes": [
+			"WhiteWater",
+			"Lifestealer",
 			"HRForm",
 		    "PartySnacks",
-		    "ProteinPills",
-		    "Leeches",
-		    "MuscleMass",
-		    "RainDrops",
-		    "SampleCharm"
+		    "BrawnBroth",
+		    "RollingBone",
+		    "Leeches"
 		]
 	},
 
 	"Enfuego": {
 		"name": "Enfuego Default",
 		"runes": [
-		    "DanceShoes",
+		    "LighterFluid",
 		    "BurningBracers",
+		    "Twinfire",
 		    "Molotov",
-		    "Brushfire",
-		    "ShuffleGem",
-		    "RainDrops",
-		    "SampleCharm"
+		    "CausticCastanet",
+		    "Stimulant",
+		    "Flamethrower"
   		]
 	}
 }

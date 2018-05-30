@@ -19,11 +19,11 @@ public class Enfuego : Character {
     public override void OnEffectContLoad() {
         MMLog.Log_Enfuego("Loading PASSIVE...");
         // SwapEffect for incrementing swapsThisTurn
-        SwapEffect se = new SwapEffect(_playerId, Passive_Swap);
+        SwapEffect se = new SwapEffect(_playerId, Passive_OnSwap);
         _mm.effectCont.AddSwapEffect(se, "EnSwp");
 
         // TurnEffect for reseting the counter
-        TurnEffect te = new TurnEffect(_playerId, -1, Effect.Type.None, Passive_ResetSwaps, null); // idk about type here
+        TurnEffect te = new TurnEffect(_playerId, Effect.Type.None, Passive_OnTurnEnd); // idk about type here
         _mm.effectCont.AddEndTurnEffect(te, "EnEnd");
 
         // when we have List<Buff>
@@ -32,7 +32,10 @@ public class Enfuego : Character {
         //mm.GetPlayer(playerID).AddBuff(b);
     }
 
-    public IEnumerator Passive_Swap(int id, int c1, int r1, int c2, int r2) {
+    public IEnumerator Passive_OnSwap(int id, int c1, int r1, int c2, int r2) {
+        if (id != _playerId)
+            yield break;
+
         const int swapDmg = 5;
         if(_passive_swapsThisTurn > 0)
             DealDamage(_passive_swapsThisTurn * swapDmg);
@@ -42,9 +45,12 @@ public class Enfuego : Character {
         yield return null;
     }
 
-    public IEnumerator Passive_ResetSwaps(int id) {
-        _passive_swapsThisTurn = 0;
-        MMLog.Log_Enfuego("Reseting swaps.");
+    public IEnumerator Passive_OnTurnEnd(int id) {
+        if (id == _playerId) {
+            // reset swaps for the next turn
+            _passive_swapsThisTurn = 0;
+            MMLog.Log_Enfuego("Reseting swaps.");
+        }
         yield return null;
     }
 
@@ -74,17 +80,17 @@ public class Enfuego : Character {
                 break;
             case 4:
                 dmg = 50;
-                _mm.GetOpponent(_playerId).DiscardRandom(1);
+                yield return _mm.GetOpponent(_playerId).hand._DiscardRandom();
                 burnNum = 4;
                 break;
             case 5:
                 dmg = 80;
-                _mm.GetOpponent(_playerId).DiscardRandom(2);
+                yield return _mm.GetOpponent(_playerId).hand._DiscardRandom(2);
                 burnNum = 7;
                 break;
         }
 
-        if (seq.GetElementAt(0).Equals(Tile.Element.Fire)) // not safe for multi-element tiles
+        if (seq.GetTileAt(0).IsElement(Tile.Element.Fire)) 
             dmg += 20;
         DealDamage(dmg);
 
@@ -150,9 +156,9 @@ public class Enfuego : Character {
         yield return null;
     }
     public float HotPot_Debuff(Player p, int dmg) {
-        MMLog.Log_Enfuego("Hot Potato debuff on " + p.name + ", handcount=" + p.hand.Count());
+        MMLog.Log_Enfuego("Hot Potato debuff on " + p.name + ", handcount=" + p.hand.Count);
         // TODO sound fx
-        return p.hand.Count() * 3;
+        return p.hand.Count * 3;
     }
 
 
@@ -165,7 +171,7 @@ public class Enfuego : Character {
         foreach (TileBehav tb in tbs) {
             DealDamage(70);
 
-            if (tb.tile.element.Equals(Tile.Element.Fire)) { // spread Burning to 4 nearby
+            if (tb.tile.IsElement(Tile.Element.Fire)) { // spread Burning to 4 nearby
                 List<TileBehav> ctbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 for (int i = 0; i < ctbs.Count; i++) {
                     TileBehav ctb = ctbs[i];
@@ -193,8 +199,8 @@ public class Enfuego : Character {
                     MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
                     _mm.StartCoroutine(_objFX.Ench_SetBurning(_playerId, ctb)); // yield return?
                 }
-            } else if (tb.tile.element.Equals(Tile.Element.Muscle)) {
-                yield return _mm.GetOpponent(_playerId).DiscardRandom(1);
+            } else if (tb.tile.IsElement(Tile.Element.Muscle)) {
+                yield return _mm.GetOpponent(_playerId).hand._DiscardRandom();
             }
 
             _mm.hexMan.RemoveTile(tb.tile, true);

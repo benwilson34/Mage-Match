@@ -106,7 +106,7 @@ public class DebugTools : MonoBehaviour {
         yield return null;
     }
 
-    public void OnGameAction(int id, bool costsAP) {
+    public void OnGameAction(int id, int cost) {
         UpdateEffTexts(); // could be considerable overhead...
     }
 
@@ -171,7 +171,7 @@ public class DebugTools : MonoBehaviour {
                         if (tb.wasInvoked)
                             grid += "[*]";
                         else
-                            grid += "[" + tb.tile.ThisElementToChar() + "]";
+                            grid += "[" + tb.tile.ElementsToString() + "]";
 
                     } else
                         grid += "[ ]";
@@ -507,10 +507,10 @@ public class DebugTools : MonoBehaviour {
         DiscardMode_OnClick(hex);
     }
     void DiscardMode_OnClick(Hex hex) {
-        if (_mm.GetPlayer(1).IsHexMine(hex)) {
-            _mm.GetPlayer(1).Discard(hex);
-        } else if (_mm.GetPlayer(2).IsHexMine(hex)) {
-            _mm.GetPlayer(2).Discard(hex);
+        if (_mm.GetPlayer(1).hand.IsHexMine(hex)) {
+            _mm.GetPlayer(1).hand.Discard(hex);
+        } else if (_mm.GetPlayer(2).hand.IsHexMine(hex)) {
+            _mm.GetPlayer(2).hand.Discard(hex);
         } else {
             MMLog.LogWarning("DebugTools: user clicked on a non-hand hex! Naughty!");
             return;

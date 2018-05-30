@@ -1,13 +1,16 @@
 {
-  "SampleCharm": {
-  	"title": "Sample Charm",
-    "category": "Charm",
-    "keywords": [],
-    "deckCount": 2,
-    "desc": "This Charm is fxkin wild boi"
+  "Twinfire": {
+    "category": "Tile",
+    "keywords": ["Duplicate"],
+    "deckCount": 9,
+    "desc": "Basic Fire tile with Duplicate."
   },
-
-
+  "Raindrops": {
+    "category": "Tile",
+    "keywords": ["Duplicate"],
+    "deckCount": 9,
+    "desc": "Basic Water tile with Duplicate."
+  },
   "MuscleMass": {
     "title": "Muscle Mass",
     "category": "Tile",
@@ -15,21 +18,12 @@
     "deckCount": 9,
     "desc": "Basic Muscle tile with Duplicate."
   },
-  "ProteinPills": {
-    "title": "Protein Pills",
-    "category": "Charm",
-    "keywords": ["Buff"],
-    "deckCount": 3,
-    "desc": "Gain a 2-turn buff that increases the damage you deal and reduces the damage you take by 15%."
+  "Brushfire": {
+    "category": "Tile",
+    "keywords": ["Quickdraw"],
+    "deckCount": 8,
+    "desc": "Basic Fire tile with Quickdraw."
   },
-  "Leeches": {
-    "title": "Leeches!",
-    "category": "Charm",
-    "keywords": ["Buff"],
-    "deckCount": 4,
-    "desc": "Gain a buff this turn that heals you for 20% of all damage you deal."
-  },
-
   "WhiteWater": {
     "title": "White Water",
     "category": "Tile",
@@ -37,13 +31,39 @@
     "deckCount": 8,
     "desc": "Basic Water tile with Quickdraw."
   },
-  "RainDrops": {
-    "title": "Rain Drops",
+  "Stimulant": {
     "category": "Tile",
-    "keywords": ["Duplicate"],
-    "deckCount": 9,
-    "desc": "Basic Water tile with Duplicate."
+    "keywords": ["Quickdraw"],
+    "deckCount": 8,
+    "desc": "Basic Muscle tile with Quickdraw."
   },
+  "Flamethrower": {
+    "category": "Charm",
+    "keywords": [],
+    "deckCount": 8,
+    "desc": "Add 5 Fire tiles into random columns in the board."
+  },
+  "Geode": {
+    "category": "Charm",
+    "keywords": [],
+    "deckCount": 8,
+    "desc": "Add 5 Earth tiles into random columns in the board."
+  },
+  "PuffPendant": {
+    "title": "Puff Pendant",
+    "category": "Charm",
+    "keywords": [],
+    "deckCount": 8,
+    "desc": "Add 5 Air tiles into random columns in the board."
+  },
+  "BrawnBroth": {
+    "title": "BrawnBroth",
+    "category": "Charm",
+    "keywords": [],
+    "deckCount": 8,
+    "desc": "Add 5 Muscle tiles into random columns in the board."
+  },
+
   "ShuffleGem": {
     "title": "Shuffle Gem",
     "category": "Charm",
@@ -51,25 +71,57 @@
     "deckCount": 6,
     "desc": "Perform two swaps."
   },
-
   "Molotov": {
     "category": "Charm",
-    "keywords": [],
+    "keywords": ["Tile Area Target"],
     "deckCount": 3,
-    "desc": "Deal 30 damage to your opponent and inflict Burning on all tiles in a small area. Discard 1 random hex."
+    "cost": 2,
+    "desc": "Deal 40 damage to your opponent. Inflict Burning on all tiles in a small area. Discard 1 random hex."
   },
-  "FiveAlarmBell": {
-    "title": "Five-Alarm Bell",
+  "Leeches": {
+    "title": "Leeches!",
     "category": "Charm",
-    "keywords": ["Drag Target"],
-    "deckCount": 2,
-    "desc": "Locked: Charm: Drag target 5 tiles and inflict them with Burning and deal 50 damage. Key: Inflict Burning on 8 or more tiles this turn."
+    "keywords": ["Buff"],
+    "deckCount": 3,
+    "cost": 3,
+    "desc": "Gain a buff that heals you for 30% of all damage you deal. Lasts 1 turn."
   },
-  "Brushfire": {
+  "ProteinPills": {
+    "title": "Protein Pills",
+    "category": "Charm",
+    "keywords": ["Duplicate", "Buff"],
+    "deckCount": 4,
+    "desc": "Gain a stacking buff that increases the damage you deal and reduces the damage you take by 20%. Lasts 2 turns"
+  },
+  "RollingBone": {
+    "title": "Rolling Bone",
+    "category": "Charm",
+    "keywords": ["Discard", "Draw"],
+    "deckCount": 2,
+    "cost": 3,
+    "desc": "Discard your hand and draw that many hexes."
+  },
+  "ComebackBrace": {
+    "title": "Comeback Brace",
+    "category": "Charm",
+    "keywords": ["Buff"],
+    "deckCount": 1,
+    "cost": 3,
+    "desc": "Gain a buff that makes you invulnerable to damage. Lasts 2 turns."
+  },
+  "EvilDoll": {
+    "title": "Evil Doll",
     "category": "Tile",
-    "keywords": ["Quickdraw"],
-    "deckCount": 8,
-    "desc": "Basic Fire tile with Quickdraw."
+    "keywords": [],
+    "deckCount": 2,
+    "cost": 3,
+    "desc": "Persist: Deal damage to the opponent equal to the amount of health you healed this turn."
+  },
+  "Lifestealer": {
+    "category": "Tile",
+    "keywords": ["Buff"],
+    "deckCount": 2,
+    "cost": 3,
+    "desc": "Persist: Deal 20 damage. Heal 20 health. Gain a stacking buff that increases the damage you deal and reduces the damage you take by 10%. The buff lasts 5 turns."
   }
-
 }

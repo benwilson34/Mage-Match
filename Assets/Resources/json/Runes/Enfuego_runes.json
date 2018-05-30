@@ -1,9 +1,17 @@
 {
+  "LighterFluid": {
+    "title": "Lighter Fluid",
+    "category": "Charm",
+    "keywords": ["Discard"],
+    "deckCount": 3,
+    "cost": 2,
+    "desc": "Discard every hex in your hand. Deal 30 damage for each hex discarded."
+  },
   "DanceShoes": {
     "title": "Dance Shoes",
     "category": "Charm",
     "keywords": ["Swap Prompt"],
-    "deckCount": 5,
+    "deckCount": 6,
     "desc": "Perform a swap. Inflict Burning on both tiles swapped."
   },
   "BurningBracers": {
@@ -11,6 +19,14 @@
     "category": "Charm",
     "keywords": [],
     "deckCount": 4,
-    "desc": "Gain 1 AP. Has Quickdraw if more than 9 tiles are burning."
+    "desc": "Gain 1 AP and deal 30 damage. Has Quickdraw if more than 9 tiles are burning."
+  },
+  "CausticCastanet": {
+    "title": "Caustic Castanet",
+    "category": "Tile",
+    "keywords": [],
+    "deckCount": 3,
+    "cost": 2,
+    "desc": "Persist: Destory an adjacent burning tile to gain 2 AP next turn."
   }
 }

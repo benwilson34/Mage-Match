@@ -148,12 +148,12 @@ public class EventController {
 
 
     #region GameAction events
-    public delegate void GameActionEvent(int id, bool costsAP);
+    public delegate void GameActionEvent(int id, int cost);
     public event GameActionEvent gameAction;
-    public void GameAction(bool costsAP) {
+    public void GameAction(int cost) {
         //Debug.MMLog.Log_EventCont("EVENTCONTROLLER: GameAction called.");
         if (gameAction != null)
-            gameAction.Invoke(_mm.ActiveP().id, costsAP);
+            gameAction.Invoke(_mm.ActiveP().id, cost);
     }
 
     public delegate IEnumerator DrawEvent(int id, string tag, bool playerAction, bool dealt);
