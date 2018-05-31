@@ -18,7 +18,7 @@ public class UIController : MonoBehaviour {
     public ResultScreen resultsScreen;
 
     public GameObject alertbar, quickdrawButton, loadingText, loadingScreen;
-    public GameObject gameStartScreen, coinFlip, knockoutScreen; 
+    public GameObject gameStartScreen, coinFlip, knockoutScreen, errorButton; 
 
     private MageMatch _mm;
     private Transform _leftPinfo, _rightPinfo, _leftPspells, _rightPspells, _board;
@@ -45,6 +45,8 @@ public class UIController : MonoBehaviour {
     private const float ALERT_DELAY = 3f;
     private float _alertbarOffset;
     private bool _alertShowing = false;
+
+    private Reporter reporter;
 
     #region ---------- INIT ----------
 
@@ -138,6 +140,7 @@ public class UIController : MonoBehaviour {
         _mm.AddEventContLoadEvent(OnEventContLoaded);
         _mm.AddPlayersLoadEvent(OnPlayersLoaded);
 
+        errorButton.SetActive(false);
         Application.logMessageReceived += Debug_OnError;
     }
 
@@ -797,7 +800,7 @@ public class UIController : MonoBehaviour {
 
     public void Debug_OnError(string logString, string stackTrace, LogType type) {
         if (type == LogType.Error)
-            newsfeed.ShowErrorButton();
+            errorButton.SetActive(true);
     }
 
     public void Debug_OnErrorClick() {

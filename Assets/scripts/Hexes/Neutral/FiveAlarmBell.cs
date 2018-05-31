@@ -9,7 +9,7 @@ public class FiveAlarmBell : Charm {
     public override IEnumerator DropEffect() {
         yield return _mm.targeting.WaitForDragTarget(5);
 
-        _mm.audioCont.Trigger(AudioController.Rune_NeutralSFX.FiveAlarmBell);
+        AudioController.Trigger(AudioController.Rune_NeutralSFX.FiveAlarmBell);
 
         int id = PlayerId;
         foreach (var tb in _mm.targeting.GetTargetTBs()) {

@@ -14,13 +14,13 @@ public class AudioController {
     public enum Rune_GravekeeperSFX { HRForm, PartySnacks }
     public enum Rune_ValeriaSFX { Bandages, WaterLily }
 
-    public enum OtherSoundEffect { BackgroundMusic, GameStart, GameEnd, APGain, LowHealthWarning, FullMeter, TurnTimerWarning, TurnTimeout, UIButton, ChooseTarget, CrowdGasp };
+    public enum OtherSoundEffect { BackgroundMusic, GameStart, GameEnd, APGain, LowHealthWarning, FullMeter, TurnTimerWarning, TurnTimeout, UIButton, ChooseTarget, Quickdraw_Prompt, Quickdraw_Drop, CrowdGasp };
 
-    private MageMatch _mm;
-    private Dictionary<System.Enum, string> _clips;
+    private static MageMatch _mm;
+    private static Dictionary<System.Enum, string> _clips;
 
-    public AudioController(MageMatch mm) {
-        this._mm = mm;
+    public static void Init(MageMatch mm) {
+        _mm = mm;
 
         float masterVolume = UserData.MasterVolume;
         MMLog.Log_AudioCont("Volume = " + masterVolume);
@@ -113,6 +113,7 @@ public class AudioController {
 
         _clips.Add(OtherSoundEffect.APGain, "event:/Other/APGain");
         _clips.Add(OtherSoundEffect.LowHealthWarning, "event:/Other/LowHealthWarning");
+        //_clips.Add(OtherSoundEffect.CrowdGasp, "event:/Other/CrowdGasp");
         _clips.Add(OtherSoundEffect.FullMeter, "event:/Other/FullMeter");
 
         _clips.Add(OtherSoundEffect.TurnTimerWarning, "event:/Other/TurnTimerWarning");
@@ -122,36 +123,44 @@ public class AudioController {
         _clips.Add(OtherSoundEffect.ChooseTarget, "event:/Other/ChooseTarget");
 
 
+        _clips.Add(OtherSoundEffect.Quickdraw_Prompt, "event:/Other/Quickdraw_Prompt");
+        _clips.Add(OtherSoundEffect.Quickdraw_Drop, "event:/Other/Quickdraw_Drop");
+
+
         // TODO trigger bg music before the rest of the match finishes loading
         Trigger(OtherSoundEffect.BackgroundMusic);
         Trigger(OtherSoundEffect.GameStart);
         _mm.AddEventContLoadEvent(OnEventContLoaded);
     }
 
-    public void OnEventContLoaded() {
+    public static void OnEventContLoaded() {
         _mm.eventCont.playerHealthChange += LowHealthWarning;
         _mm.eventCont.timeout += TurnTimeout;
     }
 
-    public void LowHealthWarning(int id, int amount, int newHealth, bool dealt) {
+    public static void LowHealthWarning(int id, int amount, int newHealth, bool dealt) {
         if (amount < 0 &&
                 newHealth + (-amount) >= Character.HEALTH_WARNING_AMT &&
                 newHealth < Character.HEALTH_WARNING_AMT) {
             Trigger(OtherSoundEffect.LowHealthWarning);
-            Trigger(OtherSoundEffect.CrowdGasp);
+            //Trigger(OtherSoundEffect.CrowdGasp);
         }
     }
 
-    public void TurnTimeout(int id) {
+    public static void TurnTimeout(int id) {
         Trigger(OtherSoundEffect.TurnTimeout);
     }
 
-    public void Trigger(System.Enum sound) {
+    public static void Trigger(System.Enum sound) {
         if (_mm.IsReplayMode() && !_mm.debugSettings.animateReplay) // should be shell method
             return;
 
-        string clip = _clips[sound];
+        if (!_clips.ContainsKey(sound)) {
+            MMLog.LogError("AUDIOCONT: Couldn't trigger " + sound.ToString() + " because it wasn't found in the dictionary!");
+            return;
+        }
 
+        string clip = _clips[sound];
         FMODUnity.RuntimeManager.PlayOneShot(clip);
     }
 }

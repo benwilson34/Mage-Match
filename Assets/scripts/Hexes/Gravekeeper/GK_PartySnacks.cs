@@ -11,7 +11,7 @@ public class GK_PartySnacks : Charm {
         if (tbs.Count != 1)
             yield break; // whiff
 
-        _mm.audioCont.Trigger(AudioController.Rune_GravekeeperSFX.PartySnacks);
+        AudioController.Trigger(AudioController.Rune_GravekeeperSFX.PartySnacks);
 
         var tb = tbs[0];
         var adjTBs = _mm.hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);

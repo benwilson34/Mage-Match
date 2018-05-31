@@ -15,7 +15,7 @@ public class EM_DanceShoes : Charm {
                 yield return _mm.hexFX.Ench_SetBurning(PlayerId, tbs[i]);
         }
 
-        _mm.audioCont.Trigger(AudioController.Rune_EnfuegoSFX.DanceShoes);
+        AudioController.Trigger(AudioController.Rune_EnfuegoSFX.DanceShoes);
         yield return _mm.prompt.ContinueSwap();
     }
 }

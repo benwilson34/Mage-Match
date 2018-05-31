@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Leeches : Charm {
     public override IEnumerator DropEffect() {
-        _mm.audioCont.Trigger(AudioController.Rune_NeutralSFX.Leeches);
+        AudioController.Trigger(AudioController.Rune_NeutralSFX.Leeches);
 
         _mm.eventCont.playerHealthChange += Leeches_Buff;
         TurnEffect turn = new TurnEffect(PlayerId, Effect.Type.Healing, null, Leeches_End, 1);

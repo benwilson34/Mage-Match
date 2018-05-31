@@ -18,7 +18,7 @@ public class EM_BurningBracers : Charm {
         _mm.GetPlayer(PlayerId).IncreaseAP();
         const int dmg = 30;
         ThisCharacter().DealDamage(dmg);
-        _mm.audioCont.Trigger(AudioController.Rune_EnfuegoSFX.BurningBracers);
+        AudioController.Trigger(AudioController.Rune_EnfuegoSFX.BurningBracers);
         yield return null;
     }
 }

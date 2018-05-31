@@ -249,8 +249,10 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
                 tb.ResolveEnchantment();
             }
             tb.ClearEnchantment(); // TODO
-            tb.ClearTileEffects(); //?
         }
+
+        tb.ClearTileEffects(); // remove any tile effects
+
         _hexGrid.ClearTileBehavAt(tb.tile.col, tb.tile.row); // move up?
 
         if (isInvoked)

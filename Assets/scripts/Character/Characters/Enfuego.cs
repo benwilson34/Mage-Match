@@ -72,7 +72,7 @@ public class Enfuego : Character {
 
     // Fiery Fandango
     protected override IEnumerator CoreSpell(TileSeq seq) {
-        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.FieryFandango);
+        AudioController.Trigger(AudioController.EnfuegoSFX.FieryFandango);
 
         int burnNum = 2, dmg = 30;
         switch (seq.GetSeqLength()) {
@@ -111,7 +111,7 @@ public class Enfuego : Character {
 
     // Baila!
     protected override IEnumerator Spell1(TileSeq prereq) {
-        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.Baila);
+        AudioController.Trigger(AudioController.EnfuegoSFX.Baila);
 
         yield return ThisPlayer().DrawHexes(2, false, false); // my draw
         yield return _mm.GetOpponent(_playerId).DrawHexes(2, false, false); // their draw
@@ -125,7 +125,7 @@ public class Enfuego : Character {
     protected override IEnumerator Spell2(TileSeq prereq) {
         yield return _targeting.WaitForDragTarget(6, Inc_Filter);
 
-        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.Incinerate);
+        AudioController.Trigger(AudioController.EnfuegoSFX.Incinerate);
 
         List<TileBehav> tbs = _targeting.GetTargetTBs();
         int dmg = tbs.Count * 35;
@@ -204,7 +204,7 @@ public class Enfuego : Character {
             }
 
             _mm.hexMan.RemoveTile(tb.tile, true);
-            _mm.audioCont.Trigger(AudioController.EnfuegoSFX.WHCK);
+            AudioController.Trigger(AudioController.EnfuegoSFX.WHCK);
 
             yield return _mm.animCont.WaitForSeconds(.4f);
         }

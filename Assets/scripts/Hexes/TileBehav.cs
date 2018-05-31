@@ -22,7 +22,6 @@ public class TileBehav : Hex {
         _tileEffects = new List<TileEffect>(); // move to Init?
         tile = new Tile(initElements);
         currentState = State.Hand;
-
     }
 
 

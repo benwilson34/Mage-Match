@@ -106,7 +106,7 @@ public class TooltipManager : MonoBehaviour {
 
     public void HideOrCancelTooltip() {
         //MMDebug.MMLog.Log("TooltipMan", "orange", ">>>Hiding/canceling the tooltip<<<");
-        if (_obj != null) {
+        if (_currentTT != null) {
             if (_tooltipShowing) {
                 _tooltipShowing = false;
                 // animate out?

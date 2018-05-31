@@ -26,11 +26,11 @@ public class TombstoneTile : TileBehav {
         TileBehav tb = _mm.hexMan.GenerateBasicTile(id, elem);
         yield return _mm.hexFX.Ench_SetZombie(id, tb);
         _mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
-        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.SigEffect);
+        AudioController.Trigger(AudioController.GravekeeperSFX.SigEffect);
     }
 
     public IEnumerator Tombstone_OnEffectRemove(int id) {
         yield return _mm.hexMan._RemoveTile(this, false); // remove itself
-        _mm.audioCont.Trigger(AudioController.GravekeeperSFX.SigBell2);
+        AudioController.Trigger(AudioController.GravekeeperSFX.SigBell2);
     }
 }

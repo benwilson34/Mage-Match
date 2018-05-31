@@ -87,7 +87,7 @@ public class ObjectEffects {
 
     public IEnumerator Ench_SetBurning(int id, TileBehav tb) {
         yield return _mm.animCont._Burning(tb);
-        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.BurningEnchant);
+        AudioController.Trigger(AudioController.EnfuegoSFX.BurningEnchant);
 
         Enchantment ench = new Enchantment(id, 5, Enchantment.Type.Burning, Effect.Type.Damage, Ench_Burning_TEffect, Ench_Burning_End);
         ench.TriggerEffectEveryTurn();
@@ -99,13 +99,13 @@ public class ObjectEffects {
     IEnumerator Ench_Burning_TEffect(int id, TileBehav tb) {
         MMLog.Log_EnchantFx("Burning TurnEffect at " + tb.PrintCoord());
         yield return _mm.animCont._Burning_Turn(_mm.GetOpponent(id), tb);
-        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.BurningDamage);
+        AudioController.Trigger(AudioController.EnfuegoSFX.BurningDamage);
         _mm.GetPC(id).DealDamage(3);
         //yield return null; // for now
     }
     IEnumerator Ench_Burning_End(int id, TileBehav tb) {
         _mm.GetPC(id).DealDamage(6);
-        _mm.audioCont.Trigger(AudioController.EnfuegoSFX.BurningTimeout);
+        AudioController.Trigger(AudioController.EnfuegoSFX.BurningTimeout);
         yield return null; // for now
     }
 
@@ -129,7 +129,7 @@ public class ObjectEffects {
     public IEnumerator Ench_SetZombie(int id, TileBehav tb, bool anim = true) {
         if (anim) {
             yield return _mm.animCont._Zombify(tb);
-            _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieEnchant);
+            AudioController.Trigger(AudioController.GravekeeperSFX.ZombieEnchant);
         }
 
         Enchantment ench = new Enchantment(id, Enchantment.Type.Zombie, Effect.Type.Enchant, Ench_Zombie_Trigger, null);
@@ -163,13 +163,13 @@ public class ObjectEffects {
 
         if (selectTB.tile.IsElement(Tile.Element.Muscle)) {
             yield return _hexMan._RemoveTile(selectTB, true); // maybe?
-            _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieGulp);
+            AudioController.Trigger(AudioController.GravekeeperSFX.ZombieGulp);
 
             _mm.GetPC(id).DealDamage(10);
             _mm.GetPC(id).Heal(10);
         } else {
             yield return Ench_SetZombie(id, selectTB, false);
-            _mm.audioCont.Trigger(AudioController.GravekeeperSFX.ZombieAttack);
+            AudioController.Trigger(AudioController.GravekeeperSFX.ZombieAttack);
         }
 
         yield return _mm.animCont._Zombify_Back(tb.transform); // anim 2

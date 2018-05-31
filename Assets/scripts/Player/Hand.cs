@@ -62,7 +62,7 @@ public class Hand {
                 slot.SetHex(hex);
                 hex.transform.position = slot.transform.position;
                 _mm.animCont.PlayAnim(_mm.animCont._Draw(hex));
-                _mm.audioCont.Trigger(AudioController.HexSFX.Draw);
+                AudioController.Trigger(AudioController.HexSFX.Draw);
                 MMLog.Log("HAND", "black", "Added hex with tag " + hex.hextag);
                 break;
             }
@@ -106,6 +106,11 @@ public class Hand {
 
     public List<Hex> GetAllHexes() { return _hexes; }
 
+    public void FlipAllHexes(bool flipped) {
+        foreach (var hex in _hexes)
+            hex.Flip(flipped);
+    }
+
     #region ----- Discard -----
     public void Discard(Hex hex) {
         _mm.StartCoroutine(_Discard(hex));
@@ -114,7 +119,7 @@ public class Hand {
     public IEnumerator _Discard(Hex hex) {
         yield return _mm.eventCont.Discard(_p.id, hex.hextag);
 
-        _mm.audioCont.Trigger(AudioController.HexSFX.Discard);
+        AudioController.Trigger(AudioController.HexSFX.Discard);
         Remove(hex);
         yield return _mm.animCont._DiscardTile(hex.transform);
         GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan
@@ -200,7 +205,7 @@ public class Hand {
                 slot.SetHex(_placeholder);
                 _placeholderSlot = slot;
 
-                _mm.audioCont.Trigger(AudioController.HexSFX.Pickup);
+                AudioController.Trigger(AudioController.HexSFX.Pickup);
                 break;
             }
         }
@@ -256,7 +261,7 @@ public class Hand {
             _placeholderSlot.ClearHex();
         _placeholderSlot = newSlot;
 
-        //_mm.audioCont.Trigger(AudioController.HexSoundEffect.Pickup);
+        //AudioController.Trigger(AudioController.HexSoundEffect.Pickup);
 
         //MMDebug.MMLog.Log("HAND", "black", "After:");
         //NumFullSlots();
@@ -270,7 +275,7 @@ public class Hand {
         _placeholderSlot.SetHex(hex);
         ClearPlaceholder();
 
-        _mm.audioCont.Trigger(AudioController.HexSFX.Pickup);
+        AudioController.Trigger(AudioController.HexSFX.Pickup);
 
         //NumFullSlots();
     }

@@ -72,7 +72,7 @@ public class Player {
 
     public void IncreaseAP(int amount = 1) {
         ChangeAP(amount);
-        _mm.audioCont.Trigger(AudioController.OtherSoundEffect.APGain);
+        AudioController.Trigger(AudioController.OtherSoundEffect.APGain);
     }
 
     public void DecreaseAP(int amount = 1) {

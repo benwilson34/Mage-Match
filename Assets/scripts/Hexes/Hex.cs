@@ -26,6 +26,7 @@ public class Hex : MonoBehaviour, Tooltipable {
 
     public virtual void Init(MageMatch mm) {
         _mm = mm;
+        _flipSprite = _mm.hexMan.flipSprite;
     }
 
     public Character ThisCharacter() {
@@ -80,18 +81,25 @@ public class Hex : MonoBehaviour, Tooltipable {
 
 
     public void Flip() {
+        Flip(!_flipped);
+    }
+
+    public void Flip(bool flipped) {
+        if (_flipped == flipped)
+            return;
+
+        _flipped = flipped;
         SpriteRenderer rend = GetComponent<SpriteRenderer>();
 
-        Sprite newSprite;
-        if (!_flipped) {
-            newSprite = _mm.hexMan.flipSprite;
-        } else {
-            newSprite = _flipSprite;
-        }
+        Sprite newSprite = _flipSprite;
+        //if (!_flipped) {
+        //    newSprite = _mm.hexMan.flipSprite;
+        //} else {
+        //    newSprite = _flipSprite;
+        //}
 
         _flipSprite = rend.sprite;
         rend.sprite = newSprite;
-        _flipped = !_flipped;
     }
 
     public void Reveal() {

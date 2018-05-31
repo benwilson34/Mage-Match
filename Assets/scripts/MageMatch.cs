@@ -29,7 +29,7 @@ public class MageMatch : MonoBehaviour {
     public Prompt prompt;
     public EffectController effectCont;
     public EventController eventCont;
-    public AudioController audioCont;
+    //public AudioController audioCont;
     public AnimationController animCont;
     public UIController uiCont;
     public Stats stats;
@@ -105,7 +105,7 @@ public class MageMatch : MonoBehaviour {
         
         targeting = new Targeting(this);
         prompt = new Prompt(this);
-        audioCont = new AudioController(this);
+        AudioController.Init(this);
         animCont = GetComponent<AnimationController>();
         animCont.Init(this);
 
@@ -151,7 +151,6 @@ public class MageMatch : MonoBehaviour {
 
 
 
-        // TODO animate beginning of game
         //yield return new WaitForSeconds(5);
         yield return uiCont.AnimateBeginningOfGame();
 
@@ -178,6 +177,9 @@ public class MageMatch : MonoBehaviour {
 
         yield return eventCont.TurnBegin(); // is this ok?
         yield return _activep.OnTurnBegin();
+
+        if (IsDebugMode())
+            _activep.IncreaseAP(6);
 
         if (IsReplayMode()) {
             uiCont.ToggleLoadingText(true);
@@ -588,7 +590,7 @@ public class MageMatch : MonoBehaviour {
 
         TileBehav tb1 = hexGrid.GetTileBehavAt(c1, r1);
         TileBehav tb2 = hexGrid.GetTileBehavAt(c2, r2);
-        audioCont.Trigger(AudioController.HexSFX.Swap);
+        AudioController.Trigger(AudioController.HexSFX.Swap);
 
         hexGrid.Swap(c1, r1, c2, r2);
         tb1.ChangePos(c2, r2);
@@ -753,7 +755,7 @@ public class MageMatch : MonoBehaviour {
     public void EndTheGame(int losingPlayerId) {
         _endGame = true;
         timer.Pause();
-        audioCont.Trigger(AudioController.OtherSoundEffect.GameEnd);
+        AudioController.Trigger(AudioController.OtherSoundEffect.GameEnd);
         EnterState(State.EndOfGame);
         uiCont.TriggerEndOfMatchScreens(losingPlayerId);
 

@@ -135,7 +135,7 @@ public abstract class Character {
         _mm.eventCont.PlayerMeterChange(_playerId, amount, _meter);
 
         if (!playedFullMeterSound && _meter == METER_MAX) {
-            _mm.audioCont.Trigger(AudioController.OtherSoundEffect.FullMeter);
+            AudioController.Trigger(AudioController.OtherSoundEffect.FullMeter);
             playedFullMeterSound = true;
         }
     }

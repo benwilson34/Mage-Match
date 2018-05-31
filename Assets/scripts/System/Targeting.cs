@@ -107,7 +107,7 @@ public class Targeting {
         // TODO if targetable
 
         _mm.syncManager.SendTBTarget(tb);
-        _mm.audioCont.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
+        AudioController.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
 
         _mm.stats.Report("$ TARGET TILE " + tb.PrintCoord(), false);
 
@@ -215,7 +215,7 @@ public class Targeting {
         // TODO if targetable
 
         _mm.syncManager.SendCBTarget(cb);
-        _mm.audioCont.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
+        AudioController.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
 
         _mm.stats.Report("$ TARGET CELL " + cb.PrintCoord(), false);
 
@@ -229,6 +229,8 @@ public class Targeting {
         //targetingCanceled = false;
         Player p = _mm.ActiveP();
         _mm.EnterState(MageMatch.State.Targeting);
+        if (_mm.MyTurn())
+            p.hand.FlipAllHexes(true);
 
         _mm.uiCont.ShowAlertText(p.name + ", choose " + _targetsLeft + " more targets.");
 
@@ -256,7 +258,8 @@ public class Targeting {
 
         currentTMode = TargetMode.Tile; // needed?
         //targetTBs = null?
-
+        if (_mm.MyTurn())
+            p.hand.FlipAllHexes(false);
         _mm.ExitState();
     }
 
@@ -305,6 +308,8 @@ public class Targeting {
         selections = new List<TileSeq>(seqs);
 
         _mm.EnterState(MageMatch.State.Selecting);
+        if (_mm.MyTurn())
+            _mm.ActiveP().hand.FlipAllHexes(true);
 
         MMLog.Log_Targeting("seqs=" + _mm.boardCheck.PrintSeqList(seqs));
         _mm.uiCont.ShowSpellSeqs(selections);
@@ -320,6 +325,8 @@ public class Targeting {
         }
 
         _mm.uiCont.HideSpellSeqs();
+        if (_mm.MyTurn())
+            _mm.ActiveP().hand.FlipAllHexes(false);
         currentTMode = TargetMode.Tile;
         _mm.GetComponent<InputController>().InvalidateClick(); // i don't like this 
 

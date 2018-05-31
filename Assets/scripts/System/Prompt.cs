@@ -127,6 +127,7 @@ public class Prompt {
         _mm.uiCont.ToggleQuickdrawUI(true, hex);
 
         _mm.uiCont.ShowLocalAlertText(p.id, "Choose what to do with the Quickdraw hex!");
+        AudioController.Trigger(AudioController.OtherSoundEffect.Quickdraw_Prompt);
         _quickdrawWentToHand = false;
         currentMode = PromptMode.Drop;
 
@@ -160,7 +161,7 @@ public class Prompt {
         }
 
         if (!_quickdrawWentToHand) { // the player dropped it
-            // TODO sound fx
+            AudioController.Trigger(AudioController.OtherSoundEffect.Quickdraw_Drop);
             p.hand.Remove(hex);
             yield return _mm._Drop(hex, _dropCol);
             yield return _mm._Draw(p.id);
@@ -198,13 +199,18 @@ public class Prompt {
 
         _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", swap two adjacent tiles!");
         currentMode = PromptMode.Swap;
+        if (_mm.MyTurn())
+            _mm.ActiveP().hand.FlipAllHexes(true);
 
         if (_mm.IsReplayMode())
             _mm.replay.GetPrompt();
 
-        _mm.inputCont.SetAllowHandDragging(false);
+        _mm.inputCont.SetAllowHandDragging(false); // might not be needed now
         yield return new WaitUntil(() => currentMode == PromptMode.None);
-        _mm.inputCont.SetAllowHandDragging(true);
+        _mm.inputCont.SetAllowHandDragging(true); // might not be needed now
+
+        if (_mm.MyTurn())
+            _mm.ActiveP().hand.FlipAllHexes(false);
     }
 
     // if needed elsewhere, move to HexGrid

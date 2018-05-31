@@ -10,7 +10,7 @@ public class ProteinPills : Charm {
     }
 
     public override IEnumerator DropEffect() {
-        _mm.audioCont.Trigger(AudioController.Rune_NeutralSFX.ProteinPills);
+        AudioController.Trigger(AudioController.Rune_NeutralSFX.ProteinPills);
 
         HealthModEffect buffDealing = new HealthModEffect(PlayerId, PP_BuffDeal, false, true, 2);
         _mm.effectCont.AddHealthEffect(buffDealing, "PPdea");

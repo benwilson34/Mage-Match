@@ -17,7 +17,6 @@ public class Newsfeed : MonoBehaviour {
     private bool _isFirstAction = true;
 
     private GameObject _lastActionLog;
-    private GameObject _errorButton;
 
 	// Use this for initialization
 	void Start () {
@@ -34,9 +33,6 @@ public class Newsfeed : MonoBehaviour {
         UpdateTurnCount(1);
         _newsText = transform.Find("t_news").GetComponent<Text>();
         UpdateNewsfeed("Begin match!!");
-
-        _errorButton = transform.Find("i_error").gameObject;
-        _errorButton.SetActive(false);
 
         newsfeedMenu.SetActive(false);
 	}
@@ -107,9 +103,5 @@ public class Newsfeed : MonoBehaviour {
     }
 
     public bool isMenuOpen() { return newsfeedMenu.GetActive(); }
-
-    public void ShowErrorButton() {
-        _errorButton.SetActive(true);
-    }
 
 }
