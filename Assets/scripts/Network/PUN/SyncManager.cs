@@ -323,7 +323,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleDropSelection(string tag, int col) {
-        _mm.prompt.SetDrop(_mm.ActiveP().hand.GetHex(tag), col);
+        Prompt.SetDrop(_mm.ActiveP().hand.GetHex(tag), col);
     }
 
     public void SendSwapSelection(int c1, int r1, int c2, int r2) {
@@ -337,7 +337,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleSwapSelection(int c1, int r1, int c2, int r2) {
-        _mm.prompt.SetSwaps(c1, r1, c2, r2);
+        Prompt.SetSwaps(c1, r1, c2, r2);
     }
 
     public void SendKeepQuickdraw() {
@@ -351,6 +351,6 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleKeepQuickdraw() {
-        _mm.prompt.SetQuickdrawHand();
+        Prompt.SetQuickdrawHand();
     }
 }

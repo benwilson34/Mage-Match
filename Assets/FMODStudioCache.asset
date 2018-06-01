@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EditorBanks:
   - {fileID: 114388793628060022}
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   EditorEvents:
   - {fileID: 114153060767871656}
   - {fileID: 114380453476600182}
@@ -78,9 +78,9 @@ MonoBehaviour:
   - {fileID: 114411832437052186}
   - {fileID: 114360331396520586}
   - {fileID: 114294485541858522}
-  MasterBankRef: {fileID: 114145786545763710}
+  MasterBankRef: {fileID: 114291352351906936}
   StringsBankRef: {fileID: 114388793628060022}
-  stringsBankWriteTime: 636633821022209871
+  stringsBankWriteTime: 636632837606943705
   cacheVersion: 2
 --- !u!114 &114000556981307052
 MonoBehaviour:
@@ -314,7 +314,7 @@ MonoBehaviour:
   Path: event:/Runes/Valeria/WaterLily
   guid: 19706876098d4d4da3d782454abd93b4
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -336,7 +336,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Enfuego/Incinerate
   guid: 84405274200cbd4a8cc6ab8da7497361
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -599,7 +599,7 @@ MonoBehaviour:
   Path: event:/Runes/Enfuego/DanceShoes
   guid: dc04e72fe01fc4429191ab88b7a05f86
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -621,7 +621,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/Healing
   guid: ae74a4872e27394e90e1a7d13c3b855a
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1015,7 +1015,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/RainDance
   guid: a201396da72def4aac3215780d816dd7
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1256,7 +1256,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/Rain
   guid: 28fc429053a672408439276ba4d99b78
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1278,7 +1278,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Enfuego/Burning_Timeout
   guid: 0729318e8e60174686a5980fa4b35914
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1344,7 +1344,7 @@ MonoBehaviour:
   Path: event:/Other/LowHealthWarning
   guid: fc05386de2c78e44ae8d2d4b54a98d94
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1366,7 +1366,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/Zombie_Enchant
   guid: 82d2667f0f3bae42ac45e2954660b89a
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1447,7 +1447,7 @@ MonoBehaviour:
   Path: event:/Hexes/Hex_Pickup
   guid: 0063661687606843b160fbdb96cdcfb4
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1469,7 +1469,7 @@ MonoBehaviour:
   Path: event:/Hexes/Tile_Swap
   guid: 49e37de9ec3b6e47a72bcd0542fdffc3
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1578,7 +1578,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/Zombie_Gulp
   guid: 925f4fc4445fab4ebcf8fdc3983fd70d
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1798,7 +1798,7 @@ MonoBehaviour:
   Path: event:/Runes/Neutral/Leeches
   guid: d45d48cb1032d34aa7fbd0afbb63e5fb
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1842,7 +1842,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/PartyInTheBack
   guid: bb451b1e7a15db4fb0f01e7121e0adb3
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2032,7 +2032,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Enfuego/FieryFandango
   guid: 02b16056c48b2e43b400c7545e86cfca
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2186,7 +2186,7 @@ MonoBehaviour:
   Path: event:/Other/ChooseTarget
   guid: 4487018c7bc08440b284a4d2f140b30b
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2760,6 +2760,25 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 6113
+--- !u!114 &114291352351906936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: C:\Users\Ben\Documents\Unity projects\Mage-Match\FMOD Mage Match Test\Build\Desktop\Master
+    Bank.bank
+  lastModified: 636632837606933704
+  LoadResult: 0
+  FileSizes:
+  - Name: Desktop
+    Value: 21872224
+  Exists: 1
 --- !u!114 &114294485541858522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2774,7 +2793,7 @@ MonoBehaviour:
   Path: event:/Other/Quickdraw_Prompt
   guid: f05c12f1b723d3419380a636ab106eca
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2968,7 +2987,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/Bubbles1
   guid: 04b439147aade1459bca2eb2da0d48b6
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3317,7 +3336,7 @@ MonoBehaviour:
   Path: event:/Other/Quickdraw_Drop
   guid: 4bede200b262af4fb189b126f360a5a0
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3534,7 +3553,7 @@ MonoBehaviour:
   Path: event:/Test
   guid: c64f6e2892dc254497577d7918daf496
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3578,7 +3597,7 @@ MonoBehaviour:
   Path: event:/Hexes/Hex_Draw
   guid: 040fd24e0e696e4097a3f27da98f0c2c
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3644,7 +3663,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Enfuego/Burning_Enchant
   guid: cbd98be78291ef49823ee0382a3ebc0b
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3686,7 +3705,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Path: FMOD Mage Match Test\Build\Desktop\Master Bank.strings.bank
-  lastModified: 636633821022209871
+  lastModified: 636632837606943705
   LoadResult: 0
   FileSizes:
   - Name: Desktop
@@ -3706,7 +3725,7 @@ MonoBehaviour:
   Path: event:/Other/APGain
   guid: e51c101d18e1054eaccaf967168aba55
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3878,7 +3897,7 @@ MonoBehaviour:
   Path: event:/Other/GameStart
   guid: a9fa5e0fa57ff24a866af51e75f8f9f1
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3922,7 +3941,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/ThunderClose
   guid: fd4ce72544aa38419f917409b23a5727
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -3944,7 +3963,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Enfuego/Sig_WHCK
   guid: 63dd287d595e4c48a3b938ff971118aa
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -4053,7 +4072,7 @@ MonoBehaviour:
   Path: event:/Runes/Neutral/ShuffleGem
   guid: fe94289f184ff847a90138644887c391
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -4163,7 +4182,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Enfuego/Baila
   guid: bbe4894d4e37424eadb7344dac64008a
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -4382,7 +4401,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/Mariposa
   guid: d769d785eb5f9742a1049d7486cf7fa3
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -4601,7 +4620,7 @@ MonoBehaviour:
   Path: event:/Other/UIButton
   guid: 5e30621db214a744be412d0cbc9d7470
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -4623,7 +4642,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/Zombie_Attack
   guid: a6f9fdcbae0f714a966ef26327f9d801
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -4925,7 +4944,7 @@ MonoBehaviour:
   Path: event:/Runes/Neutral/Molotov
   guid: cfbbb84ff2c99246a39b1d28e540c602
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5100,7 +5119,7 @@ MonoBehaviour:
   Path: event:/Runes/Gravekeeper/HRForm
   guid: 8feaa5dd5d683d4fbb8c627bde290238
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5166,14 +5185,14 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/Balanco
   guid: 52abb3e08b8b904a9b9044a08f6075ce
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
   Parameters: []
   MinDistance: 0
   MaxDistance: 0
-  Length: 2710
+  Length: 0
 --- !u!114 &114530482673946650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5188,7 +5207,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/Sig_WaveCrash
   guid: f5feace79507584ba573a42e2b089b9a
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5210,7 +5229,7 @@ MonoBehaviour:
   Path: event:/Other/FullMeter
   guid: 0d3073025aeffe44a77eab8bbe8a2e4e
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5298,7 +5317,7 @@ MonoBehaviour:
   Path: event:/Hexes/Tile_Grav
   guid: abe77c57fc36b449b0bebde9c483f375
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5386,7 +5405,7 @@ MonoBehaviour:
   Path: event:/Runes/Neutral/SampleCharm
   guid: 2900b3540248c04e95d2e886cafa5c98
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5578,7 +5597,7 @@ MonoBehaviour:
   Path: event:/Other/TurnTimeout
   guid: 6ae050876070d948881be0df4cd1a20b
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5622,7 +5641,7 @@ MonoBehaviour:
   Path: event:/Runes/Neutral/ProteinPills
   guid: 784c40ddfe5a6544a2b26c152d1e1365
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5688,7 +5707,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/Sig_Bell
   guid: 6e11ad78caf02547b5e6c2d8bd374c40
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5773,7 +5792,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/Bubbles2
   guid: 15cbf6f891a6084c9c97df41c456b2c5
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5839,7 +5858,7 @@ MonoBehaviour:
   Path: event:/Other/TurnTimerWarning
   guid: 73108780e3e92b4fbb084722c53dfd0d
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5861,7 +5880,7 @@ MonoBehaviour:
   Path: event:/Runes/Valeria/Bandages
   guid: a52db783fa5e4d43b9dce42baaa92ffd
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5883,7 +5902,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Enfuego/Burning_Damage
   guid: bc1a4b20819e67489264eec0a8c4994c
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -5905,7 +5924,7 @@ MonoBehaviour:
   Path: event:/Hexes/Tile_Invoke
   guid: 4850f2764f26094da1b5af305c969bbe
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -6383,7 +6402,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/SwirlingWater
   guid: 52f6f901543c3a43b51d8c4ba255d4e8
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -6471,7 +6490,7 @@ MonoBehaviour:
   Path: event:/Hexes/Hex_Discard
   guid: e138bce11e040047ad9a93a5b3f26c67
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -6735,7 +6754,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/Sig_Motorcycle
   guid: 066fcd07cd83b14bb8c633caa830437b
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -6823,7 +6842,7 @@ MonoBehaviour:
   Path: event:/Runes/Gravekeeper/PartySnacks
   guid: ceb1c4a433ba57468ce31cb0e42d95f8
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -7174,7 +7193,7 @@ MonoBehaviour:
   Path: event:/Runes/Enfuego/BurningBracers
   guid: 9797409c125e1343839efbe99135d128
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -7566,14 +7585,14 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/UndeadUnion
   guid: 1206537a4fd31943be0d8404a832b3c2
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
   Parameters: []
   MinDistance: 0
   MaxDistance: 0
-  Length: 4490
+  Length: 0
 --- !u!114 &114807919509622548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7808,7 +7827,7 @@ MonoBehaviour:
   Path: event:/Runes/Neutral/FiveAlarmBell
   guid: 879822be4ef6704aa642215431751e88
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -7874,7 +7893,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/Sig_TSEffect
   guid: 1731de0150ac2f40b49a6994cca32077
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -7896,7 +7915,7 @@ MonoBehaviour:
   Path: event:/Other/GameEnd
   guid: a294e30f43e1fe4fb323c82745ddcaf2
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -8138,7 +8157,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/ChurchBell
   guid: f815618c8bee544d9247daa148d9a8d0
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -8247,7 +8266,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/OogieBoogie
   guid: 6b3fef04fa8a804198b098181f5542d6
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -8724,7 +8743,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/Sig_TSDrop
   guid: b97c258aa4d43b45b63ad5824039eb48
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -8746,7 +8765,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/Sig_Cut
   guid: d605940f86c60341973d0deece3bc4f8
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -8768,7 +8787,7 @@ MonoBehaviour:
   Path: event:/Hexes/Tile_Destroy
   guid: 9aa1b98058b61f499b624580d7eddd48
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -8812,7 +8831,7 @@ MonoBehaviour:
   Path: event:/Other/BackgroundMusic
   guid: af26bc02b712ca4ca5927521c855ba26
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 1
   Is3D: 0
   IsOneShot: 0
@@ -8900,7 +8919,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Valeria/ThunderFar
   guid: 88ecc630e8ea0a4cbbb76f7e3911fd1a
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -9097,7 +9116,7 @@ MonoBehaviour:
   Path: event:/CharacterSpells/Gravekeeper/PartyCrashers
   guid: 094af3d4d5837a4186082f1bdde5ea3b
   Banks:
-  - {fileID: 114145786545763710}
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1

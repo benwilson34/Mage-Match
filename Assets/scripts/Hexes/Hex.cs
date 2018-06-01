@@ -41,7 +41,7 @@ public class Hex : MonoBehaviour, Tooltipable {
 
         if (PlayerId == _mm.ActiveP().id) { // if this hex was generated on that player's turn
             if (_quickdraw)
-                yield return _mm.prompt.WaitForQuickdrawAction(this);
+                yield return Prompt.WaitForQuickdrawAction(this);
             if (_duplicate)
                 yield return _mm._Duplicate(PlayerId, hextag);
         }

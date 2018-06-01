@@ -130,18 +130,20 @@ public class Gravekeeper : Character {
     protected override IEnumerator Spell2(TileSeq prereq) {
         AudioController.Trigger(AudioController.GravekeeperSFX.PartyCrashers);
 
-        for (int i = 0; i < 2; i++) {
-            yield return _mm.prompt.WaitForDropTile();
-            if (!_mm.prompt.WasSuccessful())
+        const int dropCount = 2;
+        Prompt.SetDropCount(dropCount);
+        for (int i = 0; i < dropCount; i++) {
+            yield return Prompt.WaitForDropTile();
+            if (!Prompt.WasSuccessful())
                 break;
 
-            TileBehav tb = (TileBehav) _mm.prompt.GetDropHex();
+            TileBehav tb = (TileBehav) Prompt.GetDropHex();
             MMLog.Log_Gravekeeper("Player " + _playerId + " dropped " + tb.hextag);
             yield return _objFX.Ench_SetZombie(_playerId, tb);
-            int col = _mm.prompt.GetDropCol();
+            int col = Prompt.GetDropCol();
             int nextTBrow = _mm.boardCheck.CheckColumn(col) - 1; // next TB under, if any
 
-            yield return _mm.prompt.ContinueDrop();
+            yield return Prompt.ContinueDrop();
 
             if (nextTBrow >= _mm.hexGrid.BottomOfColumn(col)) {
                 _hexMan.RemoveTile(col, nextTBrow, false);

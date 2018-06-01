@@ -104,7 +104,7 @@ public class MageMatch : MonoBehaviour {
         timer = gameObject.GetComponent<TurnTimer>();
         
         targeting = new Targeting(this);
-        prompt = new Prompt(this);
+        Prompt.Init(this);
         AudioController.Init(this);
         animCont = GetComponent<AnimationController>();
         animCont.Init(this);

@@ -7,26 +7,29 @@ using MMDebug;
 public class Prompt {
 
     public enum PromptMode { None, Drop, Swap, QuickdrawDrop };
-    public PromptMode currentMode = PromptMode.None;
+    public static PromptMode currentMode = PromptMode.None;
 
-    private MageMatch _mm;
+    private static MageMatch _mm;
+    private static int _count = -1;
 
     // TODO make/support dropping hexes (i.e. you could drop a consumable)
     // perhaps the Wait func should take a filter like targeting...
-    private Hex _dropHex;
-    private int _dropCol;
+    private static Hex _dropHex;
+    private static int _dropCol;
 
-    private TileBehav[] _swapTiles;
-    private bool _successful = false;
+    private static TileBehav[] _swapTiles;
+    private static bool _successful = false;
 
-    private int _quickdrawDropCol;
-    private bool _quickdrawWentToHand = false;
+    private static int _quickdrawDropCol;
+    private static bool _quickdrawWentToHand = false;
 
-    public Prompt(MageMatch mm) {
-        this._mm = mm;
+    public static void Init(MageMatch mm) {
+        _mm = mm;
     }
 
-    public bool WasSuccessful() {
+    static void ResetCount() { _count = -1; }
+
+    public static bool WasSuccessful() {
         MMLog.Log("PROMPT", "blue", "prompt was" + (_successful ? "" : " not") + " successful");
         return _successful;
     }
@@ -34,13 +37,28 @@ public class Prompt {
 
     #region ---------- DROP ----------
 
-    public IEnumerator WaitForDrop() {
-        _successful = false;
+    public static void SetDropCount(int count, List<Hex> ignoredHexes = null) {
+        _count = count;
+        ToggleDropUI(true, ignoredHexes);
+    }
+
+    static void ToggleDropUI(bool on, List<Hex> ignoredHexes) {
+        if (ignoredHexes != null && _mm.MyTurn()) {
+            // flip unavailable ones
+            foreach (Hex h in ignoredHexes)
+                h.Flip(on);
+            //_mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+            //_mm.inputCont.SetAllowHandRearrange(on); // needed?
+        }
+    }
+
+    public static IEnumerator WaitForDrop() {
+        //_successful = false;
         yield return WaitForDrop(null);
     }
 
-    public IEnumerator WaitForDropTile() {
-        _successful = false;
+    public static IEnumerator WaitForDropTile() {
+        //_successful = false;
         var hexes = _mm.ActiveP().hand.GetAllHexes();
 
         if (_mm.hexGrid.IsBoardFull())
@@ -50,45 +68,55 @@ public class Prompt {
         yield return WaitForDrop(hexes);
     }
 
-    public IEnumerator WaitForDrop(List<Hex> ignoredHexes) {
+    public static IEnumerator WaitForDrop(List<Hex> ignoredHexes) {
         MMLog.Log("PROMPT", "blue", "Waiting for DROP...");
-        //_successful = false;
+        if (_count == -1) {
+            MMLog.LogWarning("PROMPT: Waiting for DROP but count wasn't set! Defaulted on 1.");
+            SetDropCount(1, ignoredHexes);
+        }
+        _successful = false;
 
         int ignCount = 0;
         if (ignoredHexes != null)
             ignCount = ignoredHexes.Count;
 
         if (_mm.ActiveP().hand.Count == ignCount) {
+            // nothing to drop; prompt whiffs
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted DROP!!");
+            ResetCount();
             yield break;
         }
 
         _mm.uiCont.ShowAlertText("Drop a hex into the board!");
         currentMode = PromptMode.Drop;
 
-        if (ignoredHexes != null && _mm.MyTurn()) {
-            // flip unavailable ones
-            foreach (Hex h in ignoredHexes)
-                h.Flip();
-            //_mm.inputCont.RestrictInteractableHexes(ignoredHexes);
-        }
+        //if (ignoredHexes != null && _mm.MyTurn()) {
+        //    // flip unavailable ones
+        //    foreach (Hex h in ignoredHexes)
+        //        h.Flip();
+        //    //_mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+        //}
 
         if (_mm.IsReplayMode())
             _mm.replay.GetPrompt();
 
-        _mm.inputCont.SetAllowHandRearrange(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
-        _mm.inputCont.SetAllowHandRearrange(true);
 
-        if (ignoredHexes != null && _mm.MyTurn()) {
-            // flip back
-            foreach (Hex h in ignoredHexes)
-                h.Flip();
-            //_mm.inputCont.EndRestrictInteractableHexes();
+        if (!_successful || _count == 0) {
+            MMLog.Log("PROMPT", "blue", "DROPs are done.");
+            ToggleDropUI(false, ignoredHexes);
+            ResetCount();
         }
+
+        //if (ignoredHexes != null && _mm.MyTurn()) {
+        //    // flip back
+        //    foreach (Hex h in ignoredHexes)
+        //        h.Flip();
+        //    //_mm.inputCont.EndRestrictInteractableHexes();
+        //}
     }
 
-    public void SetDrop(Hex hex, int col = -1) {
+    public static void SetDrop(Hex hex, int col = -1) {
         MMLog.Log("PROMPT", "blue", "DROP is " + hex.hextag);
         _mm.syncManager.SendDropSelection(hex, col);
 
@@ -99,14 +127,15 @@ public class Prompt {
         _dropCol = col;
 
         currentMode = PromptMode.None;
+        _count--;
         _successful = true;
     }
 
-    public Hex GetDropHex() { return _dropHex; }
+    public static Hex GetDropHex() { return _dropHex; }
 
-    public int GetDropCol() { return _dropCol; }
+    public static int GetDropCol() { return _dropCol; }
 
-    public IEnumerator ContinueDrop() {
+    public static IEnumerator ContinueDrop() {
         _mm.ActiveP().hand.Remove(_dropHex);
         yield return _mm._Drop(_dropHex, _dropCol);
     }
@@ -115,13 +144,14 @@ public class Prompt {
 
     #region ---------- QUICKDRAW ----------
 
-    public IEnumerator WaitForQuickdrawAction(Hex hex) {
+    public static IEnumerator WaitForQuickdrawAction(Hex hex) {
         _successful = false;
 
         if (!Hex.IsCharm(hex.hextag) && _mm.hexGrid.IsBoardFull()) {
             // can't be dropped in; quickdraw whiffs
             yield break;
         }
+        _count = 1;
         Player p = _mm.ActiveP();
 
         _mm.uiCont.ToggleQuickdrawUI(true, hex);
@@ -150,9 +180,9 @@ public class Prompt {
             _mm.replay.GetPrompt();
 
         // the InputController calls SetDrop for this too
-        _mm.inputCont.SetAllowHandRearrange(false);
+        //_mm.inputCont.SetAllowHandRearrange(false);
         yield return new WaitUntil(() => currentMode == PromptMode.None);
-        _mm.inputCont.SetAllowHandRearrange(true);
+        //_mm.inputCont.SetAllowHandRearrange(true);
 
         if (_mm.MyTurn()) {
             foreach (Hex h in ignoredHexes)
@@ -168,11 +198,12 @@ public class Prompt {
         }
 
         _mm.uiCont.ToggleQuickdrawUI(false);
+        _count = -1;
 
         yield return null;
     }
 
-    public void SetQuickdrawHand() {
+    public static void SetQuickdrawHand() {
         _quickdrawWentToHand = true;
         _mm.syncManager.SendKeepQuickdraw();
         currentMode = PromptMode.None;
@@ -183,38 +214,54 @@ public class Prompt {
 
     #region ---------- SWAP ----------
 
-    public IEnumerator WaitForSwap() {
+    public static void SetSwapCount(int count) {
+        _count = count;
+        ToggleSwapUI(true);
+    }
+
+    static void ToggleSwapUI(bool on) {
+        if (_mm.MyTurn())
+            _mm.ActiveP().hand.FlipAllHexes(on);
+    }
+
+    public static IEnumerator WaitForSwap() {
         yield return WaitForSwap(new TileSeq()); // is this ok?
     }
 
-    public IEnumerator WaitForSwap(TileSeq seq) {
+    public static IEnumerator WaitForSwap(TileSeq seq) {
+        if (_count == -1) {
+            MMLog.LogWarning("PROMPT: Waiting for SWAP but count wasn't set! Defaulted on 1.");
+            SetSwapCount(1);
+        }
         MMLog.Log("PROMPT", "blue", "Waiting for SWAP...");
         _successful = false;
 
         if (_mm.hexGrid.GetPlacedTiles().Count == 0 || // if board is empty, break
             !SwapIsPossible(seq)) {
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted SWAP!!");
+            ResetCount();
             yield break;
         }
 
         _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", swap two adjacent tiles!");
         currentMode = PromptMode.Swap;
-        if (_mm.MyTurn())
-            _mm.ActiveP().hand.FlipAllHexes(true);
+        
 
         if (_mm.IsReplayMode())
             _mm.replay.GetPrompt();
 
-        _mm.inputCont.SetAllowHandDragging(false); // might not be needed now
+        //_mm.inputCont.SetAllowHandDragging(false); // might not be needed now
         yield return new WaitUntil(() => currentMode == PromptMode.None);
-        _mm.inputCont.SetAllowHandDragging(true); // might not be needed now
+        //_mm.inputCont.SetAllowHandDragging(true); // might not be needed now
 
-        if (_mm.MyTurn())
-            _mm.ActiveP().hand.FlipAllHexes(false);
+        if (!_successful || _count == 0) {
+            ToggleSwapUI(false);
+            ResetCount();
+        }
     }
 
     // if needed elsewhere, move to HexGrid
-    public bool SwapIsPossible(TileSeq seq) {
+    public static bool SwapIsPossible(TileSeq seq) {
         List<TileBehav> tbs = _mm.hexGrid.GetPlacedTiles(seq);
         foreach (TileBehav tb in tbs) {
             if (_mm.hexGrid.HasAdjacentNonprereqTile(tb.tile, seq))
@@ -223,7 +270,7 @@ public class Prompt {
         return false;
     }
 
-    public void SetSwaps(int c1, int r1, int c2, int r2) {
+    public static void SetSwaps(int c1, int r1, int c2, int r2) {
         _mm.syncManager.SendSwapSelection(c1, r1, c2, r2);
 
         _mm.stats.Report(string.Format("$ PROMPT SWAP ({0},{1}) ({2},{3})", c1, r1, c2, r2), false);
@@ -235,12 +282,13 @@ public class Prompt {
             _swapTiles[0].hextag + " and " + _swapTiles[1].hextag);
 
         currentMode = PromptMode.None;
+        _count--;
         _successful = true;
     }
 
-    public TileBehav[] GetSwapTBs() { return _swapTiles; }
+    public static TileBehav[] GetSwapTBs() { return _swapTiles; }
 
-    public IEnumerator ContinueSwap() {
+    public static IEnumerator ContinueSwap() {
         Tile f = _swapTiles[0].tile, s = _swapTiles[1].tile;
         yield return _mm._SwapTiles(false, f.col, f.row, s.col, s.row);
     }

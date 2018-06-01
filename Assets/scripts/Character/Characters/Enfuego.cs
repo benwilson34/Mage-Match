@@ -116,9 +116,9 @@ public class Enfuego : Character {
         yield return ThisPlayer().DrawHexes(2, false, false); // my draw
         yield return _mm.GetOpponent(_playerId).DrawHexes(2, false, false); // their draw
 
-        yield return _mm.prompt.WaitForSwap(prereq);
-        if(_mm.prompt.WasSuccessful())
-            yield return _mm.prompt.ContinueSwap();
+        yield return Prompt.WaitForSwap(prereq);
+        if(Prompt.WasSuccessful())
+            yield return Prompt.ContinueSwap();
     }
 
     // Incinerate

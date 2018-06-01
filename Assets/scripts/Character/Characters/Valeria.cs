@@ -64,11 +64,12 @@ public class Valeria : Character {
         DealDamage(dmg);
 
         MMLog.Log("Valeria", "magenta", "swaps="+swaps);
+        Prompt.SetSwapCount(swaps);
         for (int i = 0; i < swaps; i++) {
             MMLog.Log("Valeria", "pink", "Waiting for swap " + (i+1) + " of " + swaps);
-            yield return _mm.prompt.WaitForSwap(seq);
-            if (_mm.prompt.WasSuccessful()) {
-                yield return _mm.prompt.ContinueSwap();
+            yield return Prompt.WaitForSwap(seq);
+            if (Prompt.WasSuccessful()) {
+                yield return Prompt.ContinueSwap();
                 AudioController.Trigger(AudioController.ValeriaSFX.Bubbles2);
             }
         }
@@ -196,12 +197,13 @@ public class Valeria : Character {
         yield return HandleMatchesOnBoard();
 
         const int numSwaps = 4;
+        Prompt.SetSwapCount(numSwaps);
         for (int i = 0; i < numSwaps; i++) {
-            yield return _mm.prompt.WaitForSwap(prereq);
-            if (!_mm.prompt.WasSuccessful())
+            yield return Prompt.WaitForSwap(prereq);
+            if (!Prompt.WasSuccessful())
                 break;
 
-            yield return _mm.prompt.ContinueSwap();
+            yield return Prompt.ContinueSwap();
             AudioController.Trigger(AudioController.ValeriaSFX.SigCut);
 
             yield return HandleMatchesOnBoard();

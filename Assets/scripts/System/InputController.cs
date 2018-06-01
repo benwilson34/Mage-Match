@@ -269,9 +269,9 @@ public class InputController : MonoBehaviour {
             if (!_mm.hexGrid.CanSwap(tile.col, tile.row, c2, r2))
                 return;
 
-            if (_mm.prompt.currentMode == Prompt.PromptMode.Swap) {
+            if (Prompt.currentMode == Prompt.PromptMode.Swap) {
                 // intercept swaps for Prompt
-                _mm.prompt.SetSwaps(tile.col, tile.row, c2, r2);
+                Prompt.SetSwaps(tile.col, tile.row, c2, r2);
             } else
                 _mm.PlayerSwapTiles(tile.col, tile.row, c2, r2);
 
@@ -286,11 +286,11 @@ public class InputController : MonoBehaviour {
 
     bool PromptedDrop() {
         return  _mm.MyTurn() && 
-               (_mm.prompt.currentMode == Prompt.PromptMode.Drop || 
-                _mm.prompt.currentMode == Prompt.PromptMode.QuickdrawDrop);
+               (Prompt.currentMode == Prompt.PromptMode.Drop || 
+                Prompt.currentMode == Prompt.PromptMode.QuickdrawDrop);
     }
 
-    bool PromptedSwap() { return _mm.MyTurn() && _mm.prompt.currentMode == Prompt.PromptMode.Swap; }
+    bool PromptedSwap() { return _mm.MyTurn() && Prompt.currentMode == Prompt.PromptMode.Swap; }
 
     public void SetBlocking(bool blocking) { _blocking = blocking; }
 
@@ -498,13 +498,13 @@ public class InputController : MonoBehaviour {
 
                         if (Hex.IsCharm(_input._heldHex.hextag)) {
                             if (_input.PromptedDrop())
-                                _mm.prompt.SetDrop(_input._heldHex);
+                                Prompt.SetDrop(_input._heldHex);
                             else
                                 _mm.PlayerDropCharm((Charm)_input._heldHex);
                             return InputStatus.PartiallyHandled;
                         } else {
                             if (_input.PromptedDrop())
-                                _mm.prompt.SetDrop(_input._heldHex, cb.col);
+                                Prompt.SetDrop(_input._heldHex, cb.col);
                             else
                                 _mm.PlayerDropTile(_input._heldHex, cb.col);
                             return InputStatus.PartiallyHandled;
