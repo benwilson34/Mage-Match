@@ -5,26 +5,21 @@ using MMDebug;
 
 public class Enfuego : Character {
 
-    private HexGrid _hexGrid; // eventually these will be static again?
-    private Targeting _targeting; // ''
-
     private int _passive_swapsThisTurn = 0;
 
     public Enfuego(MageMatch mm, int id) : base(mm, Ch.Enfuego, id) {
         _objFX = mm.hexFX;
-        _hexGrid = mm.hexGrid;
-        _targeting = mm.targeting;
     }
 
-    public override void OnEffectContLoad() {
+    public override void OnEffectControllerLoad() {
         MMLog.Log_Enfuego("Loading PASSIVE...");
         // SwapEffect for incrementing swapsThisTurn
         SwapEffect se = new SwapEffect(_playerId, Passive_OnSwap);
-        _mm.effectCont.AddSwapEffect(se, "EnSwp");
+        EffectController.AddSwapEffect(se, "EnSwp");
 
         // TurnEffect for reseting the counter
         TurnEffect te = new TurnEffect(_playerId, Effect.Type.None, Passive_OnTurnEnd); // idk about type here
-        _mm.effectCont.AddEndTurnEffect(te, "EnEnd");
+        EffectController.AddEndTurnEffect(te, "EnEnd");
 
         // when we have List<Buff>
         //Buff b = new Buff();
@@ -60,9 +55,9 @@ public class Enfuego : Character {
     //}
 
     public IEnumerator DragSample(TileSeq prereq) {
-        yield return _targeting.WaitForDragTarget(4);
+        yield return Targeting.WaitForDragTarget(4);
 
-        foreach (TileBehav tb in _targeting.GetTargetTBs()) {
+        foreach (TileBehav tb in Targeting.GetTargetTBs()) {
             _mm.StartCoroutine(_objFX.Ench_SetBurning(_playerId, tb));
         }
     }
@@ -71,7 +66,7 @@ public class Enfuego : Character {
     // -----  SPELLS  -----
 
     // Fiery Fandango
-    protected override IEnumerator CoreSpell(TileSeq seq) {
+    protected override IEnumerator MatchSpell(TileSeq seq) {
         AudioController.Trigger(AudioController.EnfuegoSFX.FieryFandango);
 
         int burnNum = 2, dmg = 30;
@@ -113,25 +108,25 @@ public class Enfuego : Character {
     protected override IEnumerator Spell1(TileSeq prereq) {
         AudioController.Trigger(AudioController.EnfuegoSFX.Baila);
 
-        yield return ThisPlayer().DrawHexes(2, false, false); // my draw
-        yield return _mm.GetOpponent(_playerId).DrawHexes(2, false, false); // their draw
+        yield return ThisPlayer.DrawHexes(2, false, false); // my draw
+        yield return Opponent.DrawHexes(2, false, false); // their draw
 
         yield return Prompt.WaitForSwap(prereq);
-        if(Prompt.WasSuccessful())
+        if(Prompt.WasSuccessful)
             yield return Prompt.ContinueSwap();
     }
 
     // Incinerate
     protected override IEnumerator Spell2(TileSeq prereq) {
-        yield return _targeting.WaitForDragTarget(6, Inc_Filter);
+        yield return Targeting.WaitForDragTarget(6, Inc_Filter);
 
         AudioController.Trigger(AudioController.EnfuegoSFX.Incinerate);
 
-        List<TileBehav> tbs = _targeting.GetTargetTBs();
+        List<TileBehav> tbs = Targeting.GetTargetTBs();
         int dmg = tbs.Count * 35;
         foreach (TileBehav tb in tbs) {
             MMLog.Log_Enfuego("Destroying tile at " + tb.PrintCoord());
-            _mm.hexMan.RemoveTile(tb.tile, false);
+            HexManager.RemoveTile(tb.tile, false);
             yield return _mm.animCont.WaitForSeconds(.15f);
         }
 
@@ -151,7 +146,7 @@ public class Enfuego : Character {
     // Hot Potatoes
     protected override IEnumerator Spell3(TileSeq prereq) {
         HealthModEffect he = new HealthModEffect(_mm.OpponentId(_playerId), HotPot_Debuff, true, false, 3);
-        _mm.effectCont.AddHealthEffect(he, "hotpo");
+        EffectController.AddHealthEffect(he, "hotpo");
 
         yield return null;
     }
@@ -164,15 +159,15 @@ public class Enfuego : Character {
 
     // White-Hot Combo Kick
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        yield return _targeting.WaitForTileTarget(3);
+        yield return Targeting.WaitForTileTarget(3);
 
-        List<TileBehav> tbs = _targeting.GetTargetTBs();
+        List<TileBehav> tbs = Targeting.GetTargetTBs();
 
         foreach (TileBehav tb in tbs) {
             DealDamage(70);
 
             if (tb.tile.IsElement(Tile.Element.Fire)) { // spread Burning to 4 nearby
-                List<TileBehav> ctbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+                List<TileBehav> ctbs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
                 for (int i = 0; i < ctbs.Count; i++) {
                     TileBehav ctb = ctbs[i];
                     bool remove = false;
@@ -203,7 +198,7 @@ public class Enfuego : Character {
                 yield return _mm.GetOpponent(_playerId).hand._DiscardRandom();
             }
 
-            _mm.hexMan.RemoveTile(tb.tile, true);
+            HexManager.RemoveTile(tb.tile, true);
             AudioController.Trigger(AudioController.EnfuegoSFX.WHCK);
 
             yield return _mm.animCont.WaitForSeconds(.4f);
@@ -215,7 +210,7 @@ public class Enfuego : Character {
     //    int dmg = mm.syncManager.GetRand();
     //    mm.GetPlayer(playerID).DealDamage(dmg);
 
-    //    mm.effectCont.AddMatchEffect(new MatchEffect(1, Backburner_Match, null, 1), "backb");
+    //    mm.EffectController.AddMatchEffect(new MatchEffect(1, Backburner_Match, null, 1), "backb");
     //    yield return null;
     //}
     //IEnumerator Backburner_Match(int id) {
@@ -225,7 +220,7 @@ public class Enfuego : Character {
     //}
 
     //public IEnumerator HotBody() {
-    //    mm.effectCont.AddSwapEffect(new SwapEffect(3, HotBody_Swap, null), "hotbd");
+    //    mm.EffectController.AddSwapEffect(new SwapEffect(3, HotBody_Swap, null), "hotbd");
     //    yield return null;
     //}
     //IEnumerator HotBody_Swap(int id, int c1, int r1, int c2, int r2) {

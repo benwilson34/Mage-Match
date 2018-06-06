@@ -24,7 +24,7 @@ public class UIController : MonoBehaviour {
     private Transform _leftPinfo, _rightPinfo, _leftPspells, _rightPspells, _board;
     private GameObject _spellOutlineEnd, _spellOutlineMid;
     private GameObject _prereqPF, _targetPF;
-    private GameObject _gradient, _targetingBG;
+    private GameObject _gradient, TargetingBG;
     private GameObject _tCancelB, _tClearB;
     private GameObject _screenScroll;
     private List<GameObject> _outlines, _spellOutlines;
@@ -145,13 +145,13 @@ public class UIController : MonoBehaviour {
     }
 
     public void OnEventContLoaded() {
-        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
-        _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
-        //_mm.eventCont.gameAction += OnGameAction;
-        _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.LastStep, EventController.Status.Begin);
-        //_mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.LastStep);
-        _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
-        _mm.eventCont.playerMeterChange += OnPlayerMeterChange;
+        EventController.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
+        EventController.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
+        //EventController.gameAction += OnGameAction;
+        EventController.AddDrawEvent(OnDraw, EventController.Type.LastStep, EventController.Status.Begin);
+        //EventController.AddMatchEvent(OnMatch, EventController.Type.LastStep);
+        EventController.playerHealthChange += OnPlayerHealthChange;
+        EventController.playerMeterChange += OnPlayerMeterChange;
     }
 
     void LoadPrefabs() {
@@ -529,9 +529,9 @@ public class UIController : MonoBehaviour {
                 piece.transform.rotation = Quaternion.Euler(0, 0, -90);
             }
 
-            Vector2 tilePos = _mm.hexGrid.GridCoordToPos(seq.sequence[0]);
+            Vector2 tilePos = HexGrid.GridCoordToPos(seq.sequence[0]);
             start.transform.position = new Vector3(tilePos.x, tilePos.y);
-            start.transform.Rotate(0, 0, _mm.hexGrid.GetDirection(seq) * -60);
+            start.transform.Rotate(0, 0, (int)HexGrid.GetDirection(seq) * -60);
 
             _spellOutlines.Add(start);
         }
@@ -548,7 +548,7 @@ public class UIController : MonoBehaviour {
         _cellOverlays = new SpriteRenderer[7,7];
         for(int i = 0; i < 7; i++) {
             Transform col = _board.GetChild(i);
-            for(int j = _mm.hexGrid.BottomOfColumn(i); j <= _mm.hexGrid.TopOfColumn(i); j++) {
+            for(int j = HexGrid.BottomOfColumn(i); j <= HexGrid.TopOfColumn(i); j++) {
                 //Debug.Log(">>>2nd for of getCellOverlays at " + (i) + (j));
                 _cellOverlays[i,j] = col.Find("cell" + (i) + (j)).GetComponent<SpriteRenderer>();
             }
@@ -563,7 +563,7 @@ public class UIController : MonoBehaviour {
         //}
 
         for(int i = 0; i < 7; i++) {
-            for(int j = _mm.hexGrid.BottomOfColumn(i); j <= _mm.hexGrid.TopOfColumn(i); j++) {
+            for(int j = HexGrid.BottomOfColumn(i); j <= HexGrid.TopOfColumn(i); j++) {
                 Color c = _cellOverlays[i,j].color;
                 c.a = 0.6f;
                 _cellOverlays[i,j].color = c;
@@ -571,7 +571,7 @@ public class UIController : MonoBehaviour {
             }
         }
 
-        TileSeq selection = _mm.targeting.GetSelection();
+        TileSeq selection = Targeting.GetSelection();
         if(selection != null)
             OutlinePrereq(selection);
 
@@ -606,7 +606,7 @@ public class UIController : MonoBehaviour {
         //}
 
         for (int i = 0; i < 7; i++) {
-            for (int j = _mm.hexGrid.BottomOfColumn(i); j <= _mm.hexGrid.TopOfColumn(i); j++) {
+            for (int j = HexGrid.BottomOfColumn(i); j <= HexGrid.TopOfColumn(i); j++) {
                 Color c = _cellOverlays[i,j].color;
                 c.a = 0.0f;
                 _cellOverlays[i,j].color = c;
@@ -621,19 +621,19 @@ public class UIController : MonoBehaviour {
         GameObject go;
         foreach (Tile t in seq.sequence) {
             go = Instantiate(_prereqPF);
-            go.transform.position = _mm.hexGrid.GridCoordToPos(t.col, t.row);
+            go.transform.position = HexGrid.GridCoordToPos(t.col, t.row);
             _outlines.Add(go);
         }
     }
 
     public void OutlineTarget(int col, int row) {
         GameObject go = Instantiate(_targetPF);
-        go.transform.position = _mm.hexGrid.GridCoordToPos(col, row);
+        go.transform.position = HexGrid.GridCoordToPos(col, row);
         _outlines.Add(go);
     }
 
     //public void ClearTargets() {
-    //    int prereqs = _mm.targeting.GetSelection().sequence.Count;
+    //    int prereqs = Targeting.GetSelection().sequence.Count;
     //    for (int i = 0; i < _outlines.Count - prereqs;) { // clear just the target outlines
     //        GameObject go = _outlines[prereqs];
     //        GameObject.Destroy(go);

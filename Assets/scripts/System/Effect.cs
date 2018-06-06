@@ -125,7 +125,7 @@ public class TileEffect : Effect {
 
 public class Enchantment : TileEffect {
 
-    public enum Type { None = 0, Burning, Zombie }
+    public new enum Type { None = 0, Burning, Zombie }
     public Type enchType; // private?
 
     private MyTileEffect _turnEffect, _removeEffect;

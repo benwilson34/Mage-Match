@@ -149,7 +149,7 @@ public class ReplayEngine {
         TileSeq seq = new TileSeq();
         for (int i = 3; i < tokens.Length - 1; i++) {
             int[] coord = ParseCoord(tokens[i]);
-            seq.sequence.Add(_mm.hexGrid.GetTileAt(coord[0], coord[1]));
+            seq.sequence.Add(HexGrid.GetTileAt(coord[0], coord[1]));
         }
         _linePointer += 2; // this is to compensate for the spell name comment
         return seq;
@@ -199,11 +199,11 @@ public class ReplayEngine {
         do {
             int[] coord = ParseCoord(tokens[3]);
             if (tokens[2] == "TILE") {
-                TileBehav tb = _mm.hexGrid.GetTileBehavAt(coord[0], coord[1]);
-                _mm.targeting.OnTBTarget(tb);
+                TileBehav tb = HexGrid.GetTileBehavAt(coord[0], coord[1]);
+                Targeting.OnTBTarget(tb);
             } else {       // CELL
-                CellBehav cb = _mm.hexGrid.GetCellBehavAt(coord[0], coord[1]);
-                _mm.targeting.OnCBTarget(cb);
+                CellBehav cb = HexGrid.GetCellBehavAt(coord[0], coord[1]);
+                Targeting.OnCBTarget(cb);
             }
 
             _linePointer++;

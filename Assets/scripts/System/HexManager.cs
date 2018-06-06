@@ -6,17 +6,17 @@ using MMDebug;
 
 public class HexManager { // should maybe inherit MonoBehaviour? or maybe static?
 
-    public int removing = 0;
-    public Sprite flipSprite;
+    public static int Removing { get { return _removing; } }
 
-    private MageMatch _mm;
-    private HexGrid _hexGrid;
-    private Dictionary<string, int>[] _tagDicts;
-    private Dictionary<string, GameObject> _prefabs;
+    public static Sprite flipSprite;
 
-    public HexManager(MageMatch mm) {
+    private static MageMatch _mm;
+    private static int _removing = 0;
+    private static Dictionary<string, int>[] _tagDicts;
+    private static Dictionary<string, GameObject> _prefabs;
+
+    public static void Init(MageMatch mm) {
         _mm = mm;
-        _hexGrid = mm.hexGrid;
         _tagDicts = new Dictionary<string, int>[3];
         for (int i = 0; i < 3; i++) {
             _tagDicts[i] = new Dictionary<string, int>();
@@ -24,7 +24,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         LoadPrefabs(_mm.gameSettings);
     }
 
-    void LoadPrefabs(GameSettings settings) {
+    static void LoadPrefabs(GameSettings settings) {
         _prefabs = new Dictionary<string, GameObject>();
 
         AddPrefab("Basic", "Fire");
@@ -72,13 +72,13 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         flipSprite = Resources.Load<Sprite>("sprites/hex-back");
     }
 
-    void AddPrefab(string cat, string title) {
+    static void AddPrefab(string cat, string title) {
         if (!_prefabs.ContainsKey(title)) {
             _prefabs.Add(title, Resources.Load("prefabs/hexes/"+cat+"/"+title) as GameObject);
         }
     }
 
-    GameObject GetRunePrefab() {
+    static GameObject GetRunePrefab() {
         // TODO 
         return null;
     }
@@ -86,7 +86,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
     #region ---------- GENERATION ----------
 
-    public Hex GenerateHex(int id, string genTag) {
+    public static Hex GenerateHex(int id, string genTag) {
         MMLog.Log("HEXMAN", "black", "Generating tile from genTag \"" + genTag + "\"");
         string type = Hex.TagTitle(genTag);
         switch (Hex.TagCat(genTag)) {
@@ -102,11 +102,11 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
     }
 
-    public TileBehav GenerateBasicTile(int id, Tile.Element element) {
+    public static TileBehav GenerateBasicTile(int id, Tile.Element element) {
         return GenerateBasicTile(id, element, GameObject.Find("tileSpawn").transform.position);
     }
 
-    public TileBehav GenerateBasicTile(int id, Tile.Element element, Vector3 position) {
+    public static TileBehav GenerateBasicTile(int id, Tile.Element element, Vector3 position) {
         if (element == Tile.Element.None) {
             MMLog.LogError("HEXMAN: Tried to init a basic tile with element None!");
             return null;
@@ -123,7 +123,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return tb;
     }
 
-    public TileBehav GenerateTile(int id, string type) {
+    public static TileBehav GenerateTile(int id, string type) {
         if (!_prefabs.ContainsKey(type)) {
             MMLog.LogError("HEXMAN: Tried to init a tile with bad name=" + type);
             return null;
@@ -138,7 +138,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return tb;
     }
 
-    public Charm GenerateCharm(int id, string type) {
+    public static Charm GenerateCharm(int id, string type) {
         if (!_prefabs.ContainsKey(type)) {
             MMLog.LogError("HEXMAN: Tried to init a charm with bad type=" + type);
             return null;
@@ -153,7 +153,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         return charm;
     }
 
-    string GenFullTag(int id, string cat, string type) {
+    static string GenFullTag(int id, string cat, string type) {
         string fullTag = "p" + id + "-" + cat + "-" + type + "-";
         if (id == 0)
             id = 3;
@@ -173,16 +173,16 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
     #region ---------- REMOVAL ----------
 
-    public void RemoveTileSeq(TileSeq seq) {
+    public static void RemoveTileSeq(TileSeq seq) {
         _mm.StartCoroutine(_RemoveSeq(seq, false));
     }
 
-    public void SetInvokedSeq(TileSeq seq) {
+    public static void SetInvokedSeq(TileSeq seq) {
         TileBehav tb;
         TileSeq seqCopy = seq.Copy();
         for (int i = 0; i < seqCopy.sequence.Count;) {
             Tile tile = seqCopy.sequence[0];
-            tb = _hexGrid.GetTileBehavAt(tile.col, tile.row);
+            tb = HexGrid.GetTileBehavAt(tile.col, tile.row);
             tb.wasInvoked = true;
 
             _mm.StartCoroutine(_mm.animCont._InvokeTile(tb));
@@ -191,22 +191,17 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         }
     }
 
-    public void RemoveInvokedSeq(TileSeq seq) {
+    public static void RemoveInvokedSeq(TileSeq seq) {
         _mm.StartCoroutine(_RemoveSeq(seq, true));
     }
 
-    public IEnumerator _RemoveSeq(TileSeq seq, bool isInvoked) {
-        if (_hexGrid == null) {
-            MMLog.LogError("HEXMAN: hexGrid is null");
-            yield break;
-        }
-
-        Debug.Log("HEXMAN: RemoveSeq() about to remove " + _mm.boardCheck.PrintSeq(seq, true));
+    public static IEnumerator _RemoveSeq(TileSeq seq, bool isInvoked) {
+        Debug.Log("HEXMAN: RemoveSeq() about to remove " + BoardCheck.PrintSeq(seq, true));
         Tile tile;
         for (int i = 0; i < seq.sequence.Count;) {
             tile = seq.sequence[0];
-            if (isInvoked || _hexGrid.IsCellFilled(tile.col, tile.row)) {
-                TileBehav tb = _hexGrid.GetTileBehavAt(tile.col, tile.row);
+            if (isInvoked || HexGrid.IsCellFilled(tile.col, tile.row)) {
+                TileBehav tb = HexGrid.GetTileBehavAt(tile.col, tile.row);
                 if (seq.sequence.Count == 1) // if it's the last one, wait for it
                     yield return _RemoveTile(tb, false, isInvoked);
                 else
@@ -218,28 +213,28 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     }
 
     // TODO should be IEnums? Then just start the anim at the end?
-    public void RemoveTile(Tile tile, bool resolveEnchant) {
-        TileBehav tb = _hexGrid.GetTileBehavAt(tile.col, tile.row);
+    public static void RemoveTile(Tile tile, bool resolveEnchant) {
+        TileBehav tb = HexGrid.GetTileBehavAt(tile.col, tile.row);
         _mm.StartCoroutine(_RemoveTile(tb, resolveEnchant));
     }
 
-    public void RemoveTile(int col, int row, bool resolveEnchant) {
-        TileBehav tb = _hexGrid.GetTileBehavAt(col, row);
+    public static void RemoveTile(int col, int row, bool resolveEnchant) {
+        TileBehav tb = HexGrid.GetTileBehavAt(col, row);
         _mm.StartCoroutine(_RemoveTile(tb, resolveEnchant));
     }
 
-    public IEnumerator _RemoveTile(TileBehav tb, bool resolveEnchant, bool isInvoked = false) {
+    public static IEnumerator _RemoveTile(TileBehav tb, bool resolveEnchant, bool isInvoked = false) {
         //		Debug.Log ("Removing (" + col + ", " + row + ")");
-        removing++;
+        _removing++;
 
         if (tb == null) {
             MMLog.LogError("HEXMAN: RemoveTile tried to access a tile that's gone!");
-            removing--;
+            _removing--;
             yield break;
         }
         if (!tb.ableDestroy) {
             MMLog.LogWarning("HEXMAN: RemoveTile tried to remove an indestructable tile!");
-            removing--;
+            _removing--;
             yield break;
         }
 
@@ -253,7 +248,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
         tb.ClearTileEffects(); // remove any tile effects
 
-        _hexGrid.ClearTileBehavAt(tb.tile.col, tb.tile.row); // move up?
+        HexGrid.ClearTileBehavAt(tb.tile.col, tb.tile.row); // move up?
 
         if (isInvoked)
             yield return _mm.animCont._InvokeTileRemove(tb); // just start it, don't yield?
@@ -262,12 +257,12 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
 
         RemoveHex(tb);
 
-        _mm.eventCont.TileRemove(tb); //? not needed for checking but idk
+        EventController.TileRemove(tb); //? not needed for checking but idk
 
-        removing--;
+        _removing--;
     }
 
-    public void RemoveHex(Hex hex) {
+    public static void RemoveHex(Hex hex) {
         string hextag = hex.hextag;
         GameObject.Destroy(hex.gameObject);
 

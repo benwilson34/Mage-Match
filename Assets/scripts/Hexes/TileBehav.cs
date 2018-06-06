@@ -32,7 +32,7 @@ public class TileBehav : Hex {
 
 	public IEnumerator _ChangePos(int col, int row, float duration = .15f, string anim = ""){
 		tile.SetPos(col, row);
-		_mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
+		HexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
 		_inPos = false;
 
         switch (anim) { // not great, but simple...
@@ -53,7 +53,7 @@ public class TileBehav : Hex {
 
     public IEnumerator _ChangePosAndDrop(int startRow, int col, int row, float duration = .15f) {
         tile.SetPos(col, row);
-		_mm.hexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
+		HexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
 		_inPos = false;
 
         yield return _mm.animCont._MoveTileAndDrop(this, startRow, duration);
@@ -63,8 +63,8 @@ public class TileBehav : Hex {
 
 	public void HardSetPos(int col, int row){ // essentially a "teleport"
 		tile.SetPos(col, row);
-        _mm.hexGrid.HardSetTileBehavAt (this, col, row);
-		transform.position = _mm.hexGrid.GridCoordToPos (col, row);
+        HexGrid.HardSetTileBehavAt (this, col, row);
+		transform.position = HexGrid.GridCoordToPos (col, row);
         SetPlaced();
 	}
 
@@ -118,7 +118,7 @@ public class TileBehav : Hex {
         if (HasEnchantment()) {
             MMLog.Log_TileBehav("About to remove enchantment with tag " + _enchantment.tag);
             if(removeFromList)
-                _mm.effectCont.RemoveTurnEffect(_enchantment);
+                EffectController.RemoveTurnEffect(_enchantment);
             _enchantment = null;
             this.GetComponent<SpriteRenderer>().color = Color.white;
         }
@@ -157,18 +157,18 @@ public class TileBehav : Hex {
 
     public void AddTileEffect(TileEffect te, string tag) {
         te.SetEnchantee(this);
-        _mm.effectCont.AddEndTurnEffect(te, tag);
+        EffectController.AddEndTurnEffect(te, tag);
         _tileEffects.Add(te);
     }
 
     public void RemoveTileEffect(TileEffect te) {
-        _mm.effectCont.RemoveTurnEffect(te);
+        EffectController.RemoveTurnEffect(te);
         _tileEffects.Remove(te);
     }
 
     public void ClearTileEffects() {
         foreach (TileEffect te in _tileEffects) {
-            _mm.effectCont.RemoveTurnEffect(te);
+            EffectController.RemoveTurnEffect(te);
         }
         _tileEffects.Clear();
     }

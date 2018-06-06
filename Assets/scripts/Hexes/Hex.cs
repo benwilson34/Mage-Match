@@ -26,7 +26,7 @@ public class Hex : MonoBehaviour, Tooltipable {
 
     public virtual void Init(MageMatch mm) {
         _mm = mm;
-        _flipSprite = _mm.hexMan.flipSprite;
+        _flipSprite = HexManager.flipSprite;
     }
 
     public Character ThisCharacter() {
@@ -93,7 +93,7 @@ public class Hex : MonoBehaviour, Tooltipable {
 
         Sprite newSprite = _flipSprite;
         //if (!_flipped) {
-        //    newSprite = _mm.hexMan.flipSprite;
+        //    newSprite = HexManager.flipSprite;
         //} else {
         //    newSprite = _flipSprite;
         //}

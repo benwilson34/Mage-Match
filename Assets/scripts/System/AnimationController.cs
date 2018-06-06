@@ -103,7 +103,7 @@ public class AnimationController : MonoBehaviour {
     public IEnumerator _MoveTile(TileBehav tb, float duration) {
         _animating++;
         int col = tb.tile.col, row = tb.tile.row;
-        Vector3 newPos = _mm.hexGrid.GridCoordToPos(col, row);
+        Vector3 newPos = HexGrid.GridCoordToPos(col, row);
         MMLog.Log_MageMatch(">>>>>>>>>>>>>>>>>>>>>>>>>about to animate");
 
         Tween tween = tb.transform.DOMove(newPos, duration).SetEase(Ease.Linear);
@@ -115,7 +115,7 @@ public class AnimationController : MonoBehaviour {
     public IEnumerator _MoveTileAndDrop(TileBehav tb, int startRow, float duration) {
         _animating++;
         int col = tb.tile.col, row = startRow;
-        Vector3 newPos = _mm.hexGrid.GridCoordToPos(col, row);
+        Vector3 newPos = HexGrid.GridCoordToPos(col, row);
         MMLog.Log_MageMatch(">>>>>>>>>>>>>>>>>>>>>>>>>about to animate");
 
         Tween tween = tb.transform.DOMove(newPos, duration).SetEase(Ease.Linear);
@@ -129,7 +129,7 @@ public class AnimationController : MonoBehaviour {
     }
 
     IEnumerator _Grav(Transform t, int col, int row) {
-        Vector2 newPos = _mm.hexGrid.GridCoordToPos(col, row);
+        Vector2 newPos = HexGrid.GridCoordToPos(col, row);
         float height = t.position.y - newPos.y;
 
         yield return Animate(t.DOMove(newPos, .04f * height).SetEase(Ease.InQuad));
@@ -221,10 +221,10 @@ public class AnimationController : MonoBehaviour {
     public IEnumerator _UpwardInsert(TileBehav tb) {
         // TODO handle bottom of column
         Transform t = tb.transform;
-        t.position = _mm.hexGrid.GridCoordToPos(tb.tile.col, tb.tile.row - 1); //safe for bottom?
+        t.position = HexGrid.GridCoordToPos(tb.tile.col, tb.tile.row - 1); //safe for bottom?
         t.localScale = new Vector3(.2f, .2f);
 
-        t.DOMoveY(_mm.hexGrid.GridRowToPos(tb.tile.col, tb.tile.row), .3f);
+        t.DOMoveY(HexGrid.GridRowToPos(tb.tile.col, tb.tile.row), .3f);
         yield return Animate(t.DOScale(1f, .3f));
     }
 }

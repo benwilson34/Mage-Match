@@ -6,47 +6,47 @@ using MMDebug;
 public class Targeting {
 
     public enum TargetMode { Tile, TileArea, Cell, Drag, Selection };
-    public TargetMode currentTMode = TargetMode.Tile;
+    public static TargetMode currentTMode = TargetMode.Tile;
     //public bool targetingCanceled = false;
 
-    private MageMatch _mm;
-    private int _targetsLeft = 0;
-    private List<TileBehav> _targetTBs, _validTBs;
-    private List<CellBehav> _targetCBs, _validCBs;
-    private Vector3 _lastTCenter;
-    private bool _largeAreaMode = false;
-    private TileBehav _lastDragTarget;
+    private static MageMatch _mm;
+    private static int _targetsLeft = 0;
+    private static List<TileBehav> _targetTBs, _validTBs;
+    private static List<CellBehav> _targetCBs, _validCBs;
+    private static Vector3 _lastTCenter;
+    private static bool _largeAreaMode = false;
+    private static TileBehav _lastDragTarget;
     //private List<GameObject> outlines;
 
     public delegate List<TileBehav> TileFilterFunc(List<TileBehav> tbs);
     public delegate List<CellBehav> CellFilterFunc(List<CellBehav> cbs);
 
-    public Targeting(MageMatch mm) {
-        this._mm = mm;
+    public static void Init(MageMatch mm) {
+        _mm = mm;
     }
 
-    public bool IsTargetMode() {
+    public static bool IsTargetMode() {
         return _targetsLeft > 0;
     }
 
-    void DecTargets() { // maybe remove?
+    static void DecTargets() { // maybe remove?
         MMLog.Log_Targeting("Targets remaining = " + _targetsLeft);
         _targetsLeft--;
         //if (targetsLeft == 0) //?
         //	currentTMode = TargetMode.Tile;
     }
 
-    List<TileBehav> GetValidTBs(TileFilterFunc filter) {
-        List<TileBehav> tbs = _mm.hexGrid.GetPlacedTiles();
+    static List<TileBehav> GetValidTBs(TileFilterFunc filter) {
+        List<TileBehav> tbs = HexGrid.GetPlacedTiles();
         if (filter != null)
             tbs = filter(tbs);
         return tbs;
     }
 
-    public IEnumerator WaitForTileTarget(int count, TileFilterFunc filter = null) {
+    public static IEnumerator WaitForTileTarget(int count, TileFilterFunc filter = null) {
         yield return WaitForTileTarget(count, GetValidTBs(filter));
     }
-    public IEnumerator WaitForTileTarget(int count, List<TileBehav> tbs) {
+    public static IEnumerator WaitForTileTarget(int count, List<TileBehav> tbs) {
         currentTMode = TargetMode.Tile;
         _targetsLeft = count;
         _targetTBs = new List<TileBehav>();
@@ -56,10 +56,10 @@ public class Targeting {
         yield return TargetingScreen();
     }
 
-    public IEnumerator WaitForTileAreaTarget(bool largeArea, TileFilterFunc filter = null) {
+    public static IEnumerator WaitForTileAreaTarget(bool largeArea, TileFilterFunc filter = null) {
         yield return WaitForTileAreaTarget(largeArea, GetValidTBs(filter));
     }
-    public IEnumerator WaitForTileAreaTarget(bool largeArea, List<TileBehav> tbs) {
+    public static IEnumerator WaitForTileAreaTarget(bool largeArea, List<TileBehav> tbs) {
         currentTMode = TargetMode.TileArea;
         _targetsLeft = 1;
         _targetTBs = new List<TileBehav>();
@@ -70,10 +70,10 @@ public class Targeting {
         yield return TargetingScreen();
     }
 
-    public IEnumerator WaitForDragTarget(int count, TileFilterFunc filter = null) {
+    public static IEnumerator WaitForDragTarget(int count, TileFilterFunc filter = null) {
         yield return WaitForDragTarget(count, GetValidTBs(filter));
     }
-    public IEnumerator WaitForDragTarget(int count, List<TileBehav> tbs) {
+    public static IEnumerator WaitForDragTarget(int count, List<TileBehav> tbs) {
         currentTMode = TargetMode.Drag;
         _targetsLeft = count;
         _targetTBs = new List<TileBehav>();
@@ -83,7 +83,7 @@ public class Targeting {
         yield return TargetingScreen();
     }
 
-    public void OnTBTarget(TileBehav tb) {
+    public static void OnTBTarget(TileBehav tb) {
         foreach (TileBehav ctb in _targetTBs) // prevent targeting a tile that's already targeted
             if (ctb.EqualsTag(tb.hextag))
                 return;
@@ -122,9 +122,9 @@ public class Targeting {
             List<TileBehav> tbs;
             Tile t = tb.tile;
             if (_largeAreaMode)
-                tbs = _mm.hexGrid.GetLargeAreaTiles(t.col, t.row);
+                tbs = HexGrid.GetLargeAreaTiles(t.col, t.row);
             else
-                tbs = _mm.hexGrid.GetSmallAreaTiles(t.col, t.row);
+                tbs = HexGrid.GetSmallAreaTiles(t.col, t.row);
             tbs.Add(tb);
 
             foreach (TileBehav ctb in tbs) {
@@ -152,18 +152,18 @@ public class Targeting {
         }
     }
 
-    bool IsDragTBValid(TileBehav tb) {
+    static bool IsDragTBValid(TileBehav tb) {
         if (_lastDragTarget == null) return true;
-        return _mm.hexGrid.CellsAreAdjacent(_lastDragTarget.tile, tb.tile);
+        return HexGrid.CellsAreAdjacent(_lastDragTarget.tile, tb.tile);
     }
 
-    public void EndDragTarget() {
+    public static void EndDragTarget() {
         _mm.syncManager.SendEndDragTarget();
         _targetsLeft = 0;
     }
 
     // TODO
-    public IEnumerator WaitForCellTarget(int count, List<CellBehav> cbs = null) {
+    public static IEnumerator WaitForCellTarget(int count, List<CellBehav> cbs = null) {
         currentTMode = TargetMode.Cell;
         _targetsLeft = count;
         _targetCBs = new List<CellBehav>();
@@ -172,14 +172,14 @@ public class Targeting {
 
         // TODO filter cells
         if (cbs == null)
-            cbs = _mm.hexGrid.GetAllCellBehavs();
+            cbs = HexGrid.GetAllCellBehavs();
 
         _validCBs = cbs;
 
         yield return TargetingScreen();
     }
 
-    public void OnCBTarget(CellBehav cb) {
+    public static void OnCBTarget(CellBehav cb) {
         ////Debug.Log ("Targeted cell (" + cb.col + ", " + cb.row + ")");
         //foreach (CellBehav ccb in _targetCBs) // prevent targeting a tile that's already targeted
         //    if (ccb.HasSamePos(cb))
@@ -225,7 +225,7 @@ public class Targeting {
         MMLog.Log_Targeting("Targeted cell " + cb.PrintCoord());
     }
 
-    IEnumerator TargetingScreen() {
+    static IEnumerator TargetingScreen() {
         //targetingCanceled = false;
         Player p = _mm.ActiveP();
         _mm.EnterState(MageMatch.State.Targeting);
@@ -263,9 +263,9 @@ public class Targeting {
         _mm.ExitState();
     }
 
-    public List<TileBehav> GetTargetTBs() { return _targetTBs; }
+    public static List<TileBehav> GetTargetTBs() { return _targetTBs; }
 
-    public List<CellBehav> GetTargetCBs() { return _targetCBs; }
+    public static List<CellBehav> GetTargetCBs() { return _targetCBs; }
 
     //public void ClearTargets() {
     //    mm.syncManager.SendClearTargets();
@@ -291,17 +291,17 @@ public class Targeting {
 
     //public bool WasCanceled() { return targetingCanceled; }
 
-    public bool TargetsRemain() { return _targetsLeft > 0; }
+    public static bool TargetsRemain() { return _targetsLeft > 0; }
 
 
     // -----------------  SPELL SELECTION  -----------------
 
-    public bool selectionCanceled = false;
+    public static bool selectionCanceled = false;
 
-    private List<TileSeq> selections;
-    private bool selectionChosen = false;
+    private static List<TileSeq> selections;
+    private static bool selectionChosen = false;
 
-    public IEnumerator SpellSelectScreen(List<TileSeq> seqs) {
+    public static IEnumerator SpellSelectScreen(List<TileSeq> seqs) {
         currentTMode = TargetMode.Selection;
         selectionCanceled = false;
         selectionChosen = false;
@@ -311,10 +311,10 @@ public class Targeting {
         if (_mm.MyTurn())
             _mm.ActiveP().hand.FlipAllHexes(true);
 
-        MMLog.Log_Targeting("seqs=" + _mm.boardCheck.PrintSeqList(seqs));
+        MMLog.Log_Targeting("seqs=" + BoardCheck.PrintSeqList(seqs));
         _mm.uiCont.ShowSpellSeqs(selections);
 
-        MMLog.Log_Targeting("Starting to show spell select screen, selections=" +         _mm.boardCheck.PrintSeqList(selections));
+        MMLog.Log_Targeting("Starting to show spell select screen, selections=" +         BoardCheck.PrintSeqList(selections));
 
         yield return new WaitUntil(() => (selections.Count == 1 && selectionChosen) || selectionCanceled);
 
@@ -334,7 +334,7 @@ public class Targeting {
         yield return null; //?
     }
 
-    public void OnSelection(TileBehav tb) {
+    public static void OnSelection(TileBehav tb) {
         List<TileSeq> newSelections = new List<TileSeq>(selections);
 
         for (int i = 0; i < newSelections.Count; i++) {
@@ -355,18 +355,18 @@ public class Targeting {
             MMLog.Log_Targeting("Player clicked on an invalid tile: " + tb.PrintCoord());
     }
 
-    public TileSeq GetSelection() {
+    public static TileSeq GetSelection() {
         if (selections == null)
             return null;
         else
             return selections[0];
     }
 
-    public void ClearSelection() { selections = null; }
+    public static void ClearSelection() { selections = null; }
 
-    public bool IsSelectionMode() { return currentTMode == TargetMode.Selection; }
+    public static bool IsSelectionMode() { return currentTMode == TargetMode.Selection; }
 
-    public void CancelSelection() {
+    public static void CancelSelection() {
         _mm.syncManager.SendCancelSelection();
         selectionCanceled = true;
     }

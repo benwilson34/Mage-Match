@@ -1,0 +1,53 @@
+{
+  "name": "Magic Al",
+  "keyElements": "AM",
+  "health": 1100,
+  "deck": [ 4, 4, 0, 11, 11 ],
+  "passive": {
+    "title": "Combo King",
+    "desc": "Magic Al deals 10 damage to the opponent at the end of his turns for each unique spell he has cast that turn."
+  },
+
+  "core": {
+    "title": "Jab",
+    "keywords": ["Tile Target"],
+    "desc": "Deal 20/40/70 damage and return 1/2/3 target tiles to your opponent’s hand. Switch to Cross."
+  },
+  "spell1": {
+    "title": "Stinger Stance",
+    "prereq": "AFA",
+    "keywords": ["Buff"],
+    "desc": "Gain a 1-turn buff that causes you to deal 40 damage at the end of your turn. Deals 15 additional damage for each hex in your opponent’s hand. Change your match spell to Jab."
+  },
+  "spell2": {
+    "title": "Flutterfly",
+    "prereq": "MW",
+    "keywords": ["Swap Prompt"],
+    "desc": "Swap one tile into an adjacent tile, forcing the adjacent tile into your opponent’s hand. You gain a stacking buff that increases your next source of damage by 8%. Buff lasts 3 turns. Change your match spell to Cross."
+  },
+  "spell3": {
+    "title": "Sky Uppercut",
+    "prereq": "AMMA",
+    "keywords": ["Tile Target"],
+    "desc": "Blast all tiles in target column into the air, causing them to fall back down into other random columns. Deal 110 damage. Change your match spell to Hook."
+  },
+  "signature": {
+    "title": "Storm Force Footwork",
+    "prereq": "MMAM",
+    "keywords": ["Buff"],
+    "desc": "Gain a 5-turn buff that reduces the damage you take by 25% and causes you to gain 1 AP for every third spell you cast per turn. Casting 6 spells in one turn removes the buff, but triggers a massive punch that deals 280 damage and blasts 7 random tiles on the board into your opponent’s hand."
+  },
+
+  "altSpells": [
+    {
+      "title": "Cross",
+      "keywords": [ ],
+      "desc": "Deal 40/60/90 damage. Your opponent discards 0/1/2 hexes. Switch to Hook."
+    }, 
+    {
+      "title": "Hook",
+      "keywords": ["Swap Prompt"],
+      "desc": "Deal 10/40/80 damage and swap 1/2/3 tiles into empty adjacent columns. Switch to Jab."
+    }
+  ]
+}

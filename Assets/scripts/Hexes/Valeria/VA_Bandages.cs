@@ -18,7 +18,7 @@ public class VA_Bandages : Charm {
 
         // mult, receiving
         HealthModEffect buff = new HealthModEffect(PlayerId, Bandages_HE, false, true, 4);
-        _mm.effectCont.AddHealthEffect(buff, "Bandg");
+        EffectController.AddHealthEffect(buff, "Bandg");
     }
 
     public float Bandages_HE(Player p, int dmg) {

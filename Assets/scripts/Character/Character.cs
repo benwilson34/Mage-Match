@@ -5,38 +5,36 @@ using MMDebug;
 
 public abstract class Character {
 
-    public enum Ch { Neutral = 0, Enfuego, Gravekeeper, Valeria };
+    public enum Ch { Neutral = 0, Enfuego, Gravekeeper, Valeria, MagicAl };
     public Ch ch;
 
-    public string characterName;
+    public const int METER_MAX = 1000; // may need to be changed later
 
-    public static int METER_MAX = 1000; // may need to be changed later
-    protected int _meter = 0;
+    public string characterName;
 
     public static int HEALTH_WARNING_AMT = 150; // audio/visual warning at 150 hp
     protected int _healthMax;
     protected int _health;
-
-     
-    protected int[] _basicDeck; // portions of 50 total
+    protected int _meter = 0;
+    
     protected Spell[] _spells;
-
-    protected MageMatch _mm;
-    protected HexManager _hexMan;
-    protected ObjectEffects _objFX; // needed here?
-    protected int _playerId;
     protected List<string> _runes;
 
+    protected MageMatch _mm;
+    protected ObjectEffects _objFX; // needed here?
+    protected int _playerId;
     protected bool playedFullMeterSound = false;
+    protected Player ThisPlayer { get { return _mm.GetPlayer(_playerId); } }
+    protected Player Opponent { get { return _mm.GetOpponent(_playerId); } }
+
 
     public Character(MageMatch mm, Ch ch, int playerId) {
         this._mm = mm;
         this.ch = ch;
         this._playerId = playerId;
-        _hexMan = mm.hexMan;
         _runes = new List<string>();
 
-        _mm.AddEffectContLoadEvent(OnEffectContLoad);
+        _mm.AddEffectContLoadEvent(OnEffectControllerLoad);
         _mm.AddEventContLoadEvent(InitEvents);
         _mm.AddEventContLoadEvent(OnEventContLoad);
 
@@ -49,19 +47,19 @@ public abstract class Character {
     }
 
     public virtual void InitEvents() {
-        _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Player, EventController.Status.Begin);
-        _mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Player, EventController.Status.Begin);
-        _mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Player, EventController.Status.Begin);
-        _mm.eventCont.AddSpellCastEvent(OnSpellCast, EventController.Type.Player, EventController.Status.Begin);
-        _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
-        _mm.eventCont.tileRemove += OnTileRemove;
+        EventController.AddDrawEvent(OnDraw, EventController.Type.Player, EventController.Status.Begin);
+        EventController.AddDropEvent(OnDrop, EventController.Type.Player, EventController.Status.Begin);
+        EventController.AddSwapEvent(OnSwap, EventController.Type.Player, EventController.Status.Begin);
+        EventController.AddSpellCastEvent(OnSpellCast, EventController.Type.Player, EventController.Status.Begin);
+        EventController.playerHealthChange += OnPlayerHealthChange;
+        EventController.tileRemove += OnTileRemove;
     }
 
     // override to init character with event callbacks (for their passive, probably)
     public virtual void OnEventContLoad() {}
 
     // override to init character with effect callbacks (for their passive, probably)
-    public virtual void OnEffectContLoad() {}
+    public virtual void OnEffectControllerLoad() {}
 
 
     #region ----------  HEALTH  ----------
@@ -72,9 +70,9 @@ public abstract class Character {
 
     public void DealDamage(int amount) {
         //int bonus = CalcBonus(); // TODO displaying the bonus amt in UI would be cool
-        _mm.effectCont.ResolveHealthEffects(_playerId, amount, true);
-        int bonus = _mm.effectCont.GetHEResult_Additive();
-        float mult = _mm.effectCont.GetHEResult_Mult();
+        EffectController.ResolveHealthEffects(_playerId, amount, true);
+        int bonus = EffectController.GetHEResult_Additive();
+        float mult = EffectController.GetHEResult_Mult();
         int buffAmount = (int)((amount + bonus) * mult);
         if (bonus != 0 || mult != 1)
             MMLog.Log_Player("BUFF: bonus=" + bonus + ", mult=" + mult + "; amount changed from " + amount + " to " + buffAmount);
@@ -86,9 +84,9 @@ public abstract class Character {
             MMLog.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
             return;
         }
-        _mm.effectCont.ResolveHealthEffects(_playerId, amount, false); // buff/debuff
-        int bonus = _mm.effectCont.GetHEResult_Additive();
-        float mult = _mm.effectCont.GetHEResult_Mult();
+        EffectController.ResolveHealthEffects(_playerId, amount, false); // buff/debuff
+        int bonus = EffectController.GetHEResult_Additive();
+        float mult = EffectController.GetHEResult_Mult();
         int debuffAmount = (int)(amount * mult) + bonus;
         if (bonus != 0 || mult != 1)
             MMLog.Log_Player("DEBUFF: bonus=" + bonus + ", mult=" + mult + "; amount changed from " + amount + " to " + debuffAmount);
@@ -103,7 +101,7 @@ public abstract class Character {
 
     void ChangeHealth(int amount, bool dealt) {
         string str = ">>>>>";
-        Player p = ThisPlayer();
+        Player p = ThisPlayer;
         if (amount < 0) { // damage
             if (dealt)
                 str += _mm.GetOpponent(_playerId).name + " dealt " + (-1 * amount) + " damage; ";
@@ -117,7 +115,7 @@ public abstract class Character {
 
         _health += amount;
         _health = Mathf.Clamp(_health, 0, _healthMax); // clamp amount before event
-        _mm.eventCont.PlayerHealthChange(_playerId, amount, _health, dealt);
+        EventController.PlayerHealthChange(_playerId, amount, _health, dealt);
 
         if (_health == 0)
             _mm.EndTheGame(_playerId);
@@ -132,7 +130,7 @@ public abstract class Character {
     public void ChangeMeter(int amount) {
         _meter += amount;
         _meter = Mathf.Clamp(_meter, 0, METER_MAX); // TODO clamp amount before event
-        _mm.eventCont.PlayerMeterChange(_playerId, amount, _meter);
+        EventController.PlayerMeterChange(_playerId, amount, _meter);
 
         if (!playedFullMeterSound && _meter == METER_MAX) {
             AudioController.Trigger(AudioController.OtherSoundEffect.FullMeter);
@@ -187,7 +185,7 @@ public abstract class Character {
 
     protected void InitSpells(CharacterInfo info) {
         _spells = new Spell[5];
-        _spells[0] = new CoreSpell(0, info.core.title, CoreSpell, info.core.cost);
+        _spells[0] = new MatchSpell(0, info.core.title, MatchSpell, info.core.cost);
         _spells[0].Init(_mm);
         _spells[0].info = CharacterInfo.GetSpellInfoString(info.core, true);
 
@@ -209,7 +207,7 @@ public abstract class Character {
 
     }
 
-    protected abstract IEnumerator CoreSpell(TileSeq seq);
+    protected abstract IEnumerator MatchSpell(TileSeq seq);
     protected abstract IEnumerator Spell1(TileSeq seq);
     protected abstract IEnumerator Spell2(TileSeq seq);
     protected abstract IEnumerator Spell3(TileSeq seq);
@@ -229,10 +227,6 @@ public abstract class Character {
     //}
     #endregion
 
-    public Player ThisPlayer() {
-        return _mm.GetPlayer(_playerId);
-    }
-
 
     public static Character Load(MageMatch mm, int id) {
         Ch myChar = mm.gameSettings.GetChar(id);
@@ -245,6 +239,8 @@ public abstract class Character {
                 return new Gravekeeper(mm, id);
             case Ch.Valeria:
                 return new Valeria(mm, id);
+            case Ch.MagicAl:
+                return new MagicAl(mm, id);
 
             default:
                 Debug.LogError("That character is not currently implemented.");
@@ -260,7 +256,7 @@ public class SampleChar : Character {
         _objFX = mm.hexFX;
     }
 
-    protected override IEnumerator CoreSpell(TileSeq seq) {
+    protected override IEnumerator MatchSpell(TileSeq seq) {
         yield return null;
     }
     protected override IEnumerator Spell1(TileSeq seq) {

@@ -7,11 +7,11 @@ public class Molotov : Charm {
     public override IEnumerator DropEffect() {
         const int dmg = 40;
         ThisCharacter().DealDamage(dmg);
-        yield return _mm.targeting.WaitForTileAreaTarget(false);
+        yield return Targeting.WaitForTileAreaTarget(false);
 
         AudioController.Trigger(AudioController.Rune_NeutralSFX.Molotov);
 
-        var tbs = _mm.targeting.GetTargetTBs();
+        var tbs = Targeting.GetTargetTBs();
         tbs = TileFilter.FilterByAbleEnch(tbs, Enchantment.Type.Burning);
 
         int id = PlayerId;

@@ -20,16 +20,8 @@ public class MageMatch : MonoBehaviour {
 
     public GameSettings gameSettings;
     public SyncManager syncManager;
-    public HexGrid hexGrid;
-    public BoardCheck boardCheck;
-    public HexManager hexMan;
     public Commish commish;
     public TurnTimer timer;
-    public Targeting targeting;
-    public Prompt prompt;
-    public EffectController effectCont;
-    public EventController eventCont;
-    //public AudioController audioCont;
     public AnimationController animCont;
     public UIController uiCont;
     public Stats stats;
@@ -103,13 +95,13 @@ public class MageMatch : MonoBehaviour {
 
         timer = gameObject.GetComponent<TurnTimer>();
         
-        targeting = new Targeting(this);
+        Targeting.Init(this);
         Prompt.Init(this);
         AudioController.Init(this);
         animCont = GetComponent<AnimationController>();
         animCont.Init(this);
 
-        eventCont = new EventController(this);
+        EventController.Init(this);
         EventContLoaded();
         InitEvents();
 
@@ -118,15 +110,15 @@ public class MageMatch : MonoBehaviour {
 
         stats = new Stats(this); // depends on Players, EventCont
 
-        hexGrid = new HexGrid(this);
-        hexMan = new HexManager(this);
-        TileFilter.Init(hexGrid); // depends on HexGrid
+        HexGrid.Init(this);
+        HexManager.Init(this);
+        //TileFilter.Init(); // depends on HexGrid
 
         debugTools = GameObject.Find("Debug").GetComponent<DebugTools>();
         debugTools.Init(this);
 
         uiCont.GetCellOverlays(); // depends on HexGrid
-        boardCheck = new BoardCheck(this);
+        BoardCheck.Init(this);
         hexFX = new ObjectEffects(this); // depends on HexMan, HexGrid, Targeting
 
         _endGame = false;
@@ -136,7 +128,7 @@ public class MageMatch : MonoBehaviour {
         _p2 = new Player(this, 2);
         PlayersLoaded();
 
-        effectCont = new EffectController(this);
+        EffectController.Init(this);
         EffectContLoaded();
 
         currentTurn = Turn.PlayerTurn;
@@ -175,7 +167,7 @@ public class MageMatch : MonoBehaviour {
 
         ExitState(); // end BeginningOfGame state
 
-        yield return eventCont.TurnBegin(); // is this ok?
+        yield return EventController.TurnBegin(); // is this ok?
         yield return _activep.OnTurnBegin();
 
         if (IsDebugMode())
@@ -194,15 +186,15 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void InitEvents() {
-        eventCont.boardAction += OnBoardAction;
-        eventCont.AddDropEvent(OnDrop, EventController.Type.GameAction, EventController.Status.End); // checking
-        eventCont.AddSwapEvent(OnSwap, EventController.Type.GameAction, EventController.Status.End); // checking
-        eventCont.gameAction += OnGameAction;
-        eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.GameAction); // checking
-        eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.GameAction); // checking
+        EventController.boardAction += OnBoardAction;
+        EventController.AddDropEvent(OnDrop, EventController.Type.GameAction, EventController.Status.End); // checking
+        EventController.AddSwapEvent(OnSwap, EventController.Type.GameAction, EventController.Status.End); // checking
+        EventController.gameAction += OnGameAction;
+        EventController.AddTurnBeginEvent(OnTurnBegin, EventController.Type.GameAction); // checking
+        EventController.AddTurnEndEvent(OnTurnEnd, EventController.Type.GameAction); // checking
 
         if (gameSettings.turnTimerOn)
-            eventCont.timeout += OnTimeout;
+            EventController.timeout += OnTimeout;
     }
 
     public void AddEffectContLoadEvent(LoadEvent ev) {
@@ -304,7 +296,7 @@ public class MageMatch : MonoBehaviour {
             int cost = 1;
             if (Hex.TagCat(tag) != Hex.Category.BasicTile)
                 cost = RuneInfoLoader.GetPlayerRuneInfo(id, Hex.TagTitle(tag)).cost;
-            eventCont.GameAction(cost);
+            EventController.GameAction(cost);
         }
         yield return null;
     }
@@ -312,7 +304,7 @@ public class MageMatch : MonoBehaviour {
     public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
         yield return BoardChecking();
         if(playerAction)
-            eventCont.GameAction(1);
+            EventController.GameAction(1);
     }
 
     public void OnGameAction(int id, int cost) { // eventually just pass in int for cost?
@@ -368,10 +360,10 @@ public class MageMatch : MonoBehaviour {
         switchingTurn = true;
         timer.Pause();
 
-        yield return new WaitUntil(() => _actionsPerforming == 0 && hexMan.removing == 0); //?
+        yield return new WaitUntil(() => _actionsPerforming == 0 && HexManager.Removing == 0); //?
         yield return new WaitUntil(() => _checking == 0); //?
         MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM START ----------</b>");
-        yield return eventCont.TurnEnd();
+        yield return EventController.TurnEnd();
 
         uiCont.DeactivateAllSpellButtons(_activep.id); //? These should be part of any boardaction...
         uiCont.SetDrawButton(_activep.id, false);
@@ -386,7 +378,7 @@ public class MageMatch : MonoBehaviour {
             yield return uiCont.ShiftScreen();
         }
 
-        yield return eventCont.TurnBegin();
+        yield return EventController.TurnBegin();
         SpellCheck();
         timer.StartTimer();
         ExitState();
@@ -398,12 +390,12 @@ public class MageMatch : MonoBehaviour {
 
     public IEnumerator BoardChecking(bool spellCheck = true) {
         _checking++; // prevents overcalling/retriggering
-        yield return new WaitUntil(() => hexMan.removing == 0); //?
+        yield return new WaitUntil(() => HexManager.Removing == 0); //?
         MMLog.Log_MageMatch("About to check the board.");
 
-        yield return new WaitUntil(() => !animCont.IsAnimating() && hexMan.removing == 0); //?
-        hexGrid.CheckGrav(); // TODO make IEnum
-        yield return new WaitUntil(() => hexGrid.IsGridAtRest());
+        yield return new WaitUntil(() => !animCont.IsAnimating() && HexManager.Removing == 0); //?
+        HexGrid.CheckGrav(); // TODO make IEnum
+        yield return new WaitUntil(() => HexGrid.IsGridAtRest());
 
         if (currentTurn == Turn.PlayerTurn && spellCheck)
             SpellCheck();
@@ -418,7 +410,7 @@ public class MageMatch : MonoBehaviour {
         Character c = _activep.character;
         int id = _activep.id;
         //List<TileSeq> spellSeqList = c.GetTileSeqList();
-        _spellsOnBoard = boardCheck.CheckBoard(c.GetSpells());
+        _spellsOnBoard = BoardCheck.CheckBoard(c.GetSpells());
         
         for (int s = 0; s < _spellsOnBoard.Length; s++) {
             Spell sp = c.GetSpell(s);
@@ -460,7 +452,7 @@ public class MageMatch : MonoBehaviour {
             for (int i = 0; i < count && !p.hand.IsFull(); i++) {
                 //yield return p.deck.ReadyNextHextag();
                 string hextag = p.deck.GetNextHextag();
-                Hex hex = hexMan.GenerateHex(id, hextag);
+                Hex hex = HexManager.GenerateHex(id, hextag);
                 hex.putBackIntoDeck = true;
 
                 if (id != myID)
@@ -468,17 +460,17 @@ public class MageMatch : MonoBehaviour {
 
                 //hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
 
-                yield return eventCont.Draw(EventController.Status.Begin, id, hex.hextag, playerAction, dealt);
+                yield return EventController.Draw(EventController.Status.Begin, id, hex.hextag, playerAction, dealt);
 
                 p.hand.Add(hex);
                 // I feel like the draw anim should go here
 
                 yield return hex.OnDraw(); // Quickdraw prompting/other effects?
 
-                yield return eventCont.Draw(EventController.Status.End, id, hex.hextag, playerAction, dealt);
+                yield return EventController.Draw(EventController.Status.End, id, hex.hextag, playerAction, dealt);
 
                 if (playerAction)
-                    eventCont.GameAction(1); //?
+                    EventController.GameAction(1); //?
             }
             MMLog.Log_Player(">>>" + p.hand.NumFullSlots() + " slots filled...");
         }
@@ -495,7 +487,7 @@ public class MageMatch : MonoBehaviour {
             yield break;
         }
 
-        Hex hex = hexMan.GenerateHex(id, hextag);
+        Hex hex = HexManager.GenerateHex(id, hextag);
 
         // TODO animate second hex being duped from first
 
@@ -531,7 +523,7 @@ public class MageMatch : MonoBehaviour {
         hex.Reveal();
 
         if (currentTurn == Turn.PlayerTurn) //kinda hacky
-            yield return eventCont.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
+            yield return EventController.Drop(EventController.Status.Begin, playerAction, hex.hextag, col);
 
         if (Hex.IsCharm(hex.hextag)) {
             _activep.hand.Remove(hex);
@@ -540,7 +532,7 @@ public class MageMatch : MonoBehaviour {
             // TODO animate? what should it look like when you use it?
             yield return cons.DropEffect(); // could be popped out above
 
-            hexMan.RemoveHex(cons);
+            HexManager.RemoveHex(cons);
         } else {
             hex.transform.SetParent(_tilesOnBoard);
             TileBehav tb = hex.GetComponent<TileBehav>();
@@ -548,11 +540,11 @@ public class MageMatch : MonoBehaviour {
             yield return tb.OnDrop(); // could be popped out above
 
             tb.SetPlaced();
-            yield return tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f);
+            yield return tb._ChangePosAndDrop(HexGrid.TopOfColumn(col), col, BoardCheck.CheckColumn(col), .08f);
         }
 
         if (currentTurn == Turn.PlayerTurn) { //kinda hacky
-            yield return eventCont.Drop(EventController.Status.End, playerAction, hex.hextag, col);
+            yield return EventController.Drop(EventController.Status.End, playerAction, hex.hextag, col);
         } 
         //else if (currentTurn == Turn.CommishTurn)
         //    eventCont.CommishDrop(hex.hextag, col);
@@ -570,7 +562,7 @@ public class MageMatch : MonoBehaviour {
 
         tb.transform.SetParent(_tilesOnBoard);
         tb.SetPlaced();
-        StartCoroutine(tb._ChangePosAndDrop(hexGrid.TopOfColumn(col), col, boardCheck.CheckColumn(col), .08f));
+        StartCoroutine(tb._ChangePosAndDrop(HexGrid.TopOfColumn(col), col, BoardCheck.CheckColumn(col), .08f));
 
         MMLog.Log_MageMatch("   ---------- DROP END ----------");
         _actionsPerforming--;
@@ -586,17 +578,17 @@ public class MageMatch : MonoBehaviour {
         MMLog.Log_MageMatch("   ---------- SWAP BEGIN ----------");
         _actionsPerforming++;
 
-        yield return eventCont.Swap(EventController.Status.Begin, playerAction, c1, r1, c2, r2);
+        yield return EventController.Swap(EventController.Status.Begin, playerAction, c1, r1, c2, r2);
 
-        TileBehav tb1 = hexGrid.GetTileBehavAt(c1, r1);
-        TileBehav tb2 = hexGrid.GetTileBehavAt(c2, r2);
+        TileBehav tb1 = HexGrid.GetTileBehavAt(c1, r1);
+        TileBehav tb2 = HexGrid.GetTileBehavAt(c2, r2);
         AudioController.Trigger(AudioController.HexSFX.Swap);
 
-        hexGrid.Swap(c1, r1, c2, r2);
+        HexGrid.Swap(c1, r1, c2, r2);
         tb1.ChangePos(c2, r2);
         yield return tb2._ChangePos(c1, r1);
 
-        yield return eventCont.Swap(EventController.Status.End, playerAction, c1, r1, c2, r2);
+        yield return EventController.Swap(EventController.Status.End, playerAction, c1, r1, c2, r2);
          
         MMLog.Log_MageMatch("   ---------- SWAP END ----------");
         _actionsPerforming--;
@@ -636,37 +628,37 @@ public class MageMatch : MonoBehaviour {
         if (IsReplayMode()) {
             prereq = replay.GetSpellSelection();
         } else {
-            targeting.selectionCanceled = false;
-            yield return targeting.SpellSelectScreen(_spellsOnBoard[spellNum]);
-            if (targeting.selectionCanceled)
+            Targeting.selectionCanceled = false;
+            yield return Targeting.SpellSelectScreen(_spellsOnBoard[spellNum]);
+            if (Targeting.selectionCanceled)
                 yield break;
-            prereq = targeting.GetSelection();
+            prereq = Targeting.GetSelection();
         }
 
         uiCont.DeactivateAllSpellButtons(_activep.id); // ?
 
         //TileSeq seqCopy = seq.Copy(); //?
-        hexMan.SetInvokedSeq(prereq);
+        HexManager.SetInvokedSeq(prereq);
 
-        yield return eventCont.SpellCast(EventController.Status.Begin, spell, prereq);
+        yield return EventController.SpellCast(EventController.Status.Begin, spell, prereq);
 
         yield return spell.Cast(prereq);
 
-        yield return eventCont.SpellCast(EventController.Status.End, spell, prereq);
+        yield return EventController.SpellCast(EventController.Status.End, spell, prereq);
 
         if (!IsReplayMode()) {
             StartCoroutine(uiCont.GetButtonCont(_activep.id, spellNum).Transition_MainView());
-            targeting.ClearSelection();
+            Targeting.ClearSelection();
         }
 
         _activep.ApplySpellCosts(spell);
-        
-        hexMan.RemoveInvokedSeq(prereq);
+
+        HexManager.RemoveInvokedSeq(prereq);
         yield return BoardChecking(); //?
     }
 
     public IEnumerator _CancelSpell() {
-        targeting.CancelSelection();
+        Targeting.CancelSelection();
         for (int i = 0; i < _spellsOnBoard.Length; i++) {
             if (_spellsOnBoard[i].Count > 0)
                 uiCont.ActivateSpellButton(_activep.id, i);
@@ -680,8 +672,8 @@ public class MageMatch : MonoBehaviour {
 
 
     public void PutTile(TileBehav tb, int col, int row, bool checkGrav = false) {
-        if (hexGrid.IsCellFilled(col, row))
-            hexMan.RemoveTile(col, row, false);
+        if (HexGrid.IsCellFilled(col, row))
+            HexManager.RemoveTile(col, row, false);
         tb.HardSetPos(col, row);
         // TODO move to tilesOnBoard obj
         if(checkGrav)
@@ -696,7 +688,7 @@ public class MageMatch : MonoBehaviour {
     //}
 
 
-    #region ---------- PLAYER ----------
+    #region ---------- PLAYERS ----------
     public Player ActiveP() {
         return _activep;
     }
@@ -749,7 +741,7 @@ public class MageMatch : MonoBehaviour {
     //}
 
     public void BoardChanged() {
-        eventCont.BoardAction();
+        EventController.BoardAction();
     }
 
     public void EndTheGame(int losingPlayerId) {

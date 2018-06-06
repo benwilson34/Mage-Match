@@ -6,10 +6,9 @@ using MMDebug;
 
 public class BoardCheck {
 
-	private List<Spell> _checkList; // compare list
+	private static List<Spell> _checkList; // compare list
     //private MageMatch mm;
-    private HexGrid _hexGrid;
-    private List<SkipCheck> _skips;
+    private static List<SkipCheck> _skips;
 
     // check skipping object
     private class SkipCheck{
@@ -21,19 +20,18 @@ public class BoardCheck {
 		}
 	}
 
-	public BoardCheck(MageMatch mm){
+	public static void Init(MageMatch mm){
         //this.mm = mm;
-        _hexGrid = mm.hexGrid;
 		_skips = new List<SkipCheck> ();
 	}
 
-    public int CheckColumn(int c){
-		int r = _hexGrid.TopOfColumn(c);
-		if (_hexGrid.IsCellFilled (c, r))
+    public static int CheckColumn(int c){
+		int r = HexGrid.TopOfColumn(c);
+		if (HexGrid.IsCellFilled (c, r))
 			return -1;
 		
-		int min = _hexGrid.BottomOfColumn (c);
-		while (r > min && !_hexGrid.IsCellFilled(c, r - 1))
+		int min = HexGrid.BottomOfColumn (c);
+		while (r > min && !HexGrid.IsCellFilled(c, r - 1))
 			r--;
 
         MMLog.Log_BoardCheck("Checking col " + c + " got r=" + r, MMLog.LogLevel.Standard);
@@ -41,12 +39,12 @@ public class BoardCheck {
 	}
 
     // note: the 8th element is the total number of empty cells
-    int[] EmptyCount() {
+    static int[] EmptyCount() {
         int[] counts = new int[8];
-        counts[7] = _hexGrid.GetEmptyCellCount();
+        counts[7] = HexGrid.GetEmptyCellCount();
         for (int i = 0; i < HexGrid.NUM_COLS; i++) {
             if (CheckColumn(i) >= 0)
-                counts[i] = _hexGrid.TopOfColumn(i) - CheckColumn(i) + 1;
+                counts[i] = HexGrid.TopOfColumn(i) - CheckColumn(i) + 1;
             else
                 counts[i] = 0;
             MMLog.Log_BoardCheck("counts[" + i + "] = " + counts[i], MMLog.LogLevel.Standard);
@@ -55,7 +53,7 @@ public class BoardCheck {
         return counts;
     }
 
-    public int[] GetRandomCols(int num) {
+    static public int[] GetRandomCols(int num) {
         int[] counts = EmptyCount();
         List<int> cs = new List<int>();
         for (int i = 0; i < num; i++) {
@@ -80,7 +78,7 @@ public class BoardCheck {
         return cs.ToArray();
     }
 
-    public List<TileSeq>[] CheckBoard(List<Spell> spells){
+    public static List<TileSeq>[] CheckBoard(List<Spell> spells){
 		_skips.Clear();
 
 		List<TileSeq>[] returnList = new List<TileSeq>[5]; // list of all matching seqs to be returned
@@ -89,9 +87,9 @@ public class BoardCheck {
         }
 
 		for(int c = 0; c < HexGrid.NUM_COLS; c++){ // for each col
-			for(int r = _hexGrid.BottomOfColumn(c); r <= _hexGrid.TopOfColumn(c); r++){ // for each row
+			for(int r = HexGrid.BottomOfColumn(c); r <= HexGrid.TopOfColumn(c); r++){ // for each row
 
-				if (_hexGrid.IsCellFilledButNotInvoked(c, r)) { // if there's a tile there
+				if (HexGrid.IsCellFilledButNotInvoked(c, r)) { // if there's a tile there
 					List<TileSeq>[] playList = CheckTile (c, r, spells);
 
                     if (playList != null) {
@@ -117,26 +115,26 @@ public class BoardCheck {
 		return returnList;
 	}
 
-	List<TileSeq>[] CheckTile(int c, int r, List<Spell> spells){
+    static List<TileSeq>[] CheckTile(int c, int r, List<Spell> spells){
         // if check matches color of current, keep checking the line
 		List<TileSeq>[] returnList = new List<TileSeq>[5];
         for (int i = 0; i < 5; i++) {
             returnList[i] = new List<TileSeq>();
         }
 
-        if (!_hexGrid.GetTileBehavAt (c, r).ableInvoke) // handle current tile not invokable
+        if (!HexGrid.GetTileBehavAt (c, r).ableInvoke) // handle current tile not invokable
 			return returnList;
 
         List<Spell> shortList = new List<Spell>(spells);
-        Tile currentTile = _hexGrid.GetTileAt(c, r);
+        Tile currentTile = HexGrid.GetTileAt(c, r);
         for (int i = 0; i < shortList.Count; i++) { // for each TileSeq in seqList
 
             // TODO if Spell is CoreSpell, add the right sequence...
-            if (shortList[i] is CoreSpell) {
+            if (shortList[i] is MatchSpell) {
                 //MMLog.Log_BoardCheck("Setting " + currentTile.element + " as current elem.", MMLog.LogLevel.Standard);
-                CoreSpell coreSpell = (CoreSpell)shortList[i];
+                MatchSpell coreSpell = (MatchSpell)shortList[i];
                 foreach (Tile.Element elem in currentTile.elements) {
-                    CoreSpell copySpell = new CoreSpell(coreSpell);
+                    MatchSpell copySpell = new MatchSpell(coreSpell);
                     copySpell.currentElem = elem;
                     shortList.Insert(i, copySpell);
                     i++;
@@ -185,20 +183,20 @@ public class BoardCheck {
             // for each tile in the direction...
             for (int seqIndex = 1; seqIndex < 5; seqIndex++) { // max seq length is 5
                 bool skipCurrentSeq = false;
-                if (!_hexGrid.HasAdjacentCell(c + dc, r + dr, dir))
+                if (!HexGrid.HasAdjacentCell(c + dc, r + dr, dir))
                     skipCurrentSeq = true;
                 else {
-                    _hexGrid.GetOffset(dir, out dc, out dr);
+                    HexGrid.GetOffset(dir, out dc, out dr);
                     dc *= seqIndex;
                     dr *= seqIndex;
-                    if (!_hexGrid.IsCellFilledButNotInvoked(c + dc, r + dr))
+                    if (!HexGrid.IsCellFilledButNotInvoked(c + dc, r + dr))
                         skipCurrentSeq = true;
                 }
 
-                TileBehav ctb = _hexGrid.GetTileBehavAt(c + dc, r + dr);
+                TileBehav ctb = HexGrid.GetTileBehavAt(c + dc, r + dr);
                 if (skipCurrentSeq || !ctb.ableInvoke) {
                     for (int i = 0; i < _checkList.Count; i++) {
-                        if (_checkList[i] is CoreSpell && seqs[i].GetSeqLength() >= 3) {
+                        if (_checkList[i] is MatchSpell && seqs[i].GetSeqLength() >= 3) {
                             AddCoreSkips(seqs[i], dir);
                             returnList[_checkList[i].index].Add(seqs[i]);
                         }
@@ -214,8 +212,8 @@ public class BoardCheck {
                     bool remove = false;
 
                     Tile.Element nextElem;
-                    if (s is CoreSpell) {
-                        nextElem = ((CoreSpell)s).currentElem; // could just be local var
+                    if (s is MatchSpell) {
+                        nextElem = ((MatchSpell)s).currentElem; // could just be local var
                         //MMLog.Log_BoardCheck("Checking core spell with elem " + nextElem, MMLog.LogLevel.Standard);
                     } else
                         nextElem = s.GetTileSeq().GetElementAt(seqIndex);
@@ -226,7 +224,7 @@ public class BoardCheck {
 
                         if (seqs[i].GetSeqLength() == s.GetLength()) { // complete seq!
                             returnList[s.index].Add(seqs[i]);
-                            if (s is CoreSpell) // core of length 5
+                            if (s is MatchSpell) // core of length 5
                                 AddCoreSkips(seqs[i], dir);
                             else if (s.isSymmetric)
                                 AddSymmetricSkips(seqs[i], dir);
@@ -234,7 +232,7 @@ public class BoardCheck {
                         }
                     } else { // it doesn't match...
                         //MMLog.Log_BoardCheck("Seq " + checkList[i].PrintSeq() + " was not found!", MMLog.LogLevel.Standard);
-                        if (s is CoreSpell && seqs[i].GetSeqLength() >= 3) {
+                        if (s is MatchSpell && seqs[i].GetSeqLength() >= 3) {
                             AddCoreSkips(seqs[i], dir);
                             returnList[s.index].Add(seqs[i]);
                         }
@@ -253,7 +251,7 @@ public class BoardCheck {
 		return returnList;
 	}
 
-	void AddCoreSkips(TileSeq seq, int dir){
+    static void AddCoreSkips(TileSeq seq, int dir){
 		//MMLog.Log_BoardCheck("Adding skips for " + PrintSeq (seq, true), MMLog.LogLevel.Standard);
 		switch (seq.GetSeqLength ()) {
 		case 3:
@@ -274,17 +272,17 @@ public class BoardCheck {
 		}
 	}
 
-    void AddSymmetricSkips(TileSeq seq, int dir) {
+    static void AddSymmetricSkips(TileSeq seq, int dir) {
         Tile lastT = seq.sequence[seq.GetSeqLength() - 1];
 		MMLog.Log_BoardCheck("Adding skip at (" + lastT.col + ", " + lastT.row + ") in dir "+dir, MMLog.LogLevel.Standard);
         _skips.Add (new SkipCheck (lastT, OppDir(dir)));
     }
 
-    int OppDir(int dir){
+    static int OppDir(int dir){
 		return (dir + 3) % 6;
 	}
 
-	public string PrintSeq(TileSeq seq, bool showPos){ // debug
+    static public string PrintSeq(TileSeq seq, bool showPos){ // debug
 		string str = "";
 		if (showPos) {
 			foreach (Tile t in seq.sequence) {
@@ -297,7 +295,7 @@ public class BoardCheck {
 		return str;
 	}
 
-	public string PrintSeqList(List<TileSeq> seqList){ // debug
+    static public string PrintSeqList(List<TileSeq> seqList){ // debug
 		string str = "";
 		foreach (TileSeq seq in seqList) {
 			str += PrintSeq(seq, true);

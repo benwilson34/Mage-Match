@@ -49,5 +49,18 @@
 		    "Stimulant",
 		    "Flamethrower"
   		]
+	},
+
+	"MagicAl": {
+		"name": "Magic Al Default",
+		"runes": [
+		    "LighterFluid",
+		    "BurningBracers",
+		    "Twinfire",
+		    "Molotov",
+		    "CausticCastanet",
+		    "Stimulant",
+		    "Flamethrower"
+  		]
 	}
 }

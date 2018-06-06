@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TileFilter {
-    private static HexGrid _hexGrid;
 
-    public static void Init(HexGrid hexGrid) {
-        _hexGrid = hexGrid;
-    }
+    //public static void Init() {
+    //}
 
     public static List<TileBehav> GetTilesByEnch(Enchantment.Type ench, bool inverse = false) {
-        return FilterByEnch(_hexGrid.GetPlacedTiles(), ench, inverse);
+        return FilterByEnch(HexGrid.GetPlacedTiles(), ench, inverse);
     }
 
     public static List<TileBehav> FilterByEnch(List<TileBehav> tbs, Enchantment.Type ench, bool inverse = false) {
@@ -23,7 +21,7 @@ public class TileFilter {
     }
 
     public static List<TileBehav> GetTilesByAbleEnch(Enchantment.Type ench) {
-        return FilterByAbleEnch(_hexGrid.GetPlacedTiles(), ench);
+        return FilterByAbleEnch(HexGrid.GetPlacedTiles(), ench);
     }
 
     public static List<TileBehav> FilterByAbleEnch(List<TileBehav> tbs, Enchantment.Type ench) {

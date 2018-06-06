@@ -12,7 +12,7 @@ public class BasicRandomDropFive : Charm {
     public override IEnumerator DropEffect() {
         const int count = 5;
 
-        int[] cols = _mm.boardCheck.GetRandomCols(count);
+        int[] cols = BoardCheck.GetRandomCols(count);
         yield return _mm.syncManager.SyncRands(PlayerId, cols);
         cols = _mm.syncManager.GetRands(cols.Length);
 
@@ -29,7 +29,7 @@ public class BasicRandomDropFive : Charm {
         int col;
         while (colQ.Count > 0) {
             col = colQ.Dequeue();
-            TileBehav newTB = _mm.hexMan.GenerateBasicTile(PlayerId, elem);
+            TileBehav newTB = HexManager.GenerateBasicTile(PlayerId, elem);
             _mm.DropTile(newTB, col);
             yield return new WaitForSeconds(ANIM_INTERVAL);
         }

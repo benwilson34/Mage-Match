@@ -27,7 +27,7 @@ public class TurnTimer : MonoBehaviour {
     }
 
     void DecreaseTimeRemaining() {
-        if (!_pause && !_mm.targeting.IsTargetMode()) {
+        if (!_pause && !Targeting.IsTargetMode()) {
             _timeRemaining -= .1f;
 
             if (!_playedWarningSound && _timeRemaining < TIMER_WARNING) {
@@ -37,7 +37,7 @@ public class TurnTimer : MonoBehaviour {
 
             if (_timeRemaining < .01f) {
                 Pause();
-                _mm.eventCont.Timeout();
+                EventController.Timeout();
             }
             _mm.uiCont.newsfeed.UpdateTurnTimer(_timeRemaining);
         }

@@ -8,11 +8,11 @@ public class EventController {
 
     public enum Type { None = 0, LastStep, GameAction, Stats, EventEffects, Player, Audio, Report, Network, FirstStep }
     public enum Status { Begin, End }
-    public bool handlingEvents = false; // worth it?
+    public static bool handlingEvents = false; // worth it?
 
-    private MageMatch _mm;
+    private static MageMatch _mm;
 
-    public EventController(MageMatch mm) {
+    public static void Init(MageMatch mm) {
         _mm = mm;
         _swap = new List<EventPack>();
         _turnBegin = new List<EventPack>();
@@ -30,7 +30,7 @@ public class EventController {
         public Status status;
     }
 
-    List<EventPack> GetEventList(string type) { // TODO this could be done with an enum
+    static List<EventPack> GetEventList(string type) { // TODO this could be done with an enum
         switch (type) {
             case "swap":
                 return _swap;
@@ -55,7 +55,7 @@ public class EventController {
     }
 
     // ex. AddEvent("swap", SwapCallbackMethod, Type.EventEffects)
-    void AddEvent(string list, System.Delegate e, Type type, Status status = Status.End) {
+    static void AddEvent(string list, System.Delegate e, Type type, Status status = Status.End) {
         List<EventPack> evList = GetEventList(list);
 
         int i = 0;
@@ -66,7 +66,7 @@ public class EventController {
         evList.Insert(i, new EventPack { ev = e, type = type, status = status });
     }
 
-    void RemoveEvent(string type, System.Delegate e) {
+    static void RemoveEvent(string type, System.Delegate e) {
         List<EventPack> evList = GetEventList(type);
 
         for (int i = 0; i < evList.Count; i++) {
@@ -81,16 +81,16 @@ public class EventController {
     // -----------------------------------------------------
 
     public delegate void BoardActionEvent();
-    public event BoardActionEvent boardAction;
-    public void BoardAction() {
+    public static event BoardActionEvent boardAction;
+    public static void BoardAction() {
         //Debug.MMLog.Log_EventCont("EVENTCONTROLLER: BoardAction event raised, dispatching to " + boardAction.GetInvocationList().Length + " subscribers.");
         if (boardAction != null)
             boardAction.Invoke();
     }
 
     public delegate IEnumerator TurnBeginEvent(int id);
-    private List<EventPack> _turnBegin;
-    public IEnumerator TurnBegin() {
+    private static List<EventPack> _turnBegin;
+    public static IEnumerator TurnBegin() {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in _turnBegin) {
             yield return ((TurnBeginEvent)pack.ev)(_mm.ActiveP().id); // OH YEAH
@@ -98,13 +98,13 @@ public class EventController {
         MMLog.Log_EventCont("Just finished TURN BEGIN events...");
         handlingEvents = false; // worth it?
     }
-    public void AddTurnBeginEvent(TurnBeginEvent ev, Type type) {
+    public static void AddTurnBeginEvent(TurnBeginEvent ev, Type type) {
         AddEvent("turnBegin", ev, type);
     }
 
     public delegate IEnumerator TurnEndEvent(int id);
-    private List<EventPack> _turnEnd;
-    public IEnumerator TurnEnd() {
+    private static List<EventPack> _turnEnd;
+    public static IEnumerator TurnEnd() {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in _turnEnd) {
             yield return ((TurnEndEvent)pack.ev)(_mm.ActiveP().id); // OH YEAH
@@ -112,35 +112,35 @@ public class EventController {
         MMLog.Log_EventCont("Just finished TURN END events...");
         handlingEvents = false; // worth it?
     }
-    public void AddTurnEndEvent(TurnEndEvent ev, Type type) {
+    public static void AddTurnEndEvent(TurnEndEvent ev, Type type) {
         AddEvent("turnEnd", ev, type);
     }
 
     public delegate void TimeoutEvent(int id);
-    public event TimeoutEvent timeout;
-    public void Timeout() {
+    public static event TimeoutEvent timeout;
+    public static void Timeout() {
         MMLog.Log_EventCont("Timeout event raised.");
         if (timeout != null) // never will be due to Stats
             timeout.Invoke(_mm.ActiveP().id);
     }
 
     public delegate void CommishDropEvent(string hextag, int col);
-    public event CommishDropEvent commishDrop;
-    public void CommishDrop(string hextag, int col) {
+    public static event CommishDropEvent commishDrop;
+    public static void CommishDrop(string hextag, int col) {
         if (commishDrop != null) // never will be due to Stats
             commishDrop.Invoke(hextag, col);
     }
 
     public delegate void CommishMatchEvent(string[] seqs);
-    public event CommishMatchEvent commishMatch;
-    public void CommishMatch(string[] seqs) {
+    public static event CommishMatchEvent commishMatch;
+    public static void CommishMatch(string[] seqs) {
         if (commishMatch != null) // never will be due to Stats
             commishMatch.Invoke(seqs);
     }
 
     public delegate void CommishTurnDoneEvent();
-    public event CommishTurnDoneEvent commishTurnDone;
-    public void CommishTurnDone() {
+    public static event CommishTurnDoneEvent commishTurnDone;
+    public static void CommishTurnDone() {
         //Debug.MMLog.Log_EventCont("EVENTCONT: Commish turn done.");
         if (commishTurnDone != null) // never will be due to Stats
             commishTurnDone.Invoke();
@@ -149,16 +149,16 @@ public class EventController {
 
     #region GameAction events
     public delegate void GameActionEvent(int id, int cost);
-    public event GameActionEvent gameAction;
-    public void GameAction(int cost) {
+    public static event GameActionEvent gameAction;
+    public static void GameAction(int cost) {
         //Debug.MMLog.Log_EventCont("EVENTCONTROLLER: GameAction called.");
         if (gameAction != null)
             gameAction.Invoke(_mm.ActiveP().id, cost);
     }
 
     public delegate IEnumerator DrawEvent(int id, string tag, bool playerAction, bool dealt);
-    private List<EventPack> _draw;
-    public IEnumerator Draw(Status status, int id, string tag, bool playerAction, bool dealt) {
+    private static List<EventPack> _draw;
+    public static IEnumerator Draw(Status status, int id, string tag, bool playerAction, bool dealt) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in _draw) {
             MMLog.Log_EventCont("going thru draw event with type " + pack.type);
@@ -168,13 +168,13 @@ public class EventController {
         MMLog.Log_EventCont("Just finished DRAW events...");
         handlingEvents = false; // worth it?
     }
-    public void AddDrawEvent(DrawEvent e, Type type, Status status) {
+    public static void AddDrawEvent(DrawEvent e, Type type, Status status) {
         AddEvent("draw", e, type, status);
     }
 
     public delegate IEnumerator DropEvent(int id, bool playerAction, string tag, int col);
-    private List<EventPack> _drop;
-    public IEnumerator Drop(Status status, bool playerAction, string tag, int col) {
+    private static List<EventPack> _drop;
+    public static IEnumerator Drop(Status status, bool playerAction, string tag, int col) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in _drop) {
             MMLog.Log_EventCont("EVENTCONT: going thru drop event with type " + pack.type);
@@ -184,13 +184,13 @@ public class EventController {
         MMLog.Log_EventCont("Just finished DROP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddDropEvent(DropEvent e, Type type, Status status) {
+    public static void AddDropEvent(DropEvent e, Type type, Status status) {
         AddEvent("drop", e, type, status);
     }
 
     public delegate IEnumerator SwapEvent(int id, bool playerAction, int c1, int r1, int c2, int r2);
-    private List<EventPack> _swap;
-    public IEnumerator Swap(Status status, bool playerAction, int c1, int r1, int c2, int r2) {
+    private static List<EventPack> _swap;
+    public static IEnumerator Swap(Status status, bool playerAction, int c1, int r1, int c2, int r2) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in _swap) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
@@ -200,14 +200,14 @@ public class EventController {
         MMLog.Log_EventCont("Just finished SWAP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddSwapEvent(SwapEvent e, Type type, Status status) {
+    public static void AddSwapEvent(SwapEvent e, Type type, Status status) {
         AddEvent("swap", e, type, status);
     }
     // TODO similar method to convert for removing (if it's ever needed...)
 
     public delegate IEnumerator SpellCastEvent(int id, Spell spell, TileSeq prereq);
-    private List<EventPack> _spellCast;
-    public IEnumerator SpellCast(Status status, Spell spell, TileSeq prereq) {
+    private static List<EventPack> _spellCast;
+    public static IEnumerator SpellCast(Status status, Spell spell, TileSeq prereq) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in _spellCast) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
@@ -217,7 +217,7 @@ public class EventController {
         MMLog.Log_EventCont("Just finished SWAP events...");
         handlingEvents = false; // worth it?
     }
-    public void AddSpellCastEvent(SpellCastEvent e, Type type, Status status) {
+    public static void AddSpellCastEvent(SpellCastEvent e, Type type, Status status) {
         AddEvent("spellCast", e, type, status);
     }
     #endregion
@@ -249,37 +249,37 @@ public class EventController {
     //}
 
     public delegate void TileRemoveEvent(int id, TileBehav tb);
-    public event TileRemoveEvent tileRemove;
-    public void TileRemove(TileBehav tb) {
+    public static event TileRemoveEvent tileRemove;
+    public static void TileRemove(TileBehav tb) {
         if (tileRemove != null)
             tileRemove.Invoke(_mm.ActiveP().id, tb);
     }
 
     // NOTE: id is ALWAYS the receiver
     public delegate void PlayerHealthChangeEvent(int id, int amount, int newHealth, bool dealt);
-    public event PlayerHealthChangeEvent playerHealthChange;
-    public void PlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
+    public static event PlayerHealthChangeEvent playerHealthChange;
+    public static void PlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         if (playerHealthChange != null)
             playerHealthChange.Invoke(id, amount, newHealth, dealt);
     }
 
     public delegate void PlayerMeterChangeEvent(int id, int amount, int newMeter);
-    public event PlayerMeterChangeEvent playerMeterChange;
-    public void PlayerMeterChange(int id, int amount, int newMeter) {
+    public static event PlayerMeterChangeEvent playerMeterChange;
+    public static void PlayerMeterChange(int id, int amount, int newMeter) {
         if (playerMeterChange != null)
             playerMeterChange.Invoke(id, amount, newMeter);
     }
 
     public delegate void GrabTileEvent(int id, string tag);
-    public event GrabTileEvent grabTile;
-    public void GrabTile(int id, string tag) {
+    public static event GrabTileEvent grabTile;
+    public static void GrabTile(int id, string tag) {
         if (grabTile != null)
             grabTile.Invoke(id, tag);
     }
 
     public delegate IEnumerator DiscardEvent(int id, string tag);
-    private List<EventPack> _discard;
-    public IEnumerator Discard(int id, string tag) {
+    private static List<EventPack> _discard;
+    public static IEnumerator Discard(int id, string tag) {
         handlingEvents = true; // worth it?
         foreach (EventPack pack in _discard) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: Resolving matchEvent with p="+pack.priority);
@@ -288,10 +288,10 @@ public class EventController {
         MMLog.Log_EventCont("Just finished DISCARD events...");
         handlingEvents = false; // worth it?
     }
-    public void AddDiscardEvent(DiscardEvent ev, Type type) {
+    public static void AddDiscardEvent(DiscardEvent ev, Type type) {
         AddEvent("discard", ev, type);
     }
-    public void RemoveDiscardEvent(DiscardEvent ev) {
+    public static void RemoveDiscardEvent(DiscardEvent ev) {
         RemoveEvent("discard", ev);
     }
 }

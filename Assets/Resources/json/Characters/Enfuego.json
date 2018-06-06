@@ -10,36 +10,30 @@
 
   "core": {
     "title": "Fiery Fandango",
-    "cost": 1,
     "keywords": [],
     "desc": "Deal 30/50/80 damage to your opponent, force them to discard 0/1/2 hexes, and inflict 2/4/7 random tiles with burning. Deal 20 additional damage when consuming a fire match."
   },
   "spell1": {
     "title": "Baila!",
     "prereq": "FM",
-    "cost": 1,
     "keywords": ["Swap Prompt"],
     "desc": "Both players draw two hexes. Perform a swap."
   },
   "spell2": {
     "title": "Incinerate",
     "prereq": "FAM",
-    "cost": 1,
     "keywords": ["Drag Target"],
     "desc": "Drag target up to 6 burning tiles, destroying them and dealing 35 damage for each destroyed."
   },
   "spell3": {
     "title": "Hot Potatoes",
     "prereq": "FFA",
-    "cost": 1,
     "keywords": ["Debuff"],
     "desc": "Place a 3-turn debuff on your opponent that causes them to take 3 additional damage whenever they take damage for each tile in their hand."
   },
   "signature": {
     "title": "White-Hot Combination Kick",
     "prereq": "FMMF",
-    "cost": 1,
-    "meterCost": 1000,
     "keywords": ["Tile Target"],
     "desc": "Destroy 3 tiles, dealing 70 damage for each tile destroyed. Any fire tiles destroyed this way inflict burning on 4 random adjacent tiles. Any muscle tiles destroyed this way cause your opponent to discard 1 hex."
   }

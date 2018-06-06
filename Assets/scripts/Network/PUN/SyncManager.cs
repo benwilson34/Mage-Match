@@ -17,9 +17,9 @@ public class SyncManager : PunBehaviour {
     }
 
     public void OnEventContLoaded() {
-        _mm.eventCont.AddDrawEvent(OnDrawLocal, EventController.Type.Network, EventController.Status.Begin);
-        _mm.eventCont.AddDropEvent(OnDropLocal, EventController.Type.Network, EventController.Status.Begin);
-        _mm.eventCont.AddSwapEvent(OnSwapLocal, EventController.Type.Network, EventController.Status.Begin);
+        EventController.AddDrawEvent(OnDrawLocal, EventController.Type.Network, EventController.Status.Begin);
+        EventController.AddDropEvent(OnDropLocal, EventController.Type.Network, EventController.Status.Begin);
+        EventController.AddSwapEvent(OnSwapLocal, EventController.Type.Network, EventController.Status.Begin);
         //eventCont.AddDiscardEvent(OnDiscardLocal, EventController.Type.Network);
         //eventCont.commishDrop += OnCommishDrop;
         //eventCont.commishTurnDone += OnCommishTurnDone;
@@ -230,7 +230,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleTBTarget(int col, int row) {
-        _mm.targeting.OnTBTarget(_mm.hexGrid.GetTileBehavAt(col, row));
+        Targeting.OnTBTarget(HexGrid.GetTileBehavAt(col, row));
     }
 
     public void SendCBTarget(CellBehav cb) {
@@ -244,7 +244,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleCBTarget(int col, int row) {
-        _mm.targeting.OnCBTarget(_mm.hexGrid.GetCellBehavAt(col, row));
+        Targeting.OnCBTarget(HexGrid.GetCellBehavAt(col, row));
     }
 
     // TODO merge into SendTargetingMessage
@@ -281,7 +281,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleTBSelection(int col, int row) {
-        _mm.targeting.OnSelection(_mm.hexGrid.GetTileBehavAt(col, row));
+        Targeting.OnSelection(HexGrid.GetTileBehavAt(col, row));
     }
 
     public void SendCancelSelection() {
@@ -295,7 +295,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleCancelSelection() {
-        _mm.targeting.CancelSelection();
+        Targeting.CancelSelection();
     }
 
     public void SendEndDragTarget() {
@@ -309,7 +309,7 @@ public class SyncManager : PunBehaviour {
     }
     [PunRPC]
     public void HandleEndDragTarget() {
-        _mm.targeting.EndDragTarget();
+        Targeting.EndDragTarget();
     }
 
     public void SendDropSelection(Hex hex, int col) {

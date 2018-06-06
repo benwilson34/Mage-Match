@@ -134,8 +134,8 @@ public class AudioController {
     }
 
     public static void OnEventContLoaded() {
-        _mm.eventCont.playerHealthChange += LowHealthWarning;
-        _mm.eventCont.timeout += TurnTimeout;
+        EventController.playerHealthChange += LowHealthWarning;
+        EventController.timeout += TurnTimeout;
     }
 
     public static void LowHealthWarning(int id, int amount, int newHealth, bool dealt) {

@@ -30,22 +30,22 @@ public class Stats {
     }
 
     public void OnEventContLoaded() {
-        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Report);
-        _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
-        _mm.eventCont.timeout += OnTimeout;
-        //_mm.eventCont.commishDrop += OnCommishDrop;
-        //_mm.eventCont.commishMatch += OnCommishMatch;
+        EventController.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Report);
+        EventController.AddTurnEndEvent(OnTurnEnd, EventController.Type.Stats);
+        EventController.timeout += OnTimeout;
+        //EventController.commishDrop += OnCommishDrop;
+        //EventController.commishMatch += OnCommishMatch;
 
-        _mm.eventCont.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.Begin);
-        _mm.eventCont.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.Begin);
-        _mm.eventCont.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.Begin);
-        _mm.eventCont.AddSpellCastEvent(OnSpellCast, EventController.Type.Stats, EventController.Status.Begin);
-        //_mm.eventCont.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
+        EventController.AddDrawEvent(OnDraw, EventController.Type.Stats, EventController.Status.Begin);
+        EventController.AddDropEvent(OnDrop, EventController.Type.Stats, EventController.Status.Begin);
+        EventController.AddSwapEvent(OnSwap, EventController.Type.Stats, EventController.Status.Begin);
+        EventController.AddSpellCastEvent(OnSpellCast, EventController.Type.Stats, EventController.Status.Begin);
+        //EventController.AddDiscardEvent(OnDiscard, EventController.Type.Stats);
 
-        //_mm.eventCont.AddMatchEvent(OnMatch, EventController.Type.Stats);
+        //EventController.AddMatchEvent(OnMatch, EventController.Type.Stats);
         //mm.eventCont.cascade += OnCascade;
-        _mm.eventCont.tileRemove += OnTileRemove;
-        _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+        EventController.tileRemove += OnTileRemove;
+        EventController.playerHealthChange += OnPlayerHealthChange;
     }
 
     public void OnPlayersLoaded() {
@@ -236,7 +236,7 @@ public class Stats {
             sb.AppendLine("Turns timed out," + ps.timeouts).AppendLine("");
         }
 
-        // TODO write num of each spell cast from EffectCont.tagDict
+        // TODO write num of each spell cast from EffectController.tagDict
         File.WriteAllText(path + filename, sb.ToString());
     }
 }

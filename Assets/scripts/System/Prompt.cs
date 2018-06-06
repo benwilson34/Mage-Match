@@ -27,12 +27,13 @@ public class Prompt {
         _mm = mm;
     }
 
-    static void ResetCount() { _count = -1; }
-
-    public static bool WasSuccessful() {
-        MMLog.Log("PROMPT", "blue", "prompt was" + (_successful ? "" : " not") + " successful");
-        return _successful;
+    public static bool WasSuccessful { get {
+            MMLog.Log("PROMPT", "blue", "prompt was" + (_successful ? "" : " not") + " successful");
+            return _successful;
+        }
     }
+
+    static void ResetCount() { _count = -1; }
 
 
     #region ---------- DROP ----------
@@ -61,7 +62,7 @@ public class Prompt {
         //_successful = false;
         var hexes = _mm.ActiveP().hand.GetAllHexes();
 
-        if (_mm.hexGrid.IsBoardFull())
+        if (HexGrid.IsBoardFull())
             yield break;
 
         hexes = TileFilter.FilterByCategory(hexes, Hex.Category.Charm);
@@ -147,7 +148,7 @@ public class Prompt {
     public static IEnumerator WaitForQuickdrawAction(Hex hex) {
         _successful = false;
 
-        if (!Hex.IsCharm(hex.hextag) && _mm.hexGrid.IsBoardFull()) {
+        if (!Hex.IsCharm(hex.hextag) && HexGrid.IsBoardFull()) {
             // can't be dropped in; quickdraw whiffs
             yield break;
         }
@@ -236,7 +237,7 @@ public class Prompt {
         MMLog.Log("PROMPT", "blue", "Waiting for SWAP...");
         _successful = false;
 
-        if (_mm.hexGrid.GetPlacedTiles().Count == 0 || // if board is empty, break
+        if (HexGrid.GetPlacedTiles().Count == 0 || // if board is empty, break
             !SwapIsPossible(seq)) {
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted SWAP!!");
             ResetCount();
@@ -262,9 +263,9 @@ public class Prompt {
 
     // if needed elsewhere, move to HexGrid
     public static bool SwapIsPossible(TileSeq seq) {
-        List<TileBehav> tbs = _mm.hexGrid.GetPlacedTiles(seq);
+        List<TileBehav> tbs = HexGrid.GetPlacedTiles(seq);
         foreach (TileBehav tb in tbs) {
-            if (_mm.hexGrid.HasAdjacentNonprereqTile(tb.tile, seq))
+            if (HexGrid.HasAdjacentNonprereqTile(tb.tile, seq))
                 return true;
         }
         return false;
@@ -276,8 +277,8 @@ public class Prompt {
         _mm.stats.Report(string.Format("$ PROMPT SWAP ({0},{1}) ({2},{3})", c1, r1, c2, r2), false);
 
         _swapTiles = new TileBehav[2];
-        _swapTiles[0] = _mm.hexGrid.GetTileBehavAt(c1, r1);
-        _swapTiles[1] = _mm.hexGrid.GetTileBehavAt(c2, r2);
+        _swapTiles[0] = HexGrid.GetTileBehavAt(c1, r1);
+        _swapTiles[1] = HexGrid.GetTileBehavAt(c2, r2);
         MMLog.Log("PROMPT", "blue", "SWAPS are " + 
             _swapTiles[0].hextag + " and " + _swapTiles[1].hextag);
 

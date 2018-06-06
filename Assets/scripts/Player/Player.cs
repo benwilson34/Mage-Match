@@ -43,7 +43,7 @@ public class Player {
 
     //public void OnEventContLoaded() {
     //    character.InitEvents();
-    //    _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Player);
+    //    EventController.AddTurnBeginEvent(OnTurnBegin, EventController.Type.Player);
     //}
 
     // TODO this should really just happen in MM.TurnSystem unless priority is important...
@@ -107,6 +107,6 @@ public class Player {
             character.ChangeMeter(-meterCost);
         }
 
-        _mm.eventCont.GameAction(0);
+        EventController.GameAction(0);
     }
 }

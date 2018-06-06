@@ -10,36 +10,30 @@
 
   "core": {
     "title": "Whirlpool Spin",
-    "cost": 1,
     "keywords": ["Swap Prompt"],
     "desc": "Deal 20/40/70 damage, heal yourself for 10/20/40 health, and perform 0/1/2 swaps. Perform 1 additional swap when invoking a water match."
   },
   "spell1": {
     "title": "Mariposa",
     "prereq": "WEW",
-    "cost": 1,
     "keywords": ["Tile Target"],
     "desc": "Deal 30-60 damage. Target 2 tiles, the first target forces into the space of the second target, destroying the second and leaving a water tile behind in its original cell."
   },
   "spell2": {
     "title": "Rain Dance",
     "prereq": "WWM",
-    "cost": 1,
     "keywords": ["Buff"],
     "desc": "For 5 turns, add 3-5 water tiles into the board in random columns and heal yourself for 15-25 health at the start of each turn."
   },
   "spell3": {
     "title": "Balanco",
     "prereq": "EWM",
-    "cost": 1,
     "keywords": ["Buff"],
     "desc": "For 3 turns, deal 7 damage to your opponent whenever water tiles are dropped into the board or are swapped."
   },
   "signature": {
     "title": "Hurricane Cutter",
     "prereq": "MWMW",
-    "cost": 1,
-    "meterCost": 1000,
     "keywords": ["Swap prompt"],
     "desc": "Perform 4 swaps. Any 3/4/5-matches made during this time are triggered automatically, dealing 30/60/100 damage to your opponent and adding 2/3/4 water tiles into the board in random columns."
   }

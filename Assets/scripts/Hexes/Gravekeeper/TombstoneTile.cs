@@ -11,7 +11,7 @@ public class TombstoneTile : TileBehav {
     }
 
     public override IEnumerator OnDrop() {
-        _mm.effectCont.AddEndTurnEffect(new TurnEffect(PlayerId, Effect.Type.Add, Tombstone_OnTurnEnd, Tombstone_OnEffectRemove, 5), "tombs");
+        EffectController.AddEndTurnEffect(new TurnEffect(PlayerId, Effect.Type.Add, Tombstone_OnTurnEnd, Tombstone_OnEffectRemove, 5), "tombs");
         yield return null;
     }
 
@@ -23,14 +23,14 @@ public class TombstoneTile : TileBehav {
         else
             elem = Tile.Element.Muscle;
 
-        TileBehav tb = _mm.hexMan.GenerateBasicTile(id, elem);
+        TileBehav tb = HexManager.GenerateBasicTile(id, elem);
         yield return _mm.hexFX.Ench_SetZombie(id, tb);
-        _mm.hexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
+        HexGrid.RaiseTileBehavIntoCell(tb, tile.col, tile.row + 1);
         AudioController.Trigger(AudioController.GravekeeperSFX.SigEffect);
     }
 
     public IEnumerator Tombstone_OnEffectRemove(int id) {
-        yield return _mm.hexMan._RemoveTile(this, false); // remove itself
+        yield return HexManager._RemoveTile(this, false); // remove itself
         AudioController.Trigger(AudioController.GravekeeperSFX.SigBell2);
     }
 }

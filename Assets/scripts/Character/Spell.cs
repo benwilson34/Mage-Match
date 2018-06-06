@@ -64,19 +64,19 @@ public class Spell {
 
 
 
-public class CoreSpell : Spell {
+public class MatchSpell : Spell {
 
     public Tile.Element currentElem = Tile.Element.None;
 
-    public CoreSpell(int index, string name, MySpellEffect effect, int APcost = 1) 
+    public MatchSpell(int index, string name, MySpellEffect effect, int APcost = 1) 
         : base(index, name, effect, APcost) {
         _seq = new TileSeq(); // empty seq...be wary of errors...
     }
 
-    public CoreSpell(CoreSpell copySpell) : this(copySpell.index, copySpell.name, copySpell._effect) { }
+    public MatchSpell(MatchSpell copySpell) : this(copySpell.index, copySpell.name, copySpell._effect) { }
 
     public override int GetLength() {
-        return 5; // max core spell length
+        return 5; // max match spell length
     }
 }
 

@@ -8,13 +8,14 @@ public class CharacterInfo {
     public class SpellInfo {
         public string title, prereq, desc;
         public string[] keywords;
-        public int cost, meterCost;
+        public int cost = 1, meterCost = 1000;
     }
 
     public string name, keyElements;
     public int health;
     public int[] deck;
-    public SpellInfo passive, core, spell1, spell2, spell3, signature, altSpell;
+    public SpellInfo passive, core, spell1, spell2, spell3, signature;
+    public SpellInfo[] altSpells;
 
     public static string GetSpellInfoString(SpellInfo spell, bool formatted) {
         // title, prereq, type, desc

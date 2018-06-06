@@ -7,9 +7,9 @@ public class Leeches : Charm {
     public override IEnumerator DropEffect() {
         AudioController.Trigger(AudioController.Rune_NeutralSFX.Leeches);
 
-        _mm.eventCont.playerHealthChange += Leeches_Buff;
+        EventController.playerHealthChange += Leeches_Buff;
         TurnEffect turn = new TurnEffect(PlayerId, Effect.Type.Healing, null, Leeches_End, 1);
-        _mm.effectCont.AddEndTurnEffect(turn, "Leech");
+        EffectController.AddEndTurnEffect(turn, "Leech");
         yield return null;
     }
 
@@ -22,7 +22,7 @@ public class Leeches : Charm {
     }
 
     IEnumerator Leeches_End(int id) {
-        _mm.eventCont.playerHealthChange -= Leeches_Buff;
+        EventController.playerHealthChange -= Leeches_Buff;
         yield return null;
     }
 }

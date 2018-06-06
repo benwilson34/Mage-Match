@@ -265,8 +265,8 @@ public class InputController : MonoBehaviour {
             int dir = (int)Mathf.Floor(angle / 60);
 
             int c2, r2;
-            _mm.hexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
-            if (!_mm.hexGrid.CanSwap(tile.col, tile.row, c2, r2))
+            HexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
+            if (!HexGrid.CanSwap(tile.col, tile.row, c2, r2))
                 return;
 
             if (Prompt.currentMode == Prompt.PromptMode.Swap) {
@@ -279,7 +279,7 @@ public class InputController : MonoBehaviour {
 	}
 
     bool DropCheck(Hex hex, int col) {
-        if (hex is TileBehav && _mm.boardCheck.CheckColumn(col) == -1)
+        if (hex is TileBehav && BoardCheck.CheckColumn(col) == -1)
             return false;
         return _mm.GetPlayer(hex.PlayerId).GetAP() >= hex.cost;
     }
@@ -373,7 +373,7 @@ public class InputController : MonoBehaviour {
                 return InputStatus.Unhandled;
 
             TileBehav tb = (TileBehav)obj;
-            _mm.targeting.OnTBTarget(tb);
+            Targeting.OnTBTarget(tb);
             return InputStatus.FullyHandled;
         }
     }
@@ -384,7 +384,7 @@ public class InputController : MonoBehaviour {
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
             CellBehav cb = (CellBehav)obj;
-            _mm.targeting.OnCBTarget(cb);
+            Targeting.OnCBTarget(cb);
             return InputStatus.FullyHandled;
         }
     }
@@ -401,7 +401,7 @@ public class InputController : MonoBehaviour {
             tb = _input.GetDragTarget();
             if (tb == null)
                 return InputStatus.Unhandled;
-            _mm.targeting.OnTBTarget(tb);
+            Targeting.OnTBTarget(tb);
             _dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
             return InputStatus.FullyHandled;
         }
@@ -414,10 +414,10 @@ public class InputController : MonoBehaviour {
                 MMLog.Log_InputCont("Drag more than 50px.");
                 tb = _input.GetDragTarget();
                 if (tb == null)
-                    _mm.targeting.EndDragTarget();
-                _mm.targeting.OnTBTarget(tb);
-                if (!_mm.targeting.TargetsRemain())
-                    _mm.targeting.EndDragTarget();
+                    Targeting.EndDragTarget();
+                Targeting.OnTBTarget(tb);
+                if (!Targeting.TargetsRemain())
+                    Targeting.EndDragTarget();
                 _dragClick = Camera.main.WorldToScreenPoint(tb.transform.position);
                 return InputStatus.FullyHandled;
             }
@@ -425,7 +425,7 @@ public class InputController : MonoBehaviour {
         }
 
         public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
-            _mm.targeting.EndDragTarget();
+            Targeting.EndDragTarget();
             return InputStatus.FullyHandled;
         }
 
@@ -441,7 +441,7 @@ public class InputController : MonoBehaviour {
                 return InputStatus.Unhandled;
 
             TileBehav tb = (TileBehav)obj;
-            _mm.targeting.OnSelection(tb);
+            Targeting.OnSelection(tb);
             return InputStatus.FullyHandled;
         }
     }
@@ -569,7 +569,7 @@ public class InputController : MonoBehaviour {
                     hex.GetComponent<SpriteRenderer>().sortingOrder = 1;
                     _input._heldHex = hex;
                     _mm.LocalP().hand.GrabHex(hex); //?
-                    _mm.eventCont.GrabTile(_mm.myID, hex.hextag);
+                    EventController.GrabTile(_mm.myID, hex.hextag);
                     return InputStatus.FullyHandled;
                 }
             }
@@ -676,7 +676,7 @@ public class InputController : MonoBehaviour {
                 break;
 
             case MageMatch.State.Targeting:
-                Targeting.TargetMode tMode = _mm.targeting.currentTMode;
+                Targeting.TargetMode tMode = Targeting.currentTMode;
                 if (tMode == Targeting.TargetMode.Drag)
                     _currentContext = _target_drag;
                 else if (tMode == Targeting.TargetMode.Tile || tMode == Targeting.TargetMode.TileArea)

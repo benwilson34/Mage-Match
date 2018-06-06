@@ -117,7 +117,7 @@ public class Hand {
     }
 
     public IEnumerator _Discard(Hex hex) {
-        yield return _mm.eventCont.Discard(_p.id, hex.hextag);
+        yield return EventController.Discard(_p.id, hex.hextag);
 
         AudioController.Trigger(AudioController.HexSFX.Discard);
         Remove(hex);

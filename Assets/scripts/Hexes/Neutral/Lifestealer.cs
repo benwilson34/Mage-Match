@@ -17,8 +17,8 @@ public class Lifestealer : TileBehav {
 
         HealthModEffect buffDeal = new HealthModEffect(id, Lifestealer_Buff_Deal, false, true, 5);
         HealthModEffect buffTake = new HealthModEffect(id, Lifestealer_Buff_Take, false, false, 5);
-        _mm.effectCont.AddHealthEffect(buffDeal, "Lifestealer_Deal");
-        _mm.effectCont.AddHealthEffect(buffTake, "Lifestealer_Take");
+        EffectController.AddHealthEffect(buffDeal, "Lifestealer_Deal");
+        EffectController.AddHealthEffect(buffTake, "Lifestealer_Take");
 
         yield return null;
     }

@@ -7,7 +7,7 @@ public class EM_DanceShoes : Charm {
     public override IEnumerator DropEffect() {
         Prompt.SetSwapCount(1);
         yield return Prompt.WaitForSwap();
-        if (!Prompt.WasSuccessful())
+        if (!Prompt.WasSuccessful)
             yield break;
 
         var tbs = Prompt.GetSwapTBs();

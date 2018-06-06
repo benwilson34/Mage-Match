@@ -14,7 +14,7 @@ public class Commish  {
     }
 
     //public void InitEvents() {
-        //_mm.eventCont.commishMatch += OnCommishMatch;
+        //EventController.commishMatch += OnCommishMatch;
         //mm.eventCont.match += OnMatch;
     //}
 
@@ -57,7 +57,7 @@ public class Commish  {
         Queue<Tile.Element> elems = new Queue<Tile.Element>();
         for (int i = 0; i < _numTiles; i++) {
             if (colQ.Count == 0) {
-                int[] cols = _mm.boardCheck.GetRandomCols(_numTiles - prevCount); // can be i?
+                int[] cols = BoardCheck.GetRandomCols(_numTiles - prevCount); // can be i?
                 if (cols.Length == 0) {  // board is full
                     MMLog.Log_Commish("The board is full. The Commissioner ends his turn early.");
                     break;
@@ -75,11 +75,11 @@ public class Commish  {
                 yield return _mm.animCont.WaitForSeconds(.15f);
             }
 
-            TileBehav tb = _mm.hexMan.GenerateBasicTile(0, elems.Dequeue()); // should get own func?
+            TileBehav tb = HexManager.GenerateBasicTile(0, elems.Dequeue()); // should get own func?
             MMLog.Log_Commish("Dropping into col " + colQ.Peek());
 
             int col = colQ.Dequeue();
-            if (_mm.boardCheck.CheckColumn(col) >= 0) {
+            if (BoardCheck.CheckColumn(col) >= 0) {
                 //_mm.DropTile(tb, col);
                 _mm.CommishDrop(tb, col);
                 _mm.stats.Report("  # C-DROP " + tb.hextag + " col" + col, false);
@@ -90,7 +90,7 @@ public class Commish  {
         }
 
         MMLog.Log_Commish("   ---------- COMMISH TURN END ----------");
-        _mm.eventCont.CommishTurnDone();
+        EventController.CommishTurnDone();
 	}
 
     int[] GetRandomInts(int num) {

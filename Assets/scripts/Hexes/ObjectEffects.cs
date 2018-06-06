@@ -7,15 +7,9 @@ using MMDebug;
 public class ObjectEffects {
 
     private MageMatch _mm;
-    private HexManager _hexMan;
-    private Targeting _targeting;
-    private HexGrid _hexGrid;
 
     public ObjectEffects(MageMatch mm) {
         this._mm = mm;
-        _hexMan = mm.hexMan;
-        _targeting = mm.targeting;
-        _hexGrid = mm.hexGrid;
     }
 
     // -------------------------------------- SPELLS ------------------------------------------
@@ -37,8 +31,8 @@ public class ObjectEffects {
     //}
 
     //public IEnumerator LightningPalm(int id) {
-    //    yield return _targeting.WaitForTileTarget(1);
-    //    List<TileBehav> tbs = _targeting.GetTargetTBs();
+    //    yield return Targeting.WaitForTileTarget(1);
+    //    List<TileBehav> tbs = Targeting.GetTargetTBs();
     //    if (tbs.Count != 1)
     //        yield return null;
 
@@ -54,13 +48,13 @@ public class ObjectEffects {
     //}
 
     //public IEnumerator Cherrybomb(TileSeq prereq) {
-    //    yield return _targeting.WaitForTileTarget(1);
+    //    yield return Targeting.WaitForTileTarget(1);
 
-    //    List<TileBehav> tbs = _targeting.GetTargetTBs();
+    //    List<TileBehav> tbs = Targeting.GetTargetTBs();
     //    if (tbs.Count != 1)
     //        yield return null;
 
-    //    TileBehav tb = _targeting.GetTargetTBs()[0];
+    //    TileBehav tb = Targeting.GetTargetTBs()[0];
     //    Ench_SetCherrybomb(_mm.ActiveP().id, tb); // right id?
     //}
 
@@ -94,7 +88,7 @@ public class ObjectEffects {
 
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(1f, .4f, .4f);
-        _mm.effectCont.AddEndTurnEffect(ench, "burn");
+        EffectController.AddEndTurnEffect(ench, "burn");
     }
     IEnumerator Ench_Burning_TEffect(int id, TileBehav tb) {
         MMLog.Log_EnchantFx("Burning TurnEffect at " + tb.PrintCoord());
@@ -112,7 +106,7 @@ public class ObjectEffects {
     //public void Ench_SetStone(TileBehav tb) {
     //    Enchantment ench = new Enchantment(5, Enchantment.Type.StoneTok, Effect.Type.Destruct, Ench_StoneTok_, Ench_StoneTok_End);
     //    tb.SetEnchantment(ench);
-    //    _mm.effectCont.AddEndTurnEffect(ench, "stoT");
+    //    EffectController.AddEndTurnEffect(ench, "stoT");
     //}
     //IEnumerator Ench_StoneTok_OnTurnEnd(int id, TileBehav tb) {
     //    int c = tb.tile.col, r = tb.tile.row;
@@ -136,7 +130,7 @@ public class ObjectEffects {
 
         //MMLog.Log("ObjEffects", "orange", "Zombify's enchtype is "+ench.enchType);
 
-        _mm.effectCont.AddEndTurnEffect(ench, "zomb");
+        EffectController.AddEndTurnEffect(ench, "zomb");
 
         tb.SetEnchantment(ench);
         tb.GetComponent<SpriteRenderer>().color = new Color(0f, .4f, 0f);
@@ -146,7 +140,7 @@ public class ObjectEffects {
         if (tb == null)
             MMLog.LogError("SPELLFX: >>>>>Zombify called with a null tile!! Maybe it was removed?");
 
-        List<TileBehav> tbs = _hexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
+        List<TileBehav> tbs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
         tbs = TileFilter.FilterByAbleEnch(tbs, Enchantment.Type.Zombie);
 
         if (tbs.Count == 0) { // no targets
@@ -162,7 +156,7 @@ public class ObjectEffects {
         yield return _mm.animCont._Zombify_Attack(tb.transform, selectTB.transform); // anim 1
 
         if (selectTB.tile.IsElement(Tile.Element.Muscle)) {
-            yield return _hexMan._RemoveTile(selectTB, true); // maybe?
+            yield return HexManager._RemoveTile(selectTB, true); // maybe?
             AudioController.Trigger(AudioController.GravekeeperSFX.ZombieGulp);
 
             _mm.GetPC(id).DealDamage(10);

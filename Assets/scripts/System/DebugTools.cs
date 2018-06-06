@@ -91,9 +91,9 @@ public class DebugTools : MonoBehaviour {
     }
 
     public void OnEventContLoaded() {
-        _mm.eventCont.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
-        _mm.eventCont.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
-        _mm.eventCont.gameAction += OnGameAction;
+        EventController.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
+        EventController.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
+        EventController.gameAction += OnGameAction;
     }
 
     public IEnumerator OnTurnBegin(int id) {
@@ -165,9 +165,9 @@ public class DebugTools : MonoBehaviour {
         for (int r = HexGrid.NUM_ROWS - 1; r >= 0; r--) {
             grid += r + " ";
             for (int c = 0; c < HexGrid.NUM_COLS; c++) {
-                if (r <= _mm.hexGrid.TopOfColumn(c) && r >= _mm.hexGrid.BottomOfColumn(c)) {
-                    if (_mm.hexGrid.IsCellFilled(c, r)) {
-                        TileBehav tb = _mm.hexGrid.GetTileBehavAt(c, r);
+                if (r <= HexGrid.TopOfColumn(c) && r >= HexGrid.BottomOfColumn(c)) {
+                    if (HexGrid.IsCellFilled(c, r)) {
+                        TileBehav tb = HexGrid.GetTileBehavAt(c, r);
                         if (tb.wasInvoked)
                             grid += "[*]";
                         else
@@ -188,7 +188,7 @@ public class DebugTools : MonoBehaviour {
             Destroy(child.gameObject);
         }
 
-        object[] lists = _mm.effectCont.GetLists();
+        object[] lists = EffectController.GetLists();
         List<GameObject> debugItems = new List<GameObject>();
 
         Color lightBlue = new Color(.07f, .89f, .93f, .8f);
@@ -420,7 +420,7 @@ public class DebugTools : MonoBehaviour {
         Insert(GetHexGenTag(GetPlayerId()), cb.col, cb.row);
     }
     public void Insert(string hextag, int col, int row) {
-        TileBehav insertTB = (TileBehav) _mm.hexMan.GenerateHex(_mm.ActiveP().id, hextag);
+        TileBehav insertTB = (TileBehav) HexManager.GenerateHex(_mm.ActiveP().id, hextag);
         _mm.stats.Report(string.Format("$ DEBUG INSERT {0} ({1},{2})", insertTB.hextag, col, row), false);
         _mm.PutTile(insertTB, col, row);
         //insertTB.HardSetPos(cb.col, cb.row);
@@ -433,12 +433,12 @@ public class DebugTools : MonoBehaviour {
     public void Destroy(int col, int row) { // maybe need to rename?
         //MMLog.Log("DebugTools", "orange", "calling destroy mode!");
         _mm.stats.Report(string.Format("$ DEBUG DESTROY ({0},{1})", col, row), false);
-        _mm.hexMan.RemoveTile(col, row, false);
+        HexManager.RemoveTile(col, row, false);
     }
 
 
     public void Enchant(int col, int row, string ench) {
-        TileBehav tb = _mm.hexGrid.GetTileBehavAt(col, row);
+        TileBehav tb = HexGrid.GetTileBehavAt(col, row);
         EnchantMode_OnClick(tb, ench);
     }
     void EnchantMode_OnClick(TileBehav tb, string ench = "") {
@@ -472,7 +472,7 @@ public class DebugTools : MonoBehaviour {
     }
 
     public void Clear(int col, int row) {
-        TileBehav tb = _mm.hexGrid.GetTileBehavAt(col, row);
+        TileBehav tb = HexGrid.GetTileBehavAt(col, row);
         ClearMode_OnClick(tb);
     }
     void ClearMode_OnClick(TileBehav tb) {
@@ -490,7 +490,7 @@ public class DebugTools : MonoBehaviour {
         if (p.hand.IsFull())
             return;
 
-        Hex hex = _mm.hexMan.GenerateHex(id, hextag);
+        Hex hex = HexManager.GenerateHex(id, hextag);
         if (id != _mm.myID)
             hex.Flip();
 

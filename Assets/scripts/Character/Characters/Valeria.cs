@@ -5,19 +5,14 @@ using MMDebug;
 
 public class Valeria : Character {
 
-    private HexGrid _hexGrid; // eventually these will be static again?
-    private Targeting _targeting; // ''
-
     public Valeria(MageMatch mm, int id) : base(mm, Ch.Valeria, id) {
         _objFX = mm.hexFX;
-        _hexGrid = mm.hexGrid;
-        _targeting = mm.targeting;
     }
 
-    public override void OnEffectContLoad() {
+    public override void OnEffectControllerLoad() {
         MMLog.Log("Valeria","cyan","Loading PASSIVE...");
         SwapEffect se = new SwapEffect(_playerId, Passive_Swap);
-        _mm.effectCont.AddSwapEffect(se, "VlSwp");
+        EffectController.AddSwapEffect(se, "VlSwp");
 
         // when we have List<Buff>
         //Buff b = new Buff();
@@ -40,7 +35,7 @@ public class Valeria : Character {
     // -----  SPELLS  -----
 
     // Whirlpool Spin
-    protected override IEnumerator CoreSpell(TileSeq seq) {
+    protected override IEnumerator MatchSpell(TileSeq seq) {
         AudioController.Trigger(AudioController.ValeriaSFX.SwirlingWater);
 
         int dmg = 0, swaps = 0;
@@ -68,7 +63,7 @@ public class Valeria : Character {
         for (int i = 0; i < swaps; i++) {
             MMLog.Log("Valeria", "pink", "Waiting for swap " + (i+1) + " of " + swaps);
             yield return Prompt.WaitForSwap(seq);
-            if (Prompt.WasSuccessful()) {
+            if (Prompt.WasSuccessful) {
                 yield return Prompt.ContinueSwap();
                 AudioController.Trigger(AudioController.ValeriaSFX.Bubbles2);
             }
@@ -85,8 +80,8 @@ public class Valeria : Character {
         DealDamage(dmg);
 
         // get targets
-        yield return _targeting.WaitForTileTarget(2);
-        List<TileBehav> tbs = _targeting.GetTargetTBs();
+        yield return Targeting.WaitForTileTarget(2);
+        List<TileBehav> tbs = Targeting.GetTargetTBs();
         if (tbs.Count < 2)
             yield break;
 
@@ -95,12 +90,12 @@ public class Valeria : Character {
 
         // move first to second and destroy second
         int secCol = second.tile.col, secRow = second.tile.row;
-        yield return _hexMan._RemoveTile(second, false);
+        yield return HexManager._RemoveTile(second, false);
         AudioController.Trigger(AudioController.ValeriaSFX.Mariposa);
         yield return first._ChangePos(secCol, secRow, 0.3f);
 
         // put new water tile in first's place
-        TileBehav waterTile = _hexMan.GenerateBasicTile(_playerId, Tile.Element.Water);
+        TileBehav waterTile = HexManager.GenerateBasicTile(_playerId, Tile.Element.Water);
         waterTile.SetPlaced(); // this kinda sucks here
         yield return waterTile._ChangePos(firstCol, firstRow);
 
@@ -113,7 +108,7 @@ public class Valeria : Character {
         AudioController.Trigger(AudioController.ValeriaSFX.ThunderFar);
 
         TurnEffect te = new TurnEffect(_playerId, Effect.Type.Add, RainDance_T, null, 5);
-        _mm.effectCont.AddBeginTurnEffect(te, "rainD");
+        EffectController.AddBeginTurnEffect(te, "rainD");
         yield return null;
     }
     public IEnumerator RainDance_T(int id) {
@@ -135,7 +130,7 @@ public class Valeria : Character {
     }
 
     public IEnumerator DropWaterIntoRandomCols(int count) {
-        int[] cols = _mm.boardCheck.GetRandomCols(count);
+        int[] cols = BoardCheck.GetRandomCols(count);
         yield return _mm.syncManager.SyncRands(_playerId, cols);
         cols = _mm.syncManager.GetRands(cols.Length);
 
@@ -152,7 +147,7 @@ public class Valeria : Character {
         int col;
         while (colQ.Count > 0) {
             col = colQ.Dequeue();
-            TileBehav newWater = _hexMan.GenerateBasicTile(_playerId, Tile.Element.Water);
+            TileBehav newWater = HexManager.GenerateBasicTile(_playerId, Tile.Element.Water);
             _mm.DropTile(newWater, col);
         }
     }
@@ -163,11 +158,11 @@ public class Valeria : Character {
 
         DropEffect de = new DropEffect(_playerId, Balanco_Drop, 3);
         de.isGlobal = true;
-        _mm.effectCont.AddDropEffect(de, "balDp");
+        EffectController.AddDropEffect(de, "balDp");
 
         SwapEffect se = new SwapEffect(_playerId, Balanco_Swap, 3);
         se.isGlobal = true;
-        _mm.effectCont.AddSwapEffect(se, "balSw");
+        EffectController.AddSwapEffect(se, "balSw");
         yield return null;
     }
     public IEnumerator Balanco_Drop(int id, bool playerAction, string tag, int col) {
@@ -176,8 +171,8 @@ public class Valeria : Character {
         yield return null;    
     }
     public IEnumerator Balanco_Swap(int id, int c1, int r1, int c2, int r2) {
-        Tile tile1 = _mm.hexGrid.GetTileAt(c1, r1);
-        Tile tile2 = _mm.hexGrid.GetTileAt(c2, r2);
+        Tile tile1 = HexGrid.GetTileAt(c1, r1);
+        Tile tile2 = HexGrid.GetTileAt(c2, r2);
         int dmg = 0;
         if (tile1.IsElement(Tile.Element.Water))
             dmg += 7;
@@ -200,7 +195,7 @@ public class Valeria : Character {
         Prompt.SetSwapCount(numSwaps);
         for (int i = 0; i < numSwaps; i++) {
             yield return Prompt.WaitForSwap(prereq);
-            if (!Prompt.WasSuccessful())
+            if (!Prompt.WasSuccessful)
                 break;
 
             yield return Prompt.ContinueSwap();
@@ -214,9 +209,9 @@ public class Valeria : Character {
 
     IEnumerator HandleMatchesOnBoard() {
         var spells = new List<Spell>();
-        spells.Add(new CoreSpell(0, "", null));
+        spells.Add(new MatchSpell(0, "", null));
 
-        List<TileSeq> seqs = _mm.boardCheck.CheckBoard(spells)[0];
+        List<TileSeq> seqs = BoardCheck.CheckBoard(spells)[0];
         while (seqs.Count > 0) {  // this is needed to handle cascades
             for (int s = 0; s < seqs.Count; s++) {
                 TileSeq seq = seqs[s];
@@ -236,7 +231,7 @@ public class Valeria : Character {
                         break;
                 }
 
-                yield return _mm.hexMan._RemoveSeq(seq, false);
+                yield return HexManager._RemoveSeq(seq, false);
 
                 DealDamage(dmg);
                 yield return DropWaterIntoRandomCols(dropCount);
@@ -246,7 +241,7 @@ public class Valeria : Character {
             // wait for board to update...will this work?
             yield return _mm.BoardChecking(false);
 
-            seqs = _mm.boardCheck.CheckBoard(spells)[0];
+            seqs = BoardCheck.CheckBoard(spells)[0];
         }
         yield return null;
     }

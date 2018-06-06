@@ -153,7 +153,7 @@
 //            //hex.GetComponent<SpriteRenderer>().sortingOrder = 1;
 //            _input._heldRune = rune;
 //            //_mm.LocalP().hand.GrabHex(hex); //?
-//            //_mm.eventCont.GrabTile(_mm.myID, hex.hextag);
+//            //EventController.GrabTile(_mm.myID, hex.hextag);
 //    }
 
 //        void OnMouseDrag(RunebuildingRune rune) {

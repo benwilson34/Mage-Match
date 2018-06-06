@@ -7,12 +7,12 @@ public class FiveAlarmBell : Charm {
     // TODO lock and key
 
     public override IEnumerator DropEffect() {
-        yield return _mm.targeting.WaitForDragTarget(5);
+        yield return Targeting.WaitForDragTarget(5);
 
         AudioController.Trigger(AudioController.Rune_NeutralSFX.FiveAlarmBell);
 
         int id = PlayerId;
-        foreach (var tb in _mm.targeting.GetTargetTBs()) {
+        foreach (var tb in Targeting.GetTargetTBs()) {
             _mm.hexFX.Ench_SetBurning(id, tb);
         }
 

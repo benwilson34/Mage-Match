@@ -13,9 +13,9 @@ public class ProteinPills : Charm {
         AudioController.Trigger(AudioController.Rune_NeutralSFX.ProteinPills);
 
         HealthModEffect buffDealing = new HealthModEffect(PlayerId, PP_BuffDeal, false, true, 2);
-        _mm.effectCont.AddHealthEffect(buffDealing, "PPdea");
+        EffectController.AddHealthEffect(buffDealing, "PPdea");
         HealthModEffect buffReceiving = new HealthModEffect(PlayerId, PP_BuffDeal, false, false, 2);
-        _mm.effectCont.AddHealthEffect(buffReceiving, "PPrec");
+        EffectController.AddHealthEffect(buffReceiving, "PPrec");
 
         yield return null;
     }

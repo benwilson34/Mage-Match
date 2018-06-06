@@ -48,7 +48,7 @@
 //    //public IEnumerator Magnitude10() {
 //    //    TurnEffect t = new TurnEffect(3, Magnitude10_Turn, Magnitude10_End, null);
 //    //    t.priority = 4;
-//    //    mm.effectCont.AddEndTurnEffect(t, "mag");
+//    //    mm.EffectController.AddEndTurnEffect(t, "mag");
 //    //    yield return null;
 //    //}
 //    //IEnumerator Magnitude10_Turn(int id) {

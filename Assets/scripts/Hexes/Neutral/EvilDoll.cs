@@ -7,7 +7,7 @@ public class EvilDoll : TileBehav {
     int _amountHealed = 0;
 
     public override IEnumerator OnDrop() {
-        _mm.eventCont.playerHealthChange += OnPlayerHealthChange;
+        EventController.playerHealthChange += OnPlayerHealthChange;
         TileEffect te = new TileEffect(PlayerId, Effect.Type.Damage, OnTurnEnd, OnRemove);
         AddTileEffect(te, Title);
         yield return null;
@@ -27,7 +27,7 @@ public class EvilDoll : TileBehav {
     }
 
     public IEnumerator OnRemove(int id, TileBehav tb) {
-        _mm.eventCont.playerHealthChange -= OnPlayerHealthChange;
+        EventController.playerHealthChange -= OnPlayerHealthChange;
         yield return null;
     }
 }
