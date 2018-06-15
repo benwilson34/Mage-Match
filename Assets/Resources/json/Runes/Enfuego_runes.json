@@ -1,25 +1,25 @@
 {
-  "LighterFluid": {
-    "title": "Lighter Fluid",
+  "RoaringFlame": {
+    "title": "Roaring Flame",
     "category": "Charm",
     "keywords": ["Discard"],
     "deckCount": 3,
     "cost": 2,
     "desc": "Discard every hex in your hand. Deal 30 damage for each hex discarded."
   },
-  "DanceShoes": {
-    "title": "Dance Shoes",
+  "GleamingGolpe": {
+    "title": "Gleaming Golpe",
     "category": "Charm",
     "keywords": ["Swap Prompt"],
     "deckCount": 6,
     "desc": "Perform a swap. Inflict Burning on both tiles swapped."
   },
-  "BurningBracers": {
-    "title": "Burning Bracers",
+  "ScorchingSpin": {
+    "title": "Scorching Spin",
     "category": "Charm",
     "keywords": [],
-    "deckCount": 4,
-    "desc": "Gain 1 AP and deal 30 damage. Has Quickdraw if more than 9 tiles are burning."
+    "deckCount": 6,
+    "desc": "Gain 1 AP and deal 30 damage. Has Quickdraw if at least 9 tiles are burning."
   },
   "CausticCastanet": {
     "title": "Caustic Castanet",

@@ -2,7 +2,10 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{9f2894fe-4f18-47f8-a901-38644887c391}">
         <property name="name">
-            <value>ShuffleGem</value>
+            <value>Redesign</value>
+        </property>
+        <property name="note">
+            <value>Previously called Shuffle Gem</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

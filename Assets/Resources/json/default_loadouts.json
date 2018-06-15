@@ -3,25 +3,25 @@
 		"name": "Sample",
 		"runes": [
 		    "MuscleMass",
-		    "Brushfire",
-		    "Leeches",
-		   	"WhiteWater",
-			"ShuffleGem",
-		    "Raindrops",
-		    "PuffPendant"
+		    "Cyclone",
+		    "WillOWisps",
+		    "Molotov",
+		    "Firespout",
+		    "Stimulant",
+		    "Brushfire"
   		]
 	},
 
-	"Valeria": {
-		"name": "Valeria Default",
+	"Enfuego": {
+		"name": "Enfuego Default",
 		"runes": [
-		    "Bandages",
-		    "WaterLily",
-			"ShuffleGem",
-		    "WhiteWater",
-		    "EvilDoll",
-		    "ComebackBrace",
-		    "Geode"
+		    "RoaringFlame",
+		    "ScorchingSpin",
+		    "WillOWisps",
+		    "Molotov",
+		    "CausticCastanet",
+		    "Stimulant",
+		    "Brushfire"
   		]
 	},
 
@@ -30,37 +30,37 @@
 		"runes": [
 			"WhiteWater",
 			"Lifestealer",
-			"HRForm",
-		    "PartySnacks",
-		    "BrawnBroth",
+			"Recruit",
+		    "Engorge",
+		    "Stampede",
 		    "RollingBone",
 		    "Leeches"
 		]
 	},
 
-	"Enfuego": {
-		"name": "Enfuego Default",
+	"Valeria": {
+		"name": "Valeria Default",
 		"runes": [
-		    "LighterFluid",
-		    "BurningBracers",
-		    "Twinfire",
-		    "Molotov",
-		    "CausticCastanet",
-		    "Stimulant",
-		    "Flamethrower"
+		    "HealingHands",
+		    "WaterLily",
+			"Redesign",
+		    "WhiteWater",
+		    "EvilDoll",
+		    "Sanctuary",
+		    "Mudslide"
   		]
 	},
 
 	"MagicAl": {
 		"name": "Magic Al Default",
 		"runes": [
-		    "LighterFluid",
-		    "BurningBracers",
-		    "Twinfire",
-		    "Molotov",
-		    "CausticCastanet",
-		    "Stimulant",
-		    "Flamethrower"
+		    "IllusoryFist",
+		    "LegWeights",
+		    "Stardust",
+		    "LivingMana",
+		    "Soulbind",
+		    "RopeADope",
+		    "FutureSight"
   		]
 	}
 }

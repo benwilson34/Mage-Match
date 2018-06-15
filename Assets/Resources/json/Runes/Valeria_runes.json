@@ -1,5 +1,6 @@
 {
-  "Bandages": {
+  "HealingHands": {
+    "title": "Healing Hands",
     "category": "Charm",
     "keywords": ["Buff"],
     "deckCount": 5,

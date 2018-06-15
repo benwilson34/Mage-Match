@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Deck {
 
+    public int Count { get { return _deckQ.Count; } }
+
     private MageMatch _mm;
     private Player _player;
     private Queue<string> _deckQ;
@@ -12,41 +14,41 @@ public class Deck {
     public Deck(MageMatch mm, Player p) {
         _mm = mm;
         _player = p;
+        _deckQ = new Queue<string>(GetInitHextags());
+
         _graveyard = new List<string>();
     }
 
     string[] GetInitHextags() {
-        MMDebug.MMLog.Log("DECK", "black", "Init player " + _player.id);
+        MMDebug.MMLog.Log("DECK", "black", "Init player " + _player.ID);
         var list = new List<string>();
-        var info = CharacterInfo.GetCharacterInfo(_player.character.ch);
+        var info = CharacterInfo.GetCharacterInfo(_player.Character.ch);
         for(int d = 0; d < 5; d++) {
             Tile.Element elem = (Tile.Element)(d + 1);
             for (int i = 0; i < info.deck[d]; i++) {
-                list.Add("p"+_player.id+"-B-"+elem.ToString().Substring(0, 1));
+                list.Add("p"+_player.ID+"-B-"+elem.ToString());
             }
         }
 
-        foreach (string rune in _mm.gameSettings.GetLoadout(_player.id)) {
-            var runeInfo = RuneInfoLoader.GetPlayerRuneInfo(_player.id, rune);
+        foreach (string rune in _mm.gameSettings.GetLoadout(_player.ID)) {
+            var runeInfo = RuneInfoLoader.GetPlayerRuneInfo(_player.ID, rune);
             string cat = runeInfo.category.Substring(0, 1);
             for (int i = 0; i < runeInfo.deckCount; i++) {
-                list.Add("p" + _player.id + "-" + cat + "-" + runeInfo.tagTitle);
+                list.Add("p" + _player.ID + "-" + cat + "-" + runeInfo.tagTitle);
             }
         }
 
         return list.ToArray();
     }
 
-    public IEnumerator Shuffle(string[] hextags = null) {
-        if (hextags == null)
-            hextags = GetInitHextags();
+    public void AddHextag(string hextag) {
+        _deckQ.Enqueue(hextag);
+    }
 
-        int id;
-        if (_mm.IsDebugMode())
-            id = 1;
-        else
-            id = _player.id;
+    public IEnumerator Shuffle() {
+        int id = _mm.IsDebugMode ? 1 : _player.ID;
 
+        string[] hextags = _deckQ.ToArray();
         int count = hextags.Length;
         Debug.Log("DECK: Shuffling " + count + " hexes...");
         int[] rands = new int[count];
@@ -81,24 +83,6 @@ public class Deck {
         Debug.Log("DECK: " + s);
     }
 
-    public int GetDeckCount() { return _deckQ.Count; }
-
-    //public IEnumerator ReadyNextHextag() {
-    //    if (_deckQ.Count == 0) {
-    //        yield return Shuffle(_graveyard.ToArray());
-    //        _graveyard.Clear();
-    //        _mm.uiCont.UpdateRemovedCount(_player.id, 0);
-    //    }
-
-    //    Debug.Log("DECK: Next hex is " + _deckQ.Peek());
-    //    string nextHex = _deckQ.Dequeue();
-
-    //    _mm.uiCont.UpdateDeckCount(_player.id, _deckQ.Count);
-
-    //    PrintDeck();
-    //    _nextHexTag = nextHex; // + "-" ?
-    //}
-
     public string GetNextHextag() {
         if (_deckQ.Count == 0) {
             // TODO damage for trying to overdraw
@@ -107,7 +91,7 @@ public class Deck {
         Debug.Log("DECK: Next hex is " + _deckQ.Peek());
         string nextHex = _deckQ.Dequeue();
 
-        _mm.uiCont.UpdateDeckCount(_player.id, _deckQ.Count);
+        _mm.uiCont.UpdateDeckCount(_player.ID, _deckQ.Count);
 
         PrintDeck();
         return nextHex;
@@ -115,7 +99,7 @@ public class Deck {
 
     public void AddHextagToGraveyard(string hextag) {
         _graveyard.Add(hextag);
-        _mm.uiCont.UpdateRemovedCount(_player.id, _graveyard.Count);
+        _mm.uiCont.UpdateRemovedCount(_player.ID, _graveyard.Count);
     }
 
     //public int GetRemoveListCount() { return _graveyard.Count; }

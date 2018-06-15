@@ -6,10 +6,22 @@ public class EvilDoll : TileBehav {
 
     int _amountHealed = 0;
 
-    public override IEnumerator OnDrop() {
+    public override void SetInitProps() {
+        cost = 3;
+        initElements = new Tile.Element[2] { Tile.Element.Fire, Tile.Element.Water };
+    }
+
+    public override IEnumerator OnDrop(int col) {
+        AudioController.Trigger(SFX.Rune_Neutral.EvilDoll);
+
         EventController.playerHealthChange += OnPlayerHealthChange;
-        TileEffect te = new TileEffect(PlayerId, Effect.Type.Damage, OnTurnEnd, OnRemove);
-        AddTileEffect(te, Title);
+
+        TileEffect te = new TileEffect(PlayerId, this);
+        TurnEffect e = new TurnEndEffect(PlayerId, "EvilDoll_Dmg", Effect.Behav.Damage, OnTurnEnd);
+        e.onEndEffect = OnRemove;
+        te.AddEffect(e);
+
+        AddTileEffect(te);
         yield return null;
     }
 
@@ -18,15 +30,15 @@ public class EvilDoll : TileBehav {
             _amountHealed += amount;
     }
 
-    public IEnumerator OnTurnEnd(int id, TileBehav tb) {
+    public IEnumerator OnTurnEnd(int id) {
         if (_amountHealed > 0) {
-            _mm.GetPlayer(id).character.DealDamage(_amountHealed);
+            _mm.GetPlayer(id).Character.DealDamage(_amountHealed);
             _amountHealed = 0;
         }
         yield return null;
     }
 
-    public IEnumerator OnRemove(int id, TileBehav tb) {
+    public IEnumerator OnRemove() {
         EventController.playerHealthChange -= OnPlayerHealthChange;
         yield return null;
     }

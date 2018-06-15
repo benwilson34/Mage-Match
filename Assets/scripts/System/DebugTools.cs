@@ -57,7 +57,7 @@ public class DebugTools : MonoBehaviour {
 
         // Tools pane
         _toolsMenuButton = menus.transform.Find("b_tools").gameObject;
-        if (!_mm.IsDebugMode()) {
+        if (!_mm.IsDebugMode) {
             _toolsMenuButton.SetActive(false);
             toolsMenu.SetActive(false);
         } else {
@@ -84,31 +84,32 @@ public class DebugTools : MonoBehaviour {
 
         UpdateDebugGrid();
 
-        ShowPane(1);
+        _submenu = Submenu.System;
+        SetPanesActive(true, false, false);
         menus.SetActive(false);
 
-        _mm.AddEventContLoadEvent(OnEventContLoaded);
+        //_mm.AddEventContLoadEvent(OnEventContLoaded);
     }
 
-    public void OnEventContLoaded() {
-        EventController.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
-        EventController.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
-        EventController.gameAction += OnGameAction;
-    }
+    //public void OnEventContLoaded() {
+    //    EventController.AddTurnBeginEvent(OnTurnBegin, MMEvent.Behav.LastStep);
+    //    EventController.AddTurnEndEvent(OnTurnEnd, MMEvent.Behav.LastStep);
+    //    EventController.gameAction += OnGameAction;
+    //}
 
-    public IEnumerator OnTurnBegin(int id) {
-        UpdateEffTexts();
-        yield return null;
-    }
+    //public IEnumerator OnTurnBegin(int id) {
+    //    UpdateEffTexts();
+    //    yield return null;
+    //}
 
-    public IEnumerator OnTurnEnd(int id) {
-        UpdateEffTexts();
-        yield return null;
-    }
+    //public IEnumerator OnTurnEnd(int id) {
+    //    UpdateEffTexts();
+    //    yield return null;
+    //}
 
-    public void OnGameAction(int id, int cost) {
-        UpdateEffTexts(); // could be considerable overhead...
-    }
+    //public void OnGameAction(int id, int cost) {
+    //    UpdateEffTexts(); // could be considerable overhead...
+    //}
 
     public void ShowPane(int p) {
         _submenu = (Submenu)p;
@@ -116,6 +117,7 @@ public class DebugTools : MonoBehaviour {
         switch (p) {
             case 1:
                 SetPanesActive(true, false, false);
+                UpdateEffTexts();
                 break;
             case 2:
                 SetPanesActive(false, true, false);
@@ -151,6 +153,7 @@ public class DebugTools : MonoBehaviour {
         if (openingMenu) {
             menuButtonText.text = "Close";
             _mm.EnterState(MageMatch.State.DebugMenu);
+            UpdateEffTexts();
         } else {
             menuButtonText.text = "Debug";
             _mm.ExitState();
@@ -188,54 +191,43 @@ public class DebugTools : MonoBehaviour {
             Destroy(child.gameObject);
         }
 
-        object[] lists = EffectController.GetLists();
-        List<GameObject> debugItems = new List<GameObject>();
+        LastingEffect[][] lists = EffectManager.GetLists();
 
+        InstantiateEffectList(lists[0], "TurnBeginEffs");
+        InstantiateEffectList(lists[1], "TurnEndEffs");
+        InstantiateEffectList(lists[2], "HandChangeEffs");
+        InstantiateEffectList(lists[3], "DropEffs");
+        InstantiateEffectList(lists[4], "SwapEffs");
+        InstantiateEffectList(lists[5], "HealthMods");
+        InstantiateEffectList(lists[6], "TileEffs");        
+    }
+
+    void InstantiateEffectList(LastingEffect[] effs, string title) {
         Color lightBlue = new Color(.07f, .89f, .93f, .8f);
-
-        List<Effect> beginTurnEff = (List<Effect>)lists[0];
-        if (beginTurnEff.Count > 0) {
-            debugItems.Add(InstantiateDebugEntry("<b>BeginTurnEffs:</b>", lightBlue));
-            foreach (Effect e in beginTurnEff) {
-                debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
-            }
-        }
-
-        List<Effect> endTurnEff = (List<Effect>)lists[1];
-        if (endTurnEff.Count > 0) {
-            debugItems.Add(InstantiateDebugEntry("<b>EndTurnEffs:</b>", lightBlue));
-            foreach (Effect e in endTurnEff) {
-                debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
-            }
-        }
-
-        List<DropEffect> dropEff = (List<DropEffect>)lists[2];
-        if (dropEff.Count > 0) {
-            debugItems.Add(InstantiateDebugEntry("<b>DropEffs:</b>", lightBlue));
-            foreach (DropEffect e in dropEff) {
-                debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
-            }
-        }
-
-        List<SwapEffect> swapEff = (List<SwapEffect>)lists[3];
-        if (swapEff.Count > 0) {
-            debugItems.Add(InstantiateDebugEntry("<b>SwapEffs:</b>", lightBlue));
-            foreach (SwapEffect e in swapEff) {
-                debugItems.Add(InstantiateDebugEntry(e.tag, Color.white));
+        if (effs.Length > 0) {
+            InstantiateDebugEntry(lightBlue, "<b>"+title+":</b>", -1, -1, true);
+            foreach (var e in effs) {
+                InstantiateDebugEntry(Color.white, e.tag, e.countLeft, e.turnsLeft);
             }
         }
     }
 
-    GameObject InstantiateDebugEntry(string t, Color c) {
+    GameObject InstantiateDebugEntry(Color c, string title, int count, int turns, bool header = false) {
         GameObject item = Instantiate(_debugItemPF, _debugContent);
         item.GetComponent<Image>().color = c;
-        item.transform.Find("Text").GetComponent<Text>().text = t;
+        Text tTitle = item.transform.Find("t_title").GetComponent<Text>();
+        tTitle.text = title;
+        if (!header) {
+            tTitle.alignment = TextAnchor.MiddleLeft;
+            item.transform.Find("t_count").GetComponent<Text>().text = count + "";
+            item.transform.Find("t_turns").GetComponent<Text>().text = turns + "";
+        }
         return item;
     }
 
     public void SaveFiles() {
         MMLog.Log("ButtonCont", "black", "Saving files...");
-        _mm.stats.SaveFiles();
+        Report.SaveFiles();
     }
 
     public void UpdateReport(string str) {
@@ -243,7 +235,7 @@ public class DebugTools : MonoBehaviour {
     }
 
 
-    // ---------- TOOLS MENU ----------
+    #region ---------- TOOLS MENU ----------
 
     public void ValueChanged(string func) {
         if (func == _oldFunc)
@@ -412,30 +404,29 @@ public class DebugTools : MonoBehaviour {
                 break;
         }
     }
+    #endregion
 
 
-    // ---------- ACTUAL TOOLS ----------
-  
+    #region ---------- ACTUAL TOOLS ----------
+
     void InsertMode_OnClick(CellBehav cb) {
         Insert(GetHexGenTag(GetPlayerId()), cb.col, cb.row);
     }
     public void Insert(string hextag, int col, int row) {
-        TileBehav insertTB = (TileBehav) HexManager.GenerateHex(_mm.ActiveP().id, hextag);
-        _mm.stats.Report(string.Format("$ DEBUG INSERT {0} ({1},{2})", insertTB.hextag, col, row), false);
-        _mm.PutTile(insertTB, col, row);
+        TileBehav insertTB = (TileBehav) HexManager.GenerateHex(_mm.ActiveP.ID, hextag);
+        Report.ReportLine(string.Format("$ DEBUG INSERT {0} ({1},{2})", insertTB.hextag, col, row), false);
+        CommonEffects.PutTile(insertTB, col, row);
         //insertTB.HardSetPos(cb.col, cb.row);
     }
-
 
     void DestroyMode_OnClick(TileBehav tb) {
         Destroy(tb.tile.col, tb.tile.row);
     }
     public void Destroy(int col, int row) { // maybe need to rename?
         //MMLog.Log("DebugTools", "orange", "calling destroy mode!");
-        _mm.stats.Report(string.Format("$ DEBUG DESTROY ({0},{1})", col, row), false);
+        Report.ReportLine(string.Format("$ DEBUG DESTROY ({0},{1})", col, row), false);
         HexManager.RemoveTile(col, row, false);
     }
-
 
     public void Enchant(int col, int row, string ench) {
         TileBehav tb = HexGrid.GetTileBehavAt(col, row);
@@ -450,21 +441,15 @@ public class DebugTools : MonoBehaviour {
 
         switch (ench) {
             case "Burning":
-                StartCoroutine(_mm.hexFX.Ench_SetBurning(_playerId, tb));
+                StartCoroutine(Burning.Set(_playerId, tb));
                 break;
-            //case "Cherrybomb":
-            //    StartCoroutine(mm.hexFX.Ench_SetCherrybomb(id, tb));
-            //    break;
-            //case "Stone":
-            //    mm.hexFX.Ench_SetStone(tb);
-            //    break;
             case "Zombie":
                 MMLog.Log("DebugTools", "orange", "calling enchant, id=" + _playerId);
-                StartCoroutine(_mm.hexFX.Ench_SetZombie(_playerId, tb));
+                StartCoroutine(Zombie.Set(_playerId, tb));
                 break;
         }
 
-        _mm.stats.Report(string.Format("$ DEBUG ENCHANT {0} ({1},{2}) ", ench, tb.tile.col, tb.tile.row), false);
+        Report.ReportLine(string.Format("$ DEBUG ENCHANT {0} ({1},{2}) ", ench, tb.tile.col, tb.tile.row), false);
     }
 
     void ApplyPropertiesMode_OnClick(TileBehav tb) {
@@ -479,7 +464,7 @@ public class DebugTools : MonoBehaviour {
         // TODO reset props
         //MMLog.Log("DebugTools", "orange", "Clearing " + tb.PrintCoord());
         tb.ClearEnchantment();
-        _mm.stats.Report(string.Format("$ DEBUG CLEAR ({0},{1})", tb.tile.col, tb.tile.row), false);
+        Report.ReportLine(string.Format("$ DEBUG CLEAR ({0},{1})", tb.tile.col, tb.tile.row), false);
     }
 
     void AddToHandMode_OnClick() {
@@ -487,36 +472,36 @@ public class DebugTools : MonoBehaviour {
     }
     public void AddToHand(int id, string hextag) {
         Player p = _mm.GetPlayer(id);
-        if (p.hand.IsFull())
+        if (p.Hand.IsFull)
             return;
 
         Hex hex = HexManager.GenerateHex(id, hextag);
         if (id != _mm.myID)
             hex.Flip();
 
-        p.hand.Add(hex);
+        p.Hand.Add(hex);
 
         StartCoroutine(hex.OnDraw());
 
-        _mm.stats.Report("$ DEBUG ADDTOHAND " + hex.hextag, false);
+        Report.ReportLine("$ DEBUG ADDTOHAND " + hex.hextag, false);
     }
 
     public void Discard(string hextag) {
         int id = Hex.TagPlayer(hextag);
-        Hex hex = _mm.GetPlayer(id).hand.GetHex(hextag);
+        Hex hex = _mm.GetPlayer(id).Hand.GetHex(hextag);
         DiscardMode_OnClick(hex);
     }
     void DiscardMode_OnClick(Hex hex) {
-        if (_mm.GetPlayer(1).hand.IsHexMine(hex)) {
-            _mm.GetPlayer(1).hand.Discard(hex);
-        } else if (_mm.GetPlayer(2).hand.IsHexMine(hex)) {
-            _mm.GetPlayer(2).hand.Discard(hex);
+        if (_mm.GetPlayer(1).Hand.IsHexMine(hex)) {
+            _mm.GetPlayer(1).Hand.Discard(hex);
+        } else if (_mm.GetPlayer(2).Hand.IsHexMine(hex)) {
+            _mm.GetPlayer(2).Hand.Discard(hex);
         } else {
             MMLog.LogWarning("DebugTools: user clicked on a non-hand hex! Naughty!");
             return;
         }
 
-        _mm.stats.Report("$ DEBUG DISCARD " + hex.hextag, false);
+        Report.ReportLine("$ DEBUG DISCARD " + hex.hextag, false);
     }
 
     void ChangeHealthMode_OnClick() {
@@ -531,7 +516,7 @@ public class DebugTools : MonoBehaviour {
         else
             _mm.GetPC(id).Heal(amt);
 
-        _mm.stats.Report("$ DEBUG HEALTH p" + id + " " + amt, false);
+        Report.ReportLine("$ DEBUG HEALTH p" + id + " " + amt, false);
     }
 
     void ChangeMeterMode_OnClick() {
@@ -540,8 +525,9 @@ public class DebugTools : MonoBehaviour {
         ChangeMeter(pid, amt);
     }
     public void ChangeMeter(int id, int amt) {
-        _mm.GetPlayer(id).character.ChangeMeter(amt);
+        _mm.GetPlayer(id).Character.ChangeMeter(amt);
 
-        _mm.stats.Report("$ DEBUG METER p" + id + " " + amt, false);
+        Report.ReportLine("$ DEBUG METER p" + id + " " + amt, false);
     }
+    #endregion
 }

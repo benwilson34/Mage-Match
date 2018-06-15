@@ -6,47 +6,34 @@ using MMDebug;
 
 public class EventController {
 
-    public enum Type { None = 0, LastStep, GameAction, Stats, EventEffects, Player, Audio, Report, Network, FirstStep }
-    public enum Status { Begin, End }
     public static bool handlingEvents = false; // worth it?
 
     private static MageMatch _mm;
 
     public static void Init(MageMatch mm) {
         _mm = mm;
-        _swap = new List<EventPack>();
-        _turnBegin = new List<EventPack>();
-        _turnEnd = new List<EventPack>();
-        //_match = new List<EventPack>();
-        _drop = new List<EventPack>();
-        _draw = new List<EventPack>();
-        _discard = new List<EventPack>();
-        _spellCast = new List<EventPack>();
+        _swap = new List<MMEvent>();
+        _turnBegin = new List<MMEvent>();
+        _turnEnd = new List<MMEvent>();
+        _drop = new List<MMEvent>();
+        _handChange = new List<MMEvent>();
+        _spellCast = new List<MMEvent>();
     }
 
-    struct EventPack {
-        public System.Delegate ev;
-        public Type type;
-        public Status status;
-    }
-
-    static List<EventPack> GetEventList(string type) { // TODO this could be done with an enum
+    // this could be better done with a Dictionary
+    static List<MMEvent> GetEventList(MMEvent.Type type) {
         switch (type) {
-            case "swap":
-                return _swap;
-            case "turnBegin":
+            case MMEvent.Type.TurnBegin:
                 return _turnBegin;
-            case "turnEnd":
+            case MMEvent.Type.TurnEnd:
                 return _turnEnd;
-            //case "match":
-            //    return _match;
-            case "draw":
-                return _draw;
-            case "drop":
+            case MMEvent.Type.HandChange:
+                return _handChange;
+            case MMEvent.Type.Drop:
                 return _drop;
-            case "discard":
-                return _discard;
-            case "spellCast":
+            case MMEvent.Type.Swap:
+                return _swap;
+            case MMEvent.Type.SpellCast:
                 return _spellCast;
             default:
                 MMLog.LogError("EVENTCONT: Bad type name!!");
@@ -55,19 +42,19 @@ public class EventController {
     }
 
     // ex. AddEvent("swap", SwapCallbackMethod, Type.EventEffects)
-    static void AddEvent(string list, System.Delegate e, Type type, Status status = Status.End) {
-        List<EventPack> evList = GetEventList(list);
+    static void AddEvent(MMEvent.Type type, System.Delegate e, MMEvent.Behav behav, MMEvent.Moment moment = MMEvent.Moment.End) {
+        List<MMEvent> evList = GetEventList(type);
 
         int i = 0;
         for (; i < evList.Count; i++) {
-            if ((int)evList[i].type < (int)type)
+            if ((int)evList[i].behav < (int)behav)
                 break;
         }
-        evList.Insert(i, new EventPack { ev = e, type = type, status = status });
+        evList.Insert(i, new MMEvent { ev = e, behav = behav, moment = moment });
     }
 
-    static void RemoveEvent(string type, System.Delegate e) {
-        List<EventPack> evList = GetEventList(type);
+    static void RemoveEvent(MMEvent.Type type, System.Delegate e) {
+        List<MMEvent> evList = GetEventList(type);
 
         for (int i = 0; i < evList.Count; i++) {
             if (evList[i].ev.Equals(e)) {
@@ -88,32 +75,31 @@ public class EventController {
             boardAction.Invoke();
     }
 
-    public delegate IEnumerator TurnBeginEvent(int id);
-    private static List<EventPack> _turnBegin;
+    public delegate IEnumerator TurnEvent(int id);
+    private static List<MMEvent> _turnBegin;
     public static IEnumerator TurnBegin() {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in _turnBegin) {
-            yield return ((TurnBeginEvent)pack.ev)(_mm.ActiveP().id); // OH YEAH
+        foreach (MMEvent pack in _turnBegin) {
+            yield return ((TurnEvent)pack.ev)(_mm.ActiveP.ID); // OH YEAH
         }
         MMLog.Log_EventCont("Just finished TURN BEGIN events...");
         handlingEvents = false; // worth it?
     }
-    public static void AddTurnBeginEvent(TurnBeginEvent ev, Type type) {
-        AddEvent("turnBegin", ev, type);
+    public static void AddTurnBeginEvent(TurnEvent ev, MMEvent.Behav type) {
+        AddEvent(MMEvent.Type.TurnBegin, ev, type);
     }
 
-    public delegate IEnumerator TurnEndEvent(int id);
-    private static List<EventPack> _turnEnd;
+    private static List<MMEvent> _turnEnd;
     public static IEnumerator TurnEnd() {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in _turnEnd) {
-            yield return ((TurnEndEvent)pack.ev)(_mm.ActiveP().id); // OH YEAH
+        foreach (MMEvent pack in _turnEnd) {
+            yield return ((TurnEvent)pack.ev)(_mm.ActiveP.ID); // OH YEAH
         }
         MMLog.Log_EventCont("Just finished TURN END events...");
         handlingEvents = false; // worth it?
     }
-    public static void AddTurnEndEvent(TurnEndEvent ev, Type type) {
-        AddEvent("turnEnd", ev, type);
+    public static void AddTurnEndEvent(TurnEvent ev, MMEvent.Behav type) {
+        AddEvent(MMEvent.Type.TurnEnd, ev, type);
     }
 
     public delegate void TimeoutEvent(int id);
@@ -121,138 +107,119 @@ public class EventController {
     public static void Timeout() {
         MMLog.Log_EventCont("Timeout event raised.");
         if (timeout != null) // never will be due to Stats
-            timeout.Invoke(_mm.ActiveP().id);
+            timeout.Invoke(_mm.ActiveP.ID);
     }
 
-    public delegate void CommishDropEvent(string hextag, int col);
-    public static event CommishDropEvent commishDrop;
-    public static void CommishDrop(string hextag, int col) {
-        if (commishDrop != null) // never will be due to Stats
-            commishDrop.Invoke(hextag, col);
-    }
+    //public delegate void CommishDropEvent(string hextag, int col);
+    //public static event CommishDropEvent commishDrop;
+    //public static void CommishDrop(string hextag, int col) {
+    //    if (commishDrop != null) // never will be due to Stats
+    //        commishDrop.Invoke(hextag, col);
+    //}
 
-    public delegate void CommishMatchEvent(string[] seqs);
-    public static event CommishMatchEvent commishMatch;
-    public static void CommishMatch(string[] seqs) {
-        if (commishMatch != null) // never will be due to Stats
-            commishMatch.Invoke(seqs);
-    }
+    //public delegate void CommishMatchEvent(string[] seqs);
+    //public static event CommishMatchEvent commishMatch;
+    //public static void CommishMatch(string[] seqs) {
+    //    if (commishMatch != null) // never will be due to Stats
+    //        commishMatch.Invoke(seqs);
+    //}
 
-    public delegate void CommishTurnDoneEvent();
-    public static event CommishTurnDoneEvent commishTurnDone;
-    public static void CommishTurnDone() {
+    //public delegate void CommishTurnDoneEvent();
+    //public static event CommishTurnDoneEvent commishTurnDone;
+    //public static void CommishTurnDone() {
         //Debug.MMLog.Log_EventCont("EVENTCONT: Commish turn done.");
-        if (commishTurnDone != null) // never will be due to Stats
-            commishTurnDone.Invoke();
-    }
+    //    if (commishTurnDone != null) // never will be due to Stats
+    //        commishTurnDone.Invoke();
+    //}
 
 
     #region GameAction events
-    public delegate void GameActionEvent(int id, int cost);
-    public static event GameActionEvent gameAction;
-    public static void GameAction(int cost) {
-        //Debug.MMLog.Log_EventCont("EVENTCONTROLLER: GameAction called.");
-        if (gameAction != null)
-            gameAction.Invoke(_mm.ActiveP().id, cost);
-    }
+    //public delegate void GameActionEvent(int id, int cost);
+    //public static event GameActionEvent gameAction;
+    //public static void GameAction(int cost) {
+    //    //Debug.MMLog.Log_EventCont("EVENTCONTROLLER: GameAction called.");
+    //    if (gameAction != null)
+    //        gameAction.Invoke(_mm.ActiveP.id, cost);
+    //}
 
-    public delegate IEnumerator DrawEvent(int id, string tag, bool playerAction, bool dealt);
-    private static List<EventPack> _draw;
-    public static IEnumerator Draw(Status status, int id, string tag, bool playerAction, bool dealt) {
+    public enum HandChangeState { TurnBeginDeal, PlayerDraw, DrawFromEffect, Discard };
+    public delegate IEnumerator HandChangeEvent(HandChangeEventArgs args);
+    private static List<MMEvent> _handChange;
+    public static IEnumerator HandChange(MMEvent.Moment moment, int id, string hextag, HandChangeState state) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in _draw) {
-            MMLog.Log_EventCont("going thru draw event with type " + pack.type);
-            if (pack.status == status)
-                yield return ((DrawEvent)pack.ev)(id, tag, playerAction, dealt); // OHYEAH
+        foreach (MMEvent pack in _handChange) {
+            //MMLog.Log_EventCont("going thru HANDCHANGE event with type " + pack.behav);
+            var args = new HandChangeEventArgs(id, hextag, state);
+            if (pack.moment == moment)
+                yield return ((HandChangeEvent)pack.ev)(args); // OHYEAH
         }
-        MMLog.Log_EventCont("Just finished DRAW events...");
+        MMLog.Log_EventCont("Just finished HANDCHANGE events...");
         handlingEvents = false; // worth it?
     }
-    public static void AddDrawEvent(DrawEvent e, Type type, Status status) {
-        AddEvent("draw", e, type, status);
+    public static void AddHandChangeEvent(HandChangeEvent e, MMEvent.Behav behav, MMEvent.Moment moment) {
+        AddEvent(MMEvent.Type.HandChange, e, behav, moment);
     }
 
-    public delegate IEnumerator DropEvent(int id, bool playerAction, string tag, int col);
-    private static List<EventPack> _drop;
-    public static IEnumerator Drop(Status status, bool playerAction, string tag, int col) {
+    public enum DropState { PlayerDrop, PromptDrop, DropFromEffect, CommishDrop };
+    public delegate IEnumerator DropEvent(DropEventArgs args);
+    private static List<MMEvent> _drop;
+    public static IEnumerator Drop(MMEvent.Moment moment, Hex hex, int col, DropState state) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in _drop) {
-            MMLog.Log_EventCont("EVENTCONT: going thru drop event with type " + pack.type);
-            if (pack.status == status)
-                yield return ((DropEvent)pack.ev)(_mm.ActiveP().id, playerAction, tag, col); // OHYEAH
+        foreach (MMEvent pack in _drop) {
+            //MMLog.Log_EventCont("EVENTCONT: going thru DROP event with type " + pack.behav);
+            var args = new DropEventArgs(_mm.ActiveP.ID, hex, col, state); // will inactive player ever drop?
+            if (pack.moment == moment)
+                yield return ((DropEvent)pack.ev)(args); // OHYEAH
         }
         MMLog.Log_EventCont("Just finished DROP events...");
         handlingEvents = false; // worth it?
     }
-    public static void AddDropEvent(DropEvent e, Type type, Status status) {
-        AddEvent("drop", e, type, status);
+    public static void AddDropEvent(DropEvent e, MMEvent.Behav behav, MMEvent.Moment moment) {
+        AddEvent(MMEvent.Type.Drop, e, behav, moment);
     }
 
-    public delegate IEnumerator SwapEvent(int id, bool playerAction, int c1, int r1, int c2, int r2);
-    private static List<EventPack> _swap;
-    public static IEnumerator Swap(Status status, bool playerAction, int c1, int r1, int c2, int r2) {
+    public enum SwapState { PlayerSwap, PromptSwap, SwapFromEffect }
+    public delegate IEnumerator SwapEvent(SwapEventArgs args);
+    private static List<MMEvent> _swap;
+    public static IEnumerator Swap(MMEvent.Moment moment, int c1, int r1, int c2, int r2, SwapState state) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in _swap) {
+        foreach (MMEvent pack in _swap) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
-            if(pack.status == status)
-                yield return ((SwapEvent)pack.ev)(_mm.ActiveP().id, playerAction, c1, r1, c2, r2);
+            var args = new SwapEventArgs(_mm.ActiveP.ID, c1, r1, c2, r2, state); // will inactive player ever swap?
+            if (pack.moment == moment)
+                yield return ((SwapEvent)pack.ev)(args);
         }
         MMLog.Log_EventCont("Just finished SWAP events...");
         handlingEvents = false; // worth it?
     }
-    public static void AddSwapEvent(SwapEvent e, Type type, Status status) {
-        AddEvent("swap", e, type, status);
+    public static void AddSwapEvent(SwapEvent e, MMEvent.Behav behav, MMEvent.Moment moment) {
+        AddEvent(MMEvent.Type.Swap, e, behav, moment);
     }
     // TODO similar method to convert for removing (if it's ever needed...)
 
     public delegate IEnumerator SpellCastEvent(int id, Spell spell, TileSeq prereq);
-    private static List<EventPack> _spellCast;
-    public static IEnumerator SpellCast(Status status, Spell spell, TileSeq prereq) {
+    private static List<MMEvent> _spellCast;
+    public static IEnumerator SpellCast(MMEvent.Moment moment, Spell spell, TileSeq prereq) {
         handlingEvents = true; // worth it?
-        foreach (EventPack pack in _spellCast) {
+        foreach (MMEvent pack in _spellCast) {
             //Debug.MMLog.Log_EventCont("EVENTCONT: going thru swap event with priority " + pack.priority);
-            if (pack.status == status)
-                yield return ((SpellCastEvent)pack.ev)(_mm.ActiveP().id, spell, prereq);
+            if (pack.moment == moment)
+                yield return ((SpellCastEvent)pack.ev)(_mm.ActiveP.ID, spell, prereq);
         }
-        MMLog.Log_EventCont("Just finished SWAP events...");
+        MMLog.Log_EventCont("Just finished SPELLCAST events...");
         handlingEvents = false; // worth it?
     }
-    public static void AddSpellCastEvent(SpellCastEvent e, Type type, Status status) {
-        AddEvent("spellCast", e, type, status);
+    public static void AddSpellCastEvent(SpellCastEvent e, MMEvent.Behav behav, MMEvent.Moment moment) {
+        AddEvent(MMEvent.Type.SpellCast, e, behav, moment);
     }
     #endregion
 
 
-    //public delegate IEnumerator MatchEvent(int id, string[] seqs);
-    //private List<EventPack> _match;
-    //public IEnumerator Match(string[] seqs) {
-    //    handlingEvents = true; // worth it?
-    //    foreach (EventPack pack in _match) {
-    //        //Debug.MMLog.Log_EventCont("EVENTCONT: Resolving matchEvent with p="+pack.priority);
-    //        yield return ((MatchEvent)pack.ev)(_mm.ActiveP().id, seqs); // OH YEAH
-    //    }
-    //    MMLog.Log_EventCont("Just finished MATCH events...");
-    //    handlingEvents = false; // worth it?
-    //}
-    //public void AddMatchEvent(MatchEvent ev, Type type) {
-    //    AddEvent("match", ev, type);
-    //}
-    //public void RemoveMatchEvent(MatchEvent ev) {
-    //    RemoveEvent("match", ev);
-    //}
-
-    //public delegate void CascadeEvent(int id, int chain);
-    //public event CascadeEvent cascade;
-    //public void Cascade(int chain) {
-    //    if (cascade != null)
-    //        cascade.Invoke(mm.ActiveP().id, chain);
-    //}
-
-    public delegate void TileRemoveEvent(int id, TileBehav tb);
-    public static event TileRemoveEvent tileRemove;
+    public delegate void TileEvent(int id, TileBehav tb);
+    public static event TileEvent tileRemove;
     public static void TileRemove(TileBehav tb) {
         if (tileRemove != null)
-            tileRemove.Invoke(_mm.ActiveP().id, tb);
+            tileRemove.Invoke(_mm.ActiveP.ID, tb);
     }
 
     // NOTE: id is ALWAYS the receiver
@@ -276,22 +243,57 @@ public class EventController {
         if (grabTile != null)
             grabTile.Invoke(id, tag);
     }
+}
 
-    public delegate IEnumerator DiscardEvent(int id, string tag);
-    private static List<EventPack> _discard;
-    public static IEnumerator Discard(int id, string tag) {
-        handlingEvents = true; // worth it?
-        foreach (EventPack pack in _discard) {
-            //Debug.MMLog.Log_EventCont("EVENTCONT: Resolving matchEvent with p="+pack.priority);
-            yield return ((DiscardEvent)pack.ev)(id, tag); // OH YEAH
-        }
-        MMLog.Log_EventCont("Just finished DISCARD events...");
-        handlingEvents = false; // worth it?
-    }
-    public static void AddDiscardEvent(DiscardEvent ev, Type type) {
-        AddEvent("discard", ev, type);
-    }
-    public static void RemoveDiscardEvent(DiscardEvent ev) {
-        RemoveEvent("discard", ev);
+
+public class MMEvent {
+    public enum Type { TurnBegin, TurnEnd, HandChange, Drop, Swap, SpellCast }
+    public enum Behav { None = 0, LastStep, GameAction, Stats, EventEffects, Player, Audio, Report, Network, FirstStep }
+    public enum Moment { Begin, End }
+    public Behav behav;
+    public Moment moment;
+    public System.Delegate ev;
+}
+
+
+public struct HandChangeEventArgs {
+    public int id;
+    public string hextag;
+    public EventController.HandChangeState state;
+    public HandChangeEventArgs(int id, string hextag, EventController.HandChangeState state) {
+        this.id = id;
+        this.hextag = hextag;
+        this.state = state;
     }
 }
+
+
+public struct DropEventArgs {
+    public int id;
+    public Hex hex;
+    public int col;
+    public EventController.DropState state;
+    public DropEventArgs(int id, Hex hex, int col, EventController.DropState state) {
+        this.id = id;
+        this.hex = hex;
+        this.col = col;
+        this.state = state;
+    }
+}
+
+
+public struct SwapEventArgs {
+    public int id;
+    public int c1, r1, c2, r2;
+    public EventController.SwapState state;
+    public TileBehav TB1 { get { /* TODO */ return null; } }
+
+    public SwapEventArgs(int id, int c1, int r1, int c2, int r2, EventController.SwapState state) {
+        this.id = id;
+        this.c1 = c1;
+        this.r1 = r1;
+        this.c2 = c2;
+        this.r2 = r2;
+        this.state = state;
+    }
+} 

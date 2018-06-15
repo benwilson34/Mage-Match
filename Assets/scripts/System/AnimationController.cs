@@ -28,7 +28,7 @@ public class AnimationController : MonoBehaviour {
 
     IEnumerator Animate(Tween tween) {
         bool animate = true;
-        if(_mm.IsReplayMode())
+        if(_mm.IsReplayMode)
             animate = _mm.debugSettings.animateReplay;
 
         if (animate) {
@@ -44,7 +44,7 @@ public class AnimationController : MonoBehaviour {
 
     public IEnumerator WaitForSeconds(float secs) {
         bool animate = true;
-        if(_mm.IsReplayMode())
+        if(_mm.IsReplayMode)
             animate = _mm.debugSettings.animateReplay;
 
         if (animate)
@@ -81,7 +81,7 @@ public class AnimationController : MonoBehaviour {
         //Tween swellTween = tb.transform.DOScale(new Vector3(1.25f, 1.25f), .15f);
         Tween colorTween = tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 0, 0, 0), .15f);
         //Camera.main.DOShakePosition(.1f, 1.5f, 20, 90, false); // heh
-        AudioController.Trigger(AudioController.HexSFX.Invoke);
+        AudioController.Trigger(SFX.Hex.Invoke);
 
         //yield return swellTween.WaitForCompletion();
         yield return Animate(colorTween);
@@ -94,7 +94,7 @@ public class AnimationController : MonoBehaviour {
         Tween tween = tb.transform.DOMoveY(yPos - 1, .25f);
         tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .25f);
         //Camera.main.DOShakePosition(.1f, 1.5f, 20, 90, false); // heh
-        AudioController.Trigger(AudioController.HexSFX.Destroy);
+        AudioController.Trigger(SFX.Hex.Destroy);
 
         yield return Animate(tween);
         _animating--;
@@ -133,7 +133,7 @@ public class AnimationController : MonoBehaviour {
         float height = t.position.y - newPos.y;
 
         yield return Animate(t.DOMove(newPos, .04f * height).SetEase(Ease.InQuad));
-        AudioController.Trigger(AudioController.HexSFX.Grav);
+        AudioController.Trigger(SFX.Hex.GravClick);
 
         // bounce anim
         // TODO .SetLoops(2, LoopType.Yoyo);
@@ -176,7 +176,7 @@ public class AnimationController : MonoBehaviour {
     public IEnumerator _Burning_Turn(Player p, TileBehav tb) {
         GameObject fb = Instantiate(_fireballPF, tb.transform);
 
-        Vector3 dmgSpot = _mm.uiCont.GetPinfo(p.id).position;
+        Vector3 dmgSpot = _mm.uiCont.GetPinfo(p.ID).position;
         Tween tween = fb.transform.DOMove(dmgSpot, .4f);
         tween.SetEase(Ease.InQuart);
         yield return Animate(tween);

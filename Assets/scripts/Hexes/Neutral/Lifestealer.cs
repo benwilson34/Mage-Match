@@ -4,30 +4,42 @@ using UnityEngine;
 
 public class Lifestealer : TileBehav {
 
-    public override IEnumerator OnDrop() {
-        TileEffect te = new TileEffect(PlayerId, Effect.Type.Buff, Lifestealer_Turn, null);
-        AddTileEffect(te, Title);
+    public override void SetInitProps() {
+        cost = 3;
+        initElements = new Tile.Element[2] { Tile.Element.Earth, Tile.Element.Muscle };
+    }
+
+    public override IEnumerator OnDrop(int col) {
+        AudioController.Trigger(SFX.Rune_Neutral.Lifestealer);
+
+        TileEffect te = new TileEffect(PlayerId, this);
+        te.AddEffect(new TurnEndEffect(PlayerId, "Lifestealer_Buff", Effect.Behav.Healing, OnTurnEnd));
+        AddTileEffect(te);
         yield return null;
     }
 
-    IEnumerator Lifestealer_Turn(int id, TileBehav tb) {
-        Character character = _mm.GetPlayer(id).character;
+    IEnumerator OnTurnEnd(int id) {
+        Character character = _mm.GetPlayer(PlayerId).Character;
         character.DealDamage(20);
         character.Heal(20);
 
-        HealthModEffect buffDeal = new HealthModEffect(id, Lifestealer_Buff_Deal, false, true, 5);
-        HealthModEffect buffTake = new HealthModEffect(id, Lifestealer_Buff_Take, false, false, 5);
-        EffectController.AddHealthEffect(buffDeal, "Lifestealer_Deal");
-        EffectController.AddHealthEffect(buffTake, "Lifestealer_Take");
+        const int numTurns = 5;
+        HealthModEffect buffDeal = new HealthModEffect(PlayerId, "Lifestealer_Deal", Buff_Deal, HealthModEffect.Type.DealingPercent) { turnsLeft = numTurns };
+        EffectManager.AddHealthMod(buffDeal);
+
+        HealthModEffect buffTake = new HealthModEffect(PlayerId, "Lifestealer_Take", Buff_Rec, HealthModEffect.Type.ReceivingPercent) { turnsLeft = numTurns };
+        EffectManager.AddHealthMod(buffTake);
 
         yield return null;
     }
 
-    float Lifestealer_Buff_Deal(Player p, int dmg) {
-        return 1.10f; // +10% dmg dealt
+    float Buff_Deal(Player p, int dmg) {
+        const float morePercent = .10f;
+        return 1 + morePercent; // +10% dmg dealt
     }
 
-    float Lifestealer_Buff_Take(Player p, int dmg) {
-        return .90f; // -10% dmg recieved
+    float Buff_Rec(Player p, int dmg) {
+        const float lessPercent = .10f;
+        return 1 - lessPercent; // -10% dmg recieved
     }
 }

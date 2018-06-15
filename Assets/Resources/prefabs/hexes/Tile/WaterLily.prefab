@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4809911209877258}
   - component: {fileID: 212503704163439028}
   - component: {fileID: 58870391209271576}
-  - component: {fileID: 114641395387960582}
+  - component: {fileID: 114936366707120718}
   m_Layer: 0
   m_Name: WaterLily
   m_TagString: Untagged
@@ -57,7 +57,7 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &114641395387960582
+--- !u!114 &114936366707120718
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1224954329028808}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea24e327d35dd284d83edb75b81beb4c, type: 3}
+  m_Script: {fileID: 11500000, guid: 78496b59977591b4f8520f90664b6dc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
@@ -78,6 +78,7 @@ MonoBehaviour:
   ableDestroy: 1
   ableInvoke: 1
   ableTarget: 1
+  ableEnchant: 1
   wasInvoked: 0
 --- !u!212 &212503704163439028
 SpriteRenderer:

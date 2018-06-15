@@ -107,16 +107,16 @@ public class Targeting {
         // TODO if targetable
 
         _mm.syncManager.SendTBTarget(tb);
-        AudioController.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
+        AudioController.Trigger(SFX.Other.ChooseTarget);
 
-        _mm.stats.Report("$ TARGET TILE " + tb.PrintCoord(), false);
+        Report.ReportLine("$ TARGET TILE " + tb.PrintCoord(), false);
 
         if (currentTMode == TargetMode.Tile) {
             Tile t = tb.tile;
             _mm.uiCont.OutlineTarget(t.col, t.row);
             _targetTBs.Add(tb);
             DecTargets();
-            _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
+            _mm.uiCont.ShowAlertText(_mm.ActiveP.Name + ", choose " + _targetsLeft + " more targets.");
             MMLog.Log_Targeting("Targeted tile " + tb.PrintCoord());
         } else if (currentTMode == TargetMode.TileArea) {
             List<TileBehav> tbs;
@@ -147,7 +147,7 @@ public class Targeting {
             _mm.uiCont.OutlineTarget(t.col, t.row);
             _targetTBs.Add(tb);
             DecTargets();
-            _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
+            _mm.uiCont.ShowAlertText(_mm.ActiveP.Name + ", choose " + _targetsLeft + " more targets.");
             MMLog.Log_Targeting("Targeted tile " + tb.PrintCoord());
         }
     }
@@ -189,12 +189,12 @@ public class Targeting {
 
         //_mm.syncManager.SendCBTarget(cb);
 
-        //_mm.stats.Report(string.Format("$ TARGET CELL ({0},{1})", cb.col, cb.row), false);
+        //Report.ReportLine(string.Format("$ TARGET CELL ({0},{1})", cb.col, cb.row), false);
 
         //_mm.uiCont.OutlineTarget(cb.col, cb.row);
         //_targetCBs.Add(cb);
         //DecTargets();
-        //_mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
+        //_mm.uiCont.ShowAlertText(_mm.ActiveP.name + ", choose " + _targetsLeft + " more targets.");
         //MMLog.Log_Targeting("Targeted cell (" + cb.col + ", " + cb.row + ")");
 
         foreach (CellBehav ccb in _targetCBs) // prevent targeting a cell that's already targeted
@@ -215,24 +215,24 @@ public class Targeting {
         // TODO if targetable
 
         _mm.syncManager.SendCBTarget(cb);
-        AudioController.Trigger(AudioController.OtherSoundEffect.ChooseTarget);
+        AudioController.Trigger(SFX.Other.ChooseTarget);
 
-        _mm.stats.Report("$ TARGET CELL " + cb.PrintCoord(), false);
+        Report.ReportLine("$ TARGET CELL " + cb.PrintCoord(), false);
 
         _targetCBs.Add(cb);
         DecTargets();
-        _mm.uiCont.ShowAlertText(_mm.ActiveP().name + ", choose " + _targetsLeft + " more targets.");
+        _mm.uiCont.ShowAlertText(_mm.ActiveP.Name + ", choose " + _targetsLeft + " more targets.");
         MMLog.Log_Targeting("Targeted cell " + cb.PrintCoord());
     }
 
     static IEnumerator TargetingScreen() {
         //targetingCanceled = false;
-        Player p = _mm.ActiveP();
+        Player p = _mm.ActiveP;
         _mm.EnterState(MageMatch.State.Targeting);
         if (_mm.MyTurn())
-            p.hand.FlipAllHexes(true);
+            p.Hand.FlipAllHexes(true);
 
-        _mm.uiCont.ShowAlertText(p.name + ", choose " + _targetsLeft + " more targets.");
+        _mm.uiCont.ShowAlertText(p.Name + ", choose " + _targetsLeft + " more targets.");
 
         IList validObjs; // selected targets are removed from this, so the loop breaks if no more valids
         if (currentTMode == TargetMode.Cell) {
@@ -243,7 +243,7 @@ public class Targeting {
             _mm.uiCont.ActivateTargetingUI(_validTBs);
         }
 
-        if (_mm.IsReplayMode())
+        if (_mm.IsReplayMode)
             _mm.replay.GetTargets();
 
         yield return new WaitUntil(() => _targetsLeft == 0 || validObjs.Count == 0);
@@ -259,7 +259,7 @@ public class Targeting {
         currentTMode = TargetMode.Tile; // needed?
         //targetTBs = null?
         if (_mm.MyTurn())
-            p.hand.FlipAllHexes(false);
+            p.Hand.FlipAllHexes(false);
         _mm.ExitState();
     }
 
@@ -279,7 +279,7 @@ public class Targeting {
     //    }
 
     //    targetsLeft = targets;
-    //    mm.uiCont.UpdateMoveText(mm.ActiveP().name + ", choose " + targetsLeft + " more targets.");
+    //    mm.uiCont.UpdateMoveText(mm.ActiveP.name + ", choose " + targetsLeft + " more targets.");
     //}
 
     //public void CancelTargeting() {
@@ -309,7 +309,7 @@ public class Targeting {
 
         _mm.EnterState(MageMatch.State.Selecting);
         if (_mm.MyTurn())
-            _mm.ActiveP().hand.FlipAllHexes(true);
+            _mm.ActiveP.Hand.FlipAllHexes(true);
 
         MMLog.Log_Targeting("seqs=" + BoardCheck.PrintSeqList(seqs));
         _mm.uiCont.ShowSpellSeqs(selections);
@@ -326,7 +326,7 @@ public class Targeting {
 
         _mm.uiCont.HideSpellSeqs();
         if (_mm.MyTurn())
-            _mm.ActiveP().hand.FlipAllHexes(false);
+            _mm.ActiveP.Hand.FlipAllHexes(false);
         currentTMode = TargetMode.Tile;
         _mm.GetComponent<InputController>().InvalidateClick(); // i don't like this 
 

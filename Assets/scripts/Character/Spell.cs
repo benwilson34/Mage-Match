@@ -86,12 +86,9 @@ public class SignatureSpell : Spell {
 
     public int meterCost;
 
+    public bool IsReadyToCast { get { return _mm.ActiveP.Character.GetMeter() >= meterCost; } }
+
     public SignatureSpell(int index, string name, string seq, MySpellEffect effect, int APcost = 1, int meterCost = 1000) : base(index, name, seq, effect, APcost) {
         this.meterCost = meterCost;
-    }
-
-    public bool IsReadyToCast() {
-        MMLog.Log("SIGSPELL", "black", "Checking " + _mm.ActiveP().name + "'s sig spell.");
-        return _mm.ActiveP().character.GetMeter() >= meterCost;
     }
 }

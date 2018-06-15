@@ -1,0 +1,17 @@
+{
+   	"RopeADope": {
+	    "title": "Rope-a-dope",
+	    "category": "Charm",
+	    "keywords": [],
+	    "deckCount": 5,
+	    "desc": "Both players gain 2 AP at the start of their next turn. Your opponent discards a hex."
+  	},
+  	"IllusoryFist": {
+	    "title": "Illusory Fist",
+	    "category": "Tile",
+	    "keywords": ["Quickdraw"],
+	    "deckCount": 5,
+	    "cost": 2,
+	    "desc": "Quickdraw: Blast all tiles below this tile into other random columns when this tile enters the board."
+  	}
+}

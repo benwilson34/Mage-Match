@@ -8,7 +8,9 @@ public class Hex : MonoBehaviour, Tooltipable {
     public enum Category { BasicTile, Tile, Charm };
 
 	public enum State { Hand, Placed, Removed };
+    [HideInInspector]
 	public State currentState;
+    [HideInInspector]
     public int cost = 1;
     [HideInInspector]
     public bool putBackIntoDeck = false;
@@ -19,6 +21,9 @@ public class Hex : MonoBehaviour, Tooltipable {
     public Category Cat { get { return TagCat(hextag); } }
     public string Title { get { return TagTitle(hextag); } }
 
+    public Player ThisPlayer { get { return _mm.GetPlayer(PlayerId); } }
+    public Player Opponent { get { return _mm.GetOpponent(PlayerId); } }
+
     protected MageMatch _mm;
     private Sprite _flipSprite;
     private bool _flipped = false;
@@ -27,11 +32,10 @@ public class Hex : MonoBehaviour, Tooltipable {
     public virtual void Init(MageMatch mm) {
         _mm = mm;
         _flipSprite = HexManager.flipSprite;
+        SetInitProps();
     }
 
-    public Character ThisCharacter() {
-        return _mm.GetPlayer(PlayerId).character;
-    }
+    public virtual void SetInitProps() { }
 
     protected void SetQuickdraw() { _quickdraw = true; }
     protected void SetDuplicate() { _duplicate = true; }
@@ -39,7 +43,7 @@ public class Hex : MonoBehaviour, Tooltipable {
         if (_mm.GetState() == MageMatch.State.BeginningOfGame)
             yield break;
 
-        if (PlayerId == _mm.ActiveP().id) { // if this hex was generated on that player's turn
+        if (PlayerId == _mm.ActiveP.ID) { // if this hex was generated on that player's turn
             if (_quickdraw)
                 yield return Prompt.WaitForQuickdrawAction(this);
             if (_duplicate)
@@ -48,7 +52,7 @@ public class Hex : MonoBehaviour, Tooltipable {
         yield return null;
     }
 
-    public virtual IEnumerator OnDrop() { yield return null; }
+    public virtual IEnumerator OnDrop(int col) { yield return null; }
 
 
     #region ---------- TAG ----------

@@ -73,7 +73,7 @@ public class Prematch : MenuScreen {
 
             Connect();
 
-            _p1portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.chosenChar);
+            _p1portrait.sprite = CharacterSelect.GetFullCharacterArt(_gameSettings.chosenChar);
             _p1username.text = UserData.Username;
         }
     } 
@@ -223,9 +223,9 @@ public class Prematch : MenuScreen {
 
     public IEnumerator ShowPrematchInfoBeforeLoad(bool training) {
         // TODO show both, audio, screen transition
-        _p1portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.p1char);
+        _p1portrait.sprite = CharacterSelect.GetFullCharacterArt(_gameSettings.p1char);
         _p1username.text = _gameSettings.p1name;
-        _p2portrait.sprite = CharacterSelect.GetCharacterPortrait(_gameSettings.p2char);
+        _p2portrait.sprite = CharacterSelect.GetFullCharacterArt(_gameSettings.p2char);
         _p2username.text = _gameSettings.p2name;
 
         _cancelButton.SetActive(false);

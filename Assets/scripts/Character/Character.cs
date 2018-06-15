@@ -21,12 +21,13 @@ public abstract class Character {
     protected List<string> _runes;
 
     protected MageMatch _mm;
-    protected ObjectEffects _objFX; // needed here?
     protected int _playerId;
     protected bool playedFullMeterSound = false;
     protected Player ThisPlayer { get { return _mm.GetPlayer(_playerId); } }
     protected Player Opponent { get { return _mm.GetOpponent(_playerId); } }
 
+
+    #region ---------- INIT ----------
 
     public Character(MageMatch mm, Ch ch, int playerId) {
         this._mm = mm;
@@ -47,19 +48,20 @@ public abstract class Character {
     }
 
     public virtual void InitEvents() {
-        EventController.AddDrawEvent(OnDraw, EventController.Type.Player, EventController.Status.Begin);
-        EventController.AddDropEvent(OnDrop, EventController.Type.Player, EventController.Status.Begin);
-        EventController.AddSwapEvent(OnSwap, EventController.Type.Player, EventController.Status.Begin);
-        EventController.AddSpellCastEvent(OnSpellCast, EventController.Type.Player, EventController.Status.Begin);
+        EventController.AddHandChangeEvent(OnDraw, MMEvent.Behav.Player, MMEvent.Moment.Begin);
+        EventController.AddDropEvent(OnDrop, MMEvent.Behav.Player, MMEvent.Moment.Begin);
+        EventController.AddSwapEvent(OnSwap, MMEvent.Behav.Player, MMEvent.Moment.Begin);
+        EventController.AddSpellCastEvent(OnSpellCast, MMEvent.Behav.Player, MMEvent.Moment.Begin);
         EventController.playerHealthChange += OnPlayerHealthChange;
         EventController.tileRemove += OnTileRemove;
     }
 
     // override to init character with event callbacks (for their passive, probably)
-    public virtual void OnEventContLoad() {}
+    public virtual void OnEventContLoad() { }
 
     // override to init character with effect callbacks (for their passive, probably)
-    public virtual void OnEffectControllerLoad() {}
+    public virtual void OnEffectControllerLoad() { }
+    #endregion
 
 
     #region ----------  HEALTH  ----------
@@ -70,13 +72,13 @@ public abstract class Character {
 
     public void DealDamage(int amount) {
         //int bonus = CalcBonus(); // TODO displaying the bonus amt in UI would be cool
-        EffectController.ResolveHealthEffects(_playerId, amount, true);
-        int bonus = EffectController.GetHEResult_Additive();
-        float mult = EffectController.GetHEResult_Mult();
+        int bonus = 0;
+        float mult = 1;
+        EffectManager.ResolveHealthEffects(_playerId, amount, true, out bonus, out mult);
         int buffAmount = (int)((amount + bonus) * mult);
         if (bonus != 0 || mult != 1)
             MMLog.Log_Player("BUFF: bonus=" + bonus + ", mult=" + mult + "; amount changed from " + amount + " to " + buffAmount);
-        _mm.GetOpponent(_playerId).character.TakeDamage(buffAmount, true);
+        Opponent.Character.TakeDamage(buffAmount, true);
     }
 
     public void TakeDamage(int amount, bool dealt) {
@@ -84,9 +86,9 @@ public abstract class Character {
             MMLog.LogError("PLAYER: Tried to take zero or negative damage...something is wrong.");
             return;
         }
-        EffectController.ResolveHealthEffects(_playerId, amount, false); // buff/debuff
-        int bonus = EffectController.GetHEResult_Additive();
-        float mult = EffectController.GetHEResult_Mult();
+        int bonus = 0;
+        float mult = 1;
+        EffectManager.ResolveHealthEffects(_playerId, amount, false, out bonus, out mult);
         int debuffAmount = (int)(amount * mult) + bonus;
         if (bonus != 0 || mult != 1)
             MMLog.Log_Player("DEBUFF: bonus=" + bonus + ", mult=" + mult + "; amount changed from " + amount + " to " + debuffAmount);
@@ -104,13 +106,13 @@ public abstract class Character {
         Player p = ThisPlayer;
         if (amount < 0) { // damage
             if (dealt)
-                str += _mm.GetOpponent(_playerId).name + " dealt " + (-1 * amount) + " damage; ";
+                str += Opponent.Name + " dealt " + (-1 * amount) + " damage; ";
             else
-                str += p.name + " took " + (-1 * amount) + " damage; ";
+                str += p.Name + " took " + (-1 * amount) + " damage; ";
         } else { // healing
-            str += p.name + " healed for " + amount + " health; ";
+            str += p.Name + " healed for " + amount + " health; ";
         }
-        str += p.name + "'s health changed from " + _health + " to " + (_health + amount);
+        str += p.Name + "'s health changed from " + _health + " to " + (_health + amount);
         MMLog.Log("CHAR", "green", str);
 
         _health += amount;
@@ -133,25 +135,25 @@ public abstract class Character {
         EventController.PlayerMeterChange(_playerId, amount, _meter);
 
         if (!playedFullMeterSound && _meter == METER_MAX) {
-            AudioController.Trigger(AudioController.OtherSoundEffect.FullMeter);
+            AudioController.Trigger(SFX.Other.FullMeter);
             playedFullMeterSound = true;
         }
     }
 
-    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
-        if(id == _playerId && !dealt)
+    public IEnumerator OnDraw(HandChangeEventArgs args) {
+        if(args.id == _playerId && args.state != EventController.HandChangeState.TurnBeginDeal)
             ChangeMeter(10);
         yield return null;
     }
 
-    public IEnumerator OnDrop(int id, bool playerAction, string tag, int col) {
-        if(id == _playerId)
+    public IEnumerator OnDrop(DropEventArgs args) {
+        if(args.id == _playerId && args.state == EventController.DropState.PlayerDrop)
             ChangeMeter(10);
         yield return null;
     }
 
-    public IEnumerator OnSwap(int id, bool playerAction, int c1, int r1, int c2, int r2) {
-        if(id == _playerId)
+    public IEnumerator OnSwap(SwapEventArgs args) {
+        if(args.id == _playerId && args.state == EventController.SwapState.PlayerSwap)
             ChangeMeter(10);
         yield return null;
     }
@@ -252,9 +254,7 @@ public abstract class Character {
 
 
 public class SampleChar : Character {
-    public SampleChar(MageMatch mm, int id) : base(mm, Ch.Neutral, id) {
-        _objFX = mm.hexFX;
-    }
+    public SampleChar(MageMatch mm, int id) : base(mm, Ch.Neutral, id) { }
 
     protected override IEnumerator MatchSpell(TileSeq seq) {
         yield return null;

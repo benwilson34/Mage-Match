@@ -48,7 +48,7 @@ public class ResultScreen : MonoBehaviour {
         // TODO if first victory today
         // TODO win streak
 
-        AddResultItem("Match Length:", _mm.stats.turns);
+        AddResultItem("Match Length:", Report.turns);
 
         // TODO 10 victories in one day
 

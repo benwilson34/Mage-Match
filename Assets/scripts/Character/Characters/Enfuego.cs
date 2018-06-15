@@ -7,19 +7,17 @@ public class Enfuego : Character {
 
     private int _passive_swapsThisTurn = 0;
 
-    public Enfuego(MageMatch mm, int id) : base(mm, Ch.Enfuego, id) {
-        _objFX = mm.hexFX;
-    }
+    public Enfuego(MageMatch mm, int id) : base(mm, Ch.Enfuego, id) { }
 
     public override void OnEffectControllerLoad() {
         MMLog.Log_Enfuego("Loading PASSIVE...");
         // SwapEffect for incrementing swapsThisTurn
-        SwapEffect se = new SwapEffect(_playerId, Passive_OnSwap);
-        EffectController.AddSwapEffect(se, "EnSwp");
+        SwapEffect se = new SwapEffect(_playerId, "EnfPassive_Damage", Effect.Behav.Damage, Passive_OnSwap);
+        EffectManager.AddEventEffect(se);
 
         // TurnEffect for reseting the counter
-        TurnEffect te = new TurnEffect(_playerId, Effect.Type.None, Passive_OnTurnEnd); // idk about type here
-        EffectController.AddEndTurnEffect(te, "EnEnd");
+        TurnEffect te = new TurnEndEffect(_playerId, "EnfPassive_Reset", Effect.Behav.TickDown, Passive_OnTurnEnd);
+        EffectManager.AddEventEffect(te);
 
         // when we have List<Buff>
         //Buff b = new Buff();
@@ -27,8 +25,11 @@ public class Enfuego : Character {
         //mm.GetPlayer(playerID).AddBuff(b);
     }
 
-    public IEnumerator Passive_OnSwap(int id, int c1, int r1, int c2, int r2) {
-        if (id != _playerId)
+
+    #region ---------- PASSIVE ----------
+
+    public IEnumerator Passive_OnSwap(SwapEventArgs args) {
+        if (args.id != _playerId)
             yield break;
 
         const int swapDmg = 5;
@@ -48,26 +49,23 @@ public class Enfuego : Character {
         }
         yield return null;
     }
+    #endregion
 
-    //public int Enf_Passive(Player p) {
-    //    MMLog.Log_Enfuego("PASSIVE buff being called!");
-    //    return swapsThisTurn * 4;
-    //}
 
     public IEnumerator DragSample(TileSeq prereq) {
         yield return Targeting.WaitForDragTarget(4);
 
         foreach (TileBehav tb in Targeting.GetTargetTBs()) {
-            _mm.StartCoroutine(_objFX.Ench_SetBurning(_playerId, tb));
+            _mm.StartCoroutine(Burning.Set(_playerId, tb));
         }
     }
 
 
-    // -----  SPELLS  -----
+    #region ----------  SPELLS  ----------
 
     // Fiery Fandango
     protected override IEnumerator MatchSpell(TileSeq seq) {
-        AudioController.Trigger(AudioController.EnfuegoSFX.FieryFandango);
+        AudioController.Trigger(SFX.Enfuego.FieryFandango);
 
         int burnNum = 2, dmg = 30;
         switch (seq.GetSeqLength()) {
@@ -75,12 +73,12 @@ public class Enfuego : Character {
                 break;
             case 4:
                 dmg = 50;
-                yield return _mm.GetOpponent(_playerId).hand._DiscardRandom();
+                yield return Opponent.Hand._DiscardRandom();
                 burnNum = 4;
                 break;
             case 5:
                 dmg = 80;
-                yield return _mm.GetOpponent(_playerId).hand._DiscardRandom(2);
+                yield return Opponent.Hand._DiscardRandom(2);
                 burnNum = 7;
                 break;
         }
@@ -98,7 +96,7 @@ public class Enfuego : Character {
             TileBehav ctb = tbs[index];
             tbs.RemoveAt(index);
             MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
-            _mm.StartCoroutine(_objFX.Ench_SetBurning(_playerId, ctb)); // yield return?
+            _mm.StartCoroutine(Burning.Set(_playerId, ctb)); // yield return?
         }
 
         yield return null;
@@ -106,10 +104,10 @@ public class Enfuego : Character {
 
     // Baila!
     protected override IEnumerator Spell1(TileSeq prereq) {
-        AudioController.Trigger(AudioController.EnfuegoSFX.Baila);
+        AudioController.Trigger(SFX.Enfuego.Baila);
 
-        yield return ThisPlayer.DrawHexes(2, false, false); // my draw
-        yield return Opponent.DrawHexes(2, false, false); // their draw
+        yield return ThisPlayer.DrawHexes(2); // my draw
+        yield return Opponent.DrawHexes(2); // their draw
 
         yield return Prompt.WaitForSwap(prereq);
         if(Prompt.WasSuccessful)
@@ -120,7 +118,7 @@ public class Enfuego : Character {
     protected override IEnumerator Spell2(TileSeq prereq) {
         yield return Targeting.WaitForDragTarget(6, Inc_Filter);
 
-        AudioController.Trigger(AudioController.EnfuegoSFX.Incinerate);
+        AudioController.Trigger(SFX.Enfuego.Incinerate);
 
         List<TileBehav> tbs = Targeting.GetTargetTBs();
         int dmg = tbs.Count * 35;
@@ -145,17 +143,17 @@ public class Enfuego : Character {
 
     // Hot Potatoes
     protected override IEnumerator Spell3(TileSeq prereq) {
-        HealthModEffect he = new HealthModEffect(_mm.OpponentId(_playerId), HotPot_Debuff, true, false, 3);
-        EffectController.AddHealthEffect(he, "hotpo");
+        HealthModEffect he = new HealthModEffect(_playerId, "HotPotatoes", HotPot_Debuff, HealthModEffect.Type.ReceivingBonus, true) { turnsLeft = 3 };
+        EffectManager.AddHealthMod(he);
 
         yield return null;
     }
     public float HotPot_Debuff(Player p, int dmg) {
-        MMLog.Log_Enfuego("Hot Potato debuff on " + p.name + ", handcount=" + p.hand.Count);
+        MMLog.Log_Enfuego("Hot Potato debuff on " + p.Name + ", handcount=" + p.Hand.Count);
         // TODO sound fx
-        return p.hand.Count * 3;
+        const int dmgPerHexInHand = 3;
+        return p.Hand.Count * dmgPerHexInHand;
     }
-
 
     // White-Hot Combo Kick
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
@@ -192,18 +190,19 @@ public class Enfuego : Character {
                     TileBehav ctb = ctbs[index];
                     ctbs.RemoveAt(index);
                     MMLog.Log_Enfuego("Setting Burning to " + ctb.PrintCoord());
-                    _mm.StartCoroutine(_objFX.Ench_SetBurning(_playerId, ctb)); // yield return?
+                    _mm.StartCoroutine(Burning.Set(_playerId, ctb)); // yield return?
                 }
             } else if (tb.tile.IsElement(Tile.Element.Muscle)) {
-                yield return _mm.GetOpponent(_playerId).hand._DiscardRandom();
+                yield return Opponent.Hand._DiscardRandom();
             }
 
             HexManager.RemoveTile(tb.tile, true);
-            AudioController.Trigger(AudioController.EnfuegoSFX.WHCK);
+            AudioController.Trigger(SFX.Enfuego.Sig_WHCK);
 
             yield return _mm.animCont.WaitForSeconds(.4f);
         }
     }
+    #endregion
 
     //public IEnumerator Backburner() {
     //    yield return mm.syncManager.SyncRand(playerID, Random.Range(15, 26));

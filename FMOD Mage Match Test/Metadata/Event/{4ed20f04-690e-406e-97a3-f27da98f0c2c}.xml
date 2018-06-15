@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{4ed20f04-690e-406e-97a3-f27da98f0c2c}">
         <property name="name">
-            <value>Hex_Draw</value>
+            <value>Draw</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

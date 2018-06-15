@@ -39,7 +39,7 @@ public class ReplayEngine {
     }
 
     IEnumerator HandleCommand(string cmd) {
-        int id = _mm.ActiveP().id;
+        int id = _mm.ActiveP.ID;
         string[] tokens = cmd.Split(' ');
 
         switch (tokens[0]) {
@@ -48,19 +48,19 @@ public class ReplayEngine {
                 break;
 
             case "DRAW":
-                yield return _mm._Draw(id, 1, true);
+                yield return _mm._Draw(id, 1, EventController.HandChangeState.PlayerDraw);
                 break;
             case "DROP":
-                Hex hex = _mm.ActiveP().hand.GetHex(tokens[1]);
-                _mm.ActiveP().hand.Remove(hex);
+                Hex hex = _mm.ActiveP.Hand.GetHex(tokens[1]);
+                _mm.ActiveP.Hand.Remove(hex);
                 int col = -1;
                 if(tokens.Length == 3) // tile, not charm
                     col = ParseTokenInt(tokens[2]);
-                yield return _mm._Drop(hex, col, true);
+                yield return _mm._Drop(hex, col, EventController.DropState.PlayerDrop);
                 break;
             case "SWAP":
                 int[] coordA = ParseCoord(tokens[1]), coordB = ParseCoord(tokens[2]);
-                yield return _mm._SwapTiles(true, coordA[0], coordA[1], coordB[0], coordB[1]);
+                yield return _mm._SwapTiles(coordA[0], coordA[1], coordB[0], coordB[1], EventController.SwapState.PlayerSwap);
                 break;
             case "CAST":
                 int spellNum = ParseTokenInt(tokens[1]);
@@ -179,7 +179,7 @@ public class ReplayEngine {
         string cmd = _fileLines[_linePointer];
         string[] tokens = cmd.Split(' ');
         if (tokens[2] == "DROP") {
-            Hex hex = _mm.ActiveP().hand.GetHex(tokens[3]);
+            Hex hex = _mm.ActiveP.Hand.GetHex(tokens[3]);
             int col = -1;
             if (tokens.Length == 5)
                 col = ParseTokenInt(tokens[4]);

@@ -86,4 +86,8 @@ public class RunebuildingLoadoutList : MenuScreen {
         GameObject.Find("world ui").GetComponent<MenuController>()
             .ChangeToRunebuilding_EditLoadout(_character, loadout);
     }
+
+    public void OnClearButtonClick() {
+        LoadoutData.ClearUserLoadouts(_character);
+    }
 }

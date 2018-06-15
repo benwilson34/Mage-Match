@@ -94,8 +94,12 @@ public class RuneInfoLoader {
     public static RuneInfo GetRuneInfo(Character.Ch ch, string rune) {
         if (_allRuneInfo[ch].ContainsKey(rune))
             return _allRuneInfo[ch][rune];
-        else
+        else if (_allRuneInfo[Character.Ch.Neutral].ContainsKey(rune))
             return _allRuneInfo[Character.Ch.Neutral][rune];
+        else {
+            Debug.LogError("Couldn't load rune info for \"" + rune + "\"!");
+            return null;
+        }
     }
 
     public static RuneInfo GetPlayerRuneInfo(int id, string rune) {

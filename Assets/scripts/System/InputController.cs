@@ -281,7 +281,7 @@ public class InputController : MonoBehaviour {
     bool DropCheck(Hex hex, int col) {
         if (hex is TileBehav && BoardCheck.CheckColumn(col) == -1)
             return false;
-        return _mm.GetPlayer(hex.PlayerId).GetAP() >= hex.cost;
+        return _mm.GetPlayer(hex.PlayerId).AP >= hex.cost;
     }
 
     bool PromptedDrop() {
@@ -549,7 +549,7 @@ public class InputController : MonoBehaviour {
             _mm.uiCont.tooltipMan.SetTooltip(_tooltip); // where to check for null?
 
             if (obj == null) {
-                MMLog.LogWarning("Nothing under mouse in standard input");
+                //MMLog.LogWarning("Nothing under mouse in standard input");
                 return InputStatus.FullyHandled;
             }
 
@@ -557,7 +557,7 @@ public class InputController : MonoBehaviour {
             MMLog.Log_InputCont("Standard mouse ; hex state="+hex.currentState);
 
             if (hex.currentState == Hex.State.Hand) {
-                if (_mm.LocalP().hand.IsHexMine(hex) && allowHandDragging) {
+                if (_mm.LocalP().Hand.IsHexMine(hex) && allowHandDragging) {
                     MMLog.Log_InputCont("Standard mouse down");
 
                     //if (!AbleToInteract(hex))
@@ -568,7 +568,7 @@ public class InputController : MonoBehaviour {
 
                     hex.GetComponent<SpriteRenderer>().sortingOrder = 1;
                     _input._heldHex = hex;
-                    _mm.LocalP().hand.GrabHex(hex); //?
+                    _mm.LocalP().Hand.GrabHex(hex); //?
                     EventController.GrabTile(_mm.myID, hex.hextag);
                     return InputStatus.FullyHandled;
                 }
@@ -599,7 +599,7 @@ public class InputController : MonoBehaviour {
                     RaycastHit2D[] hits = Physics2D.LinecastAll(cursor, cursor);
                     HandSlot slot = _input.GetHandSlot(hits);
                     if (slot != null && Vector3.Distance(cursor, slot.transform.position) < 10)
-                        _mm.LocalP().hand.Rearrange(slot);
+                        _mm.LocalP().Hand.Rearrange(slot);
                 }
                 return InputStatus.FullyHandled;
             }
@@ -621,9 +621,9 @@ public class InputController : MonoBehaviour {
             if (_input._holdingHex) {
                 _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
                 if(status == InputStatus.Unhandled)
-                    _mm.LocalP().hand.ReleaseTile(_input._heldHex); //?
+                    _mm.LocalP().Hand.ReleaseTile(_input._heldHex); //?
                 else
-                    _mm.LocalP().hand.ClearPlaceholder();
+                    _mm.LocalP().Hand.ClearPlaceholder();
 
                 _input._holdingHex = false;
                 return InputStatus.FullyHandled;
@@ -690,7 +690,7 @@ public class InputController : MonoBehaviour {
                 break;
 
             case MageMatch.State.DebugMenu:
-                if (_mm.IsDebugMode()) {
+                if (_mm.IsDebugMode) {
                     _currentContext = _debugMenu;
                 } else
                     _currentContext = _block;

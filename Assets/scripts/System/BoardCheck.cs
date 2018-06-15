@@ -54,25 +54,24 @@ public class BoardCheck {
     }
 
     static public int[] GetRandomCols(int num) {
-        int[] counts = EmptyCount();
+        int[] emptyCounts = EmptyCount();
         List<int> cs = new List<int>();
         for (int i = 0; i < num; i++) {
-            if (counts[7] == 0)
+            if (emptyCounts[7] == 0)
                 break;
 
-            int val = Random.Range(0, counts[7]);
+            int val = Random.Range(0, emptyCounts[7]);
             //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol val=" + val);
             int sum = 0;
             for (int c = 0; c < HexGrid.NUM_COLS; c++) {
-                sum += counts[c];
+                sum += emptyCounts[c];
                 if (val < sum) {
-                    counts[c]--; // update column count
-                    counts[7]--; // update total count
+                    emptyCounts[c]--; // update column count
+                    emptyCounts[7]--; // update total count
                     cs.Add(c);
                     break;
                 }
             }
-            //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol: shouldn't get to this point. val = " + val);
         }
         // syncing could be here?
         return cs.ToArray();

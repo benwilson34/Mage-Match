@@ -5,84 +5,39 @@ using MMDebug;
 
 public class Commish  {
 
-	private int _mood = 0, _numTiles;
-	private MageMatch _mm;
-    //private bool activeEffects = true;
+    public const int COMMISH_ID = 0;
 
-	public Commish(MageMatch mm) {
+	private static MageMatch _mm;
+
+	public static void Init(MageMatch mm) {
         _mm = mm;
     }
 
-    //public void InitEvents() {
-        //EventController.commishMatch += OnCommishMatch;
-        //mm.eventCont.match += OnMatch;
-    //}
-
-    //public void OnCommishMatch(string[] seqs) {
-    //    int sum = 0;
-    //    string s = "{";
-    //    foreach (string seq in seqs) {
-    //        int i = seq.Length;
-    //        sum += i;
-    //        s += i + ",";
-    //    }
-    //    s = s.Remove(s.Length - 1, 1) + "}";
-    //    MMLog.Log_Commish("CommishMatch: lens=" + s + ", sum=" + sum);
-    //    _numTiles += sum;
-    //}
-
-    //public void OnMatch(int id, int[] lens) {
-    //    // TODO mood stuff etc.
-    //}
-
-    public IEnumerator CTurn(){
-        //if (activeEffects) {
-        //    if (mood == -100)
-        //        AngryDamage();
-        //    else if (mood == 100)
-        //        HappyHealing();
-        //    else
-        //        ChangeMood(-35);
-
-        //}
-        _numTiles = 5;
-        yield return PlaceTiles();
-//		Debug.Log ("CTurn: done placing tiles.");
-	}
-
-	IEnumerator PlaceTiles(){
+	public static IEnumerator DropRandomTiles(){
         MMLog.Log_Commish("   ---------- COMMISH TURN BEGIN ----------");
-        int prevCount = 0;
-        Queue<int> colQ = new Queue<int>();
-        Queue<Tile.Element> elems = new Queue<Tile.Element>();
-        for (int i = 0; i < _numTiles; i++) {
-            if (colQ.Count == 0) {
-                int[] cols = BoardCheck.GetRandomCols(_numTiles - prevCount); // can be i?
-                if (cols.Length == 0) {  // board is full
-                    MMLog.Log_Commish("The board is full. The Commissioner ends his turn early.");
-                    break;
-                }
-                yield return _mm.syncManager.SyncRands(_mm.ActiveP().id, cols);
-                colQ = new Queue<int>( _mm.syncManager.GetRands(cols.Length) );
 
-                int[] rands = GetRandomInts(colQ.Count);
-                yield return _mm.syncManager.SyncRands(_mm.ActiveP().id, rands);
-                elems = GetRandomElems( _mm.syncManager.GetRands(rands.Length) );
-                prevCount = _numTiles;
-            }
-            
+        const int numDrops = 5;
+
+        var cols = BoardCheck.GetRandomCols(numDrops);
+        yield return _mm.syncManager.SyncRands(_mm.ActiveP.ID, cols);
+        Queue<int> colQ = new Queue<int>( _mm.syncManager.GetRands(cols.Length) );
+
+        var elems = GetRandomInts(numDrops);
+        yield return _mm.syncManager.SyncRands(_mm.ActiveP.ID, elems);
+        Queue<Tile.Element> elemQ = GetElemQueue( _mm.syncManager.GetRands(cols.Length) );
+
+        for (int i = 0; i < numDrops && colQ.Count > 0; i++) {            
             if (i != 0) { // wait to drop next tile (anim purposes only)
                 yield return _mm.animCont.WaitForSeconds(.15f);
             }
 
-            TileBehav tb = HexManager.GenerateBasicTile(0, elems.Dequeue()); // should get own func?
+            TileBehav tb = HexManager.GenerateBasicTile(COMMISH_ID, elemQ.Dequeue());
             MMLog.Log_Commish("Dropping into col " + colQ.Peek());
 
             int col = colQ.Dequeue();
             if (BoardCheck.CheckColumn(col) >= 0) {
-                //_mm.DropTile(tb, col);
-                _mm.CommishDrop(tb, col);
-                _mm.stats.Report("  # C-DROP " + tb.hextag + " col" + col, false);
+                _mm.CommishDropTile(tb, col);
+                Report.ReportLine("  # C-DROP " + tb.hextag + " col" + col, false);
             } else {
                 MMLog.LogError("COMMISH: Tried to drop into a full column!");
                 break;
@@ -90,64 +45,22 @@ public class Commish  {
         }
 
         MMLog.Log_Commish("   ---------- COMMISH TURN END ----------");
-        EventController.CommishTurnDone();
+        //EventController.CommishTurnDone();
 	}
 
-    int[] GetRandomInts(int num) {
+    static int[] GetRandomInts(int num) {
         int[] rs = new int[num];
         for (int i = 0; i < num; i++) {
-            rs[i] = Random.Range(0, 5);
+            rs[i] = Random.Range(1, 6);
         }
         return rs;
     }
 
-	Tile.Element GetTileElement (int i){
-        switch (i) {
-            case 0:
-                return Tile.Element.Fire;
-            case 1:
-                return Tile.Element.Water;
-            case 2:
-                return Tile.Element.Earth;
-            case 3:
-                return Tile.Element.Air;
-            case 4:
-                return Tile.Element.Muscle;
-            default:
-                MMLog.LogError("COMMISH: Tried to get a bad element!");
-                return Tile.Element.None;
-        }
-	}
-
-    Queue<Tile.Element> GetRandomElems(int[] rands) {
+    static Queue<Tile.Element> GetElemQueue(int[] rands) {
         Queue<Tile.Element> elems = new Queue<Tile.Element>();
         for (int i = 0; i < rands.Length; i++) {
-            elems.Enqueue(GetTileElement(rands[i]));
+            elems.Enqueue((Tile.Element)rands[i]);
         }
         return elems;
     }
-
-	//int GetSemiRandomCol(float[] ratios){
-	//	float val = Random.Range (0f, 1f);
- //       //Debug.MMLog.Log_Commish("COMMISH: GetSemiRandomCol val=" + val);
- //       float thresh = 0;
-	//	for (int i = 0; i < HexGrid.numCols; i++) {
-	//		thresh += ratios [i];
-	//		if (val < thresh)
-	//			return i;
-	//	}
-	//	Debug.Log ("COMMISH: GetSemiRandomCol: shouldn't get to this point. val = " + val);
-	//	return 6;
-	//}
-
-    
-
-    public void ChangeMood(int amount){
-		_mood += amount;
-		_mood = Mathf.Clamp(_mood, -100, 100);
-	}
-	
-	public int GetMood(){
-		return _mood;
-	}
 }

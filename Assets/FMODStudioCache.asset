@@ -15,42 +15,28 @@ MonoBehaviour:
   - {fileID: 114388793628060022}
   - {fileID: 114291352351906936}
   EditorEvents:
-  - {fileID: 114153060767871656}
-  - {fileID: 114380453476600182}
   - {fileID: 114128532122372922}
   - {fileID: 114533011694088876}
   - {fileID: 114025663364952302}
   - {fileID: 114560496100744316}
   - {fileID: 114230475428375442}
-  - {fileID: 114620012883135162}
-  - {fileID: 114154423172819436}
   - {fileID: 114472903797370422}
   - {fileID: 114583635341205166}
   - {fileID: 114615502244199130}
-  - {fileID: 114597445210356962}
   - {fileID: 114142739073339506}
   - {fileID: 114827827257007792}
-  - {fileID: 114526031416628396}
   - {fileID: 114165883188153086}
-  - {fileID: 114749532321251036}
-  - {fileID: 114957595428661796}
   - {fileID: 114836479202155434}
-  - {fileID: 114616315810822258}
   - {fileID: 114472919142808230}
   - {fileID: 114410402029793466}
-  - {fileID: 114544526375054130}
   - {fileID: 114972488603028568}
   - {fileID: 114619759706104388}
   - {fileID: 114377673758235700}
   - {fileID: 114385967626455324}
-  - {fileID: 114720961454726770}
   - {fileID: 114497887237896110}
   - {fileID: 114184041431932102}
-  - {fileID: 114059227159008466}
-  - {fileID: 114676465465162440}
   - {fileID: 114388834195184122}
   - {fileID: 114140595344356290}
-  - {fileID: 114432612170135674}
   - {fileID: 114211242746117502}
   - {fileID: 114315069763027660}
   - {fileID: 114706999454974128}
@@ -78,9 +64,43 @@ MonoBehaviour:
   - {fileID: 114411832437052186}
   - {fileID: 114360331396520586}
   - {fileID: 114294485541858522}
+  - {fileID: 114094471780066144}
+  - {fileID: 114694964248377706}
+  - {fileID: 114470184935917152}
+  - {fileID: 114117628413005606}
+  - {fileID: 114828273074272110}
+  - {fileID: 114881864960118100}
+  - {fileID: 114029885138544622}
+  - {fileID: 114219175630134888}
+  - {fileID: 114444909903292898}
+  - {fileID: 114974979205682762}
+  - {fileID: 114567808856344342}
+  - {fileID: 114268366135435970}
+  - {fileID: 114010365238251476}
+  - {fileID: 114251908894353162}
+  - {fileID: 114944745618507452}
+  - {fileID: 114875096422201698}
+  - {fileID: 114518133853031026}
+  - {fileID: 114309616335950300}
+  - {fileID: 114990107739031164}
+  - {fileID: 114862867456243228}
+  - {fileID: 114191326861325720}
+  - {fileID: 114987360452213726}
+  - {fileID: 114326587628829298}
+  - {fileID: 114430336082287416}
+  - {fileID: 114997438468591442}
+  - {fileID: 114477241620345886}
+  - {fileID: 114273011645281148}
+  - {fileID: 114170532938680938}
+  - {fileID: 114330363578784000}
+  - {fileID: 114270214312719848}
+  - {fileID: 114708897692570992}
+  - {fileID: 114376555438911622}
+  - {fileID: 114693753788597630}
+  - {fileID: 114681529855270218}
   MasterBankRef: {fileID: 114291352351906936}
   StringsBankRef: {fileID: 114388793628060022}
-  stringsBankWriteTime: 636632837606943705
+  stringsBankWriteTime: 636646024389302741
   cacheVersion: 2
 --- !u!114 &114000556981307052
 MonoBehaviour:
@@ -213,6 +233,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1262
+--- !u!114 &114010365238251476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Hex/Swap
+  guid: 49e37de9ec3b6e47a72bcd0542fdffc3
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 999
 --- !u!114 &114019014425020258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -322,6 +364,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 4569
+--- !u!114 &114029885138544622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Enfuego/RoaringFlame
+  guid: 237e2b1ba81bd145b0304b5e6058501a
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114037047379588210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1001,6 +1065,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 2763
+--- !u!114 &114094471780066144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/Stardust
+  guid: 001b2953a313bb49b969cb3ca5e953b3
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114094616180459898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1177,6 +1263,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1710
+--- !u!114 &114117628413005606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/RollingBone
+  guid: 190a9dd01710514bbc7e8a3199595fd8
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114119654104926288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1652,6 +1760,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 409
+--- !u!114 &114170532938680938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Gravekeeper/Engorge
+  guid: ceb1c4a433ba57468ce31cb0e42d95f8
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 3943
 --- !u!114 &114171534292160608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1872,6 +2002,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 6113
+--- !u!114 &114191326861325720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Hex/Destroy
+  guid: 9aa1b98058b61f499b624580d7eddd48
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1999
 --- !u!114 &114191555019088484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2128,6 +2280,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1746
+--- !u!114 &114219175630134888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/FutureSight
+  guid: 2de74dddceb1f84d9a177581f27624cf
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114220357411660612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2348,6 +2522,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 6528
+--- !u!114 &114251908894353162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/MagicAl/Jab
+  guid: 56f9573db5c9c74ab058fffb4fe68480
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114254747959017962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2519,6 +2715,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 6528
+--- !u!114 &114268366135435970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Hex/Invoke
+  guid: 4850f2764f26094da1b5af305c969bbe
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1978
 --- !u!114 &114269437614165626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2541,6 +2759,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1710
+--- !u!114 &114270214312719848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Enfuego/GleamingGolpe
+  guid: dc04e72fe01fc4429191ab88b7a05f86
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 5231
 --- !u!114 &114272098024105768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2556,6 +2796,28 @@ MonoBehaviour:
   guid: dc04e72fe01fc4429191ab88b7a05f86
   Banks:
   - {fileID: 114623280597449964}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
+--- !u!114 &114273011645281148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/LegWeights
+  guid: c6ecae227052984696b6bbe45d48a02c
+  Banks:
+  - {fileID: 114291352351906936}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2773,11 +3035,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: C:\Users\Ben\Documents\Unity projects\Mage-Match\FMOD Mage Match Test\Build\Desktop\Master
     Bank.bank
-  lastModified: 636632837606933704
+  lastModified: 636646024389132731
   LoadResult: 0
   FileSizes:
   - Name: Desktop
-    Value: 21872224
+    Value: 22073952
   Exists: 1
 --- !u!114 &114294485541858522
 MonoBehaviour:
@@ -2929,6 +3191,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1270
+--- !u!114 &114309616335950300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/Bolster
+  guid: 784c40ddfe5a6544a2b26c152d1e1365
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 3073
 --- !u!114 &114313831874598948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3061,6 +3345,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 941
+--- !u!114 &114326587628829298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/MagicAl/Cross
+  guid: a605a2a294cd1545a814d58113dad5bc
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114328940106458032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3126,6 +3432,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 3973
+--- !u!114 &114330363578784000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/Soulbind
+  guid: db4fee4d42f80347bc31488834093f93
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114331359735756926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3517,6 +3845,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 941
+--- !u!114 &114376555438911622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Hex/Discard
+  guid: e138bce11e040047ad9a93a5b3f26c67
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 2430
 --- !u!114 &114376720688553318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3705,11 +4055,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Path: FMOD Mage Match Test\Build\Desktop\Master Bank.strings.bank
-  lastModified: 636632837606943705
+  lastModified: 636646024389302741
   LoadResult: 0
   FileSizes:
   - Name: Desktop
-    Value: 3882
+    Value: 4788
   Exists: 1
 --- !u!114 &114388834195184122
 MonoBehaviour:
@@ -4058,6 +4408,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 0
+--- !u!114 &114430336082287416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Hex/GravClick
+  guid: abe77c57fc36b449b0bebde9c483f375
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 428
 --- !u!114 &114432612170135674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4234,6 +4606,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 2763
+--- !u!114 &114444909903292898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/Sanctuary
+  guid: 2debff13aaad0241b1d4123aa083a870
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114449187795476220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4585,6 +4979,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1711
+--- !u!114 &114470184935917152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Hex/Draw
+  guid: 040fd24e0e696e4097a3f27da98f0c2c
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 999
 --- !u!114 &114470414455610022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4650,6 +5066,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1833
+--- !u!114 &114477241620345886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/MagicAl/RopeADope
+  guid: c6e1ea0a28208842865a2772c182fce8
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114480170520861548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5083,6 +5521,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 0
+--- !u!114 &114518133853031026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/MagicAl/SkyUppercut
+  guid: 7604037cebb98844962b4f6d9f57e2bf
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114525284160371500
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5192,7 +5652,7 @@ MonoBehaviour:
   Parameters: []
   MinDistance: 0
   MaxDistance: 0
-  Length: 0
+  Length: 2710
 --- !u!114 &114530482673946650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5476,6 +5936,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1270
+--- !u!114 &114567808856344342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Enfuego/CausticCastanet
+  guid: 30bfa414d95fcb4f93fc1eeff8d5005a
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114569287188942226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6542,6 +7024,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1713
+--- !u!114 &114681529855270218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/Redesign
+  guid: fe94289f184ff847a90138644887c391
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 2669
 --- !u!114 &114683104646093732
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6630,6 +7134,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1048
+--- !u!114 &114693753788597630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/MagicAl/Hook
+  guid: ec38d6cd40a6cc4dbcf281753f2c34f8
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114694532976223936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6652,6 +7178,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 640
+--- !u!114 &114694964248377706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Hex/Pickup
+  guid: 0063661687606843b160fbdb96cdcfb4
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 428
 --- !u!114 &114696905164613600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6762,6 +7310,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 9459
+--- !u!114 &114708897692570992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/MagicAl/StingerStance
+  guid: dd9db145fb128a4085d2570a42878459
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114711458728982880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7592,7 +8162,7 @@ MonoBehaviour:
   Parameters: []
   MinDistance: 0
   MaxDistance: 0
-  Length: 0
+  Length: 4490
 --- !u!114 &114807919509622548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7879,6 +8449,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 10113
+--- !u!114 &114828273074272110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/LivingMana
+  guid: 1c15726838442643916d620a57f2fa36
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114831700672032940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8077,6 +8669,50 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 0
+--- !u!114 &114862867456243228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Enfuego/ScorchingSpin
+  guid: 9797409c125e1343839efbe99135d128
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 2270
+--- !u!114 &114875096422201698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/MagicAl/Flutterfly
+  guid: 650d181fddf0d8489f06a8f450bdd96a
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114875663725734930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8143,6 +8779,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 2763
+--- !u!114 &114881864960118100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/MagicAl/IllusoryFist
+  guid: 1e52420044db0c41a3efa0a166284b2d
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114882008389395124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8641,6 +9299,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1713
+--- !u!114 &114944745618507452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/EvilDoll
+  guid: 5cfeba06aa90c640ac7000bbb6b19c81
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114945746931770560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8883,6 +9563,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 8800
+--- !u!114 &114974979205682762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Neutral/Lifestealer
+  guid: 2edaf1112a823f45a4827945764950f5
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114975054336906292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9059,6 +9761,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1978
+--- !u!114 &114987360452213726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Valeria/HealingHands
+  guid: a52db783fa5e4d43b9dce42baaa92ffd
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 2586
 --- !u!114 &114988775742612746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9102,6 +9826,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 1270
+--- !u!114 &114990107739031164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/Runes/Gravekeeper/Recruit
+  guid: 8feaa5dd5d683d4fbb8c627bde290238
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 1704
 --- !u!114 &114991960123743238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9124,6 +9870,28 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 7318
+--- !u!114 &114997438468591442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: event:/CharacterSpells/MagicAl/StormForceFootwork
+  guid: add55b419e06f844a20a06c4408f773c
+  Banks:
+  - {fileID: 114291352351906936}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 0
 --- !u!114 &114999794038720916
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,6 +8,8 @@ public class Hand {
     public const int MAX_HAND_SIZE = 7;
 
     public int Count { get { return _hexes.Count; } }
+    public bool IsEmpty { get { return _hexes.Count == 0; } }
+    public bool IsFull { get { return _hexes.Count == MAX_HAND_SIZE; } }
 
     private List<Hex> _hexes = null;
     private Transform _handPos = null;
@@ -29,7 +31,7 @@ public class Hand {
 
     void SetHandPos() { // TODO this needs to check which side of the screen the player is on
         int place = 0;
-        if (_p.id == _mm.myID)
+        if (_p.ID == _mm.myID)
             place = 1;
         else
             place = 2;
@@ -62,7 +64,7 @@ public class Hand {
                 slot.SetHex(hex);
                 hex.transform.position = slot.transform.position;
                 _mm.animCont.PlayAnim(_mm.animCont._Draw(hex));
-                AudioController.Trigger(AudioController.HexSFX.Draw);
+                AudioController.Trigger(SFX.Hex.Draw);
                 MMLog.Log("HAND", "black", "Added hex with tag " + hex.hextag);
                 break;
             }
@@ -116,24 +118,25 @@ public class Hand {
         _mm.StartCoroutine(_Discard(hex));
     }
 
-    public IEnumerator _Discard(Hex hex) {
-        yield return EventController.Discard(_p.id, hex.hextag);
-
-        AudioController.Trigger(AudioController.HexSFX.Discard);
-        Remove(hex);
-        yield return _mm.animCont._DiscardTile(hex.transform);
-        GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan
-    }
-
     public IEnumerator _Discard(string tag) {
         MMLog.Log_Player("Discarding " + tag);
         yield return _Discard(GetHex(tag));
+    }
 
+    public IEnumerator _Discard(Hex hex) {
+        yield return EventController.HandChange(MMEvent.Moment.Begin, _p.ID, hex.hextag, EventController.HandChangeState.Discard);
+
+        AudioController.Trigger(SFX.Hex.Discard);
+        Remove(hex);
+        yield return _mm.animCont._DiscardTile(hex.transform);
+        GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan
+
+        yield return EventController.HandChange(MMEvent.Moment.End, _p.ID, hex.hextag, EventController.HandChangeState.Discard);
     }
 
     public IEnumerator _DiscardRandom(int count = 1) {
         for (int i = 0; i < count && _hexes.Count > 0; i++) {
-            yield return _mm.syncManager.SyncRand(_p.id, Random.Range(0, _hexes.Count));
+            yield return _mm.syncManager.SyncRand(_p.ID, Random.Range(0, _hexes.Count));
             int rand = _mm.syncManager.GetRand();
             Hex hex = _hexes[rand];
             yield return _Discard(hex);
@@ -163,11 +166,15 @@ public class Hand {
         return true;
     }
 
-    public bool IsEmpty() { return _hexes.Count == 0; }
-
-    public bool IsFull() { return _hexes.Count == MAX_HAND_SIZE; }
-
     public HandSlot GetHandSlot(int ind) { return _slots[ind]; }
+
+    public Vector3 GetEmptyHandSlotPos() {
+        foreach (HandSlot slot in _slots) {
+            if (!slot.IsFull())
+                return slot.transform.position;
+        }
+        return Vector3.zero;
+    }
 
     public int NumFullSlots() {
         string str = "";
@@ -205,7 +212,7 @@ public class Hand {
                 slot.SetHex(_placeholder);
                 _placeholderSlot = slot;
 
-                AudioController.Trigger(AudioController.HexSFX.Pickup);
+                AudioController.Trigger(SFX.Hex.Pickup);
                 break;
             }
         }
@@ -275,7 +282,7 @@ public class Hand {
         _placeholderSlot.SetHex(hex);
         ClearPlaceholder();
 
-        AudioController.Trigger(AudioController.HexSFX.Pickup);
+        AudioController.Trigger(SFX.Hex.Pickup);
 
         //NumFullSlots();
     }

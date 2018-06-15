@@ -4,28 +4,33 @@ using UnityEngine;
 
 public class CausticCastanet : TileBehav {
 
-    bool _gainAPthisTurn = false;
-    string _turnEffectTag;
+    private bool _gainAPthisTurn = false;
 
-    public override IEnumerator OnDrop() {
-        TileEffect te = new TileEffect(PlayerId, Effect.Type.Destruct, OnTurnEnd, OnRemove);
-        AddTileEffect(te, Title);
+    public override void SetInitProps() {
+        cost = 2;
+        initElements = new Tile.Element[1] { Tile.Element.Fire };
+    }
 
-        TurnEffect turn = new TurnEffect(PlayerId, Effect.Type.Healing, OnTurnBegin);
-        _turnEffectTag = EffectController.AddBeginTurnEffect(turn, "CausticCastanet_Begin");
+    public override IEnumerator OnDrop(int col) {
+        AudioController.Trigger(SFX.Rune_Enfuego.CausticCastanet);
+
+        TileEffect te = new TileEffect(PlayerId, this);
+
+        TurnEffect turnEnd = new TurnEndEffect(PlayerId, "CausticCastanet_Destroy", Effect.Behav.Destruct, OnTurnEnd);
+        te.AddEffect(turnEnd);
+
+        TurnEffect turnBegin = new TurnBeginEffect(PlayerId, "CausticCastanet_Begin", Effect.Behav.APChange, OnTurnBegin);
+        te.AddEffect(turnBegin);
+
+        AddTileEffect(te);
         yield return null;
     }
 
-
-    IEnumerator OnTurnEnd(int id, TileBehav tb) {
-        List<TileBehav> tbs = HexGrid.GetSmallAreaTiles(tb.tile.col, tb.tile.row);
-        for (int i = 0; i < tbs.Count; i++) {
-            var atb = tbs[i];
-            if (atb.GetEnchType() != Enchantment.Type.Burning) {
-                tbs.RemoveAt(i);
-                i--;
-            }
-        }
+    IEnumerator OnTurnEnd(int id) {
+        Debug.Log("CausticCastanet: TurnEnd starting...");
+        List<TileBehav> tbs = HexGrid.GetSmallAreaTiles(tile.col, tile.row);
+        tbs = TileFilter.FilterByEnch(tbs, Enchantment.Type.Burning);
+        Debug.Log("CausticCastanet: " + tbs.Count + " available adjacent tiles.");
 
         if (tbs.Count == 0)
             yield break;
@@ -42,15 +47,11 @@ public class CausticCastanet : TileBehav {
 
     IEnumerator OnTurnBegin(int id) {
         if (PlayerId == id && _gainAPthisTurn) {
-            MMDebug.MMLog.LogError("Is this going to work?");
+            //MMDebug.MMLog.LogError("Is this going to work?");
+            Debug.LogWarning("CausticCastanet: gaining AP!");
             _mm.GetPlayer(id).IncreaseAP(2);
             _gainAPthisTurn = false;
         }
-        yield return null;
-    }
-
-    IEnumerator OnRemove(int id, TileBehav tb) {
-        EffectController.RemoveTurnEffect(_turnEffectTag);
         yield return null;
     }
 }

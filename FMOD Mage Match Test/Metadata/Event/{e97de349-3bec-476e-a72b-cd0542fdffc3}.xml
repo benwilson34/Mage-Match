@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{e97de349-3bec-476e-a72b-cd0542fdffc3}">
         <property name="name">
-            <value>Tile_Swap</value>
+            <value>Swap</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{76f25048-264f-4d09-a1b5-af305c969bbe}">
         <property name="name">
-            <value>Tile_Invoke</value>
+            <value>Invoke</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

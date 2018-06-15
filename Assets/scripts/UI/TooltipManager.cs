@@ -29,6 +29,8 @@ public class TooltipManager : MonoBehaviour {
         if (obj == null)
             return;
 
+        HideOrCancelTooltip();
+
         Transform staticUI = GameObject.Find("static ui").transform;
         _currentTT = (RectTransform)Instantiate(_tooltipPF, staticUI).transform;
         //MMDebug.MMLog.Log("TooltipMan", "orange", "Setting tooltip: " + obj.GetTooltipInfo());

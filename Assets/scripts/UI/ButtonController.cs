@@ -119,14 +119,13 @@ public class ButtonController : MonoBehaviour {
         MMLog.Log("ButtonCont","black","Button " + spellNum + " clicked...");
         if (_onClick != null) {
             _onClick();
-            AudioController.Trigger(AudioController.OtherSoundEffect.UIButton);
+            AudioController.Trigger(SFX.Other.UIButton);
         } else
             MMLog.LogError("BUTTONCONT: Button was clicked and onClick is somehow null!");
     }
 
     public void ShowSpellInfo() {
-        Spell currentSpell = _mm.GetPlayer(_playerId)
-            .character.GetSpell(spellNum);
+        Spell currentSpell = _mm.GetPlayer(_playerId).Character.GetSpell(spellNum);
         //Debug.Log("Spell " + spellNum + " seq=" + currentSpell.GetTileSeq().SeqAsString());
         Transform t = transform.Find("main");
 
@@ -191,10 +190,10 @@ public class ButtonController : MonoBehaviour {
         if (_cancelView != null) {
             Destroy(_cancelView.gameObject);
             _cancelView = null;
-            _mainView.SetActive(true);
-
-            SetOnClick(_mainClick);
         }
+
+        _mainView.SetActive(true);
+        SetOnClick(_mainClick);
 
         yield return null;
     }
@@ -203,7 +202,7 @@ public class ButtonController : MonoBehaviour {
 
 	void OnSpellButtonClick(){
         StartCoroutine(Transition_Cancel());
-		StartCoroutine(_mm._CastSpell (spellNum));
+		StartCoroutine(_mm._CastSpell(spellNum));
 	}
 
     public void OnSpellCancelClick() {

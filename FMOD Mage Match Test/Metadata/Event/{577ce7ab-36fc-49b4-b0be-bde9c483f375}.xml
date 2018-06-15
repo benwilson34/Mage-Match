@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{577ce7ab-36fc-49b4-b0be-bde9c483f375}">
         <property name="name">
-            <value>Tile_Grav</value>
+            <value>GravClick</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

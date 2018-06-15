@@ -8,7 +8,7 @@ public class RunebuildingEditLoadout : MenuScreen {
 
     public GameObject renameDialog;
 
-    private const int DECK_MIN = 80, DECK_MAX = 120;
+    private const int DECK_MIN = 60, DECK_MAX = 100;
 
     private Character.Ch _character;
     private LoadoutData _loadout;
@@ -136,24 +136,27 @@ public class RunebuildingEditLoadout : MenuScreen {
         }
     }
 
+    int GetTotalDeckCount() { return _deckCount + 30; }
+
     public void UpdateDeckCountMeter() {
-        _deckCountText.text = "Deck Count: " + _deckCount;
-        _deckCountMeter.fillAmount = (float)_deckCount / DECK_MAX;
-        if (_deckCount < DECK_MIN)
+        int totalDeckCount = GetTotalDeckCount();
+        _deckCountText.text = "Deck Count: " + totalDeckCount;
+        _deckCountMeter.fillAmount = (float)totalDeckCount / DECK_MAX;
+        if (totalDeckCount < DECK_MIN)
             _deckCountMeter.color = Color.red;
         else
             _deckCountMeter.color = Color.green;
     }
 
     public void UpdateSaveButton() {
-        bool active = true;
+        bool allSevenSlotsFilled = true;
         for (int i = 0; i < _usedRunes.Length; i++) {
             if (_usedRunes[i] == null) {
-                active = false;
+                allSevenSlotsFilled = false;
             }
         }
 
-        _bSave.interactable = active;
+        _bSave.interactable = allSevenSlotsFilled && GetTotalDeckCount() >= DECK_MIN;
     }
 
     public void OnCharacterButtonClick() {

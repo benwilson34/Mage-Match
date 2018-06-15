@@ -1,5 +1,6 @@
 {
-  "Twinfire": {
+  "WillOWisps": {
+    "title": "Will O'Wisps",
     "category": "Tile",
     "keywords": ["Duplicate"],
     "deckCount": 9,
@@ -18,7 +19,8 @@
     "deckCount": 9,
     "desc": "Basic Muscle tile with Duplicate."
   },
-  "Brushfire": {
+
+  "Firespout": {
     "category": "Tile",
     "keywords": ["Quickdraw"],
     "deckCount": 8,
@@ -37,35 +39,33 @@
     "deckCount": 8,
     "desc": "Basic Muscle tile with Quickdraw."
   },
-  "Flamethrower": {
+
+  "Brushfire": {
     "category": "Charm",
     "keywords": [],
     "deckCount": 8,
     "desc": "Add 5 Fire tiles into random columns in the board."
   },
-  "Geode": {
+  "Mudslide": {
     "category": "Charm",
     "keywords": [],
     "deckCount": 8,
     "desc": "Add 5 Earth tiles into random columns in the board."
   },
-  "PuffPendant": {
-    "title": "Puff Pendant",
+  "Cyclone": {
     "category": "Charm",
     "keywords": [],
     "deckCount": 8,
     "desc": "Add 5 Air tiles into random columns in the board."
   },
-  "BrawnBroth": {
-    "title": "BrawnBroth",
+  "Stampede": {
     "category": "Charm",
     "keywords": [],
     "deckCount": 8,
     "desc": "Add 5 Muscle tiles into random columns in the board."
   },
 
-  "ShuffleGem": {
-    "title": "Shuffle Gem",
+  "Redesign": {
     "category": "Charm",
     "keywords": ["Swap Prompt"],
     "deckCount": 6,
@@ -86,12 +86,19 @@
     "cost": 3,
     "desc": "Gain a buff that heals you for 30% of all damage you deal. Lasts 1 turn."
   },
-  "ProteinPills": {
-    "title": "Protein Pills",
+  "Bolster": {
     "category": "Charm",
     "keywords": ["Duplicate", "Buff"],
     "deckCount": 4,
     "desc": "Gain a stacking buff that increases the damage you deal and reduces the damage you take by 20%. Lasts 2 turns"
+  },
+  "LegWeights": {
+    "title": "Leg Weights",
+    "category": "Tile",
+    "keywords": ["Duplicate"],
+    "deckCount": 4,
+    "cost": 2,
+    "desc": "Duplicate: Persist: Your opponent loses 1 AP next turn."
   },
   "RollingBone": {
     "title": "Rolling Bone",
@@ -101,7 +108,13 @@
     "cost": 3,
     "desc": "Discard your hand and draw that many hexes."
   },
-  "ComebackBrace": {
+  "Stardust": {
+    "category": "Charm",
+    "keywords": [],
+    "deckCount": 8,
+    "desc": "Add one fire, water, earth, air, and muscle basic tile to the board in random columns."
+  },
+  "Sanctuary": {
     "title": "Comeback Brace",
     "category": "Charm",
     "keywords": ["Buff"],
@@ -123,5 +136,27 @@
     "deckCount": 2,
     "cost": 3,
     "desc": "Persist: Deal 20 damage. Heal 20 health. Gain a stacking buff that increases the damage you deal and reduces the damage you take by 10%. The buff lasts 5 turns."
+  },
+  "LivingMana": {
+    "title": "Living Mana",
+    "category": "Tile",
+    "keywords": ["Duplicate"],
+    "deckCount": 2,
+    "cost": 2,
+    "desc": "Duplicate: Persist: Gain 15 health and shuffle a muscle and water tile into your deck."
+  },
+  "FutureSight": {
+    "title": "Future Sight",
+    "category": "Charm",
+    "keywords": [],
+    "deckCount": 3,
+    "desc": "Look at the top 3 hexes of your deck. Draw one and discard the other 2."
+  },
+  "Soulbind": {
+    "category": "Charm",
+    "keywords": ["Debuff"],
+    "deckCount": 3,
+    "cost": 3,
+    "desc": "Place a debuff on both players that discards 1 hex at the end of each turn. Your opponent takes 7 damage when either player discards over the duration. Lasts 3 turns."
   }
 }

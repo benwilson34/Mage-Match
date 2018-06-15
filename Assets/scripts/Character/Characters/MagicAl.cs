@@ -11,11 +11,10 @@ public class MagicAl : Character {
     private Spell[] _altMatchSpells;
 
     private bool _sig_active = false;
+    private string _sig_turnEffectTag, _sig_healthEffectTag;
     private int _sig_spellsCastThisTurn = 0;
 
     public MagicAl(MageMatch mm, int id) : base(mm, Ch.MagicAl, id) {
-        _objFX = mm.hexFX;
-
         const int numSpells = 7;
         _passive_spellsCastThisTurn = new BitArray(numSpells, false);
 
@@ -24,17 +23,17 @@ public class MagicAl : Character {
         _altMatchSpells = new Spell[3];
         _altMatchSpells[0] = _spells[0]; // Jab
         _altMatchSpells[1] = new MatchSpell(0, "Cross", Cross);
-        _altMatchSpells[1].info = CharacterInfo.GetSpellInfoString(info.altSpells[1], true);
+        _altMatchSpells[1].info = CharacterInfo.GetSpellInfoString(info.altSpells[0], true);
         _altMatchSpells[2] = new MatchSpell(0, "Hook", Hook);
-        _altMatchSpells[2].info = CharacterInfo.GetSpellInfoString(info.altSpells[2], true);
+        _altMatchSpells[2].info = CharacterInfo.GetSpellInfoString(info.altSpells[1], true);
     }
 
 
     #region ---------- PASSIVE ----------
 
     public override void OnEffectControllerLoad() {
-        TurnEffect te = new TurnEffect(_playerId, Effect.Type.Damage, Passive_OnTurnEnd);
-        EffectController.AddEndTurnEffect(te, "MagicAl_Passive");
+        TurnEffect te = new TurnEndEffect(_playerId, "MagicAl_Passive", Effect.Behav.Damage, Passive_OnTurnEnd);
+        EffectManager.AddEventEffect(te);
     }
 
     public IEnumerator Passive_OnTurnEnd(int id) {
@@ -42,8 +41,10 @@ public class MagicAl : Character {
         foreach (bool b in _passive_spellsCastThisTurn)
             if (b) uniqueCount++;
 
-        const int damagePerSpell = 10;
-        DealDamage(uniqueCount * damagePerSpell);
+        if (uniqueCount > 0) {
+            const int damagePerSpell = 10;
+            DealDamage(uniqueCount * damagePerSpell);
+        }
 
         _passive_spellsCastThisTurn.SetAll(false);
         yield return null;
@@ -73,11 +74,10 @@ public class MagicAl : Character {
 
         DealDamage(dmg);
 
-        //List<TileBehav> tbs = _hexGrid.GetPlacedTiles(seq);
         yield return Targeting.WaitForTileTarget(returnCount);
         var tbs = Targeting.GetTargetTBs();
         foreach (var tb in tbs) {
-            // TODO add to hand?
+            yield return CommonEffects.BounceToHand(tb, Opponent);
         }
 
         SetSpellCast(MagicAlSpell.Jab);
@@ -88,7 +88,7 @@ public class MagicAl : Character {
 
     // alt core spell - Cross
     public IEnumerator Cross(TileSeq seq) {
-        //AudioController.Trigger(AudioController.GravekeeperSFX.PartyInTheBack);
+        //AudioController.Trigger(SFX.GravekeeperSFX.PartyInTheBack);
 
         int dmg = 0, discardCount = 0;
         switch (seq.GetSeqLength()) {
@@ -107,9 +107,7 @@ public class MagicAl : Character {
 
         DealDamage(dmg);
 
-        yield return Opponent.hand._DiscardRandom(discardCount);
-        //for (int i = 0; i < discardCount; i++) {
-        //}
+        yield return Opponent.Hand._DiscardRandom(discardCount);
 
         SetSpellCast(MagicAlSpell.Cross);
         ChangeMatchSpell(MagicAlSpell.Hook);
@@ -119,7 +117,7 @@ public class MagicAl : Character {
 
     // alt core spell - Hook
     public IEnumerator Hook(TileSeq seq) {
-        //AudioController.Trigger(AudioController.GravekeeperSFX.PartyInTheBack);
+        //AudioController.Trigger(SFX.GravekeeperSFX.PartyInTheBack);
 
         int dmg = 0, swapCount = 0;
         switch (seq.GetSeqLength()) {
@@ -141,6 +139,7 @@ public class MagicAl : Character {
 
         for (int i = 0; i < swapCount; i++) {
             // TODO allow swapping into open space
+            _mm.uiCont.ShowAlertText("Empty swapping isn't supported yet. Sorry!");
             yield return Prompt.WaitForSwap();
             if (Prompt.WasSuccessful)
                 Prompt.ContinueSwap();
@@ -166,15 +165,16 @@ public class MagicAl : Character {
 
     void SetSpellCast(MagicAlSpell spell) {
         _passive_spellsCastThisTurn[(int)spell] = true;
-        _mm.StartCoroutine(_OnSpellCast());
+        if(_sig_active)
+            _mm.StartCoroutine(_OnSpellCast());
     }
 
     // Stinger Stance
     protected override IEnumerator Spell1(TileSeq prereq) {
-        //AudioController.Trigger(AudioController.GravekeeperSFX.OogieBoogie);
+        //AudioController.Trigger(SFX.GravekeeperSFX.OogieBoogie);
 
-        TurnEffect te = new TurnEffect(_playerId, Effect.Type.Damage, Stinger_OnTurnEnd);
-        EffectController.AddEndTurnEffect(te, "Stinger");
+        TurnEffect effect = new TurnEndEffect(_playerId, "StingerStance", Effect.Behav.Damage, Stinger_OnTurnEnd) { turnsLeft = 1 };
+        EffectManager.AddEventEffect(effect);
 
         SetSpellCast(MagicAlSpell.StingerStance);
         ChangeMatchSpell(MagicAlSpell.Jab);
@@ -184,33 +184,38 @@ public class MagicAl : Character {
     IEnumerator Stinger_OnTurnEnd(int id) {
         int dmg = 40;
         const int damagePerHex = 15;
-        dmg += Opponent.hand.Count * damagePerHex;
+        dmg += Opponent.Hand.Count * damagePerHex;
         DealDamage(dmg);
         yield return null;
     }
 
     // Flutterfly
     protected override IEnumerator Spell2(TileSeq prereq) {
-        //AudioController.Trigger(AudioController.GravekeeperSFX.PartyCrashers);
+        //AudioController.Trigger(SFX.GravekeeperSFX.PartyCrashers);
 
         yield return Prompt.WaitForSwap();
         if (!Prompt.WasSuccessful)
             yield break;
 
         var bounceTB = Prompt.GetSwapTBs()[1];
-        // TODO add bounceTB to hand
+        yield return CommonEffects.BounceToHand(bounceTB, Opponent);
 
-        // TODO stacking buff that gives next instance of damage +8%, lasts three turns
+        HealthModEffect he = new HealthModEffect(_playerId, "Flutterfly", Flutterfly_Buff, HealthModEffect.Type.DealingPercent) { turnsLeft = 3, countLeft = 1 };
+        EffectManager.AddHealthMod(he);
 
         SetSpellCast(MagicAlSpell.Flutterfly);
         ChangeMatchSpell(MagicAlSpell.Cross);
 
         yield return null;
     }
+    float Flutterfly_Buff(Player p, int dmg) {
+        const float morePercent = .08f;
+        return 1 + morePercent; // +8% dmg
+    }
 
     // Sky Uppercut
     protected override IEnumerator Spell3(TileSeq prereq) {
-        //AudioController.Trigger(AudioController.GravekeeperSFX.UndeadUnion);
+        //AudioController.Trigger(SFX.GravekeeperSFX.UndeadUnion);
 
         yield return Targeting.WaitForCellTarget(1);
         var cbs = Targeting.GetTargetCBs();
@@ -220,7 +225,7 @@ public class MagicAl : Character {
         var cb = cbs[0];
         var tbs = HexGrid.GetTilesInCol(cb.col);
 
-        // TODO blast tbs up off of board and drop back down in random cols
+        yield return CommonEffects.ShootIntoAirAndRearrange(tbs);
 
         const int dmg = 110;
         DealDamage(dmg);
@@ -233,28 +238,31 @@ public class MagicAl : Character {
 
     // Storm Force Footwork
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        //AudioController.Trigger(AudioController.GravekeeperSFX.SigBell1);
+        //AudioController.Trigger(SFX.GravekeeperSFX.SigBell1);
 
         const int turnCount = 5;
 
         _sig_active = true;
         _sig_spellsCastThisTurn = 0;
-        TurnEffect te = new TurnEffect(_playerId, Effect.Type.None, null, Sig_OnEffectEnd, turnCount);
-        EffectController.AddEndTurnEffect(te, "MagicAl_SFFCount");
+        TurnEffect te = new TurnEndEffect(_playerId, "MagicAl_SFFCount", Effect.Behav.TickDown, null) { turnsLeft = turnCount, onEndEffect = Sig_OnEffectEnd };
+        _sig_turnEffectTag = te.tag;
+        EffectManager.AddEventEffect(te);
 
-        HealthModEffect he = new HealthModEffect(_playerId, Sig_Buff, false, false, turnCount);
-        EffectController.AddHealthEffect(he, "MagicAl_SFFBuff");
+        HealthModEffect he = new HealthModEffect(_playerId, "MagicAl_SFFBuff", Sig_Buff, HealthModEffect.Type.ReceivingPercent) { turnsLeft = turnCount };
+        _sig_healthEffectTag = he.tag;
+        EffectManager.AddHealthMod(he);
 
         SetSpellCast(MagicAlSpell.StormForceFootwork);
 
         yield return null;
     }
-    IEnumerator Sig_OnEffectEnd(int id) {
+    IEnumerator Sig_OnEffectEnd() {
         _sig_active = false;
         yield return null;
     }
     float Sig_Buff(Player p, int dmg) {
-        return .75f; // -25% damage
+        const float lessPercent = .25f;
+        return 1 - lessPercent; // -25% damage
     }
 
     IEnumerator _OnSpellCast() {
@@ -266,14 +274,31 @@ public class MagicAl : Character {
 
         const int massiveEffectAmt = 6, massiveDmg = 280;
         if (_sig_spellsCastThisTurn == massiveEffectAmt) {
-            // TODO remove turnEffect and buff
+            EffectManager.RemoveEventEffect(_sig_turnEffectTag); // safe?
+            EffectManager.RemoveHealthMod(_sig_healthEffectTag); // safe?
 
             DealDamage(massiveDmg);
 
             var tbs = HexGrid.GetPlacedTiles();
-            const int bounceCount = 7;
+            int bounceCount = 7;
+            bounceCount = Mathf.Max(tbs.Count, bounceCount);
+            if (bounceCount == 0)
+                yield break;
+
+            int[] rands = CommonEffects.GetRandomInds(tbs.Count, bounceCount);
+            yield return _mm.syncManager.SyncRands(_playerId, rands);
+            rands = _mm.syncManager.GetRands(bounceCount);
+
+            IEnumerator lastBounceAnim = null;
+            Player opp = Opponent;
             for (int i = 0; i < bounceCount; i++) {
-                // TODO blast random tiles into opponent hand
+                lastBounceAnim = CommonEffects.BounceToHand(tbs[rands[i]], opp);
+                if (i != bounceCount - 1) {
+                    _mm.StartCoroutine(lastBounceAnim);
+                    yield return new WaitForSeconds(.1f);
+                } else {
+                    yield return lastBounceAnim;
+                }
             }
         }
 

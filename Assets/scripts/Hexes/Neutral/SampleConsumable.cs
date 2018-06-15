@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SampleConsumable : Charm {
     public override IEnumerator DropEffect() {
-        AudioController.Trigger(AudioController.Rune_NeutralSFX.SampleCharm);
+        AudioController.Trigger(SFX.Rune_Neutral.SampleCharm);
 
         var tbs = HexGrid.GetPlacedTiles();
         for (int i = 0; i < tbs.Count; i++) {

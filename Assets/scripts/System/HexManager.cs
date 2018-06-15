@@ -27,54 +27,63 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
     static void LoadPrefabs(GameSettings settings) {
         _prefabs = new Dictionary<string, GameObject>();
 
-        AddPrefab("Basic", "Fire");
-        AddPrefab("Basic", "Water");
-        AddPrefab("Basic", "Earth");
-        AddPrefab("Basic", "Air");
-        AddPrefab("Basic", "Muscle");
+        AddPrefab(Hex.Category.BasicTile, "Fire");
+        AddPrefab(Hex.Category.BasicTile, "Water");
+        AddPrefab(Hex.Category.BasicTile, "Earth");
+        AddPrefab(Hex.Category.BasicTile, "Air");
+        AddPrefab(Hex.Category.BasicTile, "Muscle");
 
         // TODO load only the tokens + consumables that either player will use??
         //_stonePF = Resources.Load("prefabs/hexes/token_stone") as GameObject;
         //_emberPF = Resources.Load("prefabs/hexes/token_ember") as GameObject;
-        AddPrefab("Tile", "Tombstone");
+        AddPrefab(Hex.Category.Tile, "Tombstone");
 
-        AddPrefab("Tile", "Twinfire");
-        AddPrefab("Tile", "Raindrops");
-        AddPrefab("Tile", "MuscleMass");
-        AddPrefab("Tile", "Brushfire");
-        AddPrefab("Tile", "WhiteWater");
-        AddPrefab("Tile", "Stimulant");
-        AddPrefab("Charm", "Flamethrower");
-        AddPrefab("Charm", "Geode");
-        AddPrefab("Charm", "PuffPendant");
-        AddPrefab("Charm", "BrawnBroth");
+        AddPrefab(Hex.Category.Tile, "WillOWisps");
+        AddPrefab(Hex.Category.Tile, "Raindrops");
+        AddPrefab(Hex.Category.Tile, "MuscleMass");
+        AddPrefab(Hex.Category.Tile, "Firespout");
+        AddPrefab(Hex.Category.Tile, "WhiteWater");
+        AddPrefab(Hex.Category.Tile, "Stimulant");
+        AddPrefab(Hex.Category.Charm, "Brushfire");
+        AddPrefab(Hex.Category.Charm, "Mudslide");
+        AddPrefab(Hex.Category.Charm, "Cyclone");
+        AddPrefab(Hex.Category.Charm, "Stampede");
 
-        AddPrefab("Charm", "ShuffleGem");
-        AddPrefab("Charm", "Molotov");
-        AddPrefab("Charm", "Leeches");
-        AddPrefab("Charm", "ProteinPills");
-        AddPrefab("Charm", "RollingBone");
-        AddPrefab("Charm", "ComebackBrace");
-        AddPrefab("Tile", "EvilDoll");
-        AddPrefab("Tile", "Lifestealer");
+        AddPrefab(Hex.Category.Charm, "Redesign");
+        AddPrefab(Hex.Category.Charm, "Molotov");
+        AddPrefab(Hex.Category.Charm, "Leeches");
+        AddPrefab(Hex.Category.Charm, "Bolster");
+        AddPrefab(Hex.Category.Tile, "LegWeights");
+        AddPrefab(Hex.Category.Charm, "RollingBone");
+        AddPrefab(Hex.Category.Charm, "Stardust");
+        AddPrefab(Hex.Category.Charm, "Sanctuary");
+        AddPrefab(Hex.Category.Tile, "EvilDoll");
+        AddPrefab(Hex.Category.Tile, "Lifestealer");
+        AddPrefab(Hex.Category.Tile, "LivingMana");
+        AddPrefab(Hex.Category.Charm, "FutureSight");
+        AddPrefab(Hex.Category.Charm, "Soulbind");
 
-        AddPrefab("Charm", "LighterFluid");
-        AddPrefab("Charm", "DanceShoes");
-        AddPrefab("Charm", "BurningBracers");
-        AddPrefab("Tile", "CausticCastanet");
+        AddPrefab(Hex.Category.Charm, "RoaringFlame");
+        AddPrefab(Hex.Category.Charm, "GleamingGolpe");
+        AddPrefab(Hex.Category.Charm, "ScorchingSpin");
+        AddPrefab(Hex.Category.Tile, "CausticCastanet");
 
-        AddPrefab("Charm", "Bandages");
-        AddPrefab("Tile", "WaterLily");
+        AddPrefab(Hex.Category.Charm, "HealingHands");
+        AddPrefab(Hex.Category.Tile, "WaterLily");
 
-        AddPrefab("Charm", "HRForm");
-        AddPrefab("Charm", "PartySnacks");
+        AddPrefab(Hex.Category.Charm, "Recruit");
+        AddPrefab(Hex.Category.Charm, "Engorge");
+
+        AddPrefab(Hex.Category.Charm, "RopeADope");
+        AddPrefab(Hex.Category.Tile, "IllusoryFist");
 
         flipSprite = Resources.Load<Sprite>("sprites/hex-back");
     }
 
-    static void AddPrefab(string cat, string title) {
+    static void AddPrefab(Hex.Category cat, string title) {
         if (!_prefabs.ContainsKey(title)) {
-            _prefabs.Add(title, Resources.Load("prefabs/hexes/"+cat+"/"+title) as GameObject);
+            string path = "prefabs/hexes/" + cat.ToString() + "/" + title;
+            _prefabs.Add(title, Resources.Load(path) as GameObject);
         }
     }
 
@@ -91,7 +100,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         string type = Hex.TagTitle(genTag);
         switch (Hex.TagCat(genTag)) {
             case Hex.Category.BasicTile:
-                return GenerateBasicTile(id, Tile.CharToElement(type[0]));
+                return GenerateBasicTile(id, (Tile.Element)Enum.Parse(typeof(Tile.Element), type));
             case Hex.Category.Tile:
                 return GenerateTile(id, type);
             case Hex.Category.Charm:
@@ -168,6 +177,10 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         MMLog.Log("TILEMAN", "black", "...generated HandObject with tag " + fullTag);
         return fullTag;
     }
+
+    public static string GetShortTag(int id, Hex.Category cat, string type) {
+        return "p" + id + "-" + cat.ToString() + "-" + type + "-";
+    }
     #endregion
 
 
@@ -238,15 +251,15 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             yield break;
         }
 
-        if (tb.HasEnchantment()) {
+        if (tb.HasEnchantment) {
             if (resolveEnchant) {
                 MMLog.Log_MageMatch("About to resolve enchant on tile " + tb.PrintCoord());
-                tb.ResolveEnchantment();
+                yield return tb.GetEnchantment().OnEndEffect();
             }
             tb.ClearEnchantment(); // TODO
         }
 
-        tb.ClearTileEffects(); // remove any tile effects
+        tb.ClearTileEffect(); // remove any tile effects
 
         HexGrid.ClearTileBehavAt(tb.tile.col, tb.tile.row); // move up?
 
@@ -270,7 +283,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         int id = Hex.TagPlayer(hextag);
         if (id != 0 && hex.putBackIntoDeck) { // don't do this for tiles added by the Commish
             MMLog.Log("HEXMAN", "orange", "Removing " + hextag + " and adding it to their remove list.");
-            _mm.GetPlayer(id).deck.AddHextagToGraveyard(hextag);
+            _mm.GetPlayer(id).Deck.AddHextagToGraveyard(hextag);
         }
     }
     #endregion

@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{80b9a19a-b658-491f-9b62-4580d7eddd48}">
         <property name="name">
-            <value>Tile_Destroy</value>
+            <value>Destroy</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

@@ -74,12 +74,17 @@ public class CharacterSelect : MenuScreen {
             CharacterChosen(Character.Ch.Valeria);
     }
 
+    public void OnChooseMagicAl() {
+        if (!_thisPlayerLocked)
+            CharacterChosen(Character.Ch.MagicAl);
+    }
+
     void CharacterChosen(Character.Ch ch) {
         Debug.Log("CharacterSelect: local char chosen is " + ch);
         _localChar = ch;
         _charName.text = CharacterInfo.GetCharacterInfo(ch).name;
         _charPortrait.enabled = true;
-        _charPortrait.sprite = GetCharacterPortrait(ch);
+        _charPortrait.sprite = GetFullCharacterArt(ch);
         //string info = CharacterInfo.GetCharacterInfo(ch);
         //charT.text = info;
 
@@ -104,8 +109,13 @@ public class CharacterSelect : MenuScreen {
     }
 
     // TODO move to asset loader once I make that
-    public static Sprite GetCharacterPortrait(Character.Ch ch) {
+    public static Sprite GetFullCharacterArt(Character.Ch ch) {
         return Resources.Load<Sprite>("sprites/characters/" + ch.ToString());
+    }
+
+    // ''
+    public static Sprite GetCharacterPortrait(Character.Ch ch) {
+        return Resources.Load<Sprite>("sprites/character-thumbs/" + ch.ToString());
     }
 
     public void OnLoadoutEditClick() {

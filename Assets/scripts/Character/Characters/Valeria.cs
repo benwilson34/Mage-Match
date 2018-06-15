@@ -5,14 +5,12 @@ using MMDebug;
 
 public class Valeria : Character {
 
-    public Valeria(MageMatch mm, int id) : base(mm, Ch.Valeria, id) {
-        _objFX = mm.hexFX;
-    }
+    public Valeria(MageMatch mm, int id) : base(mm, Ch.Valeria, id) { }
 
     public override void OnEffectControllerLoad() {
         MMLog.Log("Valeria","cyan","Loading PASSIVE...");
-        SwapEffect se = new SwapEffect(_playerId, Passive_Swap);
-        EffectController.AddSwapEffect(se, "VlSwp");
+        SwapEffect se = new SwapEffect(_playerId, "ValeriaPassive_Heal", Effect.Behav.Healing, Passive_Swap);
+        EffectManager.AddEventEffect(se);
 
         // when we have List<Buff>
         //Buff b = new Buff();
@@ -20,23 +18,21 @@ public class Valeria : Character {
         //mm.GetPlayer(playerID).AddBuff(b);
     }
 
-    public IEnumerator Passive_Swap(int id, int c1, int r1, int c2, int r2) {
-        Heal(7);
-        AudioController.Trigger(AudioController.ValeriaSFX.Healing);
+    public IEnumerator Passive_Swap(SwapEventArgs args) {
+        if (args.id == _playerId) {
+            const int healAmt = 7;
+            Heal(healAmt);
+            AudioController.Trigger(SFX.Valeria.Healing);
+        }
         yield return null;
     }
 
-    //public int Enf_Passive(Player p) {
-    //    MMLog.Log_Enfuego("PASSIVE buff being called!");
-    //    return swapsThisTurn * 4;
-    //}
 
-
-    // -----  SPELLS  -----
+    #region ---------- SPELLS ----------
 
     // Whirlpool Spin
     protected override IEnumerator MatchSpell(TileSeq seq) {
-        AudioController.Trigger(AudioController.ValeriaSFX.SwirlingWater);
+        AudioController.Trigger(SFX.Valeria.SwirlingWater);
 
         int dmg = 0, swaps = 0;
         switch (seq.GetSeqLength()) {
@@ -65,7 +61,7 @@ public class Valeria : Character {
             yield return Prompt.WaitForSwap(seq);
             if (Prompt.WasSuccessful) {
                 yield return Prompt.ContinueSwap();
-                AudioController.Trigger(AudioController.ValeriaSFX.Bubbles2);
+                AudioController.Trigger(SFX.Valeria.Bubbles2);
             }
         }
 
@@ -91,7 +87,7 @@ public class Valeria : Character {
         // move first to second and destroy second
         int secCol = second.tile.col, secRow = second.tile.row;
         yield return HexManager._RemoveTile(second, false);
-        AudioController.Trigger(AudioController.ValeriaSFX.Mariposa);
+        AudioController.Trigger(SFX.Valeria.Mariposa);
         yield return first._ChangePos(secCol, secRow, 0.3f);
 
         // put new water tile in first's place
@@ -104,75 +100,52 @@ public class Valeria : Character {
 
     // Rain Dance
     protected override IEnumerator Spell2(TileSeq prereq) {
-        AudioController.Trigger(AudioController.ValeriaSFX.Rain);
-        AudioController.Trigger(AudioController.ValeriaSFX.ThunderFar);
+        AudioController.Trigger(SFX.Valeria.Rain);
+        AudioController.Trigger(SFX.Valeria.ThunderFar);
 
-        TurnEffect te = new TurnEffect(_playerId, Effect.Type.Add, RainDance_T, null, 5);
-        EffectController.AddBeginTurnEffect(te, "rainD");
+        TurnEffect te = new TurnBeginEffect(_playerId, "RainDance", Effect.Behav.Add, RainDance_T) { turnsLeft = 5 };
+        EffectManager.AddEventEffect(te);
         yield return null;
     }
     public IEnumerator RainDance_T(int id) {
-        AudioController.Trigger(AudioController.ValeriaSFX.RainDance);
+        AudioController.Trigger(SFX.Valeria.RainDance);
 
         yield return _mm.syncManager.SyncRand(_playerId, Random.Range(3, 6));
         int dropCount = _mm.syncManager.GetRand();
 
         // random water drops
-        yield return DropWaterIntoRandomCols(dropCount);
+        yield return CommonEffects.DropBasicsIntoRandomCols(_playerId, Tile.Element.Water, dropCount);
 
         // heal 15-25
         yield return _mm.syncManager.SyncRand(_playerId, Random.Range(15, 26));
         int healing = _mm.syncManager.GetRand();
         Heal(healing);
-        AudioController.Trigger(AudioController.ValeriaSFX.Healing);
+        AudioController.Trigger(SFX.Valeria.Healing);
 
         yield return null;
-    }
-
-    public IEnumerator DropWaterIntoRandomCols(int count) {
-        int[] cols = BoardCheck.GetRandomCols(count);
-        yield return _mm.syncManager.SyncRands(_playerId, cols);
-        cols = _mm.syncManager.GetRands(cols.Length);
-
-        string s = "";
-        for (int i = 0; i < cols.Length; i++) {
-            s += cols[i];
-            if(i < cols.Length - 1)
-                s += ", ";
-        }
-        MMLog.Log("Valeria", "magenta", "random water columns are [" + s + "]");
-
-        Queue<int> colQ = new Queue<int>(cols);
-
-        int col;
-        while (colQ.Count > 0) {
-            col = colQ.Dequeue();
-            TileBehav newWater = HexManager.GenerateBasicTile(_playerId, Tile.Element.Water);
-            _mm.DropTile(newWater, col);
-        }
     }
 
     // Balanco
     protected override IEnumerator Spell3(TileSeq prereq) {
-        AudioController.Trigger(AudioController.ValeriaSFX.Balanco);
+        AudioController.Trigger(SFX.Valeria.Balanco);
 
-        DropEffect de = new DropEffect(_playerId, Balanco_Drop, 3);
-        de.isGlobal = true;
-        EffectController.AddDropEffect(de, "balDp");
+        const int numTurns = 3;
 
-        SwapEffect se = new SwapEffect(_playerId, Balanco_Swap, 3);
-        se.isGlobal = true;
-        EffectController.AddSwapEffect(se, "balSw");
+        DropEffect de = new DropEffect(_playerId, "Balanco_Dmg", Effect.Behav.Damage, Balanco_Drop) { turnsLeft = numTurns };
+        EffectManager.AddEventEffect(de);
+
+        SwapEffect se = new SwapEffect(_playerId, "Balanco_Dmg", Effect.Behav.Damage, Balanco_Swap) { turnsLeft = numTurns };
+        EffectManager.AddEventEffect(se);
         yield return null;
     }
-    public IEnumerator Balanco_Drop(int id, bool playerAction, string tag, int col) {
-        if (Hex.TagTitle(tag) == "W")
+    public IEnumerator Balanco_Drop(DropEventArgs args) {
+        if (args.hex is TileBehav && ((TileBehav)args.hex).tile.IsElement(Tile.Element.Water))
             DealDamage(7);
         yield return null;    
     }
-    public IEnumerator Balanco_Swap(int id, int c1, int r1, int c2, int r2) {
-        Tile tile1 = HexGrid.GetTileAt(c1, r1);
-        Tile tile2 = HexGrid.GetTileAt(c2, r2);
+    public IEnumerator Balanco_Swap(SwapEventArgs args) {
+        Tile tile1 = HexGrid.GetTileAt(args.c1, args.r1);
+        Tile tile2 = HexGrid.GetTileAt(args.c2, args.r2);
         int dmg = 0;
         if (tile1.IsElement(Tile.Element.Water))
             dmg += 7;
@@ -186,8 +159,8 @@ public class Valeria : Character {
 
     // Hurricane Cutter
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        AudioController.Trigger(AudioController.ValeriaSFX.ThunderClose);
-        AudioController.Trigger(AudioController.ValeriaSFX.Rain);
+        AudioController.Trigger(SFX.Valeria.ThunderClose);
+        AudioController.Trigger(SFX.Valeria.Rain);
 
         yield return HandleMatchesOnBoard();
 
@@ -199,7 +172,7 @@ public class Valeria : Character {
                 break;
 
             yield return Prompt.ContinueSwap();
-            AudioController.Trigger(AudioController.ValeriaSFX.SigCut);
+            AudioController.Trigger(SFX.Valeria.Sig_Cut);
 
             yield return HandleMatchesOnBoard();
         }
@@ -234,9 +207,9 @@ public class Valeria : Character {
                 yield return HexManager._RemoveSeq(seq, false);
 
                 DealDamage(dmg);
-                yield return DropWaterIntoRandomCols(dropCount);
+                yield return CommonEffects.DropBasicsIntoRandomCols(_playerId, Tile.Element.Water, dropCount);
             }
-            AudioController.Trigger(AudioController.ValeriaSFX.SigWaveCrash);
+            AudioController.Trigger(SFX.Valeria.Sig_WaveCrash);
 
             // wait for board to update...will this work?
             yield return _mm.BoardChecking(false);
@@ -245,4 +218,5 @@ public class Valeria : Character {
         }
         yield return null;
     }
+    #endregion
 }

@@ -22,15 +22,17 @@ public class RunebuildingCharList : MenuScreen {
         AddCharacterEntry(Character.Ch.Enfuego);
         AddCharacterEntry(Character.Ch.Gravekeeper);
         AddCharacterEntry(Character.Ch.Valeria);
+        AddCharacterEntry(Character.Ch.MagicAl);
 
         // TODO get list of available characters (once they can be bought in-store)
     }
 
     void AddCharacterEntry(Character.Ch ch) {
         Transform item = Instantiate(_itemPF, _scrCharList).transform;
+
         // replace icon, name, and loadout count
         Image charPortrait = item.Find("i_charPortrait").GetComponent<Image>();
-        // TODO load smaller icon
+        charPortrait.sprite = CharacterSelect.GetCharacterPortrait(ch);
         Text charName = item.Find("t_charName").GetComponent<Text>();
         charName.text = CharacterInfo.GetCharacterInfo(ch).name;
 

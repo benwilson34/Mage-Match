@@ -1,14 +1,12 @@
 {
-  "HRForm": {
-    "title": "HR Form",
+  "Recruit": {
     "category": "Charm",
     "keywords": ["Area Target"],
     "deckCount": 5,
     "cost": 2,
     "desc": "Zombify all Muscle tiles in a small area."
   },
-  "PartySnacks": {
-    "title": "Party Snacks",
+  "Engorge": {
     "category": "Charm",
     "keywords": ["Tile Target"],
     "deckCount": 4,

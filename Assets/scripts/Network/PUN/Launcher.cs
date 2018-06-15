@@ -164,7 +164,7 @@ namespace Com.SoupSkull.MageMatch {
 
         [PunRPC]
         public void SetPlayerName(int id, string pName) {
-            GameSettings gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
+            //GameSettings gameSettings = GameObject.Find("gameSettings").GetComponent<GameSettings>();
             //gameSettings.SetPlayerName(id, pName);
             nameSet = true;
         }

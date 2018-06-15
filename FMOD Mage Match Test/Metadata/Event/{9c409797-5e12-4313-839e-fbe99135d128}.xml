@@ -2,7 +2,10 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{9c409797-5e12-4313-839e-fbe99135d128}">
         <property name="name">
-            <value>BurningBracers</value>
+            <value>ScorchingSpin</value>
+        </property>
+        <property name="note">
+            <value>Previously called Burning Bracers</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

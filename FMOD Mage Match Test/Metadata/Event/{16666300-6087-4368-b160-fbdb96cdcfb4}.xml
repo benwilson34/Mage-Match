@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{16666300-6087-4368-b160-fbdb96cdcfb4}">
         <property name="name">
-            <value>Hex_Pickup</value>
+            <value>Pickup</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

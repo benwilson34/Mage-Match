@@ -12,14 +12,15 @@ public class TileBehav : Hex {
 	public bool ableSwap = true, ableGrav = true, ableDestroy = true;
     public bool ableInvoke = true, ableTarget = true, ableEnchant = true;
     public bool wasInvoked = false;
+    public bool HasEnchantment { get { return _enchantment != null; } }
 
-	private Enchantment _enchantment;
-    private List<TileEffect> _tileEffects;
-	private bool _inPos = true; // auto?
+	protected Enchantment _enchantment;
+    protected TileEffect _tileEffect; // just one?
+	protected bool _inPos = true; // auto?
 
     public override void Init(MageMatch mm) {
         base.Init(mm);
-        _tileEffects = new List<TileEffect>(); // move to Init?
+        //_tileEffect = new List<TileEffect>();
         tile = new Tile(initElements);
         currentState = State.Hand;
     }
@@ -89,36 +90,23 @@ public class TileBehav : Hex {
             return false;
         }
 
-        //return (int)type >= GetEnchTier() && ableTarget;
+        // TODO handle ableEnchant
+
         return ableEnchant;
     }
 
-	public bool HasEnchantment(){ // just use GetEnchType?
-		return _enchantment != null;
-	}
-
     public Enchantment.Type GetEnchType() {
-        if (HasEnchantment())
+        if (HasEnchantment)
             return _enchantment.enchType;
         else
             return Enchantment.Type.None;
     }
 
-    //int GetEnchTier() {
-    //    return Enchantment.GetEnchTier(GetEnchType());
-    //}
-
-    public IEnumerator TriggerEnchantment() {
-        MMLog.Log_TileBehav("Triggering enchantment at " + tile.col + ", " + tile.row);
-        yield return _enchantment.TriggerEffect();
-    }
-
-	public void ClearEnchantment(bool removeFromList = true){
+	public void ClearEnchantment(){
         MMLog.Log_TileBehav("About to remove enchantment...");
-        if (HasEnchantment()) {
+        if (HasEnchantment) {
             MMLog.Log_TileBehav("About to remove enchantment with tag " + _enchantment.tag);
-            if(removeFromList)
-                EffectController.RemoveTurnEffect(_enchantment);
+            EffectManager.RemoveTileEffect(_enchantment);
             _enchantment = null;
             this.GetComponent<SpriteRenderer>().color = Color.white;
         }
@@ -129,48 +117,51 @@ public class TileBehav : Hex {
             MMLog.LogError("TILEBEHAV: Can't set ench at "+PrintCoord()+"! enchType="+ench.enchType);
 			return false;
 		}
-        if(HasEnchantment())
-            ClearEnchantment(); //?
+        if(HasEnchantment)
+            ClearEnchantment(); // needed to remove ench from EffectManager
 
         MMLog.Log_TileBehav("About to set ench with tag="+ench.tag);
-		ench.SetEnchantee(this);
 		_enchantment = ench; 
 		return true;
 	}
 
-	public bool ResolveEnchantment(){
-		if (HasEnchantment() && currentState == State.Placed) {
-//			Debug.Log ("About to resolve enchant: " + (this.enchantEffect != null));
-//			resolved = true;
-			currentState = State.Removed;
-//			this.enchantEffect (this);
-			_enchantment.CancelEffect();
-			return true;
-		}
-		return false;
-	}
+    public Enchantment GetEnchantment() { return _enchantment; }
+
+//	public bool ResolveEnchantment(){
+//		if (HasEnchantment && currentState == State.Placed) {
+////			Debug.Log ("About to resolve enchant: " + (this.enchantEffect != null));
+////			resolved = true;
+//			currentState = State.Removed;
+////			this.enchantEffect (this);
+//			_enchantment.CancelEffect();
+//			return true;
+//		}
+//		return false;
+//	}
     #endregion
 
 
     #region ---------- TILE EFFECTS ----------
     // Maybe not needed?
 
-    public void AddTileEffect(TileEffect te, string tag) {
-        te.SetEnchantee(this);
-        EffectController.AddEndTurnEffect(te, tag);
-        _tileEffects.Add(te);
+    public void AddTileEffect(TileEffect te) {
+        EffectManager.AddTileEffect(te);
+        //_tileEffects.Add(te);
+        _tileEffect = te;
     }
 
-    public void RemoveTileEffect(TileEffect te) {
-        EffectController.RemoveTurnEffect(te);
-        _tileEffects.Remove(te);
-    }
+    //public void RemoveTileEffect(TileEffect te) {
+    //    EffectManager.RemoveTileEffect(te);
+        //_tileEffects.Remove(te);
+    //}
 
-    public void ClearTileEffects() {
-        foreach (TileEffect te in _tileEffects) {
-            EffectController.RemoveTurnEffect(te);
-        }
-        _tileEffects.Clear();
+    public void ClearTileEffect() {
+        //foreach (TileEffect te in _tileEffect) {
+        if(_tileEffect != null)
+            EffectManager.RemoveTileEffect(_tileEffect);
+        //}
+        //_tileEffects.Clear();
+        _tileEffect = null;
     }
     #endregion
 
@@ -184,7 +175,7 @@ public class TileBehav : Hex {
         RuneInfoLoader.RuneInfo info = RuneInfoLoader.GetPlayerRuneInfo(PlayerId, Title);
 
         string ench = "";
-        if (HasEnchantment())
+        if (HasEnchantment)
             ench = "\nThis tile is enchanted with " + GetEnchType().ToString();
         return GetTooltipInfo(info.title, "Tile", info.cost, info.desc + ench);
     }

@@ -8,14 +8,12 @@ public class Gravekeeper : Character {
     private Spell _altMatchSpell;
 
     public Gravekeeper(MageMatch mm, int id) : base(mm, Ch.Gravekeeper, id) {
-        _objFX = mm.hexFX;
-
         _altMatchSpell = new MatchSpell(0, "Party in the Back", PartyInTheBack);
         CharacterInfo info = CharacterInfo.GetCharacterInfo(Ch.Gravekeeper);
         _altMatchSpell.info = CharacterInfo.GetSpellInfoString(info.altSpells[0], true);
     }
 
-    // ----- spells -----
+    #region ---------- SPELLS ----------
 
     // Business in the Front
     protected override IEnumerator MatchSpell(TileSeq seq) {
@@ -41,7 +39,7 @@ public class Gravekeeper : Character {
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
             yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, tbs.Count));
             int rand = _mm.syncManager.GetRand();
-            yield return _objFX.Ench_SetZombie(_playerId, tbs[rand]); // skip?
+            yield return Zombie.Set(_playerId, tbs[rand]); // skip?
             tbs.RemoveAt(rand);
         }
 
@@ -52,7 +50,7 @@ public class Gravekeeper : Character {
 
     // alt core spell - Party in the Back
     public IEnumerator PartyInTheBack(TileSeq seq) {
-        AudioController.Trigger(AudioController.GravekeeperSFX.PartyInTheBack);
+        AudioController.Trigger(SFX.Gravekeeper.PartyInTheBack);
 
         int dmg = 0;
         switch (seq.GetSeqLength()) {
@@ -76,8 +74,8 @@ public class Gravekeeper : Character {
 
         List<TileBehav> tbs = Targeting.GetTargetTBs();
         foreach (TileBehav tb in tbs) {
-            if(tb.GetEnchType() == Enchantment.Type.Zombie)
-                yield return tb.TriggerEnchantment();
+            if (tb.GetEnchType() == Enchantment.Type.Zombie)
+                yield return ((Zombie)tb.GetEnchantment()).Attack();
         }
 
         SwitchMatchSpell();
@@ -96,7 +94,7 @@ public class Gravekeeper : Character {
 
     // The Oogie Boogie
     protected override IEnumerator Spell1(TileSeq prereq) {
-        AudioController.Trigger(AudioController.GravekeeperSFX.OogieBoogie);
+        AudioController.Trigger(SFX.Gravekeeper.OogieBoogie);
 
 
         var zombs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
@@ -110,17 +108,17 @@ public class Gravekeeper : Character {
             yield return null;
 
         Tile a = tbs[0].tile, b = tbs[1].tile;
-        yield return _mm._SwapTiles(false, a.col, a.row, b.col, b.row);
+        yield return _mm._SwapTiles(a.col, a.row, b.col, b.row);
 
         foreach (TileBehav tb in tbs)
-            yield return tb.TriggerEnchantment(); // that easy?
+            yield return ((Zombie)tb.GetEnchantment()).Attack();
 
         yield return null;
     }
 
     // Party Crashers
     protected override IEnumerator Spell2(TileSeq prereq) {
-        AudioController.Trigger(AudioController.GravekeeperSFX.PartyCrashers);
+        AudioController.Trigger(SFX.Gravekeeper.PartyCrashers);
 
         const int dropCount = 2;
         Prompt.SetDropCount(dropCount);
@@ -131,7 +129,7 @@ public class Gravekeeper : Character {
 
             TileBehav tb = (TileBehav) Prompt.GetDropHex();
             MMLog.Log_Gravekeeper("Player " + _playerId + " dropped " + tb.hextag);
-            yield return _objFX.Ench_SetZombie(_playerId, tb);
+            yield return Zombie.Set(_playerId, tb);
             int col = Prompt.GetDropCol();
             int nextTBrow = BoardCheck.CheckColumn(col) - 1; // next TB under, if any
 
@@ -148,7 +146,7 @@ public class Gravekeeper : Character {
 
     // Undead Union
     protected override IEnumerator Spell3(TileSeq prereq) {
-        AudioController.Trigger(AudioController.GravekeeperSFX.UndeadUnion);
+        AudioController.Trigger(SFX.Gravekeeper.UndeadUnion);
 
         var tbs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
         MMLog.Log_Gravekeeper(tbs.Count + " zombs on the board...");
@@ -175,8 +173,8 @@ public class Gravekeeper : Character {
 
     // Tombstone
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        AudioController.Trigger(AudioController.GravekeeperSFX.SigBell1);
-        AudioController.Trigger(AudioController.GravekeeperSFX.Motorcycle);
+        AudioController.Trigger(SFX.Gravekeeper.Sig_Bell1);
+        AudioController.Trigger(SFX.Gravekeeper.Sig_Motorcycle);
 
         DealDamage(225);
 
@@ -196,8 +194,9 @@ public class Gravekeeper : Character {
 
         _mm.DropTile(tombstone, col); // idk how to animate this one yet
 
-        AudioController.Trigger(AudioController.GravekeeperSFX.SigDrop);
+        AudioController.Trigger(SFX.Gravekeeper.Sig_TSDrop);
     }
+    #endregion
 
     //public IEnumerator CompanyLuncheon() {
     //    targeting.WaitForTileAreaTarget(false, CompanyLuncheon_Target);

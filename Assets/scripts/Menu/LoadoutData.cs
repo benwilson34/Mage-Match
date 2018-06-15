@@ -74,4 +74,12 @@ public class LoadoutData {
         File.WriteAllText(data.filepath, JsonConvert.SerializeObject(data));
         Debug.Log("Saved data to " + data.filepath);
     }
+
+    public static void ClearUserLoadouts(Character.Ch ch) {
+        // TODO
+    }
+
+    public static void DeleteUserLoadout(LoadoutData data) {
+        // TODO
+    }
 }

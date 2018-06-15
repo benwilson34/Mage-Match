@@ -9,6 +9,7 @@ using MMDebug;
 public class UIController : MonoBehaviour {
 
     //public AnimationCurve slidingEase;
+    public Gradient healthbarGradient;
     [HideInInspector]
     public Sprite miniFire, miniWater, miniEarth, miniAir, miniMuscle;
     [HideInInspector]
@@ -22,7 +23,8 @@ public class UIController : MonoBehaviour {
 
     private MageMatch _mm;
     private Transform _leftPinfo, _rightPinfo, _leftPspells, _rightPspells, _board;
-    private GameObject _spellOutlineEnd, _spellOutlineMid;
+    private GameObject _healthChangeNumPF;
+    private GameObject _spellOutlineEndPF, _spellOutlineMidPF;
     private GameObject _prereqPF, _targetPF;
     private GameObject _gradient, TargetingBG;
     private GameObject _tCancelB, _tClearB;
@@ -145,18 +147,19 @@ public class UIController : MonoBehaviour {
     }
 
     public void OnEventContLoaded() {
-        EventController.AddTurnBeginEvent(OnTurnBegin, EventController.Type.LastStep);
-        EventController.AddTurnEndEvent(OnTurnEnd, EventController.Type.LastStep);
+        EventController.AddTurnBeginEvent(OnTurnBegin, MMEvent.Behav.LastStep);
+        EventController.AddTurnEndEvent(OnTurnEnd, MMEvent.Behav.LastStep);
         //EventController.gameAction += OnGameAction;
-        EventController.AddDrawEvent(OnDraw, EventController.Type.LastStep, EventController.Status.Begin);
+        EventController.AddHandChangeEvent(OnHandChange, MMEvent.Behav.LastStep, MMEvent.Moment.Begin);
         //EventController.AddMatchEvent(OnMatch, EventController.Type.LastStep);
         EventController.playerHealthChange += OnPlayerHealthChange;
         EventController.playerMeterChange += OnPlayerMeterChange;
     }
 
     void LoadPrefabs() {
-        _spellOutlineEnd = Resources.Load<GameObject>("prefabs/ui/spell-outline_end");
-        _spellOutlineMid = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
+        _healthChangeNumPF = Resources.Load<GameObject>("prefabs/ui/healthChangeNum");
+        _spellOutlineEndPF = Resources.Load<GameObject>("prefabs/ui/spell-outline_end");
+        _spellOutlineMidPF = Resources.Load<GameObject>("prefabs/ui/spell-outline_mid");
         _prereqPF = Resources.Load("prefabs/outline_prereq") as GameObject;
         _targetPF = Resources.Load("prefabs/outline_target") as GameObject;
     }
@@ -180,18 +183,18 @@ public class UIController : MonoBehaviour {
 
             Transform gameStartSide = GetGameStartSide(id);
             gameStartSide.Find("i_char").GetComponent<Image>().sprite =
-                Resources.Load<Sprite>("sprites/characters/" + p.character.ch.ToString());
-            gameStartSide.Find("t_name").GetComponent<Text>().text = p.name;
+                Resources.Load<Sprite>("sprites/characters/" + p.Character.ch.ToString());
+            gameStartSide.Find("t_name").GetComponent<Text>().text = p.Name;
 
-            pinfo.Find("t_name").GetComponent<Text>().text = p.name;
-            SetPinfoColor(id);
+            pinfo.Find("t_name").GetComponent<Text>().text = p.Name;
+            //SetPinfoColor(id);
             //if (id == _mm.myID)
             //    nameText.text += " (ME!)";
 
             ShowAllSpellInfo(id);
             DeactivateAllSpellButtons(id); // not needed now
             GetPortrait(id).Find("i_portrait").GetComponent<Image>().sprite =
-                Resources.Load<Sprite>("sprites/character-thumbs/" + p.character.ch.ToString());
+                Resources.Load<Sprite>("sprites/character-thumbs/" + p.Character.ch.ToString());
 
             UpdateAP(p);
         }
@@ -291,11 +294,11 @@ public class UIController : MonoBehaviour {
     }
     #endregion
 
-    
-    #region EventCont callbacks
+
+    #region ---------- EVENT CALLBACKS ----------
     public IEnumerator OnTurnBegin(int id) {
         if (_mm.MyTurn()) {
-            ShowAlertText(_mm.ActiveP().name + ", make your move!");
+            ShowAlertText(_mm.ActiveP.Name + ", make your move!");
             //UpdateMoveText("Completed turns: " + (mm.stats.turns - 1));
 
             SetDrawButton(_mm.myID, true);
@@ -308,7 +311,7 @@ public class UIController : MonoBehaviour {
     }
 
     public IEnumerator OnTurnEnd(int id) {
-        newsfeed.UpdateTurnCount(_mm.stats.turns);
+        newsfeed.UpdateTurnCount(Report.turns);
         //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
         yield return null;
     }
@@ -317,15 +320,18 @@ public class UIController : MonoBehaviour {
     //    UpdateAP(_mm.GetPlayer(id));
     //}
 
-    public IEnumerator OnDraw(int id, string tag, bool playerAction, bool dealt) {
-        // TODO update button
-        if (_mm.GetPlayer(id).hand.IsFull())
-            GetDrawButtonCont(id).Deactivate();
+    public IEnumerator OnHandChange(HandChangeEventArgs args) {
+        if (args.state == EventController.HandChangeState.PlayerDraw ||
+            args.state == EventController.HandChangeState.DrawFromEffect) {
+            if (_mm.GetPlayer(args.id).Hand.IsFull)
+                GetDrawButtonCont(args.id).Deactivate();
+        }
         yield return null;
     }
 
     public void OnPlayerHealthChange(int id, int amount, int newHealth, bool dealt) {
         StartCoroutine(UpdateHealthbar(_mm.GetPlayer(id)));
+        StartCoroutine(HealthChangeNumbers(id, amount));
         StartCoroutine(DamageAnim(_mm.GetPlayer(id), amount));
     }
 
@@ -406,24 +412,24 @@ public class UIController : MonoBehaviour {
             return _rightPinfo;
     }
 
-    void SetPinfoColor(int id) {
-        Image healthImg = GetPinfo(id).Find("i_healthbar").GetComponent<Image>();
-        switch (_mm.GetPlayer(id).character.ch) {
-            case Character.Ch.Enfuego:
-                healthImg.color = Color.red;
-                break;
-            case Character.Ch.Gravekeeper:
-                healthImg.color = Color.green;
-                break;
-            case Character.Ch.Valeria:
-                healthImg.color = Color.blue;
-                break;
+    //void SetPinfoColor(int id) {
+    //    Image healthImg = GetPinfo(id).Find("i_healthbar").GetComponent<Image>();
+    //    switch (_mm.GetPlayer(id).character.ch) {
+    //        case Character.Ch.Enfuego:
+    //            healthImg.color = Color.red;
+    //            break;
+    //        case Character.Ch.Gravekeeper:
+    //            healthImg.color = Color.green;
+    //            break;
+    //        case Character.Ch.Valeria:
+    //            healthImg.color = Color.blue;
+    //            break;
 
-            case Character.Ch.Neutral:
-                healthImg.color = Color.gray;
-                break;
-        }
-    }
+    //        case Character.Ch.Neutral:
+    //            healthImg.color = Color.gray;
+    //            break;
+    //    }
+    //}
 
     //Tween PinfoColorTween(int id, Color newColor) {
     //    Transform pinfo = GetPinfo(id);
@@ -432,37 +438,56 @@ public class UIController : MonoBehaviour {
     //} 
 
     public void UpdateAP(Player p) {
-        MMLog.Log_UICont("Updating AP for p" + p.id);
-        var APimage = GetPinfo(p.id).Find("i_AP").GetComponent<Image>();
-        APimage.fillAmount = (float) p.GetAP() / Player.MAX_AP;
+        MMLog.Log_UICont("Updating AP for p" + p.ID);
+        var APimage = GetPinfo(p.ID).Find("i_AP").GetComponent<Image>();
+        APimage.fillAmount = (float) p.AP / Player.MAX_AP;
     }
 
     IEnumerator UpdateHealthbar(Player p) {
-        Transform pinfo = GetPinfo(p.id);
+        Transform pinfo = GetPinfo(p.ID);
         Image healthImg = pinfo.Find("i_healthbar").GetComponent<Image>();
         Text healthText = pinfo.Find("t_health").GetComponent<Text>();
 
-        int healthAmt = p.character.GetHealth();
+        int healthAmt = p.Character.GetHealth();
         TextNumTween(healthText, healthAmt);
 
-        float slideRatio = (float)healthAmt / p.character.GetMaxHealth();
+        float slideRatio = (float)healthAmt / p.Character.GetMaxHealth();
 
         // TODO I have a feeling I can just Lerp this? lol
         // health bar coloring; green -> yellow -> red
         //float thresh = .6f; // point where health bar is yellow (0.6 = 60% health)
         //float r = (((Mathf.Clamp(slideRatio, thresh, 1) - thresh) / (1 - thresh)) * -1 + 1);
         //float g = Mathf.Clamp(slideRatio, 0, thresh) / thresh;
-        //healthbar.GetComponent<Image>().color = new Color(r, g, 0);
+        //healthImg.color = new Color(r, g, 0);
+        healthImg.color = healthbarGradient.Evaluate(slideRatio);
 
         yield return healthImg.DOFillAmount(slideRatio, .8f).SetEase(Ease.OutCubic).WaitForCompletion();
     }
 
+    IEnumerator HealthChangeNumbers(int id, int amount) {
+        Transform pHealthNums = GetPinfo(id).Find("HealthChangeNums");
+        var tNumEntry = Instantiate(_healthChangeNumPF, pHealthNums).GetComponent<Text>();
+
+        if (amount < 0) {
+            tNumEntry.text = amount + "";
+        } else {
+            tNumEntry.color = Color.green;
+            tNumEntry.text = "+" + amount;
+        }
+
+        yield return new WaitForSeconds(2.5f);
+
+        yield return tNumEntry.DOFade(0, .5f).WaitForCompletion();
+
+        Destroy(tNumEntry.gameObject);
+    }
+
     IEnumerator UpdateMeterbar(Player p) {
-        Transform pinfo = GetPinfo(p.id);
+        Transform pinfo = GetPinfo(p.ID);
         Image sig = pinfo.Find("i_meterbar").GetComponent<Image>();
         Text sigText = pinfo.Find("t_meter").GetComponent<Text>();
 
-        int meter = p.character.GetMeter();
+        int meter = p.Character.GetMeter();
         TextNumTween(sigText, meter / 10, "%"); // change if a character has meter of different amount 
 
         float slideRatio = (float) meter / Character.METER_MAX;
@@ -472,16 +497,16 @@ public class UIController : MonoBehaviour {
 
     IEnumerator DamageAnim(Player p, int amount) {
         if (amount < 0) { // damage
-            Image pinfoImg = GetPinfo(p.id).GetComponent<Image>();
+            Image pinfoImg = GetPinfo(p.ID).GetComponent<Image>();
             pinfoImg.color = new Color(1, 0, 0, 0.4f); // red
-            Color pColor = CorrectPinfoColor(p.id);
+            Color pColor = CorrectPinfoColor(p.ID);
             yield return _mm.animCont.WaitForSeconds(.2f);
             pinfoImg.DOColor(pColor, .3f).SetEase(Ease.OutQuad);
         }
     }
 
     Color CorrectPinfoColor(int id) {
-        //if (id == mm.ActiveP().id && mm.currentTurn != MageMatch.Turn.CommishTurn) {
+        //if (id == mm.ActiveP.id && mm.currentTurn != MageMatch.Turn.CommishTurn) {
         //    return new Color(0, 1, 0);
         //} else
             return new Color(1, 1, 1);
@@ -517,14 +542,14 @@ public class UIController : MonoBehaviour {
     public void ShowSpellSeqs(List<TileSeq> seqs) {
         foreach (TileSeq seq in seqs) {
             MMLog.Log_UICont("showing " + seqs.Count + " seqs");
-            GameObject start = Instantiate(_spellOutlineEnd);
+            GameObject start = Instantiate(_spellOutlineEndPF);
             int length = seq.GetSeqLength();
             for (int i = 1; i < length; i++) {
                 GameObject piece;
                 if (i == length - 1)
-                    piece = Instantiate(_spellOutlineEnd, start.transform);
+                    piece = Instantiate(_spellOutlineEndPF, start.transform);
                 else
-                    piece = Instantiate(_spellOutlineMid, start.transform);
+                    piece = Instantiate(_spellOutlineMidPF, start.transform);
                 piece.transform.position = new Vector3(0, i);
                 piece.transform.rotation = Quaternion.Euler(0, 0, -90);
             }
@@ -659,7 +684,7 @@ public class UIController : MonoBehaviour {
         // TODO glow under hex
         quickdrawButton.SetActive(on);
 
-        int id = _mm.ActiveP().id;
+        int id = _mm.ActiveP.ID;
         TurnAllSpellButtons(id, !on);
         if (on) {
             GetDrawButtonCont(id).Deactivate();

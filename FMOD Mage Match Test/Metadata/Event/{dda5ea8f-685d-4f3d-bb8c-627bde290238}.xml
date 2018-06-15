@@ -2,7 +2,10 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{dda5ea8f-685d-4f3d-bb8c-627bde290238}">
         <property name="name">
-            <value>HRForm</value>
+            <value>Recruit</value>
+        </property>
+        <property name="note">
+            <value>Previously called HR Form</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

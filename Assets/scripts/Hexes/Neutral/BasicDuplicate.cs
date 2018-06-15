@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class BasicDuplicate : TileBehav {
 
-	public override void Init(MageMatch mm) {
-        base.Init(mm);
+	public override void SetInitProps() {
         SetDuplicate();
     }
 

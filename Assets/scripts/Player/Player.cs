@@ -7,36 +7,46 @@ public class Player {
 
     public const int MAX_AP = 7;
 
-    public int id; // auto
-    public string name; // auto
-    public Character character;
-    public Hand hand;
-    public Deck deck;
+    public int ID { get { return _id; } }
+    private int _id;
+
+    public string Name { get { return _name; } }
+    private string _name;
+
+    public Character Character { get { return _character; } }
+    private Character _character;
+
+    public Deck Deck { get { return _deck; } }
+    private Deck _deck;
+
+    public Hand Hand { get { return _hand; } }
+    private Hand _hand;
 
     private MageMatch _mm;
     private int _ap, _initAP = 1;
-    //private MatchEffect _matchEffect;
+    public int AP { get { return _ap; } }
+    public bool IsOutOfAP { get { return _ap == 0; } }
 
     public Player(MageMatch mm, int playerId) {
         _ap = 0;
         _mm = mm;
-        id = playerId;
-        hand = new Hand(_mm, this);
+        _id = playerId;
+        _hand = new Hand(_mm, this);
 
         switch (playerId) {
             case 1:
-                name = _mm.gameSettings.p1name;
+                _name = _mm.gameSettings.p1name;
                 break;
             case 2:
-                name = _mm.gameSettings.p2name;
+                _name = _mm.gameSettings.p2name;
                 break;
             default:
                 MMLog.LogError("PLAYER: Tried to instantiate player with id not 1 or 2!");
                 break;
         }
 
-        character = Character.Load(_mm, id);
-        deck = new Deck(_mm, this);
+        _character = Character.Load(_mm, ID);
+        _deck = new Deck(_mm, this);
 
         //_mm.AddEventContLoadEvent(OnEventContLoaded);
     }
@@ -49,21 +59,22 @@ public class Player {
     // TODO this should really just happen in MM.TurnSystem unless priority is important...
     public IEnumerator OnTurnBegin() {
         InitAP();
-        yield return _mm._Deal(id);
+        yield return _mm._Deal(_id);
     }
 
-    public IEnumerator DrawHexes(int count, bool playerAction, bool dealt) {
-        yield return _mm._Draw(id, count, playerAction, dealt);
+    // just for the convenience of calling from effects
+    public IEnumerator DrawHexes(int count) {
+        yield return _mm._Draw(ID, count, EventController.HandChangeState.DrawFromEffect);
     }
 
     //public bool IsHexMine(Hex hex) {
     //    return hex.transform.parent.position.Equals(hand.GetHandPos()); // kinda weird...hand function? compare tags
     //}
 
-    public bool ThisIsLocal() { return _mm.myID == id; }
+    //public bool ThisIsLocal() { return _mm.myID == ID; }
 
     void InitAP() {
-        _ap = _initAP;
+        _ap += _initAP;
         _mm.uiCont.UpdateAP(this);
 
         if (_initAP < MAX_AP)
@@ -72,7 +83,7 @@ public class Player {
 
     public void IncreaseAP(int amount = 1) {
         ChangeAP(amount);
-        AudioController.Trigger(AudioController.OtherSoundEffect.APGain);
+        AudioController.Trigger(SFX.Other.APGain);
     }
 
     public void DecreaseAP(int amount = 1) {
@@ -83,30 +94,5 @@ public class Player {
         _ap += amount;
         // TODO clamp
         _mm.uiCont.UpdateAP(this);
-    }
-
-    public int GetAP() { return _ap; }
-
-    public bool OutOfAP() { return _ap == 0; }
-
-    public void ApplySpellCosts(Spell spell) {
-        bool applyAPcost = true;
-        if (_mm.IsDebugMode()) {
-            applyAPcost = _mm.debugSettings.applyAPcost;
-        }
-        if (applyAPcost) {
-            MMLog.Log_Player("Applying AP cost...which is " + spell.APcost);
-            _ap -= spell.APcost;
-            _mm.uiCont.UpdateAP(this);
-        }
-
-
-        if (spell is SignatureSpell) {
-            int meterCost = ((SignatureSpell)spell).meterCost;
-            MMLog.Log_Player("Applying meter cost...which is " + meterCost);
-            character.ChangeMeter(-meterCost);
-        }
-
-        EventController.GameAction(0);
     }
 }

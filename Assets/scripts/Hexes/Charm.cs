@@ -6,7 +6,7 @@ public abstract class Charm : Hex {
 
     public abstract IEnumerator DropEffect();
 
-    public override IEnumerator OnDrop() {
+    public override IEnumerator OnDrop(int col) {
         yield return DropEffect();
     }
 
