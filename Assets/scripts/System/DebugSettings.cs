@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class DebugSettings : MonoBehaviour {
 
-    public bool applyAPcost = false, onePlayerMode = true, midiMode = false;
+    public enum TrainingMode { OneCharacter, TwoCharacters };
+    public TrainingMode trainingMode = TrainingMode.OneCharacter;
+
+    public bool IsOneCharMode { get { return trainingMode == TrainingMode.OneCharacter; } }
 
     public bool replayMode = false, animateReplay = false;
     public string replayFile = "";

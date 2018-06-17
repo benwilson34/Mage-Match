@@ -85,9 +85,9 @@ public class Lobby : Photon.PunBehaviour {
 
     public void StartTestScene() {
         DebugSettings dbs = new GameObject("debugSettings").AddComponent<DebugSettings>();
-        dbs.applyAPcost = testSettingsMenu.transform.Find("tog_applyAPcosts").GetComponent<Toggle>().isOn;
-        dbs.onePlayerMode = testSettingsMenu.transform.Find("tog_onlyP1").GetComponent<Toggle>().isOn;
-        dbs.midiMode = testSettingsMenu.transform.Find("tog_midiMode").GetComponent<Toggle>().isOn;
+        //dbs.applyAPcost = testSettingsMenu.transform.Find("tog_applyAPcosts").GetComponent<Toggle>().isOn;
+        //dbs.onePlayerMode = testSettingsMenu.transform.Find("tog_onlyP1").GetComponent<Toggle>().isOn;
+        //dbs.midiMode = testSettingsMenu.transform.Find("tog_midiMode").GetComponent<Toggle>().isOn;
 
         GameSettings settings = new GameObject("gameSettings").AddComponent<GameSettings>();
         settings.p1name = "GOD";

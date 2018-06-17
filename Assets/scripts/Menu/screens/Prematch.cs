@@ -46,9 +46,8 @@ public class Prematch : MenuScreen {
             _gameSettings.p1name = UserData.Username;
             _gameSettings.p1char = _gameSettings.chosenChar;
             _gameSettings.p1loadout = _gameSettings.chosenLoadout;
-            _gameSettings.p2name = "Training Dummy";
-            _gameSettings.p2char = Character.Ch.Neutral;
-            _gameSettings.p2loadout = new string[0];
+            _gameSettings.p2name = "Sparring Buddy";
+            _gameSettings.p2loadout = LoadoutData.GetDefaultLoadout(_gameSettings.p2char).runes;
 
             StartCoroutine(ShowPrematchInfoBeforeLoad(true));
         } else {

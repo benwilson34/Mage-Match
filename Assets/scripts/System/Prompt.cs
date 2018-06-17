@@ -99,7 +99,7 @@ public class Prompt {
         //}
 
         if (_mm.IsReplayMode)
-            _mm.replay.GetPrompt();
+            ReplayEngine.GetPrompt();
 
         yield return new WaitUntil(() => currentMode == PromptMode.None);
 
@@ -178,7 +178,7 @@ public class Prompt {
         }
 
         if (_mm.IsReplayMode)
-            _mm.replay.GetPrompt();
+            ReplayEngine.GetPrompt();
 
         // the InputController calls SetDrop for this too
         //_mm.inputCont.SetAllowHandRearrange(false);
@@ -249,7 +249,7 @@ public class Prompt {
         
 
         if (_mm.IsReplayMode)
-            _mm.replay.GetPrompt();
+            ReplayEngine.GetPrompt();
 
         //_mm.inputCont.SetAllowHandDragging(false); // might not be needed now
         yield return new WaitUntil(() => currentMode == PromptMode.None);

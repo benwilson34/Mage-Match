@@ -23,6 +23,8 @@ public class Targeting {
 
     public static void Init(MageMatch mm) {
         _mm = mm;
+        _targetTBs = new List<TileBehav>();
+        _targetCBs = new List<CellBehav>();
     }
 
     public static bool IsTargetMode() {
@@ -49,7 +51,7 @@ public class Targeting {
     public static IEnumerator WaitForTileTarget(int count, List<TileBehav> tbs) {
         currentTMode = TargetMode.Tile;
         _targetsLeft = count;
-        _targetTBs = new List<TileBehav>();
+        _targetTBs.Clear();
         MMLog.Log_Targeting("targets = " + _targetsLeft);
 
         _validTBs = tbs;
@@ -62,7 +64,7 @@ public class Targeting {
     public static IEnumerator WaitForTileAreaTarget(bool largeArea, List<TileBehav> tbs) {
         currentTMode = TargetMode.TileArea;
         _targetsLeft = 1;
-        _targetTBs = new List<TileBehav>();
+        _targetTBs.Clear();
         _largeAreaMode = largeArea;
         MMLog.Log_Targeting("Waiting for TileArea target. Targets = " + _targetsLeft);
 
@@ -76,7 +78,7 @@ public class Targeting {
     public static IEnumerator WaitForDragTarget(int count, List<TileBehav> tbs) {
         currentTMode = TargetMode.Drag;
         _targetsLeft = count;
-        _targetTBs = new List<TileBehav>();
+        _targetTBs.Clear();
         MMLog.Log_Targeting("Waiting for Drag target. Targets = " + _targetsLeft);
 
         _validTBs = tbs;
@@ -244,7 +246,7 @@ public class Targeting {
         }
 
         if (_mm.IsReplayMode)
-            _mm.replay.GetTargets();
+            ReplayEngine.GetTargets();
 
         yield return new WaitUntil(() => _targetsLeft == 0 || validObjs.Count == 0);
         MMLog.Log_Targeting("no more targets.");

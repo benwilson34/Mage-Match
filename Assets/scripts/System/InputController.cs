@@ -690,9 +690,9 @@ public class InputController : MonoBehaviour {
                 break;
 
             case MageMatch.State.DebugMenu:
-                if (_mm.IsDebugMode) {
+                if (_mm.IsDebugMode)
                     _currentContext = _debugMenu;
-                } else
+                else
                     _currentContext = _block;
                 break;
 

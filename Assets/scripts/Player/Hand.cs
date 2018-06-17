@@ -43,7 +43,7 @@ public class Hand {
         }
     }
 
-    public Vector3 GetHandPos() { return _handPos.position; }
+    //public Vector3 GetHandPos() { return _handPos.position; }
 
     public bool IsHexMine(Hex hex) {
         foreach (Hex handHex in _hexes) {
@@ -54,6 +54,9 @@ public class Hand {
     }
 
     public void Add(Hex hex) {
+        if (_mm.gameMode != MageMatch.GameMode.TrainingTwoChars && !_mm.IsMe(_p.ID))
+            hex.Flip();
+
         hex.transform.SetParent(_handPos); // , false)?
         _hexes.Add(hex);
 

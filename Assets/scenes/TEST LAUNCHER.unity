@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 1010678306}
   - component: {fileID: 1010678305}
   m_Layer: 0
-  m_Name: Launcher
+  m_Name: LAUNCHER
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -141,6 +141,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   testCharacter: 1
+  trainingMode: 0
+  secondTestCharacter: 2
 --- !u!4 &1010678306
 Transform:
   m_ObjectHideFlags: 0
@@ -181,9 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b7f6b51ab26a534ba013add90da462b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  applyAPcost: 0
-  onePlayerMode: 1
-  midiMode: 0
+  trainingMode: 0
   replayMode: 0
   animateReplay: 0
   replayFile: 

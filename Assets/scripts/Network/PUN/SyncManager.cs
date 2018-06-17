@@ -32,7 +32,7 @@ public class SyncManager : PunBehaviour {
 
     public IEnumerator SyncRands(int id, int[] values) {
         if (_mm.IsReplayMode) {
-            int[] replayRands = _mm.replay.GetSyncedRands();
+            int[] replayRands = ReplayEngine.GetSyncedRands();
             foreach (int r in replayRands)
                 _rands.Enqueue(r);
         } else if (_mm.IsDebugMode) {

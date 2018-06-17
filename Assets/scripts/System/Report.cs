@@ -8,7 +8,8 @@ using MMDebug;
 
 public class Report {
 
-    public static int turns = 1;
+    public static int Turns { get { return _turns; } }
+    private static int _turns = 1;
 
     private static MageMatch _mm;
     private static StringBuilder _report;
@@ -85,13 +86,13 @@ public class Report {
     }
 
     public static IEnumerator OnTurnBegin(int id) {
-        _report.AppendLine("\n  # TURN " + turns + " (p" + id + ")");
+        _report.AppendLine("\n  # TURN " + _turns + " (p" + id + ")");
         yield return null;
     }
 
     public static IEnumerator OnTurnEnd(int id) {
         _report.AppendLine("\n  # COMMISH TURN");
-        turns++;
+        _turns++;
         yield return null;
     }
 
@@ -227,7 +228,7 @@ public class Report {
         filename = @"/" + filename + ".csv";
 
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine("Turns complete," + turns);
+        sb.AppendLine("Turns complete," + _turns);
         sb.AppendLine("Commish drops," + _commishDrops).AppendLine("");
         //sb.AppendLine("Commish matches," + _commishMatches).AppendLine("");
         for (int id = 1; id <= 2; id++) {

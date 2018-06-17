@@ -476,8 +476,6 @@ public class DebugTools : MonoBehaviour {
             return;
 
         Hex hex = HexManager.GenerateHex(id, hextag);
-        if (id != _mm.myID)
-            hex.Flip();
 
         p.Hand.Add(hex);
 

@@ -48,7 +48,7 @@ public class ResultScreen : MonoBehaviour {
         // TODO if first victory today
         // TODO win streak
 
-        AddResultItem("Match Length:", Report.turns);
+        AddResultItem("Match Length:", Report.Turns);
 
         // TODO 10 victories in one day
 

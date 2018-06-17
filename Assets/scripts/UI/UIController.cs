@@ -8,6 +8,8 @@ using MMDebug;
 
 public class UIController : MonoBehaviour {
 
+    public enum ScreenSide { Left, Right };
+
     //public AnimationCurve slidingEase;
     public Gradient healthbarGradient;
     [HideInInspector]
@@ -79,7 +81,8 @@ public class UIController : MonoBehaviour {
                 //MMLog.Log_UICont("mm = " + _mm.myID);
                 button.Init(_mm, id);
                 button.Deactivate();
-                if (id == _mm.myID) { // only make my buttons interactable for the match
+                if (id == _mm.myID || _mm.gameMode == MageMatch.GameMode.TrainingTwoChars) { 
+                    // only make my buttons interactable for the match
                     button.SetInteractable();
                 }
             }
@@ -278,17 +281,17 @@ public class UIController : MonoBehaviour {
         tFirstTurn.gameObject.SetActive(false);
 
         Vector3 endRot = new Vector3(0, 0, 1800);
-        endRot.z += !_mm.MyTurn() ^ _localOnRight ? 180 : 0;
+        endRot.z += IDtoSide(_mm.ActiveP.ID) == ScreenSide.Right ? 180 : 0;
         yield return spinningArrow.DORotate(endRot, 1.5f, RotateMode.LocalAxisAdd).WaitForCompletion();
 
         tFirstTurn.gameObject.SetActive(true);
         yield return new WaitForSeconds(1f);
 
-        if (!_mm.MyTurn())
+        // TODO this will have to be relative too with the option for localOnRight
+        if (IDtoSide(_mm.ActiveP.ID) == ScreenSide.Right) {
             SetDrawButton(_mm.myID, false);
-
-        if (!_mm.MyTurn() ^ _localOnRight) // because it's currently relative, only shift if needed
             StartCoroutine(ShiftScreen());
+        }
 
         coinFlip.SetActive(false);
     }
@@ -311,7 +314,7 @@ public class UIController : MonoBehaviour {
     }
 
     public IEnumerator OnTurnEnd(int id) {
-        newsfeed.UpdateTurnCount(Report.turns);
+        newsfeed.UpdateTurnCount(Report.Turns);
         //ChangePinfoColor(id, new Color(1, 1, 1, .4f));
         yield return null;
     }
@@ -339,6 +342,18 @@ public class UIController : MonoBehaviour {
         StartCoroutine(UpdateMeterbar(_mm.GetPlayer(id)));
     }
     #endregion
+
+
+    ScreenSide IDtoSide(int id) {
+        if (_mm.gameMode == MageMatch.GameMode.TrainingTwoChars) {
+            return id == 1 ? ScreenSide.Left : ScreenSide.Right;
+        }
+
+        if (id == _mm.myID ^ _localOnRight)
+            return ScreenSide.Left;
+        else
+            return ScreenSide.Right;
+    }
 
 
     #region ---------- SLIDING ELEMENTS ----------
@@ -406,7 +421,7 @@ public class UIController : MonoBehaviour {
 
     #region ---------- PLAYER INFO ----------
     public Transform GetPinfo(int id) {
-        if (id == _mm.myID ^ _localOnRight)
+        if (IDtoSide(id) == ScreenSide.Left)
             return _leftPinfo;
         else
             return _rightPinfo;
@@ -532,8 +547,7 @@ public class UIController : MonoBehaviour {
 	}
 
     Transform GetPortrait(int id) {
-        return _mm.myID == id ^ _localOnRight ? _leftPportrait : _rightPportrait;
-
+        return IDtoSide(id) == ScreenSide.Left ? _leftPportrait : _rightPportrait;
     }
     #endregion
 
@@ -723,14 +737,18 @@ public class UIController : MonoBehaviour {
     }
 
     Transform GetPspells(int id) {
-        if (id == _mm.myID ^ _localOnRight)
+        if (_mm.gameMode == MageMatch.GameMode.TrainingTwoChars) {
+            return id == 1 ? _leftPspells : _rightPspells;
+        }
+
+        if (IDtoSide(id) == ScreenSide.Left)
             return _leftPspells;
         else
             return _rightPspells;
     }
 
     Transform GetDrawButton(int id) {
-        return id == _mm.myID ^ _localOnRight ? _leftDrawButton : _rightDrawButton;
+        return IDtoSide(id) == ScreenSide.Left ? _leftDrawButton : _rightDrawButton;
     }
 
     ButtonController GetDrawButtonCont(int id) {
@@ -740,12 +758,13 @@ public class UIController : MonoBehaviour {
     public ButtonController GetButtonCont(int id, int index) {
         //Transform t = GetPspells(id).Find("b_Spell" + index);
         //MMLog.Log_UICont("Found " + t.name + ", parent=" + t.parent.name);
+        //Debug.LogWarning("Getting player " + id + " button " + index);
         return GetPspells(id).Find("b_Spell" + index)
             .GetComponent<ButtonController>();
     }
     
 	public void ActivateSpellButton(int id, int index){
-        if (_mm.MyTurn()) {
+        if (_mm.IsMe(id)) {
             var button = GetButtonCont(id, index);
             button.Activate();
         }
@@ -814,7 +833,7 @@ public class UIController : MonoBehaviour {
     }
 
     Transform GetGameStartSide(int id) {
-        if (id == _mm.myID ^ _localOnRight)
+        if (IDtoSide(id) == ScreenSide.Left)
             return gameStartScreen.transform
             .Find("LeftSide").GetComponent<RectTransform>();
         else

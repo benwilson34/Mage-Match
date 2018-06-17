@@ -37,14 +37,14 @@ public class MageMatch : MonoBehaviour {
     private int _checking = 0, _actionsPerforming = 0;
     private List<TileSeq>[] _spellsOnBoard;
 
+    public enum GameMode { Multiplayer, TrainingSingleChar, TrainingTwoChars };
+    public GameMode gameMode = GameMode.Multiplayer;
     public DebugSettings debugSettings;
     public DebugTools debugTools;
-    public ReplayEngine replay;
     public bool IsDebugMode { get { return _isDebugMode; } }
     public bool IsReplayMode { get { return _isReplayMode; } }
+    //public bool ControllingOneChar { get { return IsDebugMode ? debugSettings.IsOneCharMode : true; } }
     private bool _isDebugMode = false, _isReplayMode = false;
-    private bool ApplyAPcost { get { return IsDebugMode ? debugSettings.applyAPcost : true; } }
-    private bool IsOnePlayerMode { get { return IsDebugMode ? debugSettings.onePlayerMode : false; } }
 
     public delegate void LoadEvent();
     private List<LoadEvent> _onEffectContLoaded;
@@ -71,10 +71,12 @@ public class MageMatch : MonoBehaviour {
             debugSettings = debugObj.GetComponent<DebugSettings>();
             _isDebugMode = true;
 
+            gameMode = debugSettings.IsOneCharMode ? GameMode.TrainingSingleChar : GameMode.TrainingTwoChars;
+
             if (debugSettings.replayMode) {
                 _isReplayMode = true;
-                replay = new ReplayEngine(this);
-                replay.Load("2018-4-16_16-33-0");
+                ReplayEngine.Init(this);
+                ReplayEngine.Load("2018-4-16_16-33-0");
             }
 
             MMLog.LogWarning("This scene is in debug mode!!");
@@ -178,14 +180,14 @@ public class MageMatch : MonoBehaviour {
         yield return EventController.TurnBegin(); // is this ok?
         yield return _activep.OnTurnBegin();
 
-        if (IsDebugMode)
+        if (gameMode == GameMode.TrainingSingleChar)
             _activep.IncreaseAP(6);
 
         if (IsReplayMode) {
             uiCont.ToggleLoadingText(true);
             inputCont.SetBlocking(true);
 
-            yield return replay.StartReplay();
+            yield return ReplayEngine.StartReplay();
 
             _isReplayMode = false;
             uiCont.ToggleLoadingText(false);
@@ -306,7 +308,7 @@ public class MageMatch : MonoBehaviour {
     }
 
     public void ApplyCost(int id, int cost) {
-        if (!ApplyAPcost)
+        if (gameMode == GameMode.TrainingSingleChar) // don't apply AP cost in one-char mode (infinite AP)
             return;
 
         //Debug.Log("MAGEMATCH: OnGameAction called!");
@@ -365,8 +367,10 @@ public class MageMatch : MonoBehaviour {
 
         currentTurn = Turn.PlayerTurn;
 
-        if (!IsOnePlayerMode) {
+        if (gameMode != GameMode.TrainingSingleChar) { // would it ever get to this point if so?
             _activep = InactiveP();
+            if (gameMode == GameMode.TrainingTwoChars)
+                myID = _activep.ID;
             yield return uiCont.ShiftScreen();
         }
 
@@ -409,7 +413,7 @@ public class MageMatch : MonoBehaviour {
                 continue;
             }
 
-            //MMLog.Log_MageMatch("spell[" + s + "] count=" + _spellsOnBoard[s].Count);
+            MMLog.Log_MageMatch("spell[" + s + "] count=" + _spellsOnBoard[s].Count);
             if (_spellsOnBoard[s].Count > 0)
                 uiCont.ActivateSpellButton(_activep.ID, s);
             else
@@ -459,9 +463,6 @@ public class MageMatch : MonoBehaviour {
                 Hex hex = HexManager.GenerateHex(id, hextag);
                 hex.putBackIntoDeck = true;
 
-                if (id != myID)
-                    hex.Flip();
-
                 //hex.transform.position = Camera.main.ScreenToWorldPoint(mm.uiCont.GetPinfo(id).position);
 
                 yield return EventController.HandChange(MMEvent.Moment.Begin, id, hex.hextag, state);
@@ -491,9 +492,6 @@ public class MageMatch : MonoBehaviour {
         Hex hex = HexManager.GenerateHex(id, hextag);
 
         // TODO animate second hex being duped from first
-
-        if (id != myID)
-            hex.Flip();
 
         p.Hand.Add(hex);
 
@@ -624,7 +622,7 @@ public class MageMatch : MonoBehaviour {
 
         TileSeq prereq;
         if (IsReplayMode) {
-            prereq = replay.GetSpellSelection();
+            prereq = ReplayEngine.GetSpellSelection();
         } else {
             Targeting.selectionCanceled = false;
             yield return Targeting.SpellSelectScreen(_spellsOnBoard[spellNum]);
@@ -760,5 +758,10 @@ public class MageMatch : MonoBehaviour {
 
     public void DEBUG_EndGame() {
         EndTheGame(2);
+    }
+
+    public void DEBUG_ActivateSpell3() {
+        uiCont.ActivateSpellButton(_p1.ID, 2);
+        uiCont.ActivateSpellButton(_p2.ID, 2);
     }
 }

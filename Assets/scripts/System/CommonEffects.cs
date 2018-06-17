@@ -45,9 +45,6 @@ class CommonEffects {
 
         yield return tb.transform.DOMove(p.Hand.GetEmptyHandSlotPos(), .3f).WaitForCompletion();
 
-        if (!_mm.IsMe(p.ID))
-            tb.Flip();
-
         p.Hand.Add(tb);
         yield return null;
     }
@@ -68,6 +65,7 @@ class CommonEffects {
         // TODO shuffle tbs?
         int[] cols = BoardCheck.GetRandomCols(tbs.Count);
         yield return _mm.syncManager.SyncRands(_mm.ActiveP.ID, cols);
+        cols = _mm.syncManager.GetRands(cols.Length);
 
         IEnumerator tileAnim = null;
         for (int i = 0; i < tbs.Count; i++) {

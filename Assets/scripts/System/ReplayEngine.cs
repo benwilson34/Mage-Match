@@ -5,16 +5,16 @@ using System.Text.RegularExpressions;
 
 public class ReplayEngine {
 
-    private MageMatch _mm;
-    private string[] _fileLines;
-    private int _linePointer = 0;
-    private bool _readLine = false; // not needed currently
+    private static MageMatch _mm;
+    private static string[] _fileLines;
+    private static int _linePointer = 0;
+    private static bool _readLine = false; // not needed currently
 
-    public ReplayEngine(MageMatch mm) {
+    public static void Init(MageMatch mm) {
         _mm = mm;
     }
 
-    public void Load(string replayName) {
+    public static void Load(string replayName) {
         string filepath = string.Format("{0}/{1}/MageMatch_{2}_Report.txt", Application.persistentDataPath, replayName, replayName);
         _fileLines = File.ReadAllLines(filepath);
 
@@ -22,7 +22,7 @@ public class ReplayEngine {
         _linePointer = 3;
     }
 
-    public IEnumerator StartReplay() {
+    public static IEnumerator StartReplay() {
         do {
             // line pointer needs to always be on the NEXT line, that's why this looks weird
             _linePointer++;
@@ -38,7 +38,7 @@ public class ReplayEngine {
         MMDebug.MMLog.LogWarning("REPLAY: Done replaying!");
     }
 
-    IEnumerator HandleCommand(string cmd) {
+    static IEnumerator HandleCommand(string cmd) {
         int id = _mm.ActiveP.ID;
         string[] tokens = cmd.Split(' ');
 
@@ -77,7 +77,7 @@ public class ReplayEngine {
         yield return null;
     }
 
-    void HandleScriptCommand(string[] tokens) {
+    static void HandleScriptCommand(string[] tokens) {
         if (tokens[1] == "DEBUG") {
             HandleDebugCommand(tokens);
         } else {
@@ -86,7 +86,7 @@ public class ReplayEngine {
         }
     }
 
-    void HandleDebugCommand(string[] tokens) {
+    static void HandleDebugCommand(string[] tokens) {
         int[] coord;
         int id, amt;
         switch (tokens[2]) {
@@ -126,7 +126,7 @@ public class ReplayEngine {
         }
     }
 
-    int[] ParseCoord(string str) {
+    static int[] ParseCoord(string str) {
         //MMDebug.MMLog.LogWarning("REPLAY: Parsing " + str);
         int[] coord = new int[2];
         coord[0] = int.Parse(str.Substring(1, 1));
@@ -134,11 +134,11 @@ public class ReplayEngine {
         return coord;
     }
 
-    public int ParseTokenInt(string token) {
+    static public int ParseTokenInt(string token) {
         return int.Parse(Regex.Match(token, @"\d+").Value);
     }
 
-    public TileSeq GetSpellSelection() {
+    public static TileSeq GetSpellSelection() {
         string cmd = _fileLines[_linePointer];
         string[] tokens = cmd.Split(' ');
         if (tokens[1] != "SELECT") {
@@ -155,7 +155,7 @@ public class ReplayEngine {
         return seq;
     }
 
-    public int[] GetSyncedRands() {
+    public static int[] GetSyncedRands() {
         string cmd = _fileLines[_linePointer];
         string[] tokens = cmd.Split(' ');
         if (tokens[1] != "SYNC") {
@@ -175,7 +175,7 @@ public class ReplayEngine {
         return rands;
     }
 
-    public void GetPrompt() {
+    public static void GetPrompt() {
         string cmd = _fileLines[_linePointer];
         string[] tokens = cmd.Split(' ');
         if (tokens[2] == "DROP") {
@@ -193,7 +193,7 @@ public class ReplayEngine {
         _linePointer++;
     }
 
-    public void GetTargets() {
+    public static void GetTargets() {
         string cmd = _fileLines[_linePointer];
         string[] tokens = cmd.Split(' ');
         do {

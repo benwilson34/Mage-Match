@@ -49,6 +49,7 @@ public class ButtonController : MonoBehaviour {
     }
 
     public void SetInteractable() {
+        //MMLog.LogError("Making button " + spellNum + " interactable");
         _button.interactable = true;
         _interactable = true;
     }
@@ -56,12 +57,14 @@ public class ButtonController : MonoBehaviour {
     //public bool IsInteractable() { return interactable && isActivated; }
 
     public void Activate() {
+        //MMLog.LogWarning("Activating button " + spellNum);
         _isActivated = true; // maybe not needed?
         if (_interactable)
             _button.interactable = true;
         StartCoroutine(_Activate());
     }
     IEnumerator _Activate() {
+        //MMLog.LogWarning("Activating button " + spellNum);
         var bg = transform.Find("i_bg").GetComponent<Image>();
         bg.DOColor(new Color(1, 1, 1, 1), .15f);
         var glow = transform.Find("i_glow").GetComponent<Image>();
