@@ -19,9 +19,9 @@ public class MageMatch : MonoBehaviour {
     public bool switchingTurn = false;
 
     public GameSettings gameSettings;
+    //public AnimationController animCont;
     public SyncManager syncManager;
     public TurnTimer timer;
-    public AnimationController animCont;
     public UIController uiCont;
     public InputController inputCont;
 
@@ -107,8 +107,8 @@ public class MageMatch : MonoBehaviour {
         Targeting.Init(this);
         Prompt.Init(this);
         AudioController.Init(this);
-        animCont = GetComponent<AnimationController>();
-        animCont.Init(this);
+        //animCont = GetComponent<AnimationController>();
+        AnimationController.Init(this);
 
         EventController.Init(this);
         EventContLoaded();
@@ -126,7 +126,7 @@ public class MageMatch : MonoBehaviour {
         debugTools = GameObject.Find("Debug").GetComponent<DebugTools>();
         debugTools.Init(this);
 
-        uiCont.GetCellOverlays(); // depends on HexGrid
+        //uiCont.GetCellOverlays(); // depends on HexGrid
         BoardCheck.Init(this);
 
         _endGame = false;
@@ -164,7 +164,7 @@ public class MageMatch : MonoBehaviour {
                     yield return _Deal(pid);
                 else
                     StartCoroutine(_Deal(pid));
-                yield return animCont.WaitForSeconds(.05f);
+                yield return new WaitForSeconds(.05f);
             }
         }
 
@@ -361,18 +361,19 @@ public class MageMatch : MonoBehaviour {
 
         uiCont.DeactivateAllSpellButtons(_activep.ID); //? These should be part of any boardaction...
         uiCont.SetDrawButton(_activep.ID, false);
+        yield return uiCont.CenterScreen();
+        //yield return new WaitForSeconds(.15f);
 
         currentTurn = Turn.CommishTurn;
         yield return Commish.DropRandomTiles();
+        yield return new WaitForSeconds(.5f);
 
         currentTurn = Turn.PlayerTurn;
 
-        if (gameMode != GameMode.TrainingSingleChar) { // would it ever get to this point if so?
-            _activep = InactiveP();
-            if (gameMode == GameMode.TrainingTwoChars)
-                myID = _activep.ID;
-            yield return uiCont.ShiftScreen();
-        }
+        _activep = InactiveP();
+        if (gameMode == GameMode.TrainingTwoChars)
+            myID = _activep.ID;
+        yield return uiCont.ShiftToActivePlayerSide();
 
         yield return EventController.TurnBegin();
         SpellCheck();
@@ -389,7 +390,8 @@ public class MageMatch : MonoBehaviour {
         yield return new WaitUntil(() => HexManager.Removing == 0); //?
         MMLog.Log_MageMatch("About to check the board.");
 
-        yield return new WaitUntil(() => !animCont.IsAnimating() && HexManager.Removing == 0); //?
+        yield return new WaitUntil(() => !AnimationController.IsAnimating && 
+                                          HexManager.Removing == 0); //?
         HexGrid.CheckGrav(); // TODO make IEnum
         yield return new WaitUntil(() => HexGrid.IsGridAtRest());
 
@@ -753,7 +755,7 @@ public class MageMatch : MonoBehaviour {
 
     public void DEBUG_ShiftScreen() {
         _activep = GetOpponent(_activep.ID);
-        StartCoroutine(uiCont.ShiftScreen());
+        StartCoroutine(uiCont.ShiftToActivePlayerSide());
     }
 
     public void DEBUG_EndGame() {
@@ -763,5 +765,23 @@ public class MageMatch : MonoBehaviour {
     public void DEBUG_ActivateSpell3() {
         uiCont.ActivateSpellButton(_p1.ID, 2);
         uiCont.ActivateSpellButton(_p2.ID, 2);
+    }
+
+    private bool _isGlowing = false;
+
+    public void DEBUG_ToggleGlow() {
+        var tbs = HexGrid.GetPlacedTiles();
+        int count = Random.Range(0, tbs.Count);
+        for (int i = 0; i < count; i++) {
+            int rand = Random.Range(0, tbs.Count);
+            tbs.RemoveAt(rand);
+        }
+
+        _isGlowing = !_isGlowing;
+        if (_isGlowing) {
+            TileGFX.SetGlowingTiles(tbs);
+        } else {
+            TileGFX.ClearGlowingTiles();
+        }
     }
 }

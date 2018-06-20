@@ -44,6 +44,9 @@ TagManager:
   - name: board
     uniqueID: 24917547
     locked: 0
+  - name: glow
+    uniqueID: 3398834899
+    locked: 0
   - name: tiles
     uniqueID: 4060742115
     locked: 0

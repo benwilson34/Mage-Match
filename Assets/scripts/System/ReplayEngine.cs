@@ -31,7 +31,7 @@ public class ReplayEngine {
             // handle turn switching somehow?
             yield return new WaitUntil(() => _mm.GetState() != MageMatch.State.TurnSwitching);
 
-            if (_mm.debugSettings.animateReplay) // could just be _mm.animCont.WaitForSeconds()
+            if (_mm.debugSettings.animateReplay) // could just be AnimationController.WaitForSeconds()
                 yield return new WaitForSeconds(.25f);
         } while (_linePointer < _fileLines.Length);
 

@@ -38,10 +38,10 @@ public class TileBehav : Hex {
 
         switch (anim) { // not great, but simple...
             case "raise":
-                yield return _mm.animCont._UpwardInsert(this);
+                yield return AnimationController._UpwardInsert(this);
                 break;
             default:
-                yield return _mm.animCont._MoveTile(this, duration);
+                yield return AnimationController._MoveTile(this, duration);
                 break;
         }
 
@@ -57,7 +57,7 @@ public class TileBehav : Hex {
 		HexGrid.SetTileBehavAt (this, col, row); // i hate this being here...
 		_inPos = false;
 
-        yield return _mm.animCont._MoveTileAndDrop(this, startRow, duration);
+        yield return AnimationController._MoveTileAndDrop(this, startRow, duration);
 
 		_inPos = true;
     }

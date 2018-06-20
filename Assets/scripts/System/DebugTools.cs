@@ -69,7 +69,7 @@ public class DebugTools : MonoBehaviour {
             _b_player = t.Find("b_player").GetComponent<Button>();
             _b_ok = t.Find("b_ok").GetComponent<Button>();
 
-            string[] ddTileOptions = { "B-F", "B-W", "B-E", "B-A", "B-M" };
+            string[] ddTileOptions = { "B-Fire", "B-Water", "B-Earth", "B-Air", "B-Muscle" };
             _ddTileOptions = new List<string>(ddTileOptions);
             // TODO append list of rune tiles
             _ddTileOptions.AddRange(RuneInfoLoader.GetTileList());
@@ -247,7 +247,7 @@ public class DebugTools : MonoBehaviour {
             case "insert":
                 mode = ToolMode.Insert;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Cell);
-                SetInputs(DropdownType.Hex, false, true);
+                SetInputs(DropdownType.Tile, false, true);
                 break;
             case "destroy":
                 mode = ToolMode.Destroy;
@@ -257,7 +257,7 @@ public class DebugTools : MonoBehaviour {
             case "enchant":
                 mode = ToolMode.Enchant;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
-                SetInputs(DropdownType.Enchantment, false, false);
+                SetInputs(DropdownType.Enchantment, false, true);
                 break;
             case "properties":
                 mode = ToolMode.Properties;
@@ -439,13 +439,14 @@ public class DebugTools : MonoBehaviour {
         if (tb == null)
             MMLog.LogError("DEBUGTOOLS: Somehow enchant TB is null!");
 
+        int id = GetPlayerId();
         switch (ench) {
             case "Burning":
-                StartCoroutine(Burning.Set(_playerId, tb));
+                StartCoroutine(Burning.Set(id, tb));
                 break;
             case "Zombie":
-                MMLog.Log("DebugTools", "orange", "calling enchant, id=" + _playerId);
-                StartCoroutine(Zombie.Set(_playerId, tb));
+                MMLog.Log("DebugTools", "orange", "calling enchant, id=" + id);
+                StartCoroutine(Zombie.Set(id, tb));
                 break;
         }
 

@@ -11,7 +11,7 @@ public class SampleConsumable : Charm {
             HexManager.RemoveTile(tbs[0].tile, false);
             tbs.RemoveAt(0);
             i--;
-            yield return _mm.animCont.WaitForSeconds(.05f);
+            yield return AnimationController.WaitForSeconds(.05f);
         }
         yield return null;
     }

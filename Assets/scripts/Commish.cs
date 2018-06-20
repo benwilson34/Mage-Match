@@ -28,7 +28,7 @@ public class Commish  {
 
         for (int i = 0; i < numDrops && colQ.Count > 0; i++) {            
             if (i != 0) { // wait to drop next tile (anim purposes only)
-                yield return _mm.animCont.WaitForSeconds(.15f);
+                yield return AnimationController.WaitForSeconds(.15f);
             }
 
             TileBehav tb = HexManager.GenerateBasicTile(COMMISH_ID, elemQ.Dequeue());

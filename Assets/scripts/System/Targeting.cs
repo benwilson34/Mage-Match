@@ -239,10 +239,12 @@ public class Targeting {
         IList validObjs; // selected targets are removed from this, so the loop breaks if no more valids
         if (currentTMode == TargetMode.Cell) {
             validObjs = _validCBs;
-            _mm.uiCont.ActivateTargetingUI(_validCBs);
+            //_mm.uiCont.ActivateTargetingUI(_validCBs);
+            // TODO how to show available cols/cells?
         } else {
             validObjs = _validTBs;
-            _mm.uiCont.ActivateTargetingUI(_validTBs);
+            MMLog.Log_Targeting("validObjs="+validObjs.Count);
+            TileGFX.SetGlowingTiles(_validTBs);
         }
 
         if (_mm.IsReplayMode)
@@ -254,9 +256,10 @@ public class Targeting {
         _lastDragTarget = null;
 
         _mm.uiCont.ShowAlertText("Here are your targets!");
-        yield return _mm.animCont.WaitForSeconds(1f);
+        yield return AnimationController.WaitForSeconds(1f);
 
-        _mm.uiCont.DeactivateTargetingUI();
+        TileGFX.ClearGlowingTiles();
+        _mm.uiCont.ClearOutlines();
 
         currentTMode = TargetMode.Tile; // needed?
         //targetTBs = null?
@@ -300,33 +303,36 @@ public class Targeting {
 
     public static bool selectionCanceled = false;
 
-    private static List<TileSeq> selections;
-    private static bool selectionChosen = false;
+    private static List<TileSeq> _selections;
+    private static bool _selectionChosen = false;
 
     public static IEnumerator SpellSelectScreen(List<TileSeq> seqs) {
         currentTMode = TargetMode.Selection;
         selectionCanceled = false;
-        selectionChosen = false;
-        selections = new List<TileSeq>(seqs);
+        _selectionChosen = false;
+        _selections = new List<TileSeq>(seqs);
 
         _mm.EnterState(MageMatch.State.Selecting);
         if (_mm.MyTurn())
             _mm.ActiveP.Hand.FlipAllHexes(true);
 
         MMLog.Log_Targeting("seqs=" + BoardCheck.PrintSeqList(seqs));
-        _mm.uiCont.ShowSpellSeqs(selections);
+        _mm.uiCont.ShowSpellSeqs(_selections);
+        TileGFX.SetGlowingTiles(seqs);
 
-        MMLog.Log_Targeting("Starting to show spell select screen, selections=" +         BoardCheck.PrintSeqList(selections));
+        MMLog.Log_Targeting("Starting to show spell select screen, selections=" +         BoardCheck.PrintSeqList(_selections));
 
-        yield return new WaitUntil(() => (selections.Count == 1 && selectionChosen) || selectionCanceled);
+        yield return new WaitUntil(() => (_selections.Count == 1 && _selectionChosen) || selectionCanceled);
 
         MMLog.Log_Targeting("Chose prereq!");
 
         if (selectionCanceled) {
-            selections = null; // or clear? to avoid nullrefs
+            _selections = null; // or clear? to avoid nullrefs
         }
 
         _mm.uiCont.HideSpellSeqs();
+        TileGFX.ClearGlowingTiles();
+
         if (_mm.MyTurn())
             _mm.ActiveP.Hand.FlipAllHexes(false);
         currentTMode = TargetMode.Tile;
@@ -337,7 +343,7 @@ public class Targeting {
     }
 
     public static void OnSelection(TileBehav tb) {
-        List<TileSeq> newSelections = new List<TileSeq>(selections);
+        List<TileSeq> newSelections = new List<TileSeq>(_selections);
 
         for (int i = 0; i < newSelections.Count; i++) {
             TileSeq seq = newSelections[i];
@@ -349,22 +355,24 @@ public class Targeting {
 
         if (newSelections.Count != 0) {
             _mm.syncManager.SendTBSelection(tb);
-            selectionChosen = true;
-            selections = newSelections;
+            _selectionChosen = true;
+            _selections = newSelections;
             _mm.uiCont.HideSpellSeqs();
-            _mm.uiCont.ShowSpellSeqs(selections);
+            _mm.uiCont.ShowSpellSeqs(_selections);
+            //GlowController.ClearGlowingTiles();
+            TileGFX.SetGlowingTiles(_selections);
         } else
             MMLog.Log_Targeting("Player clicked on an invalid tile: " + tb.PrintCoord());
     }
 
     public static TileSeq GetSelection() {
-        if (selections == null)
+        if (_selections == null)
             return null;
         else
-            return selections[0];
+            return _selections[0];
     }
 
-    public static void ClearSelection() { selections = null; }
+    public static void ClearSelection() { _selections = null; }
 
     public static bool IsSelectionMode() { return currentTMode == TargetMode.Selection; }
 

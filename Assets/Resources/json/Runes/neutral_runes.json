@@ -115,7 +115,6 @@
     "desc": "Add one fire, water, earth, air, and muscle basic tile to the board in random columns."
   },
   "Sanctuary": {
-    "title": "Comeback Brace",
     "category": "Charm",
     "keywords": ["Buff"],
     "deckCount": 1,

@@ -53,7 +53,7 @@ public class Newsfeed : MonoBehaviour {
     IEnumerator _UpdateNewsfeed(string str) {
         yield return _newsText.DOFade(0, .2f);
 
-        yield return _mm.animCont.WaitForSeconds(.3f);
+        yield return AnimationController.WaitForSeconds(.3f);
         _newsText.text = str;
 
         yield return _newsText.DOFade(1, .2f);

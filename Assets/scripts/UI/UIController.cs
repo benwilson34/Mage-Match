@@ -8,7 +8,7 @@ using MMDebug;
 
 public class UIController : MonoBehaviour {
 
-    public enum ScreenSide { Left, Right };
+    public enum ScreenSide { Left, Center, Right };
 
     //public AnimationCurve slidingEase;
     public Gradient healthbarGradient;
@@ -36,7 +36,8 @@ public class UIController : MonoBehaviour {
 
     private const float SHIFT_DUR = .4f;
     private float _camOffset, _spellSlidingOffset;
-    private bool _shiftedLeft = true, _localOnRight = false;
+    private ScreenSide _shiftedPosition = ScreenSide.Left;
+    private bool _localOnRight = false;
     private Transform _leftPportrait, _rightPportrait;
     private float _portraitOffset;
 
@@ -233,6 +234,8 @@ public class UIController : MonoBehaviour {
     public IEnumerator AnimateBeginningOfGame() {
         //yield return new WaitForEndOfFrame();
 
+        AudioController.Trigger(SFX.Other.GameStart);
+
         // Game start screen
         RectTransform leftSide = gameStartScreen.transform
             .Find("LeftSide").GetComponent<RectTransform>();
@@ -290,7 +293,7 @@ public class UIController : MonoBehaviour {
         // TODO this will have to be relative too with the option for localOnRight
         if (IDtoSide(_mm.ActiveP.ID) == ScreenSide.Right) {
             SetDrawButton(_mm.myID, false);
-            StartCoroutine(ShiftScreen());
+            StartCoroutine(ShiftToActivePlayerSide());
         }
 
         coinFlip.SetActive(false);
@@ -355,42 +358,50 @@ public class UIController : MonoBehaviour {
             return ScreenSide.Right;
     }
 
+    ScreenSide OppSide(ScreenSide side) {
+        return side == ScreenSide.Left ? ScreenSide.Right : ScreenSide.Left;
+    }
+
 
     #region ---------- SLIDING ELEMENTS ----------
 
-    public IEnumerator ShiftScreen() {
-        Transform camPos = Camera.main.transform;
-        Transform spellSliding = transform.Find("Spells");
+    public IEnumerator CenterScreen() {
+        StartCoroutine(SlideDrawButton(_shiftedPosition, false));
+        yield return SlideHalfway();
+    }
 
+    public IEnumerator ShiftToActivePlayerSide() {
         Debug.Log("alertBarOffset=" + GameObject.Find("static ui").GetComponent<RectTransform>().rect.yMax);
         //GameObject.Find("TEST").transform.position = new Vector3(0, _alertbarOffset);
 
-        StartCoroutine(SlidePortrait(!_shiftedLeft, false));
-        StartCoroutine(SlideDrawButton(_shiftedLeft, false));
-        StartCoroutine(SlideDrawButton(!_shiftedLeft, true));
+        StartCoroutine(SlidePortrait(OppSide(_shiftedPosition), false));
+        StartCoroutine(SlideDrawButton(OppSide(_shiftedPosition), true));
 
-        if (_shiftedLeft) { // shift to right side
-            spellSliding.DOMoveX(spellSliding.position.x - ( _spellSlidingOffset), SHIFT_DUR);
-            yield return camPos.DOMoveX(camPos.position.x + (2*_camOffset), SHIFT_DUR).WaitForCompletion();
-        } else { // shift to left side
-            spellSliding.DOMoveX(spellSliding.position.x + ( _spellSlidingOffset), SHIFT_DUR);
-            yield return camPos.DOMoveX(camPos.position.x - (2* _camOffset), SHIFT_DUR).WaitForCompletion();
-        }
+        yield return SlideHalfway();
 
-        yield return SlidePortrait(_shiftedLeft, true);
+        yield return SlidePortrait(_shiftedPosition, true);
 
-        _shiftedLeft = !_shiftedLeft;
+        _shiftedPosition = OppSide(_shiftedPosition);
     }
 
-    IEnumerator SlidePortrait(bool left, bool active) {
-        Transform portrait = left ? _leftPportrait : _rightPportrait;
+    IEnumerator SlideHalfway() {
+        Transform camPos = Camera.main.transform;
+        Transform spellSliding = transform.Find("Spells");
+        float spellOffset = (_spellSlidingOffset / 2) * (_shiftedPosition == ScreenSide.Left ? -1 : 1);
+        float camOffset = _camOffset * (_shiftedPosition == ScreenSide.Left ? 1 : -1);
+        spellSliding.DOMoveX(spellSliding.position.x + spellOffset, SHIFT_DUR);
+        yield return camPos.DOMoveX(camPos.position.x + camOffset, SHIFT_DUR).WaitForCompletion();
+    }
+
+    IEnumerator SlidePortrait(ScreenSide side, bool active) {
+        Transform portrait = side == ScreenSide.Left ? _leftPportrait : _rightPportrait;
         float amt = portrait.position.x;
-        amt += left ^ active ? -1 * _portraitOffset : _portraitOffset;
+        amt += side == ScreenSide.Left ^ active ? -1 * _portraitOffset : _portraitOffset;
         yield return portrait.DOMoveX(amt, SHIFT_DUR).WaitForCompletion();
     }
 
-    IEnumerator SlideDrawButton(bool left, bool active) {
-        Transform deck = left ? _leftDrawButton : _rightDrawButton;
+    IEnumerator SlideDrawButton(ScreenSide side, bool active) {
+        Transform deck = side == ScreenSide.Left ? _leftDrawButton : _rightDrawButton;
         float amt = deck.position.y;
         amt += active ? -1 * _drawButtonOffset : _drawButtonOffset;
         yield return deck.DOMoveY(amt, SHIFT_DUR).WaitForCompletion();
@@ -411,7 +422,7 @@ public class UIController : MonoBehaviour {
             _alertShowing = true;
             float posY = t.position.y;
             yield return t.DOMoveY(posY - _alertbarOffset, .25f).WaitForCompletion();
-            yield return _mm.animCont.WaitForSeconds(ALERT_DELAY);
+            yield return AnimationController.WaitForSeconds(ALERT_DELAY);
             yield return t.DOMoveY(posY, .25f).WaitForCompletion();
             _alertShowing = false;
         }
@@ -515,7 +526,7 @@ public class UIController : MonoBehaviour {
             Image pinfoImg = GetPinfo(p.ID).GetComponent<Image>();
             pinfoImg.color = new Color(1, 0, 0, 0.4f); // red
             Color pColor = CorrectPinfoColor(p.ID);
-            yield return _mm.animCont.WaitForSeconds(.2f);
+            yield return AnimationController.WaitForSeconds(.2f);
             pinfoImg.DOColor(pColor, .3f).SetEase(Ease.OutQuad);
         }
     }
@@ -601,59 +612,59 @@ public class UIController : MonoBehaviour {
         //    tClearB.SetActive(true);
         //}
 
-        for(int i = 0; i < 7; i++) {
-            for(int j = HexGrid.BottomOfColumn(i); j <= HexGrid.TopOfColumn(i); j++) {
-                Color c = _cellOverlays[i,j].color;
+        for (int i = 0; i < 7; i++) {
+            for (int j = HexGrid.BottomOfColumn(i); j <= HexGrid.TopOfColumn(i); j++) {
+                Color c = _cellOverlays[i, j].color;
                 c.a = 0.6f;
-                _cellOverlays[i,j].color = c;
+                _cellOverlays[i, j].color = c;
                 //Debug.Log("Color = " + cellOverlays[i,j].color);
             }
         }
 
         TileSeq selection = Targeting.GetSelection();
-        if(selection != null)
+        if (selection != null)
             OutlinePrereq(selection);
 
         //gradient.SetActive(!gradient.activeSelf);
         //targetingBG.SetActive(!targetingBG.activeSelf);
     }
 
-    public void ActivateTargetingUI(List<TileBehav> tbs) {
-        ActivateTargetingUI();
+    //public void ActivateTargetingUI(List<TileBehav> tbs) {
+    //    ActivateTargetingUI();
 
-        foreach(TileBehav tb in tbs) {
-            Tile t = tb.tile;
-            Color c = _cellOverlays[t.col,t.row].color;
-            c.a = 0.0f;
-            _cellOverlays[t.col,t.row].color = c;
-        }
-    }
+    //    foreach(TileBehav tb in tbs) {
+    //        Tile t = tb.tile;
+    //        Color c = _cellOverlays[t.col,t.row].color;
+    //        c.a = 0.0f;
+    //        _cellOverlays[t.col,t.row].color = c;
+    //    }
+    //}
 
-    public void ActivateTargetingUI(List<CellBehav> cbs) {
-        ActivateTargetingUI();
+    //public void ActivateTargetingUI(List<CellBehav> cbs) {
+    //    ActivateTargetingUI();
 
-        foreach (CellBehav cb in cbs) {
-            // TODO do something with the filtered cells
-        }
-    }
+    //    foreach (CellBehav cb in cbs) {
+    //        // TODO do something with the filtered cells
+    //    }
+    //}
 
-    public void DeactivateTargetingUI(){
-        //overlay.SetActive(false);
-        //if (mm.MyTurn()) {
-        //    tCancelB.SetActive(false);
-        //    tClearB.SetActive(false);
-        //}
+    //public void DeactivateTargetingUI(){
+    //    //overlay.SetActive(false);
+    //    //if (mm.MyTurn()) {
+    //    //    tCancelB.SetActive(false);
+    //    //    tClearB.SetActive(false);
+    //    //}
 
-        for (int i = 0; i < 7; i++) {
-            for (int j = HexGrid.BottomOfColumn(i); j <= HexGrid.TopOfColumn(i); j++) {
-                Color c = _cellOverlays[i,j].color;
-                c.a = 0.0f;
-                _cellOverlays[i,j].color = c;
-            }
-        }
+    //    for (int i = 0; i < 7; i++) {
+    //        for (int j = HexGrid.BottomOfColumn(i); j <= HexGrid.TopOfColumn(i); j++) {
+    //            Color c = _cellOverlays[i,j].color;
+    //            c.a = 0.0f;
+    //            _cellOverlays[i,j].color = c;
+    //        }
+    //    }
 
-        ClearOutlines();
-    }
+    //    ClearOutlines();
+    //}
 
     void OutlinePrereq(TileSeq seq) {
         _outlines = new List<GameObject>(); // move to Init?
@@ -680,12 +691,12 @@ public class UIController : MonoBehaviour {
     //    }
     //}
 
-    void ClearOutlines() {
-        for (int i = 0; i < _outlines.Count;) {
-            GameObject go = _outlines[0];
+    public void ClearOutlines() {
+        for (int i = 0; i < _outlines.Count; i++) {
+            GameObject go = _outlines[i];
             GameObject.Destroy(go);
-            _outlines.Remove(go);
         }
+        _outlines.Clear();
     }
 
     #endregion

@@ -35,12 +35,20 @@ public class Gravekeeper : Character {
             zombs++;
 
         List<TileBehav> tbs = TileFilter.GetTilesByAbleEnch(Enchantment.Type.Zombie);
-
+        List<TileBehav> zombTBs = new List<TileBehav>();
         for (int i = 0; i < zombs && tbs.Count > 0; i++) {
             yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, tbs.Count));
             int rand = _mm.syncManager.GetRand();
-            yield return Zombie.Set(_playerId, tbs[rand]); // skip?
+            zombTBs.Add(tbs[rand]);
             tbs.RemoveAt(rand);
+        }
+
+        // this is so all the zombies animate at the same time
+        for (int i = 0; i < zombTBs.Count; i++) {
+            if (i == zombTBs.Count - 1)
+                yield return Zombie.Set(_playerId, zombTBs[i]);
+            else
+                _mm.StartCoroutine(Zombie.Set(_playerId, zombTBs[i]));
         }
 
         SwitchMatchSpell();
@@ -56,7 +64,9 @@ public class Gravekeeper : Character {
         switch (seq.GetSeqLength()) {
             case 3:
                 dmg = 20;
-                yield return Targeting.WaitForTileTarget(1);
+                var zombs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
+                Debug.Log("Party in the Back: zomb count=" + zombs.Count);
+                yield return Targeting.WaitForTileTarget(1, zombs);
                 break;
             case 4:
                 dmg = 50;
@@ -73,9 +83,10 @@ public class Gravekeeper : Character {
         DealDamage(dmg);
 
         List<TileBehav> tbs = Targeting.GetTargetTBs();
-        foreach (TileBehav tb in tbs) {
-            if (tb.GetEnchType() == Enchantment.Type.Zombie)
-                yield return ((Zombie)tb.GetEnchantment()).Attack();
+        for (int i = 0; i < tbs.Count; i++) {
+            var tb = tbs[i];
+            if (tb.GetEnchType() != Enchantment.Type.Zombie)
+                yield return ((Zombie)tbs[i].GetEnchantment()).Attack();
         }
 
         SwitchMatchSpell();
@@ -95,7 +106,6 @@ public class Gravekeeper : Character {
     // The Oogie Boogie
     protected override IEnumerator Spell1(TileSeq prereq) {
         AudioController.Trigger(SFX.Gravekeeper.OogieBoogie);
-
 
         var zombs = TileFilter.GetTilesByEnch(Enchantment.Type.Zombie);
         if (zombs.Count < 2) // if not enough Zombies

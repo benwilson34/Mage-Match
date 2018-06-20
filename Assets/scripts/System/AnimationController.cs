@@ -8,25 +8,23 @@ public class AnimationController : MonoBehaviour {
 
     public AnimationCurve someCustomEase;
 
-    private MageMatch _mm;
-    private GameObject _fireballPF, _zombifyPF;
-    private int _animating;
+    private static MageMatch _mm;
+    private static GameObject _fireballPF, _zombifyPF;
+    private static int _animating;
 
-    public void Init(MageMatch mm) {
+    public static void Init(MageMatch mm) {
         _mm = mm;
         _fireballPF = (GameObject)Resources.Load("prefabs/anim/fireball");
         _zombifyPF = (GameObject)Resources.Load("prefabs/anim/zombify");
     }
 
-    public void PlayAnim(IEnumerator anim) {
-        StartCoroutine(anim);
+    public static void PlayAnim(IEnumerator anim) {
+        _mm.StartCoroutine(anim);
     }
 
-    public bool IsAnimating() {
-        return _animating > 0;
-    }
+    public static bool IsAnimating { get { return _animating > 0; } }
 
-    IEnumerator Animate(Tween tween) {
+    static IEnumerator Animate(Tween tween) {
         bool animate = true;
         if(_mm.IsReplayMode)
             animate = _mm.debugSettings.animateReplay;
@@ -42,7 +40,7 @@ public class AnimationController : MonoBehaviour {
         yield return null;
     }
 
-    public IEnumerator WaitForSeconds(float secs) {
+    public static IEnumerator WaitForSeconds(float secs) {
         bool animate = true;
         if(_mm.IsReplayMode)
             animate = _mm.debugSettings.animateReplay;
@@ -53,13 +51,13 @@ public class AnimationController : MonoBehaviour {
             yield return null;
     }
 
-    public IEnumerator _DiscardTile(Transform t) {
+    public static IEnumerator _DiscardTile(Transform t) {
         Vector3 spawn = GameObject.Find("tileSpawn").transform.position;
         Tween tween = t.DOMove(spawn, .7f);
         yield return Animate(tween);
     }
 
-    public IEnumerator _InvokeTile(TileBehav tb) {
+    public static IEnumerator _InvokeTile(TileBehav tb) {
         _animating++;
         //Tween swellTween = tb.transform.DOScale(new Vector3(1.25f, 1.25f), .15f);
         Tween colorTween = tb.GetComponent<SpriteRenderer>().DOColor(new Color(0, 0, 0, .4f), .15f);
@@ -73,7 +71,7 @@ public class AnimationController : MonoBehaviour {
         _animating--;
     }
 
-    public IEnumerator _InvokeTileRemove(TileBehav tb) {
+    public static IEnumerator _InvokeTileRemove(TileBehav tb) {
 
         // TODO
 
@@ -88,7 +86,7 @@ public class AnimationController : MonoBehaviour {
         _animating--;
     }
 
-    public IEnumerator _DestroyTile(TileBehav tb) {
+    public static IEnumerator _DestroyTile(TileBehav tb) {
         _animating++;
         float yPos = tb.transform.position.y;
         Tween tween = tb.transform.DOMoveY(yPos - 1, .25f);
@@ -100,7 +98,7 @@ public class AnimationController : MonoBehaviour {
         _animating--;
     }
 
-    public IEnumerator _MoveTile(TileBehav tb, float duration) {
+    public static IEnumerator _MoveTile(TileBehav tb, float duration) {
         _animating++;
         int col = tb.tile.col, row = tb.tile.row;
         Vector3 newPos = HexGrid.GridCoordToPos(col, row);
@@ -112,7 +110,7 @@ public class AnimationController : MonoBehaviour {
         _animating--;
     }
 
-    public IEnumerator _MoveTileAndDrop(TileBehav tb, int startRow, float duration) {
+    public static IEnumerator _MoveTileAndDrop(TileBehav tb, int startRow, float duration) {
         _animating++;
         int col = tb.tile.col, row = startRow;
         Vector3 newPos = HexGrid.GridCoordToPos(col, row);
@@ -128,7 +126,7 @@ public class AnimationController : MonoBehaviour {
         _animating--;
     }
 
-    IEnumerator _Grav(Transform t, int col, int row) {
+    static IEnumerator _Grav(Transform t, int col, int row) {
         Vector2 newPos = HexGrid.GridCoordToPos(col, row);
         float height = t.position.y - newPos.y;
 
@@ -143,10 +141,10 @@ public class AnimationController : MonoBehaviour {
         //MMLog.Log_AnimCont(t.name + " is in position: (" + col + ", " + row + ")");
     }
 
-    public IEnumerator _Draw(Hex hex) {
+    public static IEnumerator _Draw(Hex hex) {
         var sr = hex.GetComponent<SpriteRenderer>();
         sr.color = new Color(1,1,1,0);
-        StartCoroutine(Animate(sr.DOFade(1, .15f)));
+        PlayAnim(Animate(sr.DOFade(1, .15f)));
         hex.transform.localScale = new Vector3(2, 2, 2);
         Tween tween = hex.transform.DOScale(Vector3.one, .15f);
 
@@ -154,11 +152,11 @@ public class AnimationController : MonoBehaviour {
         yield return Animate(tween);
     }
 
-    public IEnumerator _Move(Hex hex, Vector3 newPos) {
+    public static IEnumerator _Move(Hex hex, Vector3 newPos) {
         yield return Animate(hex.transform.DOMove(newPos, .1f));
     }
 
-    public IEnumerator _Burning(TileBehav tb) {
+    public static IEnumerator _Burning(TileBehav tb) {
         // TODO spawn from Pinfo
         Transform spawn = GameObject.Find("tileSpawn").transform;
         GameObject fb = Instantiate(_fireballPF, spawn);
@@ -173,7 +171,7 @@ public class AnimationController : MonoBehaviour {
         //yield return null; //?
     }
 
-    public IEnumerator _Burning_Turn(Player p, TileBehav tb) {
+    public static IEnumerator _Burning_Turn(Player p, TileBehav tb) {
         GameObject fb = Instantiate(_fireballPF, tb.transform);
 
         Vector3 dmgSpot = _mm.uiCont.GetPinfo(p.ID).position;
@@ -187,24 +185,42 @@ public class AnimationController : MonoBehaviour {
         MMLog.Log_AnimCont("Done animating Burning_Turn.");
     }
 
-    private Vector3 _zomb_origPos;
+    private static Vector3 _zomb_origPos;
 
-    public IEnumerator _Zombify(TileBehav tb) {
-        // TODO spawn from Pinfo
-        Transform spawn = GameObject.Find("tileSpawn").transform;
-        GameObject z = Instantiate(_zombifyPF, spawn);
+    public static IEnumerator _Zombify(TileBehav tb) {
+        //// TODO spawn from Pinfo
+        //Transform spawn = GameObject.Find("tileSpawn").transform;
+        //GameObject z = Instantiate(_zombifyPF, spawn);
 
-        Tween tween = z.transform.DOMove(tb.transform.position, .6f);
-        tween.SetEase(Ease.InQuad);
-        yield return Animate(tween);
+        //Tween tween = z.transform.DOMove(tb.transform.position, .6f);
+        //tween.SetEase(Ease.InQuad);
+        //yield return Animate(tween);
 
-        tween = z.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .05f);
-        yield return Animate(tween);
-        Destroy(z);
-        MMLog.Log_AnimCont("Done animating Zombify.");
+        //tween = z.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .05f);
+        //yield return Animate(tween);
+        //Destroy(z);
+        //MMLog.Log_AnimCont("Done animating Zombify.");
+
+
+
+        Sequence shakeSeq = DOTween.Sequence();
+        const float shakeDur = .02f;
+        const float shakeDist = .1f;
+        const int loops = 5;
+        //const float speedRampDur = 1f;
+        float origX = tb.transform.position.x;
+        //Tween timeTween = DOTween.To(() => shakeSeq.timeScale, (x) => shakeSeq.timeScale = x,
+        //    2, speedRampDur);
+        shakeSeq.Append(tb.transform.DOMoveX(origX + shakeDist, shakeDur).SetEase(Ease.Linear));
+        //shakeSeq.Join(timeTween);
+        shakeSeq.Append(tb.transform.DOMoveX(origX - shakeDist, shakeDur * 2).SetEase(Ease.Linear));
+        shakeSeq.Append(tb.transform.DOMoveX(origX, shakeDur).SetEase(Ease.Linear));
+        shakeSeq.SetLoops(loops);
+
+        yield return Animate(shakeSeq);
     }
 
-    public IEnumerator _Zombify_Attack(Transform zomb, Transform target) {
+    public static IEnumerator _Zombify_Attack(Transform zomb, Transform target) {
         _zomb_origPos = zomb.position;
         Vector3 bite = Vector3.Lerp(_zomb_origPos, target.position, 0.75f);
         Tween tween = zomb.DOMove(bite, .03f);
@@ -212,13 +228,13 @@ public class AnimationController : MonoBehaviour {
         yield return Animate(tween);
     }
 
-    public IEnumerator _Zombify_Back(Transform zomb) {
+    public static IEnumerator _Zombify_Back(Transform zomb) {
         Tween tween = zomb.DOMove(_zomb_origPos, .13f);
         tween.SetEase(Ease.OutQuad);
         yield return Animate(tween);
     }
 
-    public IEnumerator _UpwardInsert(TileBehav tb) {
+    public static IEnumerator _UpwardInsert(TileBehav tb) {
         // TODO handle bottom of column
         Transform t = tb.transform;
         t.position = HexGrid.GridCoordToPos(tb.tile.col, tb.tile.row - 1); //safe for bottom?

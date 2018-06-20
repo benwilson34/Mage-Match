@@ -45,80 +45,6 @@ public class AudioController {
         // ----- hexes -----
         foreach (SFX.Hex sfx in Enum.GetValues(typeof(SFX.Hex)))
             LoadClip(sfx, "Hex");
-        //_clips.Add(HexSFX.Draw, "event:/Hexes/Hex_Draw");
-        //_clips.Add(HexSFX.Pickup, "event:/Hexes/Hex_Pickup");
-        //_clips.Add(HexSFX.Discard, "event:/Hexes/Hex_Discard");
-
-        //_clips.Add(HexSFX.GravClick, "event:/Hexes/Tile_Grav");
-        //_clips.Add(HexSFX.Swap, "event:/Hexes/Tile_Swap");
-        //_clips.Add(HexSFX.Destroy, "event:/Hexes/Tile_Destroy");
-        //_clips.Add(HexSFX.Invoke, "event:/Hexes/Tile_Invoke");
-
-
-        // ----- enfuego -----
-        //foreach (EnfuegoSFX sfx in Enum.GetValues(typeof(EnfuegoSFX))) {
-        //    LoadClip(sfx, "CharacterSpells", "Enfuego");
-        //}
-        //_clips.Add(EnfuegoSFX.Burning_Enchant, "event:/CharacterSpells/Enfuego/Burning_Enchant");
-        //_clips.Add(EnfuegoSFX.Burning_Damage, "event:/CharacterSpells/Enfuego/Burning_Damage");
-        //_clips.Add(EnfuegoSFX.Burning_Timeout, "event:/CharacterSpells/Enfuego/Burning_Timeout");
-
-        //_clips.Add(EnfuegoSFX.FieryFandango, "event:/CharacterSpells/Enfuego/FieryFandango");
-        //_clips.Add(EnfuegoSFX.Baila, "event:/CharacterSpells/Enfuego/Baila");
-        //_clips.Add(EnfuegoSFX.Incinerate, "event:/CharacterSpells/Enfuego/Incinerate");
-        //_clips.Add(EnfuegoSFX.Sig_WHCK, "event:/CharacterSpells/Enfuego/Sig_WHCK");
-
-
-        // ----- gravekeeper -----
-        //_clips.Add(GravekeeperSFX.Zombie_Enchant, "event:/CharacterSpells/Gravekeeper/Zombie_Enchant");
-        //_clips.Add(GravekeeperSFX.Zombie_Attack, "event:/CharacterSpells/Gravekeeper/Zombie_Attack");
-        //_clips.Add(GravekeeperSFX.Zombie_Gulp, "event:/CharacterSpells/Gravekeeper/Zombie_Gulp");
-
-        //_clips.Add(GravekeeperSFX.PartyInTheBack, "event:/CharacterSpells/Gravekeeper/PartyInTheBack");
-        //_clips.Add(GravekeeperSFX.OogieBoogie, "event:/CharacterSpells/Gravekeeper/OogieBoogie");
-        //_clips.Add(GravekeeperSFX.PartyCrashers, "event:/CharacterSpells/Gravekeeper/PartyCrashers");
-        //_clips.Add(GravekeeperSFX.UndeadUnion, "event:/CharacterSpells/Gravekeeper/UndeadUnion");
-
-        //_clips.Add(GravekeeperSFX.Sig_Motorcycle, "event:/CharacterSpells/Gravekeeper/Sig_Motorcycle");
-        //_clips.Add(GravekeeperSFX.Sig_Bell1, "event:/CharacterSpells/Gravekeeper/Sig_Bell1");
-        //_clips.Add(GravekeeperSFX.Sig_TSDrop, "event:/CharacterSpells/Gravekeeper/Sig_TSDrop");
-        //_clips.Add(GravekeeperSFX.Sig_TSEffect, "event:/CharacterSpells/Gravekeeper/Sig_TSEffect");
-        //_clips.Add(GravekeeperSFX.Sig_Bell2, "event:/CharacterSpells/Gravekeeper/Sig_Bell2");
-
-
-        // ----- valeria -----
-        //foreach (ValeriaSFX sfx in Enum.GetValues(typeof(ValeriaSFX))) {
-        //    LoadClip(sfx, "CharacterSpells", "Valeria");
-        //}
-        //_clips.Add(ValeriaSFX.SwirlingWater, "event:/CharacterSpells/Valeria/SwirlingWater");
-        //_clips.Add(ValeriaSFX.Healing, "event:/CharacterSpells/Valeria/Healing");
-        //_clips.Add(ValeriaSFX.Mariposa, "event:/CharacterSpells/Valeria/Mariposa");
-        //_clips.Add(ValeriaSFX.Rain, "event:/CharacterSpells/Valeria/Rain");
-        //_clips.Add(ValeriaSFX.RainDance, "event:/CharacterSpells/Valeria/RainDance");
-        //_clips.Add(ValeriaSFX.Bubbles1, "event:/CharacterSpells/Valeria/Bubbles1");
-        //_clips.Add(ValeriaSFX.Bubbles2, "event:/CharacterSpells/Valeria/Bubbles2");
-        //_clips.Add(ValeriaSFX.Balanco, "event:/CharacterSpells/Valeria/Balanco");
-
-        //_clips.Add(ValeriaSFX.Sig_Cut, "event:/CharacterSpells/Valeria/Sig_Cut");
-        //_clips.Add(ValeriaSFX.Sig_WaveCrash, "event:/CharacterSpells/Valeria/Sig_WaveCrash");
-
-        //_clips.Add(ValeriaSFX.ThunderFar, "event:/CharacterSpells/Valeria/ThunderFar");
-        //_clips.Add(ValeriaSFX.ThunderClose, "event:/CharacterSpells/Valeria/ThunderClose");
-
-
-        // ----- magic al -----
-        //foreach (MagicAlSFX sfx in Enum.GetValues(typeof(MagicAlSFX))) {
-        //    LoadClip(sfx, "CharacterSpells", "MagicAl");
-        //}
-        //_clips.Add(MagicAlSFX.Jab, "event:/CharacterSpells/MagicAl/Jab");
-        //_clips.Add(MagicAlSFX.Cross, "event:/CharacterSpells/MagicAl/Cross");
-        //_clips.Add(MagicAlSFX.Hook, "event:/CharacterSpells/MagicAl/Hook");
-
-        //_clips.Add(MagicAlSFX.StingerStance, "event:/CharacterSpells/MagicAl/Cross");
-        //_clips.Add(MagicAlSFX.Flutterfly, "event:/CharacterSpells/MagicAl/Flutterfly");
-        //_clips.Add(MagicAlSFX.SkyUppercut, "event:/CharacterSpells/MagicAl/SkyUppercut");
-
-        //_clips.Add(MagicAlSFX.StormForceFootwork, "event:/CharacterSpells/MagicAl/StormForceFootwork");
 
 
         // ----- runes -----
@@ -155,29 +81,9 @@ public class AudioController {
         // ----- other -----
         foreach (SFX.Other sfx in Enum.GetValues(typeof(SFX.Other)))
             LoadClip(sfx, "Other");
-        //_clips.Add(OtherSoundEffect.BackgroundMusic, "event:/Other/BackgroundMusic");
-        //_clips.Add(OtherSoundEffect.GameStart, "event:/Other/GameStart");
-        //_clips.Add(OtherSoundEffect.GameEnd, "event:/Other/GameEnd");
-
-        //_clips.Add(OtherSoundEffect.APGain, "event:/Other/APGain");
-        //_clips.Add(OtherSoundEffect.LowHealthWarning, "event:/Other/LowHealthWarning");
-        ////_clips.Add(OtherSoundEffect.CrowdGasp, "event:/Other/CrowdGasp");
-        //_clips.Add(OtherSoundEffect.FullMeter, "event:/Other/FullMeter");
-
-        //_clips.Add(OtherSoundEffect.TurnTimerWarning, "event:/Other/TurnTimerWarning");
-        //_clips.Add(OtherSoundEffect.TurnTimeout, "event:/Other/TurnTimeout");
-
-        //_clips.Add(OtherSoundEffect.UIButton, "event:/Other/UIButton");
-        //_clips.Add(OtherSoundEffect.ChooseTarget, "event:/Other/ChooseTarget");
 
 
-        //_clips.Add(OtherSoundEffect.Quickdraw_Prompt, "event:/Other/Quickdraw_Prompt");
-        //_clips.Add(OtherSoundEffect.Quickdraw_Drop, "event:/Other/Quickdraw_Drop");
-
-
-        // TODO trigger bg music before the rest of the match finishes loading
         Trigger(SFX.Other.BackgroundMusic);
-        Trigger(SFX.Other.GameStart);
         _mm.AddEventContLoadEvent(OnEventContLoaded);
     }
 

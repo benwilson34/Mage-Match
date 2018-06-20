@@ -125,7 +125,7 @@ public class Enfuego : Character {
         foreach (TileBehav tb in tbs) {
             MMLog.Log_Enfuego("Destroying tile at " + tb.PrintCoord());
             HexManager.RemoveTile(tb.tile, false);
-            yield return _mm.animCont.WaitForSeconds(.15f);
+            yield return AnimationController.WaitForSeconds(.15f);
         }
 
         DealDamage(dmg);
@@ -199,7 +199,7 @@ public class Enfuego : Character {
             HexManager.RemoveTile(tb.tile, true);
             AudioController.Trigger(SFX.Enfuego.Sig_WHCK);
 
-            yield return _mm.animCont.WaitForSeconds(.4f);
+            yield return AnimationController.WaitForSeconds(.4f);
         }
     }
     #endregion

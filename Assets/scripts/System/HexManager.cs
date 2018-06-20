@@ -198,7 +198,7 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
             tb = HexGrid.GetTileBehavAt(tile.col, tile.row);
             tb.wasInvoked = true;
 
-            _mm.StartCoroutine(_mm.animCont._InvokeTile(tb));
+            _mm.StartCoroutine(AnimationController._InvokeTile(tb));
 
             seqCopy.sequence.RemoveAt(0);
         }
@@ -264,9 +264,9 @@ public class HexManager { // should maybe inherit MonoBehaviour? or maybe static
         HexGrid.ClearTileBehavAt(tb.tile.col, tb.tile.row); // move up?
 
         if (isInvoked)
-            yield return _mm.animCont._InvokeTileRemove(tb); // just start it, don't yield?
+            yield return AnimationController._InvokeTileRemove(tb); // just start it, don't yield?
         else
-            yield return _mm.animCont._DestroyTile(tb); // just start it, don't yield?
+            yield return AnimationController._DestroyTile(tb); // just start it, don't yield?
 
         RemoveHex(tb);
 

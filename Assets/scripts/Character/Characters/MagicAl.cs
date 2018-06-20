@@ -56,6 +56,8 @@ public class MagicAl : Character {
 
     // Jab
     protected override IEnumerator MatchSpell(TileSeq seq) {
+        AudioController.Trigger(SFX.MagicAl.Jab);
+
         int dmg = 0, returnCount = 0;
         switch (seq.GetSeqLength()) {
             case 3:
@@ -88,7 +90,7 @@ public class MagicAl : Character {
 
     // alt core spell - Cross
     public IEnumerator Cross(TileSeq seq) {
-        //AudioController.Trigger(SFX.GravekeeperSFX.PartyInTheBack);
+        AudioController.Trigger(SFX.MagicAl.Cross);
 
         int dmg = 0, discardCount = 0;
         switch (seq.GetSeqLength()) {
@@ -117,7 +119,7 @@ public class MagicAl : Character {
 
     // alt core spell - Hook
     public IEnumerator Hook(TileSeq seq) {
-        //AudioController.Trigger(SFX.GravekeeperSFX.PartyInTheBack);
+        AudioController.Trigger(SFX.MagicAl.Hook);
 
         int dmg = 0, swapCount = 0;
         switch (seq.GetSeqLength()) {
@@ -159,7 +161,7 @@ public class MagicAl : Character {
         }
 
         _spells[0] = _altMatchSpells[index];
-        MMLog.Log_Gravekeeper("MAGIC AL: Switching core spell..." + _spells[0].info);
+        MMLog.Log("MAGIC AL","black","Switching core spell to " + _spells[0].name);
         _mm.uiCont.GetButtonCont(_playerId, 0).SpellChanged();
     }
 
@@ -171,7 +173,7 @@ public class MagicAl : Character {
 
     // Stinger Stance
     protected override IEnumerator Spell1(TileSeq prereq) {
-        //AudioController.Trigger(SFX.GravekeeperSFX.OogieBoogie);
+        AudioController.Trigger(SFX.MagicAl.StingerStance);
 
         TurnEffect effect = new TurnEndEffect(_playerId, "StingerStance", Effect.Behav.Damage, Stinger_OnTurnEnd) { turnsLeft = 1 };
         EffectManager.AddEventEffect(effect);
@@ -191,13 +193,14 @@ public class MagicAl : Character {
 
     // Flutterfly
     protected override IEnumerator Spell2(TileSeq prereq) {
-        //AudioController.Trigger(SFX.GravekeeperSFX.PartyCrashers);
+        AudioController.Trigger(SFX.MagicAl.Flutterfly);
 
         yield return Prompt.WaitForSwap();
         if (!Prompt.WasSuccessful)
             yield break;
 
         var bounceTB = Prompt.GetSwapTBs()[1];
+        yield return Prompt.ContinueSwap();
         yield return CommonEffects.BounceToHand(bounceTB, Opponent);
 
         HealthModEffect he = new HealthModEffect(_playerId, "Flutterfly", Flutterfly_Buff, HealthModEffect.Type.DealingPercent) { turnsLeft = 3, countLeft = 1 };
@@ -215,7 +218,7 @@ public class MagicAl : Character {
 
     // Sky Uppercut
     protected override IEnumerator Spell3(TileSeq prereq) {
-        //AudioController.Trigger(SFX.GravekeeperSFX.UndeadUnion);
+        AudioController.Trigger(SFX.MagicAl.SkyUppercut);
 
         yield return Targeting.WaitForCellTarget(1);
         var cbs = Targeting.GetTargetCBs();
@@ -238,7 +241,7 @@ public class MagicAl : Character {
 
     // Storm Force Footwork
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        //AudioController.Trigger(SFX.GravekeeperSFX.SigBell1);
+        AudioController.Trigger(SFX.MagicAl.StormForceFootwork);
 
         const int turnCount = 5;
 

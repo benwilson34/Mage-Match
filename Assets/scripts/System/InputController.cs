@@ -345,7 +345,7 @@ public class InputController : MonoBehaviour {
                 case MouseState.Up:
                     return OnMouseUp(obj, status);
                 default:
-                    MMLog.LogError("Something is really wrong with an inputcontext.");
+                    MMLog.LogError("Somehow, an input context ("+this.ToString()+") tried to take input during no mouse action.");
                     return InputStatus.Unhandled;
             }
         }

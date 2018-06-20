@@ -58,6 +58,7 @@ public class Hand {
             hex.Flip();
 
         hex.transform.SetParent(_handPos); // , false)?
+        hex.currentState = Hex.State.Hand;
         _hexes.Add(hex);
 
         int i;
@@ -66,7 +67,7 @@ public class Hand {
             if (!slot.IsFull()) {
                 slot.SetHex(hex);
                 hex.transform.position = slot.transform.position;
-                _mm.animCont.PlayAnim(_mm.animCont._Draw(hex));
+                AnimationController.PlayAnim(AnimationController._Draw(hex));
                 AudioController.Trigger(SFX.Hex.Draw);
                 MMLog.Log("HAND", "black", "Added hex with tag " + hex.hextag);
                 break;
@@ -131,7 +132,7 @@ public class Hand {
 
         AudioController.Trigger(SFX.Hex.Discard);
         Remove(hex);
-        yield return _mm.animCont._DiscardTile(hex.transform);
+        yield return AnimationController._DiscardTile(hex.transform);
         GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan
 
         yield return EventController.HandChange(MMEvent.Moment.End, _p.ID, hex.hextag, EventController.HandChangeState.Discard);
@@ -256,13 +257,13 @@ public class Hand {
             for (int s = swapSlot.handIndex; s > newSlotInd; s--) {
                 Hex hex = _slots[s - 1].GetHex();
                 _slots[s].SetHex(hex);
-                _mm.animCont.PlayAnim(_mm.animCont._Move(hex, _slots[s].transform.position));
+                AnimationController.PlayAnim(AnimationController._Move(hex, _slots[s].transform.position));
             }
         } else { // upward
             for (int s = swapSlot.handIndex; s < newSlotInd; s++) {
                 Hex hex = _slots[s + 1].GetHex();
                 _slots[s].SetHex(hex);
-                _mm.animCont.PlayAnim(_mm.animCont._Move(hex, _slots[s].transform.position));
+                AnimationController.PlayAnim(AnimationController._Move(hex, _slots[s].transform.position));
             }
         }
 
@@ -280,7 +281,7 @@ public class Hand {
     // On MouseUp
     public void ReleaseTile(Hex hex) {
         //MMDebug.MMLog.Log("HAND", "black", "ReleaseTile called! PlaceholderSlot="+placeholderSlot.handIndex);
-        _mm.animCont.PlayAnim(_mm.animCont._Move(hex, _placeholderSlot.transform.position));
+        AnimationController.PlayAnim(AnimationController._Move(hex, _placeholderSlot.transform.position));
 
         _placeholderSlot.SetHex(hex);
         ClearPlaceholder();

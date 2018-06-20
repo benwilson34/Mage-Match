@@ -16,9 +16,19 @@ public class Recruit : Charm {
 
         var tbs = Targeting.GetTargetTBs();
         tbs = TileFilter.FilterByAbleEnch(tbs, Enchantment.Type.Zombie);
-        foreach (var tb in tbs) {
-            if (tb.tile.IsElement(Tile.Element.Muscle))
-                yield return Zombie.Set(PlayerId, tb);
+        for(int i = 0; i < tbs.Count; i++) {
+            var tb = tbs[i];
+            if (!tb.tile.IsElement(Tile.Element.Muscle)) {
+                tbs.RemoveAt(i);
+                i--;
+            }
+        }
+
+        for (int i = 0; i < tbs.Count; i++) {
+            if (i == tbs.Count - 1)
+                yield return Zombie.Set(PlayerId, tbs[i]);
+            else
+                StartCoroutine(Zombie.Set(PlayerId, tbs[i]));
         }
     }
 }
