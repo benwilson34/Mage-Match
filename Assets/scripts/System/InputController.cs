@@ -62,7 +62,7 @@ public class InputController : MonoBehaviour {
                 status = _currentContext.TakeInput(state, _mouseObj);
 
             if (state == MouseState.Down) {
-                if(!_mm.debugTools.IsDebugMenuOpen()) // i don't like this
+                if(!_mm.debugTools.DebugMenuOpen) // i don't like this
                     ((StandardContext)_standardContext).SetTooltip(GetTooltipable()); // hoo
                 if (_mouseObj != null && _mouseObj is CellBehav) // only getObject if other context gets a CellBehav
                     _mouseObj = GetObject(state, InputContext.ObjType.Hex);

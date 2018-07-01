@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using System;
 
 public class TooltipManager : MonoBehaviour {
 
@@ -36,7 +37,11 @@ public class TooltipManager : MonoBehaviour {
         //MMDebug.MMLog.Log("TooltipMan", "orange", "Setting tooltip: " + obj.GetTooltipInfo());
 
         RectTransform textRect = (RectTransform)_currentTT.GetChild(0);
-        textRect.GetComponent<Text>().text = obj.GetTooltipInfo();
+        //try {
+            textRect.GetComponent<Text>().text = obj.GetTooltipInfo();
+        //} catch (NullReferenceException nre) { // this is mainly for training rn
+        //    textRect.GetComponent<Text>().text = "Couldn't load info.";
+        //}
 
 
         _currentTT.gameObject.SetActive(false);

@@ -24,7 +24,16 @@ public class RuneInfoLoader {
     // TODO need something for character select screen (since user will still get tooltips)
     private static Dictionary<Character.Ch, Dictionary<string, RuneInfo>> _allRuneInfo; // for Runebuilding
 
+    private static bool _loadedAllRunes = false;
+
     public static void InitInGameRuneInfo(GameSettings settings) {
+        if (settings.trainingMode)
+            InitAllRuneInfo();
+        else
+            InitCharacterRunesOnly(settings);
+    }
+
+    static void InitCharacterRunesOnly(GameSettings settings) {
         JObject neutralRunes = GetCharacterJObject(Character.Ch.Neutral);
 
         for (int id = 1; id <= 2; id++) {
@@ -44,13 +53,11 @@ public class RuneInfoLoader {
             }
             SetInGameInfoList(runeList, id);
         }
-
-        if (settings.trainingMode)
-            InitAllRuneInfo();
     }
 
     public static void InitAllRuneInfo() {
         //_allRunes = new List<RuneInfo>();
+        _loadedAllRunes = true;
         _allRuneInfo = new Dictionary<Character.Ch, Dictionary<string, RuneInfo>>();
         //foreach (JProperty charGroup in o.Properties()) {
         foreach (Character.Ch ch in Enum.GetValues(typeof(Character.Ch))) {
@@ -102,12 +109,21 @@ public class RuneInfoLoader {
         }
     }
 
+    static RuneInfo GetRuneInfo(string rune) {
+        // very inefficient, use only if utterly necessary
+        foreach (var key in _allRuneInfo.Keys) {
+            if (_allRuneInfo[key].ContainsKey(rune))
+                return _allRuneInfo[key][rune];
+        }
+        Debug.LogError("Couldn't load rune info for \"" + rune + "\"!");
+        return null;
+    }
+
     public static RuneInfo GetPlayerRuneInfo(int id, string rune) {
-        Dictionary<string, RuneInfo> info;
-        if (id == 1)
-            info = _p1runes;
-        else
-            info = _p2runes;
+        if (_loadedAllRunes) // for training mode
+            return GetRuneInfo(rune);
+
+        Dictionary<string, RuneInfo> info = id == 1 ? _p1runes : _p2runes;
 
         if (info.ContainsKey(rune)) {
             return info[rune];

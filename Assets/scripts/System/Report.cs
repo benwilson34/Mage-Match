@@ -66,9 +66,19 @@ public class Report {
 
     static void InitReport() {
         _report = new StringBuilder();
-        _report.Append("  # " + _ps1.name + " (" + _ps1.character + ") vs ");
-        _report.AppendLine(_ps2.name + " (" + _ps2.character + ")");
+        _report.AppendLine("  # MODE " + _mm.gameMode.ToString());
+        // TODO need to get both players' loadouts as well
+        ReportPlayer(_mm.GetPlayer(1));
+        ReportPlayer(_mm.GetPlayer(2));
         _report.AppendLine("  # SETUP");
+    }
+
+    static void ReportPlayer(Player p) {
+        _report.AppendLine("  # PLAYER " + p.ID);
+        _report.AppendLine("  # name " + p.Name);
+        _report.AppendLine("  # character " + p.Character.ch.ToString());
+        _report.AppendLine("  # loadout " + 
+            string.Join(" ", _mm.gameSettings.GetLoadout(p.ID)));
     }
 
     static PlayerStat GetPS(int id) {
@@ -205,7 +215,9 @@ public class Report {
         string timestamp = dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
         timestamp += dt.Hour + "-" + dt.Minute + "-" + dt.Second;
 
-        string dirPath = Application.persistentDataPath;
+        string dirPath = Application.persistentDataPath + "/Replays";
+        if (!Directory.Exists(dirPath))
+            Directory.CreateDirectory(dirPath);
         MMLog.Log("Stats", "black", "dataPath is " + dirPath + "...");
         dirPath = Directory.CreateDirectory(dirPath + "/" + timestamp).FullName;
         MMLog.Log("Stats", "black", "saving files to " + dirPath + "...");

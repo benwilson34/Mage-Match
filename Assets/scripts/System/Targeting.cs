@@ -110,12 +110,14 @@ public class Targeting {
 
         _mm.syncManager.SendTBTarget(tb);
         AudioController.Trigger(SFX.Other.ChooseTarget);
+        TileGFX gfx = tb.GetComponent<TileGFX>();
 
         Report.ReportLine("$ TARGET TILE " + tb.PrintCoord(), false);
 
         if (currentTMode == TargetMode.Tile) {
             Tile t = tb.tile;
-            _mm.uiCont.OutlineTarget(t.col, t.row);
+            //_mm.uiCont.OutlineTarget(t.col, t.row);
+            gfx.ChangeState(TileGFX.GFXState.TargetChosenGlowing);
             _targetTBs.Add(tb);
             DecTargets();
             _mm.uiCont.ShowAlertText(_mm.ActiveP.Name + ", choose " + _targetsLeft + " more targets.");
@@ -131,7 +133,8 @@ public class Targeting {
 
             foreach (TileBehav ctb in tbs) {
                 Tile ct = ctb.tile;
-                _mm.uiCont.OutlineTarget(ct.col, ct.row);
+                //_mm.uiCont.OutlineTarget(ct.col, ct.row);
+                gfx.ChangeState(TileGFX.GFXState.TargetChosenGlowing);
                 // TODO if targetable
                 // TODO remove any prereq overlap!
                 _targetTBs.Add(ctb);
@@ -146,7 +149,8 @@ public class Targeting {
             _lastDragTarget = tb;
 
             Tile t = tb.tile;
-            _mm.uiCont.OutlineTarget(t.col, t.row);
+            //_mm.uiCont.OutlineTarget(t.col, t.row);
+            gfx.ChangeState(TileGFX.GFXState.TargetChosenGlowing);
             _targetTBs.Add(tb);
             DecTargets();
             _mm.uiCont.ShowAlertText(_mm.ActiveP.Name + ", choose " + _targetsLeft + " more targets.");
@@ -244,7 +248,7 @@ public class Targeting {
         } else {
             validObjs = _validTBs;
             MMLog.Log_Targeting("validObjs="+validObjs.Count);
-            TileGFX.SetGlowingTiles(_validTBs);
+            TileGFX.SetGlowingTiles(_validTBs, TileGFX.GFXState.TargetAvailGlowing);
         }
 
         if (_mm.IsReplayMode)
@@ -318,7 +322,7 @@ public class Targeting {
 
         MMLog.Log_Targeting("seqs=" + BoardCheck.PrintSeqList(seqs));
         _mm.uiCont.ShowSpellSeqs(_selections);
-        TileGFX.SetGlowingTiles(seqs);
+        TileGFX.SetGlowingTiles(seqs, TileGFX.GFXState.PrereqGlowing);
 
         MMLog.Log_Targeting("Starting to show spell select screen, selections=" +         BoardCheck.PrintSeqList(_selections));
 
@@ -360,7 +364,7 @@ public class Targeting {
             _mm.uiCont.HideSpellSeqs();
             _mm.uiCont.ShowSpellSeqs(_selections);
             //GlowController.ClearGlowingTiles();
-            TileGFX.SetGlowingTiles(_selections);
+            TileGFX.SetGlowingTiles(_selections, TileGFX.GFXState.PrereqGlowing);
         } else
             MMLog.Log_Targeting("Player clicked on an invalid tile: " + tb.PrintCoord());
     }

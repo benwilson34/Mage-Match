@@ -65,24 +65,23 @@ public class MageMatch : MonoBehaviour {
         UserData.Init();
         //CharacterInfo.Init();
 
+        gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
+
         // set game to debug (single-client) mode if appropriate
         GameObject debugObj = GameObject.Find("DebugSettings");
         if (debugObj != null) {
             debugSettings = debugObj.GetComponent<DebugSettings>();
             _isDebugMode = true;
-
-            gameMode = debugSettings.IsOneCharMode ? GameMode.TrainingSingleChar : GameMode.TrainingTwoChars;
+            MMLog.LogWarning("This scene is in debug mode!!");
 
             if (debugSettings.replayMode) {
                 _isReplayMode = true;
                 ReplayEngine.Init(this);
-                ReplayEngine.Load("2018-4-16_16-33-0");
             }
 
-            MMLog.LogWarning("This scene is in debug mode!!");
+            gameMode = debugSettings.IsOneCharMode ? GameMode.TrainingSingleChar : GameMode.TrainingTwoChars;
+
             PhotonNetwork.offlineMode = true;
-            //PhotonNetwork.CreateRoom("debug");
-            //PhotonNetwork.JoinRoom("debug");
         }
 
         myID = IsDebugMode ? 1 : PhotonNetwork.player.ID;
@@ -97,7 +96,6 @@ public class MageMatch : MonoBehaviour {
         EnterState(State.BeginningOfGame);
 
         _tilesOnBoard = GameObject.Find("tilesOnBoard").transform;
-        gameSettings = GameObject.Find("GameSettings").GetComponent<GameSettings>();
         MMLog.Log_MageMatch(gameSettings.SettingsToString());
 
         RuneInfoLoader.InitInGameRuneInfo(gameSettings);
@@ -379,7 +377,7 @@ public class MageMatch : MonoBehaviour {
         SpellCheck();
         timer.StartTimer();
         ExitState();
-        yield return _activep.OnTurnBegin(); // this h
+        yield return _activep.OnTurnBegin();
 
         MMLog.Log_MageMatch("<b>   ---------- TURNSYSTEM END ----------</b>");
         switchingTurn = false;
@@ -779,7 +777,7 @@ public class MageMatch : MonoBehaviour {
 
         _isGlowing = !_isGlowing;
         if (_isGlowing) {
-            TileGFX.SetGlowingTiles(tbs);
+            TileGFX.SetGlowingTiles(tbs, TileGFX.GFXState.PrereqGlowing);
         } else {
             TileGFX.ClearGlowingTiles();
         }

@@ -5,8 +5,8 @@ using DG.Tweening;
 
 public class TileGFX : MonoBehaviour {
 
-    public enum GlowState { None = 0, Glowing, Faded };
-    public GlowState glowState = GlowState.None;
+    public enum GFXState { None = 0, PrereqGlowing, TargetAvailGlowing, TargetChosenGlowing, Faded };
+    public GFXState glowState = GFXState.None; // private?
 
     public float GlowRange {
         get { return _glowMat.GetFloat("_Range"); }
@@ -20,9 +20,9 @@ public class TileGFX : MonoBehaviour {
     private const int GLOW_SORTINGORDER = -1; // will be changed to something like "background glow"
     private const int NORMALTB_SORTINGORDER = 0, 
                       FADEDTB_SORTINGORDER = -2;
-    private const float TRANS_DUR = .12f;
-    private const float RANGE_MIN = 1.5f, RANGE_MAX = 0.75f;
+    private const float GLOW_RANGE_MIN = 1.5f, GLOW_RANGE_MAX = 0.75f;
     private const float TINT_DUR = .15f;
+    private const float TRANS_DUR = .12f;
 
     private Color SpriteTintColor {
         get { return _spriteMat.GetColor("_TintColor"); }
@@ -41,7 +41,7 @@ public class TileGFX : MonoBehaviour {
                          TARGET_CHOSEN_COLOR = "#C15715B0", 
                          FADE_COLOR = "#A1A1A1A1";
     private Color _prereqAvailColor, _targetingAvailColor, _targetingChosenColor, _fadeColor;
-    private bool _spriteColorChanged = false;
+    //private bool _spriteColorChanged = false;
     private SpriteRenderer _rend;
 
     void Start() {
@@ -58,45 +58,62 @@ public class TileGFX : MonoBehaviour {
         _spriteMat = _rend.material;
     }
 
-    public void ChangeGlow(GlowState newState) {
+    public void ChangeState(GFXState newState) {
         if (newState == glowState) // if it's the same that it already is, return
             return;
 
-        StartCoroutine(_ChangeGlow(newState));
+        StartCoroutine(_ChangeState(newState));
         glowState = newState;
     }
 
-    // TODO I'd probably rather have "in" and "out" blocks
-    IEnumerator _ChangeGlow(GlowState newState) {
+    IEnumerator _ChangeState(GFXState newState) {
+        // default values are what hex with GFX.None would have
+        Color glowColor = Color.clear, spriteFadeColor = Color.white;
+        float glowRange = GLOW_RANGE_MIN;
+        int sortingOrder = NORMALTB_SORTINGORDER;
+
+        // IN block - assume each is coming from GFXState.None
         switch (newState) {
-            case GlowState.None:
+            //case GFXState.None:
                 // reset glow
-                DOTween.To(() => GlowInnerColor, (x) => GlowInnerColor = x, Color.clear, TRANS_DUR);
-                DOTween.To(() => GlowRange, (x) => GlowRange = x, RANGE_MIN, TRANS_DUR);
-                if (glowState == GlowState.Faded) // if it was just faded, reset color
-                    DOTween.To(() => SpriteFadeColor, (x) => SpriteFadeColor = x, 
-                        Color.white, TRANS_DUR);
-                _rend.sortingOrder = NORMALTB_SORTINGORDER;
-                break;
-
-            case GlowState.Glowing:
-                DOTween.To(() => GlowInnerColor, (x) => GlowInnerColor = x, _targetingAvailColor, TRANS_DUR);
-                DOTween.To(() => GlowRange, (x) => GlowRange = x, RANGE_MAX, TRANS_DUR); 
+                //glowColor = Color.clear;
+                //glowRange = GLOW_RANGE_MIN;
                 //if (glowState == GlowState.Faded) // if it was just faded, reset color
-                //    _rend.color = _origColor; // tween?
-                _rend.sortingOrder = NORMALTB_SORTINGORDER;
+                //    spriteFadeColor = Color.white;
+                //sortingOrder = NORMALTB_SORTINGORDER;
+                //break;
+
+            case GFXState.PrereqGlowing:
+                glowColor = _prereqAvailColor;
+                glowRange = GLOW_RANGE_MAX;
                 break;
 
-            case GlowState.Faded:
-                GlowInnerColor = Color.clear; // tween?
-                _rend.sortingOrder = FADEDTB_SORTINGORDER;
-                DOTween.To(() => SpriteFadeColor, (x) => SpriteFadeColor = x,
-                        _fadeColor, TRANS_DUR);
+            case GFXState.TargetAvailGlowing:
+                glowColor = _targetingAvailColor;
+                glowRange = GLOW_RANGE_MAX;
+                break;
+
+            case GFXState.TargetChosenGlowing:
+                glowColor = _targetingChosenColor;
+                glowRange = GLOW_RANGE_MAX;
+                break;
+
+            case GFXState.Faded:
+                //glowColor = Color.clear; // default...
+                sortingOrder = FADEDTB_SORTINGORDER;
+                spriteFadeColor = _fadeColor;
                 break;
 
             default:
                 break;
         }
+
+        // finally tween the values
+        DOTween.To(() => GlowInnerColor, (x) => GlowInnerColor = x, glowColor, TRANS_DUR);
+        DOTween.To(() => GlowRange, (x) => GlowRange = x, glowRange, TRANS_DUR);
+        DOTween.To(() => SpriteFadeColor, (x) => SpriteFadeColor = x,
+                        spriteFadeColor, TRANS_DUR);
+        _rend.sortingOrder = sortingOrder;
 
         yield return null;
     }
@@ -120,7 +137,7 @@ public class TileGFX : MonoBehaviour {
     //    _mm = mm;
     //}
 
-    public static void SetGlowingTiles(List<TileSeq> seqs) {
+    public static void SetGlowingTiles(List<TileSeq> seqs, GFXState state) {
         var tiles = new Dictionary<string, TileBehav>();
         foreach (var seq in seqs) {
             foreach (var tile in seq.sequence) {
@@ -129,10 +146,10 @@ public class TileGFX : MonoBehaviour {
                     tiles.Add(coord, HexGrid.GetTileBehavAt(tile.col, tile.row));
             }
         }
-        SetGlowingTiles(new List<TileBehav>(tiles.Values));
+        SetGlowingTiles(new List<TileBehav>(tiles.Values), state);
     }
 
-    public static void SetGlowingTiles(List<TileBehav> glowTBs) {
+    public static void SetGlowingTiles(List<TileBehav> glowTBs, GFXState state) {
         var tbs = new List<TileBehav>(glowTBs);
         foreach (TileBehav tb in HexGrid.GetPlacedTiles()) {
             bool glowThisTile = false;
@@ -147,9 +164,9 @@ public class TileGFX : MonoBehaviour {
 
             var glowDriver = tb.GetComponent<TileGFX>();
             if (glowThisTile) {
-                glowDriver.ChangeGlow(TileGFX.GlowState.Glowing);
+                glowDriver.ChangeState(state);
             } else {
-                glowDriver.ChangeGlow(TileGFX.GlowState.Faded);
+                glowDriver.ChangeState(GFXState.Faded);
             }
 
         }
@@ -158,7 +175,7 @@ public class TileGFX : MonoBehaviour {
     public static void ClearGlowingTiles() {
         foreach (var tb in HexGrid.GetPlacedTiles()) {
             var driver = tb.GetComponent<TileGFX>();
-            driver.ChangeGlow(TileGFX.GlowState.None);
+            driver.ChangeState(GFXState.None);
         }
     }
 }

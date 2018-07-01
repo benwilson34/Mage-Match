@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class TestLauncher : MonoBehaviour {
 
+    public bool playFromFile = false;
+    public bool fastForward = true;
+    public string replayFile = "";
+    public int replayChoice; // only needed for editor
+
     //[SerializeField]
     public Character.Ch testCharacter = Character.Ch.Enfuego;
     //[SerializeField]
@@ -29,6 +34,12 @@ public class TestLauncher : MonoBehaviour {
 
         var debugSettings = GameObject.Find("DebugSettings").GetComponent<DebugSettings>();
         debugSettings.trainingMode = trainingMode;
+        debugSettings.replayMode = playFromFile;
+        if (playFromFile) {
+            debugSettings.replayFile = replayFile;
+            debugSettings.animateReplay = !fastForward;
+        }
+
 
         SceneManager.LoadScene("Game Screen (Landscape)");
     }

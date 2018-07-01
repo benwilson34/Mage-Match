@@ -15,6 +15,9 @@ public class DebugTools : MonoBehaviour {
     public GameObject menus, systemMenu, reportMenu, toolsMenu;
     // maybe other menus?
 
+    public bool DebugMenuOpen { get { return _debugMenuOpen; } }
+    private bool _debugMenuOpen = false;
+
     private enum DropdownType { None, Hex, Tile, Property, Enchantment };
     private List<string> _ddTileOptions, _ddCharmOptions, _ddPropertyOptions, _ddEnchantmentOptions;
 
@@ -148,20 +151,30 @@ public class DebugTools : MonoBehaviour {
     }
 
     public void ToggleDebugMenu() {
-        bool openingMenu = !menus.GetActive();
+        // logic separated from UI - important for replaying
+        ToggleDebugActiveState(); 
+
         Text menuButtonText = GameObject.Find("MenuButtonText").GetComponent<Text>();
-        if (openingMenu) {
+        if (_debugMenuOpen) {
             menuButtonText.text = "Close";
-            _mm.EnterState(MageMatch.State.DebugMenu);
             UpdateEffTexts();
         } else {
             menuButtonText.text = "Debug";
-            _mm.ExitState();
         }
-        menus.SetActive(openingMenu);
+        menus.SetActive(_debugMenuOpen);
     }
 
-    public bool IsDebugMenuOpen() { return menus.GetActive(); }
+    public void ToggleDebugActiveState() {
+        //Report.ReportLine("$ DEBUG toggle", false);
+        _debugMenuOpen = !_debugMenuOpen;
+        if (_debugMenuOpen) {
+            _mm.EnterState(MageMatch.State.DebugMenu);
+            Report.ReportLine("$ DEBUG start", false);
+        } else {
+            _mm.ExitState();
+            Report.ReportLine("$ DEBUG end", false);
+        }
+    }
 
     public void UpdateDebugGrid() {
         string grid = "   0  1  2  3  4  5  6 \n";

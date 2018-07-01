@@ -40,7 +40,8 @@ public class Hex : MonoBehaviour, Tooltipable {
     protected void SetQuickdraw() { _quickdraw = true; }
     protected void SetDuplicate() { _duplicate = true; }
     public IEnumerator OnDraw() {
-        if (_mm.GetState() == MageMatch.State.BeginningOfGame)
+        if (_mm.GetState() == MageMatch.State.BeginningOfGame ||
+            _mm.GetState() == MageMatch.State.DebugMenu)
             yield break;
 
         if (PlayerId == _mm.ActiveP.ID) { // if this hex was generated on that player's turn

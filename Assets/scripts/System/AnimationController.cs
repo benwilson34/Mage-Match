@@ -9,13 +9,13 @@ public class AnimationController : MonoBehaviour {
     public AnimationCurve someCustomEase;
 
     private static MageMatch _mm;
-    private static GameObject _fireballPF, _zombifyPF;
+    private static GameObject _fireballPF;
     private static int _animating;
 
     public static void Init(MageMatch mm) {
         _mm = mm;
         _fireballPF = (GameObject)Resources.Load("prefabs/anim/fireball");
-        _zombifyPF = (GameObject)Resources.Load("prefabs/anim/zombify");
+        //_zombifyPF = (GameObject)Resources.Load("prefabs/anim/zombify");
     }
 
     public static void PlayAnim(IEnumerator anim) {
