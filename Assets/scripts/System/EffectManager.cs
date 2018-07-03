@@ -5,7 +5,7 @@ using MMDebug;
 using System;
 
 // TODO events for beginning-of-turn effects and for passive/trigger effects
-public class EffectManager {
+public static class EffectManager {
 
     private static MageMatch _mm;
     private static List<EventEffect> _turnBeginEffects, _turnEndEffects;

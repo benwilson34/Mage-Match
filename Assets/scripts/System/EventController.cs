@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MMDebug;
 
-public class EventController {
+public static class EventController {
 
     public static bool handlingEvents = false; // worth it?
 

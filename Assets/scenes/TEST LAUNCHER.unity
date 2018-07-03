@@ -141,12 +141,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playFromFile: 1
-  fastForward: 0
-  replayFile: C:/Users/Ben/AppData/LocalLow/Soup Skull/Mage Match/Replays\2018-7-1_14-26-48/MageMatch_2018-7-1_14-26-48_Report.txt
-  replayChoice: 1
+  fastForward: 1
+  replayFile: C:/Users/Ben/AppData/LocalLow/Soup Skull/Mage Match/Replays\2018-7-2_22-37-40/MageMatch_2018-7-2_22-37-40_Report.txt
+  replayChoice: 4
   testCharacter: 4
   trainingMode: 1
-  secondTestCharacter: 2
+  secondTestCharacter: 1
 --- !u!4 &1010678306
 Transform:
   m_ObjectHideFlags: 0

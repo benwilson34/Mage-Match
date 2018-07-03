@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using MMDebug;
 using DG.Tweening;
 
-public class HexGrid {
+public static class HexGrid {
 
 	public const int NUM_COLS = 7, NUM_ROWS = 7;
 	public const int NUM_CELLS = 37;
@@ -214,10 +214,14 @@ public class HexGrid {
     #endregion
 
 
+    public static bool ValidCoord(int c, int r) {
+        return c != -1 && r != -1;
+    }
+
     public static bool CanSwap(int c1, int r1, int c2, int r2) {
         //adjacency check
-        if (c2 == -1 || r2 == -1)
-            return false;
+        //if (!ValidCoord(c2, r2))
+        //    return false;
 
         if (IsCellFilledButNotInvoked(c2, r2) &&
             _tileGrid[c1, r1].ableSwap &&
@@ -226,18 +230,20 @@ public class HexGrid {
         else return false;
     }
 
-	public static bool Swap(int c1, int r1, int c2, int r2){
-//		Debug.Log("Swapping (" + c1 + ", " + r1 + ") to (" + c2 + ", " + r2 + ")");
-        // NOTE: this only swaps in the data structure!! the TBs animating happens in MageMatch
-		TileBehav temp = GetTileBehavAt(c2, r2);
-		SetTileBehavAt(GetTileBehavAt(c1, r1), c2, r2);
-		//GetTileBehavAt(c2, r2).ChangePos(c2, r2);
-		SetTileBehavAt (temp, c1, r1);
-		//GetTileBehavAt(c1, r1).ChangePos(c1, r1);
-		//mm.BoardChanged ();
-		CheckGrav ();
-		return true;
-	}
+	//public static bool Swap(int c1, int r1, int c2, int r2){
+ //       Debug.Log("Swapping (" + c1 + ", " + r1 + ") to (" + c2 + ", " + r2 + ")");
+ //       // NOTE: this only swaps in the data structure
+ //       TileBehav temp = GetTileBehavAt(c2, r2);
+	//	SetTileBehavAt(GetTileBehavAt(c1, r1), c2, r2);
+ //       if (temp != null) { // handles empty swap
+ //           SetTileBehavAt(temp, c1, r1);
+ //       } else {
+ //           Debug.Log("Clearing (" + c1 + ", " + r1 + ")");
+ //           ClearTileBehavAt(c1, r1);
+ //       }
+	//	CheckGrav();
+	//	return true;
+	//}
    
 	public static void GetOffset(int dir, out int dc, out int dr){
 		dc = dr = 0;

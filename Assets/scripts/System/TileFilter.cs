@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileFilter {
+public static class TileFilter {
 
     //public static void Init() {
     //}

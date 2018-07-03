@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine;
 using System.Text.RegularExpressions;
 
-public class ReplayEngine {
+public static class ReplayEngine {
 
     private static MageMatch _mm;
     private static string[] _fileLines;

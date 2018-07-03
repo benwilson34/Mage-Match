@@ -17,7 +17,7 @@ public class ButtonController : MonoBehaviour {
     private GameObject _mainView, _cancelView;
     private ButtonClick _onClick, _mainClick;
     private int _playerId;
-    private bool _newSpell = false;
+    //private bool _newSpell = false;
     private bool _isActivated = false, _interactable = false;
 
     public void Init(MageMatch mm, int id) {
@@ -182,13 +182,13 @@ public class ButtonController : MonoBehaviour {
     }
 
     public IEnumerator Transition_MainView() {
-        if (_newSpell) {
-            MMLog.Log("BUTTONCONT", "black", "button" + spellNum + " showing new spell info");
-            _mainView.SetActive(true);
-            ShowSpellInfo();
-            _mainView.SetActive(false);
-            _newSpell = false;
-        }
+        //if (_newSpell) {
+        //    MMLog.Log("BUTTONCONT", "black", "button" + spellNum + " showing new spell info");
+        //    _mainView.SetActive(true);
+        //    ShowSpellInfo();
+        //    _mainView.SetActive(false);
+        //    _newSpell = false;
+        //}
 
         if (_cancelView != null) {
             Destroy(_cancelView.gameObject);
@@ -201,7 +201,13 @@ public class ButtonController : MonoBehaviour {
         yield return null;
     }
 
-    public void SpellChanged() { _newSpell = true; }
+    public void SpellChanged() {
+        //_newSpell = true;
+        bool mainViewActive = _mainView.GetActive();
+        _mainView.SetActive(true);
+        ShowSpellInfo();
+        _mainView.SetActive(mainViewActive);
+    }
 
 	void OnSpellButtonClick(){
         StartCoroutine(Transition_Cancel());

@@ -243,4 +243,51 @@ public class AnimationController : MonoBehaviour {
         t.DOMoveY(HexGrid.GridRowToPos(tb.tile.col, tb.tile.row), .3f);
         yield return Animate(t.DOScale(1f, .3f));
     }
+
+
+
+    // ---------- MAGIC AL ----------
+
+    public static IEnumerator _MagicAl_StingerStance(int id) {
+        // fist object to send across the screen
+        var fist = (GameObject)Resources.Load("prefabs/anim/fist");
+        fist = Instantiate(fist);
+
+        var pinfopos = _mm.uiCont.GetPinfo(id).position;
+        pinfopos.z = 0;
+        fist.transform.position = pinfopos;
+        var oppPortrait = _mm.uiCont.GetPortrait(_mm.OpponentId(id)).position;
+        oppPortrait = Camera.main.ScreenToWorldPoint(oppPortrait);
+        oppPortrait.z = 0;
+
+        var testPosition = HexGrid.GetCellBehavAt(3, 6).transform.position;
+        //RotateToFace(fist.transform, testPosition);
+        //yield return fist.transform.DOMove(testPosition, .5f).SetEase(Ease.InQuad).WaitForCompletion();
+        RotateToFace(fist.transform, oppPortrait);
+        yield return fist.transform.DOMove(oppPortrait, .5f).SetEase(Ease.InQuad).WaitForCompletion();
+
+        fist.GetComponent<SpriteRenderer>().DOFade(0, .5f); // fade out fist
+        // burst of particles on hit
+        var parts = (GameObject)Resources.Load("prefabs/particles/Magic Al Burst");
+        parts = Instantiate(parts, oppPortrait, Quaternion.identity);
+
+        yield return ScreenShake().WaitForCompletion();
+    }
+
+    static void RotateToFace(Transform t, Vector3 point) {
+        t.right = point - t.position;
+    }
+
+    static Tween ScreenShake() {
+        var seq = DOTween.Sequence();
+        var origPos = Camera.main.transform.position;
+        const float shakeAmt = .5f;
+        const float shakeDur = .03f;
+        seq.Append(Camera.main.transform.DOMoveX(shakeAmt, shakeDur).SetRelative().SetEase(Ease.Linear));
+        seq.Append(Camera.main.transform.DOMoveX(shakeAmt*-2, shakeDur*2).SetRelative().SetEase(Ease.Linear));
+        seq.Append(Camera.main.transform.DOMoveX(shakeAmt, shakeDur).SetRelative().SetEase(Ease.Linear));
+        seq.SetLoops(3);
+
+        return seq;
+    }
 }

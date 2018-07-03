@@ -85,7 +85,7 @@ public class Gravekeeper : Character {
         List<TileBehav> tbs = Targeting.GetTargetTBs();
         for (int i = 0; i < tbs.Count; i++) {
             var tb = tbs[i];
-            if (tb.GetEnchType() != Enchantment.Type.Zombie)
+            if (tb.GetEnchType() == Enchantment.Type.Zombie)
                 yield return ((Zombie)tbs[i].GetEnchantment()).Attack();
         }
 

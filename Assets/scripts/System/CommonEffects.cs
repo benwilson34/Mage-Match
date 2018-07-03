@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 using DG.Tweening;
 
-class CommonEffects {
+public static class CommonEffects {
 
     private static MageMatch _mm;
 

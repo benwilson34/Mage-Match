@@ -266,7 +266,12 @@ public class InputController : MonoBehaviour {
 
             int c2, r2;
             HexGrid.GetAdjacentTile(tile.col, tile.row, dir, out c2, out r2);
-            if (!HexGrid.CanSwap(tile.col, tile.row, c2, r2))
+            Debug.Log("INPUTCONT: Checking (" + c2 + ", " + r2 + ")");
+            if (!HexGrid.ValidCoord(c2, r2))
+                return;
+
+            if (Prompt.modifier != Prompt.PromptModifier.SwapEmpty 
+                && !HexGrid.CanSwap(tile.col, tile.row, c2, r2))
                 return;
 
             if (Prompt.currentMode == Prompt.PromptMode.Swap) {

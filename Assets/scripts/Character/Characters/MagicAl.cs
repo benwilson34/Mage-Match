@@ -139,12 +139,14 @@ public class MagicAl : Character {
 
         DealDamage(dmg);
 
+        //_mm.uiCont.ShowAlertText("Empty swapping isn't supported yet. Sorry!");
+        Prompt.SetSwapCount(swapCount, Prompt.PromptModifier.SwapEmpty);
         for (int i = 0; i < swapCount; i++) {
-            // TODO allow swapping into open space
-            _mm.uiCont.ShowAlertText("Empty swapping isn't supported yet. Sorry!");
-            yield return Prompt.WaitForSwap();
-            if (Prompt.WasSuccessful)
-                Prompt.ContinueSwap();
+            yield return Prompt.WaitForSwap(seq);
+            if (Prompt.WasSuccessful) {
+                Debug.LogWarning("Swapping " + Prompt.GetSwapTBs()[0].PrintCoord());
+                yield return Prompt.ContinueSwap();
+            }
         }
 
         SetSpellCast(MagicAlSpell.Hook);
@@ -184,6 +186,7 @@ public class MagicAl : Character {
         yield return null;
     }
     IEnumerator Stinger_OnTurnEnd(int id) {
+        yield return AnimationController._MagicAl_StingerStance(_playerId);
         int dmg = 40;
         const int damagePerHex = 15;
         dmg += Opponent.Hand.Count * damagePerHex;
@@ -195,7 +198,9 @@ public class MagicAl : Character {
     protected override IEnumerator Spell2(TileSeq prereq) {
         AudioController.Trigger(SFX.MagicAl.Flutterfly);
 
-        yield return Prompt.WaitForSwap();
+        const int swapCount = 1;
+        Prompt.SetSwapCount(swapCount);
+        yield return Prompt.WaitForSwap(prereq);
         if (!Prompt.WasSuccessful)
             yield break;
 

@@ -109,6 +109,7 @@ public class Enfuego : Character {
         yield return ThisPlayer.DrawHexes(2); // my draw
         yield return Opponent.DrawHexes(2); // their draw
 
+        Prompt.SetSwapCount(1);
         yield return Prompt.WaitForSwap(prereq);
         if(Prompt.WasSuccessful)
             yield return Prompt.ContinueSwap();

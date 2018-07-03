@@ -557,7 +557,7 @@ public class UIController : MonoBehaviour {
         }
 	}
 
-    Transform GetPortrait(int id) {
+    public Transform GetPortrait(int id) {
         return IDtoSide(id) == ScreenSide.Left ? _leftPportrait : _rightPportrait;
     }
     #endregion

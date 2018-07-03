@@ -6,7 +6,7 @@ using System.IO;
 using System;
 using MMDebug;
 
-public class Report {
+public static class Report {
 
     public static int Turns { get { return _turns; } }
     private static int _turns = 1;

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
 
-public class Targeting {
+public static class Targeting {
 
     public enum TargetMode { Tile, TileArea, Cell, Drag, Selection };
     public static TargetMode currentTMode = TargetMode.Tile;
@@ -134,7 +134,7 @@ public class Targeting {
             foreach (TileBehav ctb in tbs) {
                 Tile ct = ctb.tile;
                 //_mm.uiCont.OutlineTarget(ct.col, ct.row);
-                gfx.ChangeState(TileGFX.GFXState.TargetChosenGlowing);
+                ctb.GetComponent<TileGFX>().ChangeState(TileGFX.GFXState.TargetChosenGlowing);
                 // TODO if targetable
                 // TODO remove any prereq overlap!
                 _targetTBs.Add(ctb);

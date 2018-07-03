@@ -3,7 +3,7 @@ using UnityEngine;
 using MMDebug;
 using System;
 
-public class SFX {
+public static class SFX {
     public enum Hex { Draw, Pickup, Discard, GravClick, Swap, Destroy, Invoke };
     public enum Other { BackgroundMusic, GameStart, GameEnd, APGain, LowHealthWarning, FullMeter, TurnTimerWarning, TurnTimeout, UIButton, ChooseTarget, Quickdraw_Prompt, Quickdraw_Drop, CrowdGasp };
 
@@ -19,7 +19,7 @@ public class SFX {
     public enum Rune_MagicAl { IllusoryFist, RopeADope };
 }
 
-public class AudioController {
+public static class AudioController {
 
     private static MageMatch _mm;
     private static Dictionary<Enum, string> _clips;

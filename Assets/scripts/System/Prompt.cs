@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using MMDebug;
 
-public class Prompt {
+public static class Prompt {
 
     public enum PromptMode { None, Drop, Swap, QuickdrawDrop };
     public static PromptMode currentMode = PromptMode.None;
+
+    public enum PromptModifier { None, SwapEmpty };
+    public static PromptModifier modifier = PromptModifier.None;
 
     private static MageMatch _mm;
     private static int _count = -1;
@@ -17,7 +20,7 @@ public class Prompt {
     private static Hex _dropHex;
     private static int _dropCol;
 
-    private static TileBehav[] _swapTiles;
+    private static int _swapC1, _swapR1, _swapC2, _swapR2;
     private static bool _successful = false;
 
     private static int _quickdrawDropCol;
@@ -215,8 +218,10 @@ public class Prompt {
 
     #region ---------- SWAP ----------
 
-    public static void SetSwapCount(int count) {
+    public static void SetSwapCount(int count, PromptModifier mod = PromptModifier.None) {
         _count = count;
+        if (mod != PromptModifier.None)
+            modifier = mod;
         ToggleSwapUI(true);
     }
 
@@ -258,6 +263,7 @@ public class Prompt {
         if (!_successful || _count == 0) {
             ToggleSwapUI(false);
             ResetCount();
+            modifier = PromptModifier.None;
         }
     }
 
@@ -276,22 +282,30 @@ public class Prompt {
 
         Report.ReportLine(string.Format("$ PROMPT SWAP ({0},{1}) ({2},{3})", c1, r1, c2, r2), false);
 
-        _swapTiles = new TileBehav[2];
-        _swapTiles[0] = HexGrid.GetTileBehavAt(c1, r1);
-        _swapTiles[1] = HexGrid.GetTileBehavAt(c2, r2);
-        MMLog.Log("PROMPT", "blue", "SWAPS are " + 
-            _swapTiles[0].hextag + " and " + _swapTiles[1].hextag);
+        _swapC1 = c1;
+        _swapR1 = r1;
+        _swapC2 = c2;
+        _swapR2 = r2;
+        //MMLog.Log("PROMPT", "blue", "SWAPS are " + 
+            //_swapTiles[0].hextag + " and " + _swapTiles[1].hextag);
 
         currentMode = PromptMode.None;
         _count--;
         _successful = true;
     }
 
-    public static TileBehav[] GetSwapTBs() { return _swapTiles; }
+    public static TileBehav[] GetSwapTBs() {
+        var swapTiles = new TileBehav[2];
+        swapTiles[0] = HexGrid.GetTileBehavAt(_swapC1, _swapR1);
+        if (modifier != PromptModifier.SwapEmpty)
+            swapTiles[1] = HexGrid.GetTileBehavAt(_swapC2, _swapR2);
+        return swapTiles;
+    }
 
     public static IEnumerator ContinueSwap() {
-        Tile f = _swapTiles[0].tile, s = _swapTiles[1].tile;
-        yield return _mm._SwapTiles(f.col, f.row, s.col, s.row, EventController.SwapState.PromptSwap);
+        yield return _mm._SwapTiles(_swapC1, _swapR1, _swapC2, _swapR2, EventController.SwapState.PromptSwap);
+        if (modifier == PromptModifier.SwapEmpty)
+            _mm.BoardChanged();
     }
     #endregion
 

@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MMDebug;
 
-public class BoardCheck {
+public static class BoardCheck {
 
 	private static List<Spell> _checkList; // compare list
     //private MageMatch mm;

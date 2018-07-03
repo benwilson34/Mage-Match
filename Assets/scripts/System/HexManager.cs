@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MMDebug;
 
-public class HexManager { // should maybe inherit MonoBehaviour? or maybe static?
+public static class HexManager {
 
     public static int Removing { get { return _removing; } }
 
