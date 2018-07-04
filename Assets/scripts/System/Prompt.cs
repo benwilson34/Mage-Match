@@ -294,6 +294,10 @@ public static class Prompt {
         _successful = true;
     }
 
+    public static int[] GetSwapCoords() {
+        return new int[4] { _swapC1, _swapR1, _swapC2, _swapR2 };
+    }
+
     public static TileBehav[] GetSwapTBs() {
         var swapTiles = new TileBehav[2];
         swapTiles[0] = HexGrid.GetTileBehavAt(_swapC1, _swapR1);

@@ -34,7 +34,7 @@ public class MyScriptEditor : Editor {
                     .Select(dir => new DirectoryInfo(dir).Name).ToArray();
                 launcher.replayChoice = EditorGUILayout.Popup(launcher.replayChoice, replayNames);
                 launcher.replayFile = replays[launcher.replayChoice] + "/MageMatch_" + replayNames[launcher.replayChoice] + "_Report.txt";
-                Debug.Log("Going to load "+launcher.replayFile);
+                //Debug.Log("Going to load "+launcher.replayFile);
 
                 launcher.fastForward = EditorGUILayout.Toggle("Fast forward", launcher.fastForward);
             } else {

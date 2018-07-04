@@ -110,6 +110,8 @@ public class Hand {
         return null;
     }
 
+    public Hex GetHexAt(int i) { return _hexes[i]; }
+
     public List<Hex> GetAllHexes() { return _hexes; }
 
     public void FlipAllHexes(bool flipped) {

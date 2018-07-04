@@ -347,7 +347,7 @@ public class UIController : MonoBehaviour {
     #endregion
 
 
-    ScreenSide IDtoSide(int id) {
+    public ScreenSide IDtoSide(int id) {
         if (_mm.gameMode == MageMatch.GameMode.TrainingTwoChars) {
             return id == 1 ? ScreenSide.Left : ScreenSide.Right;
         }

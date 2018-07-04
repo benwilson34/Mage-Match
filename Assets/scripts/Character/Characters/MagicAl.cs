@@ -79,6 +79,7 @@ public class MagicAl : Character {
         yield return Targeting.WaitForTileTarget(returnCount);
         var tbs = Targeting.GetTargetTBs();
         foreach (var tb in tbs) {
+            yield return AnimationController._MagicAl_Jab(_playerId, tb);
             yield return CommonEffects.BounceToHand(tb, Opponent);
         }
 
@@ -109,7 +110,13 @@ public class MagicAl : Character {
 
         DealDamage(dmg);
 
-        yield return Opponent.Hand._DiscardRandom(discardCount);
+        for (int i = 0; i < discardCount && Opponent.Hand.Count > 0; i++) {
+            yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, Opponent.Hand.Count));
+            int rand = _mm.syncManager.GetRand();
+            Hex hex = Opponent.Hand.GetHexAt(rand);
+            yield return AnimationController._MagicAl_Cross(_playerId, hex);
+            yield return Opponent.Hand._Discard(hex);
+        }
 
         SetSpellCast(MagicAlSpell.Cross);
         ChangeMatchSpell(MagicAlSpell.Hook);
@@ -144,7 +151,10 @@ public class MagicAl : Character {
         for (int i = 0; i < swapCount; i++) {
             yield return Prompt.WaitForSwap(seq);
             if (Prompt.WasSuccessful) {
-                Debug.LogWarning("Swapping " + Prompt.GetSwapTBs()[0].PrintCoord());
+                var tb1 = Prompt.GetSwapTBs()[0];
+                var coords = Prompt.GetSwapCoords();
+                Debug.LogWarning("Swapping "+coords[0]+coords[1]+coords[2]+coords[3]);
+                yield return AnimationController._MagicAl_Hook(_playerId, tb1, coords[2], coords[3]);
                 yield return Prompt.ContinueSwap();
             }
         }
