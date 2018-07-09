@@ -5,7 +5,7 @@
             <value>IllusoryFist</value>
         </property>
         <property name="outputFormat">
-            <value>0</value>
+            <value>1</value>
         </property>
         <relationship name="folder">
             <destination>{e860d823-2547-424b-aca5-ae2cd18ecdcd}</destination>
@@ -59,11 +59,18 @@
     <object class="EventAutomatableProperties" id="{6996d0da-9b6f-41c2-9bcc-c1945a9b590e}"/>
     <object class="MarkerTrack" id="{00f1ef86-41a6-4eaa-9416-9b5f0be5b3b7}"/>
     <object class="GroupTrack" id="{2336ae30-f7f2-4c60-a3c7-30fbf3071d44}">
+        <relationship name="modules">
+            <destination>{7a7328d3-9fc5-4003-a11d-14c7e99a9a2c}</destination>
+        </relationship>
         <relationship name="mixerGroup">
             <destination>{e620f0fc-70d7-4bf2-8fb3-ad8204650e96}</destination>
         </relationship>
     </object>
-    <object class="Timeline" id="{8f5c5b6b-2624-441e-aa48-7fcd9b37a849}"/>
+    <object class="Timeline" id="{8f5c5b6b-2624-441e-aa48-7fcd9b37a849}">
+        <relationship name="modules">
+            <destination>{7a7328d3-9fc5-4003-a11d-14c7e99a9a2c}</destination>
+        </relationship>
+    </object>
     <object class="EventMixerMaster" id="{80d6b002-21c3-4e68-a342-f06d23096647}">
         <relationship name="effectChain">
             <destination>{716b0a21-ced9-4704-ad91-4c039755ae8d}</destination>
@@ -81,7 +88,21 @@
         </relationship>
     </object>
     <object class="MixerBusPanner" id="{e63546e1-8d52-4eb5-9463-a13c81f77308}"/>
+    <object class="SingleSound" id="{7a7328d3-9fc5-4003-a11d-14c7e99a9a2c}">
+        <property name="length">
+            <value>5.2116744143651443</value>
+        </property>
+        <property name="timelockedOffset">
+            <value>0.24610336341263331</value>
+        </property>
+        <relationship name="audioFile">
+            <destination>{cb827674-35d1-4815-8142-19f8b32449fb}</destination>
+        </relationship>
+    </object>
     <object class="EventMixerGroup" id="{e620f0fc-70d7-4bf2-8fb3-ad8204650e96}">
+        <property name="volume">
+            <value>-5.5</value>
+        </property>
         <property name="name">
             <value>Audio 1</value>
         </property>

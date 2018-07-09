@@ -5,7 +5,7 @@
             <value>FutureSight</value>
         </property>
         <property name="outputFormat">
-            <value>0</value>
+            <value>1</value>
         </property>
         <relationship name="folder">
             <destination>{62275a97-4c20-404c-acdf-9b7e5cdf9a84}</destination>
@@ -59,11 +59,18 @@
     <object class="EventAutomatableProperties" id="{ad7deaf8-c45a-4b22-9076-0f08378d627b}"/>
     <object class="MarkerTrack" id="{ed4e5018-1f75-4362-aa68-e3a6c6a3e786}"/>
     <object class="GroupTrack" id="{ed555953-efa7-41b0-9d51-bc578744e1df}">
+        <relationship name="modules">
+            <destination>{632ca054-70ef-4eca-9f44-06a00781bc21}</destination>
+        </relationship>
         <relationship name="mixerGroup">
             <destination>{c9fc5f32-1ee4-45b3-b027-a819a786017c}</destination>
         </relationship>
     </object>
-    <object class="Timeline" id="{21caf5af-01d8-4982-9650-4a05f12d126d}"/>
+    <object class="Timeline" id="{21caf5af-01d8-4982-9650-4a05f12d126d}">
+        <relationship name="modules">
+            <destination>{632ca054-70ef-4eca-9f44-06a00781bc21}</destination>
+        </relationship>
+    </object>
     <object class="EventMixerMaster" id="{56c8b831-4c49-4882-a096-960547864bfb}">
         <relationship name="effectChain">
             <destination>{c9331126-1357-44f5-923b-9cb2853041a2}</destination>
@@ -81,7 +88,18 @@
         </relationship>
     </object>
     <object class="MixerBusPanner" id="{8f161462-6d21-4379-a317-9f0d7622dce5}"/>
+    <object class="SingleSound" id="{632ca054-70ef-4eca-9f44-06a00781bc21}">
+        <property name="length">
+            <value>2.6353061224489798</value>
+        </property>
+        <relationship name="audioFile">
+            <destination>{cfacb9ca-fbd8-42a2-8e9a-de49a757e759}</destination>
+        </relationship>
+    </object>
     <object class="EventMixerGroup" id="{c9fc5f32-1ee4-45b3-b027-a819a786017c}">
+        <property name="volume">
+            <value>-6.5</value>
+        </property>
         <property name="name">
             <value>Audio 1</value>
         </property>

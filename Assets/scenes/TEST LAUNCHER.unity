@@ -140,9 +140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37e87f6a95742d84c9bab4c0f6d2b968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playFromFile: 1
+  playFromFile: 0
   fastForward: 1
-  replayFile: C:/Users/Ben/AppData/LocalLow/Soup Skull/Mage Match/Replays\2018-7-8_1530-20_MagicAlSpells/2018-7-8_1530-20_Report.txt
+  replayFile: C:/Users/Tanner/AppData/LocalLow/Soup Skull/Mage Match/Replays\2018-7-9_1249-0_thiskillsthefuego/2018-7-9_1249-0_Report.txt
   replayChoice: 0
   testCharacter: 4
   trainingMode: 1
