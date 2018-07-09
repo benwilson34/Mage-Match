@@ -408,7 +408,9 @@ public class DebugTools : MonoBehaviour {
         _playerId = _playerId == 1 ? 2 : 1;
 
         var p = _mm.GetPlayer(_playerId);
-        var str = string.Format("P{0} - {1} ({2})", _playerId, p.Name, p.Character.ch.ToString());
+		var name = _mm.gameSettings.GetPName(_playerId);
+		var ch = _mm.gameSettings.GetChar(_playerId).ToString();
+        var str = string.Format("P{0} - {1} ({2})", _playerId, name, ch);
         _b_player.transform.GetChild(0).GetComponent<Text>().text = str;
     }
 

@@ -29,6 +29,10 @@ public class GameSettings : PunBehaviour {
             p2char = ch;
         }
     }
+	
+	public string GetPName(int id) {
+		return id == 1 ? p1name : p2name;
+	}
 
     public Character.Ch GetChar(int id) {
         return id == 1 ? p1char : p2char;
