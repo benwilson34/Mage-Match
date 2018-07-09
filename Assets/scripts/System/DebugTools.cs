@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using MMDebug;
+using System;
 
 public class DebugTools : MonoBehaviour {
 
     private enum Submenu { System = 1, Report, Tools };
     private Submenu _submenu;
 
-    public enum ToolMode { Insert, Destroy, Enchant, Properties, Clear, AddToHand, Discard, ChangeHealth, ChangeMeter };
-    public ToolMode mode = ToolMode.Insert;
+    public enum ToolMode { Insert, Destroy, Enchant, Clear, AddToHand, Discard, ChangeHealth, ChangeMeter, ChangeAP };
+    public ToolMode currentMode = ToolMode.Insert; // private?
 
     public GameObject menus, systemMenu, reportMenu, toolsMenu;
+    public Transform centerPositionTransform;
     // maybe other menus?
 
     public bool DebugMenuOpen { get { return _debugMenuOpen; } }
@@ -22,9 +24,12 @@ public class DebugTools : MonoBehaviour {
     private List<string> _ddTileOptions, _ddCharmOptions, _ddPropertyOptions, _ddEnchantmentOptions;
 
     private MageMatch _mm;
-    private Dropdown _dd_options;
+    private Dropdown _dd_toolMode, _dd_options;
+    private GameObject _inputBlock;
     private InputField _input;
-    private Button _b_healthMode, _b_player, _b_ok;
+    private Button _b_inputSign, _b_player, _b_ok;
+    private Text _t_toolHelp;
+    private Vector3 _debugMenuOrigPos, _debugMenuCenteredPos;
 
     private Text _debugGridText, _slidingText;
     private GameObject _debugItemPF;
@@ -35,8 +40,9 @@ public class DebugTools : MonoBehaviour {
 
     private int _playerId = 1;
     private bool _relativeDmgMode = true;
+    private bool _positiveInputSign = true;
 
-    private string _oldFunc;
+    private ToolMode _oldMode = ToolMode.ChangeAP;
 
 	public void Init(MageMatch mm) {
         this._mm = mm;
@@ -66,11 +72,19 @@ public class DebugTools : MonoBehaviour {
         } else {
             //toolsMenu.SetActive(true);
             Transform t = toolsMenu.transform;
+            _debugMenuOrigPos = t.position;
+            _debugMenuCenteredPos = Camera.main.WorldToScreenPoint(centerPositionTransform.position);
+            _dd_toolMode = t.Find("dd_toolMode").GetComponent<Dropdown>();
             _dd_options = t.Find("dd_option").GetComponent<Dropdown>();
-            _input = t.Find("input_dmg").GetComponent<InputField>();
-            _b_healthMode = t.Find("b_healthMode").GetComponent<Button>();
+            _inputBlock = t.Find("InputBlock").gameObject;
+            _b_inputSign = _inputBlock.transform.Find("b_sign")
+                .GetComponent<Button>();
+            _input = _inputBlock.transform.Find("input_amount")
+                .GetComponent<InputField>();
+            //_b_healthMode = t.Find("b_healthMode").GetComponent<Button>();
             _b_player = t.Find("b_player").GetComponent<Button>();
             _b_ok = t.Find("b_ok").GetComponent<Button>();
+            _t_toolHelp = t.Find("t_toolHelp").GetComponent<Text>();
 
             string[] ddTileOptions = { "B-Fire", "B-Water", "B-Earth", "B-Air", "B-Muscle" };
             _ddTileOptions = new List<string>(ddTileOptions);
@@ -81,8 +95,13 @@ public class DebugTools : MonoBehaviour {
 
             //_ddPropertyOptions = new List<string>();
 
+            // TODO foreach Enchantment in enum
             string[] ddEnchOptions = { "Burning", "Zombie" };
             _ddEnchantmentOptions = new List<string>(ddEnchOptions);
+
+            ToolModeChanged(0);
+            _playerId = 2;
+            TogglePlayer(); // just to get the right name
         }
 
         UpdateDebugGrid();
@@ -240,7 +259,8 @@ public class DebugTools : MonoBehaviour {
 
     public void SaveFiles() {
         MMLog.Log("ButtonCont", "black", "Saving files...");
-        Report.SaveFiles();
+        var input = systemMenu.transform.Find("input_saveName").GetComponent<InputField>();
+        Report.SaveFiles(input.text);
     }
 
     public void UpdateReport(string str) {
@@ -250,66 +270,92 @@ public class DebugTools : MonoBehaviour {
 
     #region ---------- TOOLS MENU ----------
 
-    public void ValueChanged(string func) {
-        if (func == _oldFunc)
-            return;
-        _oldFunc = func;
-        MMLog.Log_UICont("DEBUGTOOLS: ValueChanged=" + func);
+    public void ToolModeChanged(int choice) {
+        ToolMode mode = (ToolMode)_dd_toolMode.value;
 
-        switch (func) {
-            case "insert":
-                mode = ToolMode.Insert;
+        if (mode == _oldMode)
+            return;
+        _oldMode = mode;
+        MMLog.Log_UICont("DEBUGTOOLS: ValueChanged=" + mode.ToString());
+
+        switch (mode) {
+            case ToolMode.Insert:
+                currentMode = ToolMode.Insert;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Cell);
                 SetInputs(DropdownType.Tile, false, true);
+                SetMenuPosition(false);
+                _t_toolHelp.text = "Click on a cell on the board to insert this tile. If there is already a tile in that spot, it will be destroyed.";
                 break;
-            case "destroy":
-                mode = ToolMode.Destroy;
+            case ToolMode.Destroy:
+                currentMode = ToolMode.Destroy;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(DropdownType.None, false, false);
+                SetMenuPosition(false);
+                _t_toolHelp.text = "Click on a tile on the board to destroy it.";
                 break;
-            case "enchant":
-                mode = ToolMode.Enchant;
+            case ToolMode.Enchant:
+                currentMode = ToolMode.Enchant;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(DropdownType.Enchantment, false, true);
+                SetMenuPosition(false);
+                _t_toolHelp.text = "Click on a tile on the board to enchant it.";
                 break;
-            case "properties":
-                mode = ToolMode.Properties;
-                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
-                SetInputs(DropdownType.Property, false, false);
-                break;
-            case "clear":
-                mode = ToolMode.Clear;
+            //case "properties":
+            //    currentMode = ToolMode.Properties;
+            //    _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
+            //    SetInputs(DropdownType.Property, false, false);
+            //    break;
+            case ToolMode.Clear:
+                currentMode = ToolMode.Clear;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(DropdownType.None, false, false);
+                SetMenuPosition(false);
+                _t_toolHelp.text = "Click on a tile on the board to clear its enchantment (if any).";
                 break;
-            case "addToHand":
-                mode = ToolMode.AddToHand;
+            case ToolMode.AddToHand:
+                currentMode = ToolMode.AddToHand;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
                 SetInputs(DropdownType.Hex, false, true, "ADD");
+                SetMenuPosition(true);
+                _t_toolHelp.text = "";
                 break;
-            case "discard":
-                mode = ToolMode.Discard;
+            case ToolMode.Discard:
+                currentMode = ToolMode.Discard;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.Hex);
                 SetInputs(DropdownType.None, false, false);
+                SetMenuPosition(true);
+                _t_toolHelp.text = "Click on a hex in either player's hand to discard it.";
                 break;
-            case "changeHealth":
-                mode = ToolMode.ChangeHealth;
+            case ToolMode.ChangeHealth:
+                currentMode = ToolMode.ChangeHealth;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
                 SetInputs(DropdownType.None, true, true, "APPLY");
+                SetMenuPosition(false);
+                _t_toolHelp.text = "Specify a (relative) amount to change health. Click the sign button to switch between add and subtract.";
                 break;
-            case "changeMeter":
-                mode = ToolMode.ChangeMeter;
+            case ToolMode.ChangeMeter:
+                currentMode = ToolMode.ChangeMeter;
                 _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
                 SetInputs(DropdownType.None, true, true, "APPLY");
+                SetMenuPosition(false);
+                _t_toolHelp.text = "Specify a (relative) amount to change meter. Click the sign button to switch between add and subtract.";
+
+                break;
+            case ToolMode.ChangeAP:
+                currentMode = ToolMode.ChangeAP;
+                _mm.inputCont.SetDebugInputMode(InputController.InputContext.ObjType.None);
+                SetInputs(DropdownType.None, true, true, "APPLY");
+                SetMenuPosition(false);
+                _t_toolHelp.text = "Specify a (relative) amount to change AP. Click the sign button to switch between add and subtract.";
                 break;
         }
     }
 
     void SetInputs(DropdownType ddType, bool input, bool player, string buttonText = "") {
         if (ddType == DropdownType.None)
-            _dd_options.interactable = false;
+            _dd_options.gameObject.SetActive(false);
         else {
-            _dd_options.interactable = true;
+            _dd_options.gameObject.SetActive(true);
 
             switch (ddType) {
                 case DropdownType.Hex:
@@ -336,14 +382,15 @@ public class DebugTools : MonoBehaviour {
             }
         }
 
-        _input.interactable = input;
+        _inputBlock.SetActive(input);
+        //_input.interactable = input;
         //_b_healthMode.interactable = input;
-        _b_player.interactable = player;
+        _b_player.gameObject.SetActive(player);
 
         if (buttonText == "")
-            _b_ok.interactable = false;
+            _b_ok.gameObject.SetActive(false);
         else {
-            _b_ok.interactable = true;
+            _b_ok.gameObject.SetActive(true);
             _b_ok.transform.GetChild(0).GetComponent<Text>().text = buttonText;
         }
     }
@@ -358,31 +405,50 @@ public class DebugTools : MonoBehaviour {
     }
 
     public void TogglePlayer() {
-        if (_playerId == 1)
-            _playerId = 2;
-        else
-            _playerId = 1;
+        _playerId = _playerId == 1 ? 2 : 1;
 
-        _b_player.transform.GetChild(0).GetComponent<Text>().text = "P" + _playerId;
+        var p = _mm.GetPlayer(_playerId);
+        var str = string.Format("P{0} - {1} ({2})", _playerId, p.Name, p.Character.ch.ToString());
+        _b_player.transform.GetChild(0).GetComponent<Text>().text = str;
     }
 
     int GetPlayerId() {
+        // TODO just substitute usages?
         return _playerId;
     }
 
-    public void ToggleDmgMode() {
-        _relativeDmgMode = !_relativeDmgMode;
-        if(_relativeDmgMode)
-            _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "rel";
+    int GetInputAmount() {
+        int amt = int.Parse(_input.text);
+        amt *= _positiveInputSign ? 1 : -1;
+        return amt;
+    }
+
+    public void ToggleInputSign() {
+        _positiveInputSign = !_positiveInputSign;
+        if (_positiveInputSign)
+            _b_inputSign.transform.GetChild(0).GetComponent<Text>().text = "+";
         else
-            _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "abs";
+            _b_inputSign.transform.GetChild(0).GetComponent<Text>().text = "-";
+    }
+
+    public void ToggleDmgMode() {
+        //_relativeDmgMode = !_relativeDmgMode;
+        //if(_relativeDmgMode)
+        //    _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "rel";
+        //else
+        //    _b_healthMode.transform.GetChild(0).GetComponent<Text>().text = "abs";
+    }
+
+    void SetMenuPosition(bool centered) {
+        toolsMenu.transform.position = 
+            centered ? _debugMenuCenteredPos : _debugMenuOrigPos;
     }
 
     public void HandleInput(MonoBehaviour obj) {
         if (_submenu != Submenu.Tools)
             return;
 
-        switch (mode) {
+        switch (currentMode) {
             case ToolMode.Insert:
                 InsertMode_OnClick((CellBehav)obj);
                 break;
@@ -392,9 +458,9 @@ public class DebugTools : MonoBehaviour {
             case ToolMode.Enchant:
                 EnchantMode_OnClick((TileBehav)obj);
                 break;
-            case ToolMode.Properties:
-                ApplyPropertiesMode_OnClick((TileBehav)obj);
-                break;
+            //case ToolMode.Properties:
+            //    ApplyPropertiesMode_OnClick((TileBehav)obj);
+            //    break;
             case ToolMode.Clear:
                 ClearMode_OnClick((TileBehav)obj);
                 break;
@@ -405,7 +471,7 @@ public class DebugTools : MonoBehaviour {
     }
 
     public void HandleButtonClick() {
-        switch (mode) {
+        switch (currentMode) {
             case ToolMode.AddToHand:
                 AddToHandMode_OnClick();
                 break;
@@ -414,6 +480,9 @@ public class DebugTools : MonoBehaviour {
                 break;
             case ToolMode.ChangeMeter:
                 ChangeMeterMode_OnClick();
+                break;
+            case ToolMode.ChangeAP:
+                ChangeAPMode_OnClick();
                 break;
         }
     }
@@ -499,9 +568,18 @@ public class DebugTools : MonoBehaviour {
     }
 
     public void Discard(string hextag) {
-        int id = Hex.TagPlayer(hextag);
-        Hex hex = _mm.GetPlayer(id).Hand.GetHex(hextag);
-        DiscardMode_OnClick(hex);
+        //int id = Hex.TagPlayer(hextag); // not safe for bounces
+        Hex hex = null;
+        for (int id = 1; id <= 2; id++) {
+            if (_mm.GetPlayer(id).Hand.IsHexMine(hextag)) {
+                hex = _mm.GetPlayer(id).Hand.GetHex(hextag);
+                break;
+            }
+        }
+        if (hex != null)
+            DiscardMode_OnClick(hex);
+        else
+            Debug.LogWarning("DebugTools: could not find " + hextag + " in either player's hand...");
     }
     void DiscardMode_OnClick(Hex hex) {
         if (_mm.GetPlayer(1).Hand.IsHexMine(hex)) {
@@ -517,7 +595,7 @@ public class DebugTools : MonoBehaviour {
     }
 
     void ChangeHealthMode_OnClick() {
-        int amt = int.Parse(_input.text);
+        int amt = GetInputAmount();
         int pid = GetPlayerId();
         ChangeHealth(pid, amt);
     }
@@ -532,7 +610,7 @@ public class DebugTools : MonoBehaviour {
     }
 
     void ChangeMeterMode_OnClick() {
-        int amt = int.Parse(_input.text) * 10; // so you can just type in percentage
+        int amt = GetInputAmount() * 10; // so you can just type in percentage
         int pid = GetPlayerId();
         ChangeMeter(pid, amt);
     }
@@ -540,6 +618,19 @@ public class DebugTools : MonoBehaviour {
         _mm.GetPlayer(id).Character.ChangeMeter(amt);
 
         Report.ReportLine("$ DEBUG METER p" + id + " " + amt, false);
+    }
+
+
+    void ChangeAPMode_OnClick() {
+        int amt = GetInputAmount();
+        int pid = GetPlayerId();
+        ChangeAP(pid, amt);
+    }
+    public void ChangeAP(int id, int amt) {
+        // this will actually work whether it's positive or negative right now...
+        _mm.GetPlayer(id).IncreaseAP(amt); 
+
+        Report.ReportLine("$ DEBUG AP p" + id + " " + amt, false);
     }
     #endregion
 }

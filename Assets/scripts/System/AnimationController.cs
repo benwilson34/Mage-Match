@@ -8,7 +8,7 @@ public class AnimationController : MonoBehaviour {
 
     public AnimationCurve someCustomEase;
 
-    private static MageMatch _mm;
+    protected static MageMatch _mm;
     private static GameObject _fireballPF;
     private static int _animating;
 
@@ -24,7 +24,7 @@ public class AnimationController : MonoBehaviour {
 
     public static bool IsAnimating { get { return _animating > 0; } }
 
-    static IEnumerator Animate(Tween tween) {
+    protected static IEnumerator Animate(Tween tween) {
         bool animate = true;
         if(_mm.IsReplayMode)
             animate = _mm.debugSettings.animateReplay;
@@ -188,36 +188,7 @@ public class AnimationController : MonoBehaviour {
     private static Vector3 _zomb_origPos;
 
     public static IEnumerator _Zombify(TileBehav tb) {
-        //// TODO spawn from Pinfo
-        //Transform spawn = GameObject.Find("tileSpawn").transform;
-        //GameObject z = Instantiate(_zombifyPF, spawn);
-
-        //Tween tween = z.transform.DOMove(tb.transform.position, .6f);
-        //tween.SetEase(Ease.InQuad);
-        //yield return Animate(tween);
-
-        //tween = z.GetComponent<SpriteRenderer>().DOColor(new Color(0, 1, 0, 0), .05f);
-        //yield return Animate(tween);
-        //Destroy(z);
-        //MMLog.Log_AnimCont("Done animating Zombify.");
-
-
-
-        Sequence shakeSeq = DOTween.Sequence();
-        const float shakeDur = .02f;
-        const float shakeDist = .1f;
-        const int loops = 5;
-        //const float speedRampDur = 1f;
-        float origX = tb.transform.position.x;
-        //Tween timeTween = DOTween.To(() => shakeSeq.timeScale, (x) => shakeSeq.timeScale = x,
-        //    2, speedRampDur);
-        shakeSeq.Append(tb.transform.DOMoveX(origX + shakeDist, shakeDur).SetEase(Ease.Linear));
-        //shakeSeq.Join(timeTween);
-        shakeSeq.Append(tb.transform.DOMoveX(origX - shakeDist, shakeDur * 2).SetEase(Ease.Linear));
-        shakeSeq.Append(tb.transform.DOMoveX(origX, shakeDur).SetEase(Ease.Linear));
-        shakeSeq.SetLoops(loops);
-
-        yield return Animate(shakeSeq);
+        yield return Animate(ShakeTransform(tb.transform));
     }
 
     public static IEnumerator _Zombify_Attack(Transform zomb, Transform target) {
@@ -245,135 +216,30 @@ public class AnimationController : MonoBehaviour {
     }
 
 
+    // ----- GENERAL CONTROLS -----
 
-    // ---------- MAGIC AL ----------
-
-    public static IEnumerator _MagicAl_Jab(int id, TileBehav tb) {
-        const float fistStartDistance = 10f;
-        var fistStartPos = tb.transform.position;
-        var playerOnRight = _mm.uiCont.IDtoSide(id) == UIController.ScreenSide.Right;
-        if (playerOnRight)
-            fistStartPos.x += fistStartDistance;
-        else
-            fistStartPos.x -= fistStartDistance;
-
-        // fist object to send across the screen
-        var fist = (GameObject)Resources.Load("prefabs/anim/fist");
-        fist = Instantiate(fist, fistStartPos, Quaternion.identity);
-
-        if (playerOnRight) // flip sprite if needed
-            fist.transform.localScale = new Vector3(-1, 1);
-
-        const float fistDur = .3f;
-        yield return fist.transform.DOMoveX(tb.transform.position.x, fistDur).SetEase(Ease.InQuad).WaitForCompletion();
-
-
-        fist.GetComponent<SpriteRenderer>().DOFade(0, .3f); // fade out fist
-
-        var parts = (GameObject)Resources.Load("prefabs/particles/Pow");
-        parts = Instantiate(parts, tb.transform.position, Quaternion.identity);
-        parts.transform.localScale = new Vector3(.6f, .6f, .6f); // 60% size
-
-        ScreenShake(.2f, 2).Play();
-    }
-
-    public static IEnumerator _MagicAl_Cross(int id, Hex hex) {
-        Vector2 fistStartDistance = new Vector2(-10f, 4f); // difference
-        var fistStartPos = hex.transform.position;
-        fistStartPos.y += fistStartDistance.y;
-        var playerOnRight = _mm.uiCont.IDtoSide(id) == UIController.ScreenSide.Right;
-        if (playerOnRight)
-            fistStartPos.x -= fistStartDistance.x;
-        else
-            fistStartPos.x += fistStartDistance.x;
-
-        // fist object to send across the screen
-        var fist = (GameObject)Resources.Load("prefabs/anim/fist");
-        fist = Instantiate(fist, fistStartPos, Quaternion.identity);
-        RotateToFace(fist.transform, hex.transform.position);
-
-        if (playerOnRight) // flip sprite if needed
-            fist.transform.localScale = new Vector3(-1, 1);
-
-        const float fistDur = .3f;
-        yield return fist.transform.DOMove(hex.transform.position, fistDur).SetEase(Ease.InQuad).WaitForCompletion();
-
-
-        fist.GetComponent<SpriteRenderer>().DOFade(0, .3f); // fade out fist
-
-        var parts = (GameObject)Resources.Load("prefabs/particles/Pow");
-        parts = Instantiate(parts, hex.transform.position, Quaternion.identity);
-        parts.transform.localScale = new Vector3(.6f, .6f, .6f); // 60% size
-
-        ScreenShake(.2f, 2).Play();
-    }
-
-    public static IEnumerator _MagicAl_Hook(int id, TileBehav tb, int c2, int r2) {
-        var start = tb.transform.position;
-        var end = HexGrid.GridCoordToPos(c2, r2);
-        start += (start - end) * 6; // add some distance before the hit
-
-        //var playerOnRight = _mm.uiCont.IDtoSide(id) == UIController.ScreenSide.Right;
-        //if (playerOnRight)
-        //    fistStartPos.x -= fistStartDistance.x;
-        //else
-        //    fistStartPos.x += fistStartDistance.x;
-
-        // fist object to send across the screen
-        var fist = (GameObject)Resources.Load("prefabs/anim/fist");
-        fist = Instantiate(fist, start, Quaternion.identity);
-        RotateToFace(fist.transform, end);
-
-        //if (playerOnRight) // flip sprite if needed
-        //    fist.transform.localScale = new Vector3(-1, 1);
-
-        const float fistDur = .3f;
-        yield return fist.transform.DOMove(tb.transform.position, fistDur).SetEase(Ease.InQuad).WaitForCompletion();
-
-
-        fist.GetComponent<SpriteRenderer>().DOFade(0, .3f); // fade out fist
-
-        var parts = (GameObject)Resources.Load("prefabs/particles/Pow");
-        parts = Instantiate(parts, tb.transform.position, Quaternion.identity);
-        parts.transform.localScale = new Vector3(.6f, .6f, .6f); // 60% size
-
-        ScreenShake(.2f, 2).Play();
-    }
-
-    public static IEnumerator _MagicAl_StingerStance(int id) {
-        // fist object to send across the screen
-        var fist = (GameObject)Resources.Load("prefabs/anim/fist");
-        fist = Instantiate(fist);
-
-        var pinfoPos = _mm.uiCont.GetPinfo(id).position;
-        pinfoPos.z = 0;
-        fist.transform.position = pinfoPos;
-        var oppPortrait = _mm.uiCont.GetPortrait(_mm.OpponentId(id)).position;
-        oppPortrait = Camera.main.ScreenToWorldPoint(oppPortrait);
-        oppPortrait.z = 0;
-
-        //var testPosition = HexGrid.GetCellBehavAt(3, 6).transform.position;
-        //RotateToFace(fist.transform, testPosition);
-        //yield return fist.transform.DOMove(testPosition, .5f).SetEase(Ease.InQuad).WaitForCompletion();
-        RotateToFace(fist.transform, oppPortrait);
-        yield return fist.transform.DOMove(oppPortrait, .5f).SetEase(Ease.InQuad).WaitForCompletion();
-
-        fist.GetComponent<SpriteRenderer>().DOFade(0, .5f); // fade out fist
-        // burst of particles on hit
-        var parts = (GameObject)Resources.Load("prefabs/particles/Magic Al Burst");
-        parts = Instantiate(parts, oppPortrait, Quaternion.identity);
-
-        parts = (GameObject)Resources.Load("prefabs/particles/Pow");
-        parts = Instantiate(parts, oppPortrait, Quaternion.identity);
-
-        yield return ScreenShake().WaitForCompletion();
-    }
-
-    static void RotateToFace(Transform t, Vector3 point) {
+    protected static void RotateToFace(Transform t, Vector3 point) {
         t.right = point - t.position;
     }
 
-    static Tween ScreenShake(float distance = .5f, int loops = 3) {
+    protected static Tween ShakeTransform(Transform t) {
+        Sequence shakeSeq = DOTween.Sequence();
+        const float shakeDur = .02f;
+        const float shakeDist = .1f;
+        const int loops = 5;
+        //const float speedRampDur = 1f;
+        float origX = t.position.x;
+        //Tween timeTween = DOTween.To(() => shakeSeq.timeScale, (x) => shakeSeq.timeScale = x,
+        //    2, speedRampDur);
+        shakeSeq.Append(t.DOMoveX(origX + shakeDist, shakeDur).SetEase(Ease.Linear));
+        //shakeSeq.Join(timeTween);
+        shakeSeq.Append(t.DOMoveX(origX - shakeDist, shakeDur * 2).SetEase(Ease.Linear));
+        shakeSeq.Append(t.DOMoveX(origX, shakeDur).SetEase(Ease.Linear));
+        shakeSeq.SetLoops(loops);
+        return shakeSeq;
+    }
+
+    protected static Tween ScreenShake(float distance = .5f, int loops = 3) {
         var seq = DOTween.Sequence();
         var origPos = Camera.main.transform.position;
         const float shakeDur = .03f;

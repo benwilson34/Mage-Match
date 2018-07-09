@@ -46,8 +46,12 @@ public class Hand {
     //public Vector3 GetHandPos() { return _handPos.position; }
 
     public bool IsHexMine(Hex hex) {
+        return IsHexMine(hex.hextag);
+    }
+
+    public bool IsHexMine(string hextag) {
         foreach (Hex handHex in _hexes) {
-            if (hex.hextag == handHex.hextag)
+            if (hextag == handHex.hextag)
                 return true;
         }
         return false;

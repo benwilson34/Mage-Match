@@ -142,8 +142,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playFromFile: 1
   fastForward: 1
-  replayFile: C:/Users/Ben/AppData/LocalLow/Soup Skull/Mage Match/Replays\2018-7-2_22-37-40/MageMatch_2018-7-2_22-37-40_Report.txt
-  replayChoice: 4
+  replayFile: C:/Users/Ben/AppData/LocalLow/Soup Skull/Mage Match/Replays\2018-7-8_1530-20_MagicAlSpells/2018-7-8_1530-20_Report.txt
+  replayChoice: 0
   testCharacter: 4
   trainingMode: 1
   secondTestCharacter: 1

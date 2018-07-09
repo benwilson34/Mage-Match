@@ -189,6 +189,11 @@ public static class ReplayEngine {
                 amt = int.Parse(tokens[4]);
                 _mm.debugTools.ChangeMeter(id, amt);
                 break;
+            case "AP":
+                id = ParseTokenInt(tokens[3]);
+                amt = int.Parse(tokens[4]);
+                _mm.debugTools.ChangeAP(id, amt);
+                break;
         }
     }
 

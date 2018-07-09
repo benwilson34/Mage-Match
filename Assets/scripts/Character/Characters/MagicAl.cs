@@ -79,7 +79,7 @@ public class MagicAl : Character {
         yield return Targeting.WaitForTileTarget(returnCount);
         var tbs = Targeting.GetTargetTBs();
         foreach (var tb in tbs) {
-            yield return AnimationController._MagicAl_Jab(_playerId, tb);
+            yield return MagicAlAnim._Jab(_playerId, tb);
             yield return CommonEffects.BounceToHand(tb, Opponent);
         }
 
@@ -114,7 +114,7 @@ public class MagicAl : Character {
             yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, Opponent.Hand.Count));
             int rand = _mm.syncManager.GetRand();
             Hex hex = Opponent.Hand.GetHexAt(rand);
-            yield return AnimationController._MagicAl_Cross(_playerId, hex);
+            yield return MagicAlAnim._Cross(_playerId, hex);
             yield return Opponent.Hand._Discard(hex);
         }
 
@@ -154,7 +154,7 @@ public class MagicAl : Character {
                 var tb1 = Prompt.GetSwapTBs()[0];
                 var coords = Prompt.GetSwapCoords();
                 Debug.LogWarning("Swapping "+coords[0]+coords[1]+coords[2]+coords[3]);
-                yield return AnimationController._MagicAl_Hook(_playerId, tb1, coords[2], coords[3]);
+                yield return MagicAlAnim._Hook(_playerId, tb1, coords[2], coords[3]);
                 yield return Prompt.ContinueSwap();
             }
         }
@@ -196,7 +196,7 @@ public class MagicAl : Character {
         yield return null;
     }
     IEnumerator Stinger_OnTurnEnd(int id) {
-        yield return AnimationController._MagicAl_StingerStance(_playerId);
+        yield return MagicAlAnim._StingerStance(_playerId);
         int dmg = 40;
         const int damagePerHex = 15;
         dmg += Opponent.Hand.Count * damagePerHex;
@@ -243,7 +243,8 @@ public class MagicAl : Character {
         var cb = cbs[0];
         var tbs = HexGrid.GetTilesInCol(cb.col);
 
-        yield return CommonEffects.ShootIntoAirAndRearrange(tbs);
+        //yield return CommonEffects.ShootIntoAirAndRearrange(tbs);
+        yield return MagicAlAnim._SkyUppercut(cb.col, CommonEffects.ShootIntoAirAndRearrange(tbs));
 
         const int dmg = 110;
         DealDamage(dmg);

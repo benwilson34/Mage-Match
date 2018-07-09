@@ -210,16 +210,21 @@ public static class Report {
     public static string GetReportText() { return _report.ToString(); }
 
 
-    public static void SaveFiles() {
+    public static void SaveFiles(string customName = "") {
         DateTime dt = DateTime.Now;
         string timestamp = dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
-        timestamp += dt.Hour + "-" + dt.Minute + "-" + dt.Second;
+        timestamp += dt.Hour + "" + dt.Minute + "-" + dt.Second;
 
         string dirPath = Application.persistentDataPath + "/Replays";
         if (!Directory.Exists(dirPath))
             Directory.CreateDirectory(dirPath);
+
+        dirPath = dirPath + "/" + timestamp;
+        if (customName.Length > 0)
+            dirPath += "_" + customName;
+
         MMLog.Log("Stats", "black", "dataPath is " + dirPath + "...");
-        dirPath = Directory.CreateDirectory(dirPath + "/" + timestamp).FullName;
+        dirPath = Directory.CreateDirectory(dirPath).FullName;
         MMLog.Log("Stats", "black", "saving files to " + dirPath + "...");
 
         SaveReportTXT(dirPath, timestamp);
@@ -228,7 +233,7 @@ public static class Report {
     }
 
     static void SaveReportTXT(string path, string timestamp) {
-        string filename = "MageMatch_" + timestamp + "_Report";
+        string filename = timestamp + "_Report";
         filename = @"/" + filename + ".txt";
 
         File.WriteAllText(path + filename, "  # " + timestamp + "\n" + GetReportText());
@@ -236,7 +241,7 @@ public static class Report {
 
     public static void SaveStatsCSV(string path, string timestamp) {
         DateTime dt = DateTime.Now;
-        string filename = "MageMatch_" + timestamp + "_Stats";
+        string filename = timestamp + "_Stats";
         filename = @"/" + filename + ".csv";
 
         StringBuilder sb = new StringBuilder();
