@@ -224,7 +224,7 @@ public class MagicAl : Character {
         yield return Prompt.ContinueSwap();
         yield return CommonEffects.BounceToHand(bounceTB, Opponent);
 
-        HealthModEffect he = new HealthModEffect(_playerId, "Flutterfly", Flutterfly_Buff, HealthModEffect.Type.DealingPercent) { turnsLeft = 3, countLeft = 1 };
+        HealthModEffect he = new HealthModEffect(_playerId, "Flutterfly", Flutterfly_Buff, HealthModEffect.Type.DealingPercent) { turnsLeft = 1, countLeft = 1 };
         EffectManager.AddHealthMod(he);
 
         SetSpellCast(MagicAlSpell.Flutterfly);

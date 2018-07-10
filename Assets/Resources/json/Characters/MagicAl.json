@@ -23,7 +23,7 @@
     "title": "Flutterfly",
     "prereq": "MW",
     "keywords": ["Swap Prompt"],
-    "desc": "Swap one tile into an adjacent tile, forcing the adjacent tile into your opponent’s hand. You gain a stacking buff that increases your next source of damage by 8%. Buff lasts 3 turns. Change your match spell to Cross."
+    "desc": "Swap one tile into an adjacent tile, forcing the adjacent tile into your opponent’s hand. You gain a stacking buff that increases your next source of damage by 8%. Buff lasts 1 turn. Change your match spell to Cross."
   },
   "spell3": {
     "title": "Sky Uppercut",
