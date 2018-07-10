@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{a2a205a6-cd94-4515-a814-d58113dad5bc}">
         <property name="name">
-            <value>Cross</value>
+            <value>Cross_Cast</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

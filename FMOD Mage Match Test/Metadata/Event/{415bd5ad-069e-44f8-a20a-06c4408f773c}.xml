@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{415bd5ad-069e-44f8-a20a-06c4408f773c}">
         <property name="name">
-            <value>StormForceFootwork</value>
+            <value>StormForceFootwork_Cast</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

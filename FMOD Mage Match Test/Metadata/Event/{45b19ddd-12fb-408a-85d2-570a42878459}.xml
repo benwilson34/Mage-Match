@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{45b19ddd-12fb-408a-85d2-570a42878459}">
         <property name="name">
-            <value>StingerStance</value>
+            <value>StingerStance_Target</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

@@ -94,10 +94,13 @@ public class Newsfeed : MonoBehaviour {
 
     public void ToggleMenu() {
         bool menuOpen = !newsfeedMenu.GetActive();
-        if (menuOpen)
+        if (menuOpen) {
+            AudioController.Trigger(SFX.UI.MenuOpen);
             _mm.EnterState(MageMatch.State.NewsfeedMenu);
-        else
+        } else {
+            AudioController.Trigger(SFX.UI.MenuClose);
             _mm.ExitState();
+        }
 
         newsfeedMenu.SetActive(menuOpen);
     }

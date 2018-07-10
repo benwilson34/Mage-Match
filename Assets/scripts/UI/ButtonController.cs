@@ -122,7 +122,7 @@ public class ButtonController : MonoBehaviour {
         MMLog.Log("ButtonCont","black","Button " + spellNum + " clicked...");
         if (_onClick != null) {
             _onClick();
-            AudioController.Trigger(SFX.Other.UIButton);
+            AudioController.Trigger(SFX.UI.UIButton);
         } else
             MMLog.LogError("BUTTONCONT: Button was clicked and onClick is somehow null!");
     }

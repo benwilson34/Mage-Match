@@ -39,6 +39,7 @@ public static class CommonEffects {
     }
 
     public static IEnumerator BounceToHand(TileBehav tb, Player p) {
+        AudioController.Trigger(SFX.Hex.BounceToHand);
         HexGrid.ClearTileBehavAt(tb.tile.col, tb.tile.row);
         tb.ClearEnchantment();
         tb.ClearTileEffect();

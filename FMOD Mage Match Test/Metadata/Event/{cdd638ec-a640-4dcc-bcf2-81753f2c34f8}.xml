@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{cdd638ec-a640-4dcc-bcf2-81753f2c34f8}">
         <property name="name">
-            <value>Hook</value>
+            <value>Hook_Cast</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

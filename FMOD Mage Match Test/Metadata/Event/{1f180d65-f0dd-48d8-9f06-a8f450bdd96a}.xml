@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{1f180d65-f0dd-48d8-9f06-a8f450bdd96a}">
         <property name="name">
-            <value>Flutterfly</value>
+            <value>Flutterfly_Cast</value>
         </property>
         <property name="outputFormat">
             <value>1</value>

@@ -56,7 +56,7 @@ public class MagicAl : Character {
 
     // Jab
     protected override IEnumerator MatchSpell(TileSeq seq) {
-        AudioController.Trigger(SFX.MagicAl.Jab);
+        AudioController.Trigger(SFX.MagicAl.Jab_Cast);
 
         int dmg = 0, returnCount = 0;
         switch (seq.GetSeqLength()) {
@@ -79,6 +79,7 @@ public class MagicAl : Character {
         yield return Targeting.WaitForTileTarget(returnCount);
         var tbs = Targeting.GetTargetTBs();
         foreach (var tb in tbs) {
+            AudioController.Trigger(SFX.MagicAl.Jab_Target);
             yield return MagicAlAnim._Jab(_playerId, tb);
             yield return CommonEffects.BounceToHand(tb, Opponent);
         }
@@ -91,7 +92,7 @@ public class MagicAl : Character {
 
     // alt core spell - Cross
     public IEnumerator Cross(TileSeq seq) {
-        AudioController.Trigger(SFX.MagicAl.Cross);
+        AudioController.Trigger(SFX.MagicAl.Cross_Cast);
 
         int dmg = 0, discardCount = 0;
         switch (seq.GetSeqLength()) {
@@ -114,6 +115,8 @@ public class MagicAl : Character {
             yield return _mm.syncManager.SyncRand(_playerId, Random.Range(0, Opponent.Hand.Count));
             int rand = _mm.syncManager.GetRand();
             Hex hex = Opponent.Hand.GetHexAt(rand);
+
+            AudioController.Trigger(SFX.MagicAl.Cross_Discard);
             yield return MagicAlAnim._Cross(_playerId, hex);
             yield return Opponent.Hand._Discard(hex);
         }
@@ -126,7 +129,7 @@ public class MagicAl : Character {
 
     // alt core spell - Hook
     public IEnumerator Hook(TileSeq seq) {
-        AudioController.Trigger(SFX.MagicAl.Hook);
+        AudioController.Trigger(SFX.MagicAl.Hook_Cast);
 
         int dmg = 0, swapCount = 0;
         switch (seq.GetSeqLength()) {
@@ -151,6 +154,7 @@ public class MagicAl : Character {
         for (int i = 0; i < swapCount; i++) {
             yield return Prompt.WaitForSwap(seq);
             if (Prompt.WasSuccessful) {
+                AudioController.Trigger(SFX.MagicAl.Hook_Swap);
                 var tb1 = Prompt.GetSwapTBs()[0];
                 var coords = Prompt.GetSwapCoords();
                 Debug.LogWarning("Swapping "+coords[0]+coords[1]+coords[2]+coords[3]);
@@ -185,7 +189,7 @@ public class MagicAl : Character {
 
     // Stinger Stance
     protected override IEnumerator Spell1(TileSeq prereq) {
-        AudioController.Trigger(SFX.MagicAl.StingerStance);
+        AudioController.Trigger(SFX.MagicAl.StingerStance_Cast);
 
         TurnEffect effect = new TurnEndEffect(_playerId, "StingerStance", Effect.Behav.Damage, Stinger_OnTurnEnd) { turnsLeft = 1 };
         EffectManager.AddEventEffect(effect);
@@ -196,6 +200,8 @@ public class MagicAl : Character {
         yield return null;
     }
     IEnumerator Stinger_OnTurnEnd(int id) {
+        AudioController.Trigger(SFX.MagicAl.StingerStance_Target);
+
         yield return MagicAlAnim._StingerStance(_playerId);
         int dmg = 40;
         const int damagePerHex = 15;
@@ -206,7 +212,7 @@ public class MagicAl : Character {
 
     // Flutterfly
     protected override IEnumerator Spell2(TileSeq prereq) {
-        AudioController.Trigger(SFX.MagicAl.Flutterfly);
+        AudioController.Trigger(SFX.MagicAl.Flutterfly_Cast);
 
         const int swapCount = 1;
         Prompt.SetSwapCount(swapCount);
@@ -227,6 +233,7 @@ public class MagicAl : Character {
         yield return null;
     }
     float Flutterfly_Buff(Player p, int dmg) {
+        AudioController.Trigger(SFX.MagicAl.Flutterfly_Buff);
         const float morePercent = .08f;
         return 1 + morePercent; // +8% dmg
     }
@@ -257,7 +264,7 @@ public class MagicAl : Character {
 
     // Storm Force Footwork
     protected override IEnumerator SignatureSpell(TileSeq prereq) {
-        AudioController.Trigger(SFX.MagicAl.StormForceFootwork);
+        AudioController.Trigger(SFX.MagicAl.StormForceFootwork_Cast);
 
         const int turnCount = 5;
 
@@ -293,6 +300,9 @@ public class MagicAl : Character {
 
         const int massiveEffectAmt = 6, massiveDmg = 280;
         if (_sig_spellsCastThisTurn == massiveEffectAmt) {
+            // TODO MagicAlAnim
+            AudioController.Trigger(SFX.MagicAl.StormForceFootwork_MassivePunch);
+
             EffectManager.RemoveEventEffect(_sig_turnEffectTag); // safe?
             EffectManager.RemoveHealthMod(_sig_healthEffectTag); // safe?
 

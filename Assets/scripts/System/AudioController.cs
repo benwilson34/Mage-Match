@@ -4,13 +4,14 @@ using MMDebug;
 using System;
 
 public static class SFX {
-    public enum Hex { Draw, Pickup, Discard, GravClick, Swap, Destroy, Invoke };
-    public enum Other { BackgroundMusic, GameStart, GameEnd, APGain, LowHealthWarning, FullMeter, TurnTimerWarning, TurnTimeout, UIButton, ChooseTarget, Quickdraw_Prompt, Quickdraw_Drop, CrowdGasp };
+    public enum Hex { Draw, Pickup, Discard, BounceToHand, GravClick, Swap, Destroy, Invoke };
+    public enum Other { BackgroundMusic, GameStart, GameEnd, APGain, LowHealthWarning, FullMeter, TurnTimerWarning, TurnTimeout, ChooseTarget, Quickdraw_Prompt, Quickdraw_Drop, CrowdGasp };
+    public enum UI { UIButton, MenuOpen, MenuClose, BoardTap };
 
     public enum Enfuego { Burning_Enchant, Burning_Damage, Burning_Timeout, FieryFandango, Baila, Incinerate, Sig_WHCK };
     public enum Gravekeeper { Zombie_Enchant, Zombie_Attack, Zombie_Gulp, PartyInTheBack, OogieBoogie, PartyCrashers, UndeadUnion, Sig_Motorcycle, Sig_Bell1, Sig_TSDrop, Sig_TSEffect, Sig_Bell2 };
     public enum Valeria { SwirlingWater, Healing, Mariposa, RainDance, Bubbles1, Bubbles2, Balanco, Sig_Cut, Sig_WaveCrash, ThunderFar, ThunderClose, Rain };
-    public enum MagicAl { Jab, Hook, Cross, StingerStance, Flutterfly, SkyUppercut, StormForceFootwork };
+    public enum MagicAl { Jab_Cast, Jab_Target, Cross_Cast, Cross_Discard, Hook_Cast, Hook_Swap,  StingerStance_Cast, StingerStance_Target, Flutterfly_Cast, Flutterfly_Buff, SkyUppercut, StormForceFootwork_Cast, StormForceFootwork_MassivePunch };
 
     public enum Rune_Neutral { SampleCharm, Redesign, Molotov, Leeches, Bolster, LegWeights, RollingBone, Stardust, Sanctuary, EvilDoll, Lifestealer, LivingMana, FutureSight, Soulbind, FiveAlarmBell };
     public enum Rune_Enfuego { RoaringFlame, GleamingGolpe, ScorchingSpin, CausticCastanet };
@@ -81,6 +82,8 @@ public static class AudioController {
         // ----- other -----
         foreach (SFX.Other sfx in Enum.GetValues(typeof(SFX.Other)))
             LoadClip(sfx, "Other");
+        foreach (SFX.UI sfx in Enum.GetValues(typeof(SFX.UI)))
+            LoadClip(sfx, "UI");
 
 
         Trigger(SFX.Other.BackgroundMusic);
