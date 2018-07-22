@@ -58,11 +58,13 @@ public class Hand {
     }
 
     public void Add(Hex hex) {
+        // TODO add HandChange Event
+
         if (_mm.gameMode != MageMatch.GameMode.TrainingTwoChars && !_mm.IsMe(_p.ID))
             hex.Flip();
 
         hex.transform.SetParent(_handPos); // , false)?
-        hex.currentState = Hex.State.Hand;
+        hex.state = Hex.State.Hand;
         _hexes.Add(hex);
 
         int i;
@@ -123,7 +125,8 @@ public class Hand {
             hex.Flip(flipped);
     }
 
-    #region ----- Discard -----
+
+    #region ---------- DISCARD ----------
     public void Discard(Hex hex) {
         _mm.StartCoroutine(_Discard(hex));
     }
@@ -153,6 +156,7 @@ public class Hand {
         }
     }
     #endregion
+
 
     public List<string> Debug_GetAllTags() {
         List<string> tags = new List<string>();

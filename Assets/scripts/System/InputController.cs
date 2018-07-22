@@ -374,7 +374,7 @@ public class InputController : MonoBehaviour {
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
             Hex h = (Hex)obj;
-            if (h.currentState == Hex.State.Hand)
+            if (h.state == Hex.State.Hand)
                 return InputStatus.Unhandled;
 
             TileBehav tb = (TileBehav)obj;
@@ -442,7 +442,7 @@ public class InputController : MonoBehaviour {
 
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
             Hex h = (Hex)obj;
-            if (h.currentState == Hex.State.Hand)
+            if (h.state == Hex.State.Hand)
                 return InputStatus.Unhandled;
 
             TileBehav tb = (TileBehav)obj;
@@ -450,6 +450,59 @@ public class InputController : MonoBehaviour {
             return InputStatus.FullyHandled;
         }
     }
+
+
+    //private class ModalContext : InputContext {
+    //    public ModalContext(MageMatch mm, InputController input) : base(mm, input, ObjType.Hex) { }
+
+    //    public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
+    //        // TODO look at mode from _mm.uiCont.modal.mode
+
+    //        Hex hex = (Hex)obj;
+    //        //MMLog.Log_InputCont("MyTurn mouse down, hex state="+hex.currentState);
+    //        if (hex.state == Hex.State.Placed) {
+    //            _input._dragging = true;
+    //            _input._dragHexPos = Camera.main.WorldToScreenPoint(hex.transform.position);
+    //            return InputStatus.PartiallyHandled;
+    //        }
+    //        return InputStatus.Unhandled;
+    //    }
+
+
+    //    public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
+    //        MMLog.Log_InputCont("MyTurn mouse up");
+
+    //        Hex hex = (Hex)obj;
+    //        if (hex.state == Hex.State.Hand) {
+    //            if (_input._holdingHex) {
+    //                _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
+    //                Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    //                RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
+    //                CellBehav cb = _input.GetMouseCell(hits); // get cell underneath
+
+    //                if ((!_mm.IsPerformingAction() || _input.PromptedDrop()) && cb != null) {
+    //                    if (!_input.DropCheck(hex, cb.col))
+    //                        return InputStatus.Unhandled;
+
+    //                    if (Hex.IsCharm(_input._heldHex.hextag)) {
+    //                        if (_input.PromptedDrop())
+    //                            Prompt.SetDrop(_input._heldHex);
+    //                        else
+    //                            _mm.PlayerDropCharm((Charm)_input._heldHex);
+    //                        return InputStatus.PartiallyHandled;
+    //                    } else {
+    //                        if (_input.PromptedDrop())
+    //                            Prompt.SetDrop(_input._heldHex, cb.col);
+    //                        else
+    //                            _mm.PlayerDropTile(_input._heldHex, cb.col);
+    //                        return InputStatus.PartiallyHandled;
+    //                    }
+    //                }
+    //            }
+    //        }
+    //        return InputStatus.Unhandled; // fall through to standard context
+    //    }
+    //}
 
 
     private class DebugToolsContext : InputContext {
@@ -468,7 +521,7 @@ public class InputController : MonoBehaviour {
         public override InputStatus OnMouseDown(MonoBehaviour obj, InputStatus status) {
             Hex hex = (Hex)obj;
             //MMLog.Log_InputCont("MyTurn mouse down, hex state="+hex.currentState);
-            if (hex.currentState == Hex.State.Placed) {
+            if (hex.state == Hex.State.Placed) {
                 _input._dragging = true;
                 _input._dragHexPos = Camera.main.WorldToScreenPoint(hex.transform.position);
                 return InputStatus.PartiallyHandled;
@@ -478,7 +531,7 @@ public class InputController : MonoBehaviour {
 
         public override InputStatus OnMouseDrag(MonoBehaviour obj, InputStatus status) {
             Hex hex = (Hex)obj;
-            if (hex.currentState == Hex.State.Placed) {
+            if (hex.state == Hex.State.Placed) {
                 if (!_mm.IsPerformingAction() || _input.PromptedSwap()) // i want to change this check now since there's more uniform game states
                     _input.SwapCheck((TileBehav)hex); // move here?
                 return InputStatus.FullyHandled;
@@ -490,29 +543,36 @@ public class InputController : MonoBehaviour {
             MMLog.Log_InputCont("MyTurn mouse up");
 
             Hex hex = (Hex)obj;
-            if (hex.currentState == Hex.State.Hand) {
+            if (hex.state == Hex.State.Hand) {
                 if (_input._holdingHex) {
                     _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
                     Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
-                    CellBehav cb = _input.GetMouseCell(hits); // get cell underneath
+                    //CellBehav cb = _input.GetMouseCell(hits); // get cell underneath
 
-                    if ((!_mm.IsPerformingAction() || _input.PromptedDrop()) && cb != null) {
-                        if (!_input.DropCheck(hex, cb.col))
-                            return InputStatus.Unhandled;
+                    if (!_mm.IsPerformingAction() || _input.PromptedDrop()) {
+                        CellBehav cb; // get cell 
+                        HandSlot slot;
+                        if ((cb = _input.GetMouseCell(hits)) != null) {
+                            if (!_input.DropCheck(hex, cb.col))
+                                return InputStatus.Unhandled;
 
-                        if (Hex.IsCharm(_input._heldHex.hextag)) {
-                            if (_input.PromptedDrop())
-                                Prompt.SetDrop(_input._heldHex);
-                            else
-                                _mm.PlayerDropCharm((Charm)_input._heldHex);
-                            return InputStatus.PartiallyHandled;
-                        } else {
-                            if (_input.PromptedDrop())
-                                Prompt.SetDrop(_input._heldHex, cb.col);
-                            else
-                                _mm.PlayerDropTile(_input._heldHex, cb.col);
-                            return InputStatus.PartiallyHandled;
+                            if (Hex.IsCharm(_input._heldHex.hextag)) {
+                                if (_input.PromptedDrop())
+                                    Prompt.SetDrop(_input._heldHex);
+                                else
+                                    _mm.PlayerDropCharm((Charm)_input._heldHex);
+                                return InputStatus.PartiallyHandled;
+                            } else {
+                                if (_input.PromptedDrop())
+                                    Prompt.SetDrop(_input._heldHex, cb.col);
+                                else
+                                    _mm.PlayerDropTile(_input._heldHex, cb.col);
+                                return InputStatus.PartiallyHandled;
+                            }
+                        } else if (_input.PromptedDrop() &&
+                            (slot = _input.GetHandSlot(hits)) != null) {
+                            Prompt.SetChooseHand(hex.hextag);
                         }
                     }
                 }
@@ -559,10 +619,13 @@ public class InputController : MonoBehaviour {
             }
 
             Hex hex = (Hex)obj;
-            MMLog.Log_InputCont("Standard mouse ; hex state="+hex.currentState);
+            MMLog.Log_InputCont("Standard mouse ; hex state="+hex.state);
 
-            if (hex.currentState == Hex.State.Hand) {
-                if (_mm.LocalP().Hand.IsHexMine(hex) && allowHandDragging) {
+            //if (hex.state == Hex.State.Hand) {
+                bool hexIsHoldable = 
+                    (hex.state == Hex.State.Hand && _mm.LocalP().Hand.IsHexMine(hex)) || 
+                    hex.state == Hex.State.ModalChoice;
+                if (hexIsHoldable && allowHandDragging) {
                     MMLog.Log_InputCont("Standard mouse down");
 
                     //if (!AbleToInteract(hex))
@@ -577,7 +640,7 @@ public class InputController : MonoBehaviour {
                     EventController.GrabTile(_mm.myID, hex.hextag);
                     return InputStatus.FullyHandled;
                 }
-            }
+            //}
             return InputStatus.Unhandled; // probably can just return fullyhandled unless there's going to be an context layer chained after this one...
         }
 

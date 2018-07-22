@@ -322,17 +322,17 @@ public class SyncManager : PunBehaviour {
     #endregion
 
 
-    public void SendKeepQuickdraw() {
+    public void SendChooseHand(string hextag) {
         if (_mm.IsDebugMode)
             return;
 
         if (_mm.MyTurn()) {
             PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("HandleKeepQuickdraw", PhotonTargets.Others);
+            photonView.RPC("HandleChooseHand", PhotonTargets.Others, hextag);
         }
     }
     [PunRPC]
-    public void HandleKeepQuickdraw() {
-        Prompt.SetQuickdrawHand();
+    public void HandleChooseHand(string hextag) {
+        Prompt.SetChooseHand(hextag);
     }
 }

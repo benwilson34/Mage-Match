@@ -12,6 +12,8 @@ public static class Prompt {
     public enum PromptModifier { None, SwapEmpty };
     public static PromptModifier modifier = PromptModifier.None;
 
+    public enum ModalResult { ChoseHand, ChoseBoard }
+
     private static MageMatch _mm;
     private static int _count = -1;
 
@@ -23,8 +25,9 @@ public static class Prompt {
     private static int _swapC1, _swapR1, _swapC2, _swapR2;
     private static bool _successful = false;
 
-    private static int _quickdrawDropCol;
-    private static bool _quickdrawWentToHand = false;
+    private static int _modalDropCol;
+    private static ModalResult _modalResult;
+    private static string _handHextag;
 
     public static void Init(MageMatch mm) {
         _mm = mm;
@@ -56,6 +59,16 @@ public static class Prompt {
         }
     }
 
+    public enum DropPromptMode { DropFromHand, ModalDrop };
+    //private static DropPromptMode _dropPromptMode;
+
+    public static IEnumerator WaitForModalDrop(List<Hex> modalHexes, string title, string desc) {
+        yield return ModalController.ShowModal(_mm.ActiveID, title, desc);
+        yield return ModalController.AddHexes(modalHexes);
+        yield return WaitForDrop(_mm.ActiveP.Hand.GetAllHexes(), DropPromptMode.ModalDrop);
+        yield return ModalController.HideModal();
+    }
+
     public static IEnumerator WaitForDrop() {
         //_successful = false;
         yield return WaitForDrop(null);
@@ -72,7 +85,7 @@ public static class Prompt {
         yield return WaitForDrop(hexes);
     }
 
-    public static IEnumerator WaitForDrop(List<Hex> ignoredHexes) {
+    public static IEnumerator WaitForDrop(List<Hex> ignoredHexes, DropPromptMode dropPromptMode = DropPromptMode.DropFromHand) {
         MMLog.Log("PROMPT", "blue", "Waiting for DROP...");
         if (_count == -1) {
             MMLog.LogWarning("PROMPT: Waiting for DROP but count wasn't set! Defaulted on 1.");
@@ -84,7 +97,8 @@ public static class Prompt {
         if (ignoredHexes != null)
             ignCount = ignoredHexes.Count;
 
-        if (_mm.ActiveP.Hand.Count == ignCount) {
+        if (dropPromptMode == DropPromptMode.DropFromHand && 
+            _mm.ActiveP.Hand.Count == ignCount) {
             // nothing to drop; prompt whiffs
             MMLog.Log("PROMPT", "blue", ">>>>>> Canceling prompted DROP!!");
             ResetCount();
@@ -137,7 +151,19 @@ public static class Prompt {
 
     public static Hex GetDropHex() { return _dropHex; }
 
+    public static string GetHandHextag() { return _handHextag; }
+
     public static int GetDropCol() { return _dropCol; }
+
+    public static void SetChooseHand(string hextag) {
+        _modalResult = ModalResult.ChoseHand;
+        _handHextag = hextag;
+        _mm.syncManager.SendChooseHand(hextag);
+        currentMode = PromptMode.None;
+        Report.ReportLine("$ PROMPT CHOOSEHAND " + hextag, false);
+    }
+
+    public static ModalResult DropModalResult { get { return _modalResult; } }
 
     public static IEnumerator ContinueDrop() {
         _mm.ActiveP.Hand.Remove(_dropHex);
@@ -148,71 +174,66 @@ public static class Prompt {
 
     #region ---------- QUICKDRAW ----------
 
-    public static IEnumerator WaitForQuickdrawAction(Hex hex) {
-        _successful = false;
+    //public static IEnumerator WaitForQuickdrawAction(Hex hex) {
+    //    _successful = false;
 
-        if (!Hex.IsCharm(hex.hextag) && HexGrid.IsBoardFull()) {
-            // can't be dropped in; quickdraw whiffs
-            yield break;
-        }
-        _count = 1;
-        Player p = _mm.ActiveP;
+    //    if (!Hex.IsCharm(hex.hextag) && HexGrid.IsBoardFull()) {
+    //        // can't be dropped in; quickdraw whiffs
+    //        yield break;
+    //    }
+    //    _count = 1;
+    //    Player p = _mm.ActiveP;
 
-        _mm.uiCont.ToggleQuickdrawUI(true, hex);
+    //    _mm.uiCont.ToggleQuickdrawUI(true, hex);
 
-        _mm.uiCont.ShowLocalAlertText(p.ID, "Choose what to do with the Quickdraw hex!");
-        AudioController.Trigger(SFX.Other.Quickdraw_Prompt);
-        _quickdrawWentToHand = false;
-        currentMode = PromptMode.Drop;
+    //    _mm.uiCont.ShowLocalAlertText(p.ID, "Choose what to do with the Quickdraw hex!");
+    //    AudioController.Trigger(SFX.Other.Quickdraw_Prompt);
+    //    //_quickdrawWentToHand = false;
+    //    currentMode = PromptMode.Drop;
 
-        // ignore every hex except this one
-        var ignoredHexes = new List<Hex>();
-        if (_mm.MyTurn()) {
-            MMLog.Log("PROMPT", "orange", "My quickdraw tile, and my turn. " + hex.hextag);
-            foreach (Hex h in p.Hand.GetAllHexes()) {
-                if (!h.EqualsTag(hex)) {
-                    ignoredHexes.Add(h);
-                    h.Flip();
-                }
-            }
-            MMLog.Log("PROMPT", "orange", ignoredHexes.Count + " restricted tiles in hand.");
+    //    // ignore every hex except this one
+    //    var ignoredHexes = new List<Hex>();
+    //    if (_mm.MyTurn()) {
+    //        MMLog.Log("PROMPT", "orange", "My quickdraw tile, and my turn. " + hex.hextag);
+    //        foreach (Hex h in p.Hand.GetAllHexes()) {
+    //            if (!h.EqualsTag(hex)) {
+    //                ignoredHexes.Add(h);
+    //                h.Flip();
+    //            }
+    //        }
+    //        MMLog.Log("PROMPT", "orange", ignoredHexes.Count + " restricted tiles in hand.");
 
-            //_mm.inputCont.RestrictInteractableHexes(ignoredHexes);
-        }
+    //        //_mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+    //    }
 
-        if (_mm.IsReplayMode)
-            ReplayEngine.GetPrompt();
+    //    if (_mm.IsReplayMode)
+    //        ReplayEngine.GetPrompt();
 
-        // the InputController calls SetDrop for this too
-        //_mm.inputCont.SetAllowHandRearrange(false);
-        yield return new WaitUntil(() => currentMode == PromptMode.None);
-        //_mm.inputCont.SetAllowHandRearrange(true);
+    //    // the InputController calls SetDrop for this too
+    //    //_mm.inputCont.SetAllowHandRearrange(false);
+    //    yield return new WaitUntil(() => currentMode == PromptMode.None);
+    //    //_mm.inputCont.SetAllowHandRearrange(true);
 
-        if (_mm.MyTurn()) {
-            foreach (Hex h in ignoredHexes)
-                h.Flip();
-            //_mm.inputCont.EndRestrictInteractableHexes();
-        }
+    //    if (_mm.MyTurn()) {
+    //        foreach (Hex h in ignoredHexes)
+    //            h.Flip();
+    //        //_mm.inputCont.EndRestrictInteractableHexes();
+    //    }
 
-        if (!_quickdrawWentToHand) { // the player dropped it
-            AudioController.Trigger(SFX.Other.Quickdraw_Drop);
-            p.Hand.Remove(hex);
-            yield return _mm._Drop(hex, _dropCol);
-            yield return _mm._Draw(p.ID);
-        }
+    //    if (!_quickdrawWentToHand) { // the player dropped it
+    //        AudioController.Trigger(SFX.Other.Quickdraw_Drop);
+    //        p.Hand.Remove(hex);
+    //        yield return _mm._Drop(hex, _dropCol);
+    //        yield return _mm._Draw(p.ID);
+    //    }
 
-        _mm.uiCont.ToggleQuickdrawUI(false);
-        _count = -1;
+    //    _mm.uiCont.ToggleQuickdrawUI(false);
+    //    _count = -1;
 
-        yield return null;
-    }
+    //    yield return null;
+    //}
 
-    public static void SetQuickdrawHand() {
-        _quickdrawWentToHand = true;
-        _mm.syncManager.SendKeepQuickdraw();
-        currentMode = PromptMode.None;
-        Report.ReportLine("$ PROMPT KEEP QUICKDRAW", false);
-    }
+    
     #endregion
 
 

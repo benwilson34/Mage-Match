@@ -212,8 +212,10 @@ public static class Report {
 
     public static void SaveFiles(string customName = "") {
         DateTime dt = DateTime.Now;
-        string timestamp = dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
-        timestamp += dt.Hour + "" + dt.Minute + "-" + dt.Second;
+        //string timestamp = dt.Year + "-" + dt.Month + "-" + dt.Day + "_";
+        //timestamp += dt.Hour + "" + dt.Minute + "-" + dt.Second;
+        string timestamp = string.Format("{0}-{1:D2}-{2:D2}_{3:D2}{4:D2}-{5:D2}",
+            dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
 
         string dirPath = Application.persistentDataPath + "/Replays";
         if (!Directory.Exists(dirPath))

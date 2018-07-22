@@ -18,10 +18,11 @@ public class UIController : MonoBehaviour {
     public TooltipManager tooltipMan;
 
     public Newsfeed newsfeed;
+    //public ModalController modal;
     public ResultScreen resultsScreen;
 
     public GameObject alertbar, quickdrawButton, loadingText, loadingScreen;
-    public GameObject gameStartScreen, coinFlip, knockoutScreen, errorButton; 
+    public GameObject gameStartScreen, coinFlip, knockoutScreen, errorButton;
 
     private MageMatch _mm;
     private Transform _leftPinfo, _rightPinfo, _leftPspells, _rightPspells, _board;
@@ -58,6 +59,7 @@ public class UIController : MonoBehaviour {
     public void Init(MageMatch mm){
         loadingScreen.SetActive(true);
         gameStartScreen.SetActive(false);
+        ModalController.Init(mm);
 
         _mm = mm;
         _board = GameObject.Find("cells").transform;
@@ -722,9 +724,9 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    public void KeepQuickdraw() {
-        Prompt.SetQuickdrawHand();
-    }
+    //public void KeepQuickdraw() {
+    //    Prompt.SetChooseHand();
+    //}
 
 
     #region ---------- BUTTONS ----------

@@ -7,9 +7,9 @@ public class Hex : MonoBehaviour, Tooltipable {
 
     public enum Category { BasicTile, Tile, Charm };
 
-	public enum State { Hand, Placed, Removed };
+	public enum State { ModalChoice, Hand, Placed, Removed };
     [HideInInspector]
-	public State currentState;
+	public State state;
     [HideInInspector]
     public int cost = 1;
     [HideInInspector]
@@ -46,10 +46,77 @@ public class Hex : MonoBehaviour, Tooltipable {
 
         if (PlayerId == _mm.ActiveP.ID) { // if this hex was generated on that player's turn
             if (_quickdraw)
-                yield return Prompt.WaitForQuickdrawAction(this);
+                yield return HandleQuickdraw();
             if (_duplicate)
                 yield return _mm._Duplicate(PlayerId, hextag);
         }
+        yield return null;
+    }
+
+    IEnumerator HandleQuickdraw() {
+        if (!IsCharm(hextag) && HexGrid.IsBoardFull()) {
+            // can't be dropped in; quickdraw whiffs
+            yield break;
+        }
+        Player p = _mm.ActiveP;
+
+        //_mm.uiCont.ToggleQuickdrawUI(true, this);
+
+        //_mm.uiCont.ShowLocalAlertText(p.ID, "Choose what to do with the Quickdraw hex!");
+        AudioController.Trigger(SFX.Other.Quickdraw_Prompt);
+        //_quickdrawWentToHand = false;
+        //currentMode = PromptMode.Drop;
+
+        // ignore every hex except this one
+        //var ignoredHexes = new List<Hex>();
+        //if (_mm.MyTurn()) {
+        //    MMDebug.MMLog.Log("PROMPT", "orange", "My quickdraw tile, and my turn. " + hextag);
+        //    foreach (Hex h in p.Hand.GetAllHexes()) {
+        //        if (!h.EqualsTag(hextag)) {
+        //            ignoredHexes.Add(h);
+        //            h.Flip();
+        //        }
+        //    }
+        //    MMDebug.MMLog.Log("PROMPT", "orange", ignoredHexes.Count + " restricted tiles in hand.");
+
+        //    //_mm.inputCont.RestrictInteractableHexes(ignoredHexes);
+        //}
+
+        if (_mm.IsReplayMode)
+            ReplayEngine.GetPrompt();
+
+        // the InputController calls SetDrop for this too
+        //_mm.inputCont.SetAllowHandRearrange(false);
+        //yield return Prompt.WaitForDrop(ignoredHexes);
+        const string title = "Quickdraw";
+        const string desc = "You may drop this hex for free, then you will draw another. Otherwise, drag it into your hand to keep it.";
+
+        yield return Prompt.WaitForModalDrop(new List<Hex>() { this }, title, desc);
+
+        //_mm.inputCont.SetAllowHandRearrange(true);
+
+        //if (_mm.MyTurn()) {
+        //    foreach (Hex h in ignoredHexes)
+        //        h.Flip();
+        //    //_mm.inputCont.EndRestrictInteractableHexes();
+        //}
+
+        var result = Prompt.DropModalResult;
+        if (result == Prompt.ModalResult.ChoseBoard) { // the player dropped it
+            AudioController.Trigger(SFX.Other.Quickdraw_Drop);
+            p.Hand.Remove(this);
+            yield return _mm._Drop(this, Prompt.GetDropCol());
+            yield return _mm._Draw(p.ID);
+        } 
+        //else { // send to hand
+        //    //_quickdrawWentToHand = true;
+        //    _mm.syncManager.SendChooseHand();
+        //    //currentMode = PromptMode.None;
+        //    Report.ReportLine("$ PROMPT KEEP QUICKDRAW", false);
+        //}
+
+        //_mm.uiCont.ToggleQuickdrawUI(false);
+
         yield return null;
     }
 

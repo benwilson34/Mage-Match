@@ -260,9 +260,9 @@ public static class ReplayEngine {
         } else if (tokens[2] == "SWAP") {
             int[] coordA = ParseCoord(tokens[3]), coordB = ParseCoord(tokens[4]);
             Prompt.SetSwaps(coordA[0], coordA[1], coordB[0], coordB[1]);
-        } else {  // KEEP QUICKDRAW
+        } else {  // CHOOSEHAND
             Debug.LogWarning("REPLAY: Keeping Quickdraw.");
-            Prompt.SetQuickdrawHand();
+            Prompt.SetChooseHand(tokens[3]);
         }
         //_linePointer++;
     }

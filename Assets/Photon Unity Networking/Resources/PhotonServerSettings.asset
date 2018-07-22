@@ -86,4 +86,5 @@ MonoBehaviour:
   - ConfirmAllSettingsSynced
   - SetPlayerInfo
   - SetPlayerLoadout
+  - HandleChooseHand
   DisableAutoOpenWizard: 1

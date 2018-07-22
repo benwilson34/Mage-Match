@@ -467,10 +467,10 @@ public class MageMatch : MonoBehaviour {
 
                 yield return EventController.HandChange(MMEvent.Moment.Begin, id, hex.hextag, state);
 
+                yield return hex.OnDraw(); // Quickdraw prompting/other effects?
+
                 p.Hand.Add(hex);
                 // I feel like the draw anim should go here
-
-                yield return hex.OnDraw(); // Quickdraw prompting/other effects?
 
                 yield return EventController.HandChange(MMEvent.Moment.End, id, hex.hextag, state);
             }
@@ -785,6 +785,20 @@ public class MageMatch : MonoBehaviour {
             TileGFX.SetGlowingTiles(tbs, TileGFX.GFXState.PrereqGlowing);
         } else {
             TileGFX.ClearGlowingTiles();
+        }
+    }
+
+    private bool _modalShowing = false;
+    private int _modalId = 1;
+
+    public void DEBUG_ShowModal() {
+        _modalShowing = !_modalShowing;
+        if (_modalShowing) {
+            Debug.LogWarning("Showing modal");
+            StartCoroutine(ModalController.ShowModal(_modalId, "Some Modal!!", "Things will happen here."));
+        } else {
+            _modalId = OpponentId(_modalId);
+            StartCoroutine(ModalController.HideModal());
         }
     }
 }

@@ -22,7 +22,7 @@ public class TileBehav : Hex {
         base.Init(mm);
         //_tileEffect = new List<TileEffect>();
         tile = new Tile(initElements);
-        currentState = State.Hand;
+        state = State.Hand;
     }
 
 
@@ -70,7 +70,7 @@ public class TileBehav : Hex {
 	}
 
 	public void SetPlaced(){
-		currentState = State.Placed;
+		state = State.Placed;
 	}
 
 	public void SetOutOfPosition(){
