@@ -543,7 +543,7 @@ public class InputController : MonoBehaviour {
             MMLog.Log_InputCont("MyTurn mouse up");
 
             Hex hex = (Hex)obj;
-            if (hex.state == Hex.State.Hand) {
+            if (hex.state == Hex.State.Hand || hex.state == Hex.State.ModalChoice) { //?
                 if (_input._holdingHex) {
                     _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
                     Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -554,6 +554,7 @@ public class InputController : MonoBehaviour {
                         CellBehav cb; // get cell 
                         HandSlot slot;
                         if ((cb = _input.GetMouseCell(hits)) != null) {
+                            Debug.LogWarning("MouseUp with Cell under");
                             if (!_input.DropCheck(hex, cb.col))
                                 return InputStatus.Unhandled;
 
@@ -572,7 +573,11 @@ public class InputController : MonoBehaviour {
                             }
                         } else if (_input.PromptedDrop() &&
                             (slot = _input.GetHandSlot(hits)) != null) {
+                            Debug.LogWarning("MouseUp with Handslot under");
                             Prompt.SetChooseHand(hex.hextag);
+                            return InputStatus.PartiallyHandled;
+                        } else {
+                            Debug.LogWarning("MouseUp with nothing...");
                         }
                     }
                 }
@@ -685,13 +690,19 @@ public class InputController : MonoBehaviour {
 
             MMLog.Log_InputCont("Standard mouse up");
 
-            //if (hex.currentState == Hex.State.Hand) {
             if (_input._holdingHex) {
-                _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
-                if(status == InputStatus.Unhandled)
-                    _mm.LocalP().Hand.ReleaseTile(_input._heldHex); //?
-                else
-                    _mm.LocalP().Hand.ClearPlaceholder();
+                if (_input._heldHex.state == Hex.State.Hand) {
+                    _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
+                    if (status == InputStatus.Unhandled)
+                        _mm.LocalP().Hand.ReleaseTile(_input._heldHex); //?
+                    else
+                        _mm.LocalP().Hand.ClearPlaceholder();
+                } else if (_input._heldHex.state == Hex.State.ModalChoice) {
+                    if (status == InputStatus.Unhandled)
+                        ModalController.ReturnModalChoice(_input._heldHex); //?
+                    //else
+                    //    _mm.LocalP().Hand.ClearPlaceholder();
+                }
 
                 _input._holdingHex = false;
                 return InputStatus.FullyHandled;

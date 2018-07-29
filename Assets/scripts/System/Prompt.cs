@@ -12,7 +12,8 @@ public static class Prompt {
     public enum PromptModifier { None, SwapEmpty };
     public static PromptModifier modifier = PromptModifier.None;
 
-    public enum ModalResult { ChoseHand, ChoseBoard }
+    public enum ModalOption { OnlyHand, OnlyBoard, HandOrBoard };
+    public enum ModalResult { ChoseHand, ChoseBoard };
 
     private static MageMatch _mm;
     private static int _count = -1;
@@ -25,9 +26,10 @@ public static class Prompt {
     private static int _swapC1, _swapR1, _swapC2, _swapR2;
     private static bool _successful = false;
 
+    private static ModalOption _optionMode;
     private static int _modalDropCol;
-    private static ModalResult _modalResult;
     private static string _handHextag;
+    private static ModalResult _modalResult;
 
     public static void Init(MageMatch mm) {
         _mm = mm;
@@ -62,11 +64,14 @@ public static class Prompt {
     public enum DropPromptMode { DropFromHand, ModalDrop };
     //private static DropPromptMode _dropPromptMode;
 
-    public static IEnumerator WaitForModalDrop(List<Hex> modalHexes, string title, string desc) {
+    public static IEnumerator WaitForModalDrop(List<Hex> modalHexes, string title, string desc, ModalOption optionMode = ModalOption.HandOrBoard) {
+        _optionMode = optionMode;
+        _mm.inputCont.SetAllowHandRearrange(false);
         yield return ModalController.ShowModal(_mm.ActiveID, title, desc);
         yield return ModalController.AddHexes(modalHexes);
         yield return WaitForDrop(_mm.ActiveP.Hand.GetAllHexes(), DropPromptMode.ModalDrop);
         yield return ModalController.HideModal();
+        _mm.inputCont.SetAllowHandRearrange(true);
     }
 
     public static IEnumerator WaitForDrop() {
@@ -145,6 +150,7 @@ public static class Prompt {
         _dropCol = col;
 
         currentMode = PromptMode.None;
+        _modalResult = ModalResult.ChoseBoard;
         _count--;
         _successful = true;
     }
@@ -160,6 +166,9 @@ public static class Prompt {
         _handHextag = hextag;
         _mm.syncManager.SendChooseHand(hextag);
         currentMode = PromptMode.None;
+        _successful = true;
+        _count--;
+
         Report.ReportLine("$ PROMPT CHOOSEHAND " + hextag, false);
     }
 

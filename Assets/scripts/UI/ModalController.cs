@@ -12,6 +12,7 @@ public class ModalController : MonoBehaviour {
     private static MageMatch _mm;
     private static GameObject _modal;
     private static Transform _slotLayout;
+    private static List<Hex> _hexes;
     private static List<Transform> _slots;
 
     private static GameObject _modalSlotPF;
@@ -71,6 +72,7 @@ public class ModalController : MonoBehaviour {
     }
 
     public static IEnumerator AddHexes(List<Hex> hexes) {
+        _hexes = new List<Hex>(hexes);
         FillSlotListToCount(hexes.Count);
         yield return new WaitForEndOfFrame(); // needed to redraw layout
 
@@ -84,7 +86,7 @@ public class ModalController : MonoBehaviour {
     }
 
 
-    public static void FillSlotListToCount(int count) {
+    static void FillSlotListToCount(int count) {
     //public static Transform GetSlot(int i) {
         while (_slots.Count < count) {
             var slot = Instantiate(_modalSlotPF, _slotLayout);
@@ -92,6 +94,30 @@ public class ModalController : MonoBehaviour {
         }
         //return _slots[i];
     }
+
+
+    public static void ReturnModalChoice(Hex hex) {
+        int index = -1;
+        for (int i = 0; i < _hexes.Count; i++) {
+            //Debug.LogWarning(_hexes[i].hextag);
+            if (_hexes[i].EqualsTag(hex)) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1)
+            Debug.LogError("ModalController: Something is very wrong. Couldn't find hex");
+
+        AnimationController.PlayAnim(
+            AnimationController._Move(hex, _slots[index].position));
+        //_mm.StartCoroutine(_ReturnModalChoice(hex));
+    }
+
+    //static IEnumerator _ReturnModalChoice(Hex hex) {
+        
+    //    yield return null;
+    //}
 
     public static IEnumerator HideModal() {
         // TODO animate

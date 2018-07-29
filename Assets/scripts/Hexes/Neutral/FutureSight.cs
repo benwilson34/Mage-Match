@@ -34,7 +34,6 @@ public class FutureSight : Charm {
             var hex = hexes[i];
             if (hex.EqualsTag(hextag)) {
                 chosenHex = hex;
-                break;
             } else {
                 yield return AnimationController._DiscardTile(hex.transform);
                 GameObject.Destroy(hex.gameObject); //should maybe go thru TileMan
