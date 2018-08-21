@@ -542,47 +542,61 @@ public class InputController : MonoBehaviour {
         public override InputStatus OnMouseUp(MonoBehaviour obj, InputStatus status) {
             MMLog.Log_InputCont("MyTurn mouse up");
 
-            Hex hex = (Hex)obj;
-            if (hex.state == Hex.State.Hand || hex.state == Hex.State.ModalChoice) { //?
-                if (_input._holdingHex) {
-                    _input._heldHex.GetComponent<SpriteRenderer>().sortingOrder = 0;
-                    Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
-                    //CellBehav cb = _input.GetMouseCell(hits); // get cell underneath
+            //Hex hex = (Hex)obj;
+            //if (hex.state == Hex.State.Hand || hex.state == Hex.State.ModalChoice) { //?
+            if (!_input._holdingHex)
+                return InputStatus.Unhandled;
 
-                    if (!_mm.IsPerformingAction() || _input.PromptedDrop()) {
-                        CellBehav cb; // get cell 
-                        HandSlot slot;
-                        if ((cb = _input.GetMouseCell(hits)) != null) {
-                            Debug.LogWarning("MouseUp with Cell under");
-                            if (!_input.DropCheck(hex, cb.col))
-                                return InputStatus.Unhandled;
+            Hex hex = _input._heldHex;
+            hex.GetComponent<SpriteRenderer>().sortingOrder = 0;
+            Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D[] hits = Physics2D.LinecastAll(mouse, mouse);
 
-                            if (Hex.IsCharm(_input._heldHex.hextag)) {
-                                if (_input.PromptedDrop())
-                                    Prompt.SetDrop(_input._heldHex);
-                                else
-                                    _mm.PlayerDropCharm((Charm)_input._heldHex);
-                                return InputStatus.PartiallyHandled;
-                            } else {
-                                if (_input.PromptedDrop())
-                                    Prompt.SetDrop(_input._heldHex, cb.col);
-                                else
-                                    _mm.PlayerDropTile(_input._heldHex, cb.col);
-                                return InputStatus.PartiallyHandled;
-                            }
-                        } else if (_input.PromptedDrop() &&
-                            (slot = _input.GetHandSlot(hits)) != null) {
-                            Debug.LogWarning("MouseUp with Handslot under");
-                            Prompt.SetChooseHand(hex.hextag);
-                            return InputStatus.PartiallyHandled;
-                        } else {
-                            Debug.LogWarning("MouseUp with nothing...");
-                        }
-                    }
+            if (_input.PromptedDrop())
+                return HandlePromptDrop(hits);
+
+            if (_mm.IsPerformingAction())
+                return InputStatus.Unhandled;
+                
+            CellBehav cb; // get cell 
+            if ((cb = _input.GetMouseCell(hits)) != null) {
+                Debug.LogWarning("MouseUp with Cell under");
+                if (Hex.IsCharm(hex.hextag)) {
+                    _mm.PlayerDropCharm((Charm)hex);
+                    return InputStatus.PartiallyHandled;
+                } else if (_input.DropCheck(hex, cb.col)) {
+                    _mm.PlayerDropTile(hex, cb.col);
+                    return InputStatus.PartiallyHandled;
                 }
+            } else {
+                Debug.LogWarning("MouseUp with nothing...");
             }
+            //}
+
             return InputStatus.Unhandled; // fall through to standard context
+        }
+
+        private InputStatus HandlePromptDrop(RaycastHit2D[] hits) {
+            Hex hex = _input._heldHex;
+            CellBehav cb;
+            HandSlot slot;
+            if ((cb = _input.GetMouseCell(hits)) != null) {
+                // drop onto board
+                int col = -1;
+                if (hex is TileBehav) {
+                    if (_input.DropCheck(hex, cb.col))
+                        col = cb.col;
+                    else
+                        return InputStatus.Unhandled;
+                }
+                return Prompt.SetDrop(hex, col) ? InputStatus.PartiallyHandled : InputStatus.Unhandled;
+            } else if ((slot = _input.GetHandSlot(hits)) != null) {
+                // drop into hand
+                return Prompt.SetChooseHand(hex.hextag) ? 
+                    InputStatus.PartiallyHandled : InputStatus.Unhandled;
+            }
+
+            return InputStatus.Unhandled;
         }
     }
 

@@ -140,9 +140,9 @@ public static class Prompt {
         //}
     }
 
-    public static void SetDrop(Hex hex, int col = -1) {
+    public static bool SetDrop(Hex hex, int col = -1) {
         if (_dropPromptMode == DropPromptMode.ModalDrop && _optionMode == ModalOption.OnlyHand)
-            return;
+            return false;
 
         MMLog.Log("PROMPT", "blue", "DROP is " + hex.hextag);
         _mm.syncManager.SendDropSelection(hex, col);
@@ -157,6 +157,7 @@ public static class Prompt {
         _modalResult = ModalResult.ChoseBoard;
         _count--;
         _successful = true;
+        return true;
     }
 
     public static Hex GetDropHex() { return _dropHex; }
@@ -165,9 +166,9 @@ public static class Prompt {
 
     public static int GetDropCol() { return _dropCol; }
 
-    public static void SetChooseHand(string hextag) {
+    public static bool SetChooseHand(string hextag) {
         if (_optionMode == ModalOption.OnlyBoard)
-            return;
+            return false;
 
         _modalResult = ModalResult.ChoseHand;
         _handHextag = hextag;
@@ -177,6 +178,7 @@ public static class Prompt {
         _count--;
 
         Report.ReportLine("$ PROMPT CHOOSEHAND " + hextag, false);
+        return true;
     }
 
     public static ModalResult DropModalResult { get { return _modalResult; } }
