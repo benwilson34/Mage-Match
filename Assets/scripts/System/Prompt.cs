@@ -62,7 +62,7 @@ public static class Prompt {
     }
 
     public enum DropPromptMode { DropFromHand, ModalDrop };
-    //private static DropPromptMode _dropPromptMode;
+    private static DropPromptMode _dropPromptMode;
 
     public static IEnumerator WaitForModalDrop(List<Hex> modalHexes, string title, string desc, ModalOption optionMode = ModalOption.HandOrBoard) {
         _optionMode = optionMode;
@@ -102,6 +102,7 @@ public static class Prompt {
         if (ignoredHexes != null)
             ignCount = ignoredHexes.Count;
 
+        _dropPromptMode = dropPromptMode;
         if (dropPromptMode == DropPromptMode.DropFromHand && 
             _mm.ActiveP.Hand.Count == ignCount) {
             // nothing to drop; prompt whiffs
@@ -140,6 +141,9 @@ public static class Prompt {
     }
 
     public static void SetDrop(Hex hex, int col = -1) {
+        if (_dropPromptMode == DropPromptMode.ModalDrop && _optionMode == ModalOption.OnlyHand)
+            return;
+
         MMLog.Log("PROMPT", "blue", "DROP is " + hex.hextag);
         _mm.syncManager.SendDropSelection(hex, col);
 
@@ -162,6 +166,9 @@ public static class Prompt {
     public static int GetDropCol() { return _dropCol; }
 
     public static void SetChooseHand(string hextag) {
+        if (_optionMode == ModalOption.OnlyBoard)
+            return;
+
         _modalResult = ModalResult.ChoseHand;
         _handHextag = hextag;
         _mm.syncManager.SendChooseHand(hextag);

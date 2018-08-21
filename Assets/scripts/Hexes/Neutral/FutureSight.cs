@@ -21,7 +21,7 @@ public class FutureSight : Charm {
 
         const string title = "Future Sight";
         const string desc = "Drag one hex to your hand; the other two will be discarded";
-        yield return Prompt.WaitForModalDrop(hexes, title, desc);
+        yield return Prompt.WaitForModalDrop(hexes, title, desc, Prompt.ModalOption.OnlyHand);
         if (!Prompt.WasSuccessful || 
             Prompt.DropModalResult != Prompt.ModalResult.ChoseHand) {
             Debug.LogError("FutureSight: Prompt wasn't successful. Something is very wrong");
